@@ -1,0 +1,45 @@
+# Build artifacts
+dist/
+build/
+*.exe
+*.spec
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+
+# Vendor (third-party libs bundled locally)
+vendor/
+
+# Temp uploads & runtime files
+temp_uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Scratch files
+scratch/
+
+# Environment
+.env
+.env.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.suo
+*.user
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Sample data
+sample_pdf_text.txt
