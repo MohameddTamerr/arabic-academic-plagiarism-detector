@@ -1,0 +1,4 @@
+# متطلبات التعرف الضوئي على الحروف (اختياري - Conditional Offline OCR)
+# يتطلب وجود برنامج Tesseract-OCR مثبت مسبقاً على نظام ويندوز مع حزمة اللغة العربية (ara.traineddata)
+pytesseract>=0.3.10
+pillow>=10.0.0

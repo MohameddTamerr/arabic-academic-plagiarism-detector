@@ -1,0 +1,5 @@
+# متطلبات التشابه الدلالي المحلي (اختياري - CPU-Friendly Offline Embeddings)
+# تُثبَّت فقط في حال رغبة المؤسسة بتفعيل نمط الكشف الدلالي BALANCED / ADVANCED
+fastembed>=0.2.0
+onnxruntime>=1.16.0
+tokenizers>=0.14.0

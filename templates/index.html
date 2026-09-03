@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام كشف الاستلال العلمي والاستشهادات</title>
-    <!-- Cairo Font Family -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Institutional Offline System Font Stack (100% Offline) -->
     
     <style>
         :root {
@@ -15,11 +12,12 @@
             --primary-dark: #0a1c3d;
             --primary-hover: #163a7a;
             --active-item: #133366;
-            --bg-main: #f4f6fb;
+            --bg-main: #f8fafc;
             --card-bg: #ffffff;
-            --text-dark: #1e293b;
+            --text-dark: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --border-subtle: #f1f5f9;
             --red-copy: #ef4444;
             --red-bg: #fee2e2;
             --orange-para: #f97316;
@@ -34,7 +32,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Cairo', 'Segoe UI', Tahoma, sans-serif !important;
+            font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Traditional Arabic', sans-serif !important;
             user-select: none !important;
             -webkit-user-select: none !important;
             -moz-user-select: none !important;
@@ -431,29 +429,13 @@
             transform: scale(0.97);
         }
 
-        /* ─── Main Content Area ─────────────────────────────────────── */
+        /* ─── Main Content Area (Clean Institutional Canvas) ────────── */
         .main-content {
             flex: 1;
-            padding: 28px;
+            padding: 28px 32px;
             overflow-y: auto;
             position: relative;
-        }
-
-        .main-content::before {
-            content: '';
-            position: fixed;
-            top: 50%;
-            left: calc(50% - 130px);
-            transform: translate(-50%, -50%);
-            width: 560px;
-            height: 560px;
-            background-image: url('/static/logo.png');
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: contain;
-            opacity: 0.035;
-            pointer-events: none;
-            z-index: 0;
+            background-color: var(--bg-main);
         }
 
         .view-section {
@@ -462,29 +444,111 @@
 
         .view-section.active {
             display: block;
-            animation: fadeIn 0.25s ease;
+            animation: fadeIn 0.2s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
+            from { opacity: 0; transform: translateY(3px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Standard Page Header System ───────────────────────────── */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding-bottom: 4px;
+        }
+
+        .page-header-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            line-height: 1.3;
+            letter-spacing: -0.2px;
+        }
+
+        .page-subtitle {
+            font-size: 13.5px;
+            color: var(--text-muted);
+            font-weight: 500;
+            line-height: 1.5;
+        }
+
+        .page-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* ─── Institutional Empty State Component ───────────────────── */
+        .empty-state-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 42px 20px;
+            text-align: center;
+        }
+
+        .empty-state-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .empty-state-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: #64748b;
+        }
+
+        .empty-state-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: 5px;
+        }
+
+        .empty-state-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            max-width: 420px;
+            line-height: 1.6;
+            margin: 0 auto;
         }
 
         /* ─── Cards & Tables Shared Styles ──────────────────────────── */
         .card {
             background: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 1px solid var(--border-color);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03);
         }
 
         .section-title {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
             color: var(--primary-navy);
-            margin-bottom: 18px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -492,59 +556,83 @@
 
         .btn-primary {
             background-color: var(--primary-navy);
-            color: white;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
+            color: #ffffff;
+            border: 1px solid var(--primary-navy);
+            padding: 9px 20px;
+            border-radius: 7px;
+            font-size: 13.5px;
+            font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: background 0.2s;
+            gap: 7px;
+            transition: all 0.18s ease;
         }
 
         .btn-primary:hover {
             background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
         }
 
         .btn-success {
             background-color: #059669;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: background 0.2s;
-        }
-
-        .btn-success:hover {
-            background-color: #047857;
-        }
-
-        .btn-secondary {
-            background-color: #f1f5f9;
-            color: var(--text-dark);
-            border: 1px solid var(--border-color);
+            color: #ffffff;
+            border: 1px solid #059669;
             padding: 9px 18px;
-            border-radius: 8px;
-            font-size: 14px;
+            border-radius: 7px;
+            font-size: 13.5px;
             font-weight: 600;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
+            transition: all 0.18s ease;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+            border-color: #047857;
+        }
+
+        .btn-secondary {
+            background-color: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 7px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s ease;
         }
 
         .btn-secondary:hover {
-            background-color: #e2e8f0;
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            color: var(--primary-navy);
+        }
+
+        .btn-danger {
+            background-color: #dc2626;
+            color: #ffffff;
+            border: 1px solid #dc2626;
+            padding: 8px 16px;
+            border-radius: 7px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.18s ease;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+            border-color: #b91c1c;
         }
 
         /* ─── Alert Banners ──────────────────────────────────────────── */
@@ -595,22 +683,25 @@
 
         .custom-table th {
             background-color: #f8fafc;
-            color: var(--text-muted);
-            font-size: 13px;
+            color: #475569;
+            font-size: 12.5px;
             font-weight: 700;
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
+            padding: 12px 14px;
+            border-bottom: 1.5px solid #cbd5e1;
+            white-space: nowrap;
         }
 
         .custom-table td {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--border-color);
-            font-size: 14px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 13.5px;
+            color: var(--text-dark);
             unicode-bidi: plaintext;
             direction: auto;
+            vertical-align: middle;
         }
 
-        .custom-table tr:hover {
+        .custom-table tbody tr:hover {
             background-color: #f8fafc;
         }
 
@@ -1586,10 +1677,10 @@
 
             <!-- ================= VIEW 1: DASHBOARD ================= -->
             <section id="view-dashboard" class="view-section active">
-                <div class="hero-welcome" style="margin-bottom: 20px;">
-                    <div>
-                        <h2>لوحة المعلومات والإحصائيات العامة</h2>
-                        <p>نظام كشف الاستلال العلمي والاستشهادات — كلية الدراسات العليا بأكاديمية الشرطة</p>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">الرئيسية</h1>
+                        <p class="page-subtitle">نظرة عامة على عمليات الفحص والأبحاث</p>
                     </div>
                 </div>
 
@@ -1753,41 +1844,105 @@
             </section>
 
             <!-- ================= VIEW 2: UPLOAD (MULTI-PDF) ================= -->
+            <!-- ================= VIEW 2: UPLOAD (MULTI-PDF / THESIS / BATCH) ================= -->
             <section id="view-upload" class="view-section">
-                <h2 style="font-size: 20px; font-weight:700; margin-bottom: 20px; color: var(--primary-navy);">رفع أبحاث جديدة (يمكنك اختيار أكثر من ملف PDF في نفس الوقت)</h2>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">فحص أبحاث جديدة</h1>
+                        <p class="page-subtitle">يمكن رفع عدة أبحاث مستقلة أو تجميع ملفات رسالة واحدة للفحص الأكاديمي الشامل.</p>
+                    </div>
+                </div>
                 
                 <div class="card">
+                    <!-- Default Upload Header with Secondary Thesis Action -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <span id="upload-main-heading" style="font-size: 14px; font-weight: 700; color: var(--primary-navy);">رفع المستندات والأبحاث للفحص الأكاديمي</span>
+                        </div>
+                        <!-- Secondary Optional Action for Multi-file Thesis -->
+                        <div>
+                            <button type="button" id="toggle-thesis-mode-btn" class="btn-secondary" onclick="toggleThesisMode()" style="padding: 6px 12px; font-size: 12px; border-radius: 6px; display: flex; align-items: center; gap: 6px;">
+                                <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg>
+                                <span id="toggle-thesis-mode-text">تجميع عدة ملفات كرسالة واحدة</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <input type="file" id="file-input" style="display: none;" onchange="handleFileSelect(event)" accept=".pdf,.docx,.doc,.txt" multiple>
                     
                     <div class="upload-dropzone" id="dropzone-area" onclick="document.getElementById('file-input').click()">
                         <div style="margin-bottom: 12px;">
                             <svg class="nav-icon-svg" style="width:48px; height:48px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line></svg>
                         </div>
-                        <h3 style="font-size: 18px; color: var(--primary-navy); margin-bottom: 6px;">اسحب ملفات PDF هنا أو انقر لاختيار عدة ملفات معاً</h3>
-                        <p style="color: var(--text-muted); font-size: 13px;">يدعم رفع أكثر من ملف PDF / Word بوقت واحد مع شريط تقدم منفصل لكل ملف</p>
+                        <h3 id="dropzone-title" style="font-size: 17px; color: var(--primary-navy); margin-bottom: 6px;">اسحب ملفات الأبحاث هنا أو انقر لاختيار ملف أو عدة ملفات</h3>
+                        <p id="dropzone-subtitle" style="color: var(--text-muted); font-size: 12.5px;">يدعم رفع بحث واحد أو عدة أبحاث بصيغ PDF / Word / TXT (يُفحص كل ملف كبحث مستقل تلقائياً)</p>
                     </div>
 
-                    <!-- Batch Files List Container -->
-                    <div id="batch-files-list" style="display: none; margin-bottom: 20px;">
-                        <h4 style="font-size: 15px; font-weight: 700; color: var(--primary-navy); margin-bottom: 12px;">الملفات المختارة (يرجى التأكد من عنوان كل بحث واسم الباحث):</h4>
-                        <div id="batch-items-container" style="display: flex; flex-direction: column; gap: 14px;">
-                            <!-- Dynamic File Cards with mandatory Inputs & Progress Bars -->
+                    <!-- ─── THESIS METADATA (Asked ONLY ONCE in Thesis Mode) ─── -->
+                    <div id="thesis-metadata-container" style="display: none; margin-top: 20px; padding: 16px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-navy); margin-bottom: 12px;">بيانات الرسالة / البحث الموحد:</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div>
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">عنوان البحث / الرسالة <span style="color:#dc2626;">*</span>:</label>
+                                <input type="text" id="thesis-title" placeholder="أدخل عنوان الرسالة أو الأطروحة..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">اسم الباحث <span style="color:#dc2626;">*</span>:</label>
+                                <input type="text" id="thesis-author" placeholder="أدخل اسم الباحث..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div>
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">التخصص:</label>
+                                <input type="text" id="thesis-spec" placeholder="مثال: العلوم الجنائية، القانون العام..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">الدرجة / النوع:</label>
+                                <select id="thesis-degree" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; background: white;">
+                                    <option value="ماجستير">رسالة ماجستير</option>
+                                    <option value="دكتوراه">أطروحة دكتوراه</option>
+                                    <option value="دبلوم">بحث دبلوم</option>
+                                    <option value="ترقية">بحث ترقية علمية</option>
+                                    <option value="عام">بحث عام</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
-                    <div style="margin-top: 20px;">
+                    <!-- ─── THESIS ORDERED FILES LIST (with Up/Down/Delete) ─── -->
+                    <div id="thesis-files-list" style="display: none; margin-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-navy);">ملفات الرسالة المرتبة (أبواب / فصول / ملاحق):</h4>
+                            <span style="font-size: 12px; color: var(--text-muted);">استخدم أزرار ▲ و ▼ لضبط ترتيب الأبواب</span>
+                        </div>
+                        <div id="thesis-items-container" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Dynamic Ordered Files with Up/Down/Delete controls -->
+                        </div>
+                    </div>
+
+                    <!-- ─── BATCH INDEPENDENT FILES LIST ─── -->
+                    <div id="batch-files-list" style="display: none; margin-top: 20px;">
+                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-navy); margin-bottom: 12px;">الأبحاث المختارة (تأكد من عنوان كل بحث واسم الباحث):</h4>
+                        <div id="batch-items-container" style="display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Dynamic File Cards with Title/Author/Delete -->
+                        </div>
+                    </div>
+
+                    <!-- Single Raw Text Input (Preserved for quick single text) -->
+                    <div id="raw-text-container" style="margin-top: 20px;">
                         <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text-muted);">أو ادخل نص البحث مباشرة (للفحص الفردي السريع):</h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
                             <input type="text" id="raw-single-title" placeholder="عنوان البحث (مطلوب عند الفحص النصي)" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;">
                             <input type="text" id="raw-single-author" placeholder="اسم الباحث / صاحب البحث" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;">
                         </div>
-                        <textarea id="raw-text-input" rows="5" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;" placeholder="الصق نص البحث هنا..."></textarea>
+                        <textarea id="raw-text-input" rows="4" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;" placeholder="الصق نص البحث هنا..."></textarea>
                     </div>
 
+                    <!-- Submit Button -->
                     <div style="margin-top: 20px; text-align: left;">
-                        <button class="btn-primary" onclick="startAnalysis()">
+                        <button class="btn-primary" id="btn-start-analysis" onclick="startAnalysis()">
                             <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            <span>بدء فحص جميع الملفات المختارة</span>
+                            <span id="btn-start-analysis-text">بدء فحص جميع الملفات المختارة</span>
                         </button>
                     </div>
                 </div>
@@ -1795,20 +1950,20 @@
 
             <!-- ================= VIEW INITIAL REVIEW: PENDING ADMIN REVIEW QUEUE ================= -->
             <section id="view-initial-review" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <h2 style="font-size: 20px; font-weight:700; color: var(--primary-navy); display: flex; align-items: center; gap: 10px;">
-                            <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy); display:inline-block; vertical-align:middle; margin-left:6px;" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg><span>طابور الفحص الأولي (الأبحاث المحولة من الموظفين)</span>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h1 class="page-title">طابور الفحص الأولي</h1>
                             <span class="badge-notif-circle zero" id="section-pending-badge">0</span>
-                        </h2>
-                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-                            الأبحاث التي قام الموظفون بفحصها ورأوا أنها مناسبة وأرسلوها لك لمراجعة النص ونسبة الاستلال واتخاذ قرار (القبول المبدئي) أو (الرفض).
-                        </p>
+                        </div>
+                        <p class="page-subtitle">مراجعة الأبحاث المحولة من موظفي الفحص واتخاذ قرار القبول المبدئي أو الرفض.</p>
                     </div>
-                    <button class="btn-secondary" onclick="loadInitialReviewsQueue()">
-                        <svg class="nav-icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span>تحديث الطابور</span>
-                    </button>
+                    <div class="page-header-actions">
+                        <button class="btn-secondary" onclick="loadInitialReviewsQueue()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>تحديث الطابور</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -1869,20 +2024,17 @@
 
             <!-- ================= VIEW PRELIMINARY: ACCEPTED PRELIMINARY PAPERS ================= -->
             <section id="view-preliminary" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <h2 style="font-size: 20px; font-weight:700; color: #0284c7; display: flex; align-items: center; gap: 10px;">
-                            <svg class="nav-icon-svg" style="width:20px; height:20px; stroke:#0284c7;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>الأبحاث المقبولة مبدئياً</span>
-                        </h2>
-                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
-                            الأبحاث التي تمت مراجعتها وقبولها مبدئياً وبانتظار رفع النسخة المحدثة أو اتخاذ قرار القبول النهائي أو الرفض.
-                        </p>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">الأبحاث المقبولة مبدئياً</h1>
+                        <p class="page-subtitle">سجل الأبحاث المعتمدة مبدئياً بانتظار استلام النسخة المحدثة أو الاعتماد النهائي.</p>
                     </div>
-                    <button class="btn-secondary" onclick="loadPreliminaryPapers()">
-                        <svg class="nav-icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span>تحديث القائمة</span>
-                    </button>
+                    <div class="page-header-actions">
+                        <button class="btn-secondary" onclick="loadPreliminaryPapers()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>تحديث القائمة</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -1942,15 +2094,17 @@
 
             <!-- ================= VIEW REJECTED: DECLINED RESEARCH & RESEARCHERS ================= -->
             <section id="view-rejected" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <div>
-                        <h2 style="font-size: 20px; font-weight:700; color: #dc2626;">سجل الأبحاث والباحثين المرفوضين</h2>
-                        <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">قائمة بكل الأبحاث والباحثين الصادر في حقهم قرار الرفض مع النسبة والتاريخ وإمكانية الإلغاء أو الحذف.</p>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title" style="color: #dc2626;">سجل الأبحاث المرفوضة</h1>
+                        <p class="page-subtitle">قائمة الأبحاث الصادر بحقها قرار الرفض لعدم مطابقتها لمعايير الأمانة العلمية.</p>
                     </div>
-                    <button class="btn-secondary" onclick="loadRejectedPapers()">
-                        <svg class="nav-icon-svg" style="width:16px; height:16px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                        <span>تحديث القائمة</span>
-                    </button>
+                    <div class="page-header-actions">
+                        <button class="btn-secondary" onclick="loadRejectedPapers()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>تحديث القائمة</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -2012,166 +2166,232 @@
 
             <!-- ================= VIEW 3: ANALYSIS REPORT ================= -->
             <section id="view-reports" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 20px; font-weight:700; color: var(--primary-navy);">تقرير التحليل الشامل</h2>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">تقرير الاستلال العلمي والأمانة الأكاديمية</h1>
+                        <p class="page-subtitle">نتائج التحليل الأكاديمي، ونسب التشابه، وشواهد النصوص، وعزو الصفحات المصدرية.</p>
+                    </div>
                     
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                    <div class="page-header-actions">
                         <!-- زر الموظف لإرسال البحث للمدير -->
-                        <button class="btn-primary" id="btn-employee-submit" onclick="openSubmitAdminModal()" style="background-color: #0284c7; display: none;">
-                            <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:white; display:inline-block; vertical-align:middle; margin-left:4px;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                            <span>إرسال للمدير للاعتماد (الفحص الأولي)</span>
+                        <button class="btn-primary" id="btn-employee-submit" onclick="openSubmitAdminModal()" style="display: none;">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                            <span>إرسال للمدير للاعتماد</span>
                         </button>
 
                         <!-- أزرار مدير النظام -->
-                        <button class="btn-secondary admin-btn" id="btn-reject-paper" onclick="rejectPaper()" style="color: #dc2626; border-color: #fca5a5; background-color: #fef2f2;">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:#dc2626;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                        <button class="btn-danger admin-btn" id="btn-reject-paper" onclick="rejectPaper()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
                             <span>رفض البحث</span>
                         </button>
 
-                        <button class="btn-primary admin-btn" id="btn-accept-initial" onclick="acceptInitialPaper()" style="background-color: #0284c7;">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <button class="btn-success admin-btn" id="btn-accept-initial" onclick="acceptInitialPaper()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             <span>قبول مبدئي (تخزين)</span>
                         </button>
 
                         <button class="btn-secondary" onclick="exportReportHTML()">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:var(--text-dark);" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                             <span>تصدير التقرير</span>
                         </button>
                     </div>
                 </div>
 
+                <!-- ─── BATCH RESEARCH SWITCHER BAR (Visible for batch reports) ─── -->
+                <div id="batch-switcher-bar" style="display: none; background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.03);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 12px; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span style="font-size: 13px; font-weight: 700; color: var(--primary-navy);">أبحاث الدفعة:</span>
+                            <span id="batch-position-indicator" style="font-size: 12px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 12px;">1 من 1</span>
+                            <span id="batch-overall-status-badge" style="font-size: 11.5px; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 8px; border-radius: 12px;"></span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <!-- Search / Compact Selector for large batches -->
+                            <input type="text" id="batch-search-input" oninput="filterBatchTabs()" placeholder="بحث في أبحاث الدفعة..." style="padding: 5px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; width: 170px; outline: none;">
+                            
+                            <button class="btn-secondary" onclick="prevBatchReport()" id="btn-batch-prev" style="padding: 5px 10px; font-size: 12px;">
+                                <span>السابق</span>
+                            </button>
+                            <button class="btn-secondary" onclick="nextBatchReport()" id="btn-batch-next" style="padding: 5px 10px; font-size: 12px;">
+                                <span>التالي</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Horizontal Scrollable Tabs -->
+                    <div id="batch-tabs-container" style="display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: thin;">
+                        <!-- Dynamic Batch Tabs -->
+                    </div>
+                </div>
+
                 <!-- Submitter Notice Banner -->
-                <div id="report-submitted-banner" style="display: none; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px; padding: 12px 18px; margin-bottom: 16px; align-items: center; gap: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                    <div style="width:34px; height:34px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg class="nav-icon-svg" style="width:17px; height:17px; stroke:#0369a1;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>
+                <div id="report-submitted-banner" style="display: none; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; align-items: center; gap: 12px;">
+                    <div style="width:32px; height:32px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg class="nav-icon-svg" style="width:16px; height:16px; stroke:#0369a1;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>
                     <div style="flex: 1;">
-                        <div style="font-size: 13px; font-weight: 800; color: #0369a1;">مرسل للفحص الأولي بواسطة: <span id="report-submitter-name" style="color: var(--primary-navy);"></span></div>
+                        <div style="font-size: 13px; font-weight: 700; color: #0369a1;">مرسل للفحص الأولي بواسطة: <span id="report-submitter-name" style="color: var(--primary-navy);"></span></div>
                         <div id="report-submitter-notes-box" style="font-size: 12px; color: #0284c7; margin-top: 2px;">ملاحظات الموظف: <span id="report-submitter-notes" style="font-weight: 600;"></span></div>
                     </div>
                 </div>
 
                 <!-- Cheating Alert Banner -->
                 <div class="alert-cheating" id="cheating-alert-box" style="display: none;">
-                    <svg class="nav-icon-svg" style="width:24px; height:24px; stroke:#991b1b;" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <svg class="nav-icon-svg" style="width:22px; height:22px; stroke:#991b1b;" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     <div>
-                        <div style="font-weight: 800;">تنبيه كشف التلاعب بالأحرف المخفية!</div>
-                        <div id="cheating-details-text" style="font-size: 13px; font-weight: 500;">تم اكتشاف استخدام مسافات صفرية أو حروف أجنبية شبيهة.</div>
+                        <div style="font-weight: 700;">تنبيه كشف التلاعب بالأحرف والمحارف الخفية</div>
+                        <div id="cheating-details-text" style="font-size: 12.5px; font-weight: 500;">تم اكتشاف استخدام مسافات صفرية أو حروف أجنبية شبيهة بصرياً.</div>
                     </div>
                 </div>
 
                 <!-- Maximum Pages Limit Exceeded Alert Banner -->
                 <div class="alert-page-limit" id="page-limit-alert-box" style="display: none;">
-                    <div style="width: 36px; height: 36px; border-radius: 50%; background: #e0f2fe; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <svg class="nav-icon-svg" style="width:20px; height:20px; stroke:#0284c7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #e0f2fe; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:#0284c7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     </div>
                     <div style="flex: 1;">
-                        <div style="font-weight: 800; font-size: 15px; color: var(--primary-navy); margin-bottom: 4px;">تنبيه تجاوز الحد الأقصى للاقتباس من مصدر واحد (أكثر من 5 صفحات)</div>
-                        <div id="page-limit-details-text" style="font-size: 13px; font-weight: 600; color: var(--text-dark); line-height: 1.6;"></div>
+                        <div style="font-weight: 700; font-size: 14px; color: var(--primary-navy); margin-bottom: 3px;">تنبيه تجاوز الحد الأقصى للاقتباس من مصدر واحد (أكثر من 5 صفحات)</div>
+                        <div id="page-limit-details-text" style="font-size: 12.5px; font-weight: 500; color: var(--text-dark); line-height: 1.5;"></div>
                     </div>
                 </div>
 
-                <div class="report-grid">
-                    <!-- Left/Main Column: Text Viewer & Meter -->
-                    <div>
-                        <!-- Overall Percentage Card -->
-                        <div class="report-summary-card">
-                            <div style="display: flex; align-items: center; gap: 20px;">
-                                <!-- Donut Chart SVG -->
-                                <div class="gauge-circle">
-                                    <svg viewBox="0 0 36 36" style="width: 100%; height: 100%;">
-                                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e2e8f0" stroke-width="3"/>
-                                        <path id="svg-gauge-fill" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#ef4444" stroke-width="3.5" stroke-dasharray="0, 100"/>
-                                        <text x="18" y="20.5" text-anchor="middle" font-size="9" font-weight="bold" fill="#0f2b5c" id="gauge-text-pct">0%</text>
-                                    </svg>
-                                </div>
+                <!-- ─── 1. Five Main Operational Metric Cards ─────────────────── -->
+                <div class="report-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                    <!-- 1. Total Similarity -->
+                    <div class="card" style="padding: 16px; margin-bottom: 0;">
+                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">نسبة التشابه الإجمالية</div>
+                        <div style="font-size: 26px; font-weight: 800; color: var(--primary-navy);" id="report-overall-val">0%</div>
+                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-status-badge">تشمل كافة أشكال التطابق</div>
+                    </div>
 
-                                <div>
-                                    <div style="font-size: 13px; color: var(--text-muted); font-weight: 600;">نسبة الاستلال الإجمالية</div>
-                                    <div style="font-size: 32px; font-weight: 800; color: #dc2626;" id="report-overall-val">0%</div>
-                                    <div style="font-size: 13px; font-weight: 700; color: #dc2626;" id="report-status-badge">جاهز</div>
-                                    <div style="font-size: 12px; font-weight: 600; color: #64748b; margin-top: 4px;" id="report-volume-stats">إجمالي الحجم: 0 صفحة | المستل: 0 صفحة</div>
-                                </div>
-                            </div>
+                    <!-- 2. Problematic Similarity (VISUALLY DISTINGUISHED) -->
+                    <div class="card" style="padding: 16px; margin-bottom: 0; background: #fff5f5; border: 1.5px solid #fca5a5; border-right: 5px solid #dc2626;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <span style="font-size: 12.5px; font-weight: 700; color: #991b1b;">التشابه محل المراجعة</span>
+                            <span style="background: #fee2e2; color: #b91c1c; font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">فحص أكاديمي</span>
+                        </div>
+                        <div style="font-size: 26px; font-weight: 800; color: #dc2626;" id="report-problematic-val">0%</div>
+                        <div style="font-size: 11.5px; color: #b91c1c; margin-top: 4px;" id="report-problematic-status">الاستلال غير الموثق رسمياً</div>
+                    </div>
 
-                            <div style="text-align: left;">
-                                <span class="badge-category" id="report-domain-badge">التخصص: عام</span>
-                                <div style="margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--purple-ai);" id="report-ai-status">تحليل الذكاء الاصطناعي: 0% (نص بشري)</div>
-                                <div class="legend-group">
-                                    <div class="legend-item"><span class="legend-dot" style="background:#e2e8f0;"></span>أصلي</div>
-                                    <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span>معاد صياغته</div>
-                                    <div class="legend-item"><span class="legend-dot" style="background:#ef4444;"></span>منسوخ حرفياً</div>
-                                </div>
+                    <!-- 3. Direct Copy -->
+                    <div class="card" style="padding: 16px; margin-bottom: 0;">
+                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">النسخ المباشر</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #ea580c;" id="report-copied-val">0%</div>
+                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-copied-words">0 كلمة مطابقة</div>
+                    </div>
+
+                    <!-- 4. Possible Paraphrase -->
+                    <div class="card" style="padding: 16px; margin-bottom: 0;">
+                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">إعادة الصياغة المحتملة</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #d97706;" id="report-paraphrase-val">0%</div>
+                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-paraphrase-words">0 كلمة متقاربة</div>
+                    </div>
+
+                    <!-- 5. Properly Cited -->
+                    <div class="card" style="padding: 16px; margin-bottom: 0;">
+                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">الاقتباس الموثق</div>
+                        <div style="font-size: 24px; font-weight: 800; color: #059669;" id="report-cited-val">0%</div>
+                        <div style="font-size: 11.5px; color: #059669; margin-top: 4px;" id="report-cited-words">موثق حسب الأصول ومستبعد</div>
+                    </div>
+                </div>
+
+                <!-- ─── 2. Research Info & Stylistic Indicators Banner ────────── -->
+                <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                        <div>
+                            <div style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title">عنوان البحث</div>
+                            <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap;">
+                                <span id="doc-report-author"><strong>الباحث:</strong> غير محدد</span>
+                                <span id="report-date-str"><strong>التاريخ:</strong> غير محدد</span>
+                                <span id="report-domain-badge"><strong>التخصص:</strong> عام</span>
+                                <span id="report-volume-stats" style="color: var(--primary-navy); font-weight: 600;">الحجم: 0 صفحة</span>
                             </div>
                         </div>
-
-                        <!-- Highlighted Document Text Card -->
-                        <div class="card" style="padding: 16px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
-                                <div>
-                                    <div style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title">عنوان البحث</div>
-                                    <div style="font-size: 13px; color: #0369a1; font-weight: 600; margin-top: 2px;" id="doc-report-author">الباحث: غير محدد</div>
-                                </div>
-                                <div style="display: flex; gap: 8px; align-items: center;">
-                                    <span style="font-size: 12px; color: var(--text-muted);" id="report-date-str">التاريخ: 2026-08-25</span>
-                                </div>
-                            </div>
-
-                            <div class="document-viewer" id="document-text-content">
-                                اختر بحثًا أولاً أو ابدأ بفحص جديد لرؤية نتائج التحليل المظللة هنا.
-                            </div>
+                        <div id="report-ai-status-box" style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #6b21a8;">
+                            <strong>مؤشرات الأسلوب الإحصائي:</strong> <span id="report-ai-status" style="font-weight: 700;">طبيعي (نص بشري)</span>
+                            <span style="font-size: 11px; display: block; color: #7e22ce; margin-top: 2px;">* مؤشرات استئناسية لخصائص المفردات ولا تشكل حكماً قطعياً</span>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Detailed Sources & Pages Volume Card -->
-                        <div class="card" style="padding: 20px;">
-                            <h3 class="section-title">
-                                <svg class="nav-icon-svg" style="stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                                <span>جدول تفصيلي لعدد الصفحات والكلمات المأخوذة من كل بحث</span>
+                <!-- ─── 3. Detailed Matched Sources Table ─────────────────────── -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h3 class="section-title">
+                        <svg class="nav-icon-svg" style="stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                        <span>المصادر المرجعية المطابقة وعزو الصفحات</span>
+                    </h3>
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>عنوان البحث المرجعي المستل منه</th>
+                                <th>اسم الباحث / صاحب المرجع</th>
+                                <th style="text-align: center;">نسبة المساهمة</th>
+                                <th style="text-align: center;">الكلمات المتطابقة</th>
+                                <th style="text-align: center;">الصفحات التقديرية</th>
+                                <th style="text-align: center;">أرقام صفحات المرجع الفعلية</th>
+                                <th style="text-align: center;">حد الـ 5 صفحات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-sources-table-body">
+                            <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:16px;">لم يتم تسجيل مصادر متطابقة بعد</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- ─── 4. Detailed Evidence Comparison Section ───────────────── -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 2px;">
+                                <svg class="nav-icon-svg" style="stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                                <span>شواهد المقارنة المكتشفة (النص المفحوص مقابل النص المصدر)</span>
                             </h3>
-                            <table class="custom-table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>عنوان البحث المرجعي المستل منه</th>
-                                        <th>اسم الباحث / صاحب البحث</th>
-                                        <th>عدد الصفحات المأخوذة</th>
-                                        <th>عدد الكلمات المأخوذة</th>
-                                        <th>نسبة الاستلال</th>
-                                        <th>مؤشر الحد الأقصى (5 صفحات)</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="report-sources-table-body">
-                                    <tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:16px;">لم يتم العثور على مصادر بعد</td></tr>
-                                </tbody>
-                            </table>
+                            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0;">مقارنة الفقرات المتطابقة جنباً إلى جنب مع النصوص الأصلية وتصنيفها الأكاديمي وعزو صفحاتها.</p>
+                        </div>
+                        <div class="legend-group" style="display: flex; gap: 12px; font-size: 12px;">
+                            <div style="display:flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:2px; background:#fee2e2; border:1px solid #ef4444; display:inline-block;"></span>نسخ مباشر</div>
+                            <div style="display:flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:2px; background:#ffedd5; border:1px solid #f97316; display:inline-block;"></span>إعادة صياغة</div>
+                            <div style="display:flex; align-items:center; gap:5px;"><span style="width:10px; height:10px; border-radius:2px; background:#ecfdf5; border:1px solid #10b981; display:inline-block;"></span>اقتباس موثق</div>
                         </div>
                     </div>
 
-                    <!-- Right Column: Sources list -->
-                    <div>
-                        <div class="card">
-                            <h3 class="section-title">المصادر المكتشفة</h3>
-                            <div id="sources-list-container">
-                                <p style="color:var(--text-muted); font-size:13px;">لا توجد نتائج حالياً</p>
-                            </div>
-                        </div>
+                    <div id="evidence-comparison-container" style="display: flex; flex-direction: column; gap: 14px;">
+                        <p style="color:var(--text-muted); font-size:13px; text-align:center; padding: 24px 0;">اختر بحثاً من القائمة أو ابدأ بفحص جديد لعرض شواهد المقارنة هنا.</p>
+                    </div>
+                </div>
+
+                <!-- ─── 5. Highlighted Document Text Viewer ──────────────────── -->
+                <div class="card" style="padding: 20px;">
+                    <h3 class="section-title">
+                        <svg class="nav-icon-svg" style="stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                        <span>عرض النص الكامل مع التظليل وعزل الاتجاه</span>
+                    </h3>
+                    <div class="document-viewer" id="document-text-content">
+                        اختر بحثاً من القائمة أو ابدأ بفحص جديد لعرض النص الكامل المظلل هنا.
                     </div>
                 </div>
             </section>
 
             <!-- ================= VIEW 4: PAPER DATABASE ================= -->
             <section id="view-database" class="view-section">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="font-size: 20px; font-weight:700; color: var(--primary-navy);">قاعدة الأبحاث الأساسية للمقارنة</h2>
-                    <button class="btn-primary" onclick="openAddPaperModal()">
-                        <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                        <span>إضافة بحث للقاعدة المرجعية</span>
-                    </button>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">قاعدة الأبحاث المرجعية</h1>
+                        <p class="page-subtitle">إدارة وتصفح الأبحاث والمراجع المفهرسة محلياً للمقارنة والتحقق من الاستلال.</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <button class="btn-primary" onclick="openAddPaperModal()">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                            <span>إضافة بحث للقاعدة المرجعية</span>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="card">
                     <div class="filter-toolbar-wrap">
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            
                             <input type="text" id="db-search-input" placeholder="بحث شامل باسم البحث، اسم الباحث، التخصص، أو التاريخ..." style="width: 320px; max-width: 100%; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 13px;" onkeyup="loadDatabasePapers()">
                         </div>
 
@@ -2230,23 +2450,115 @@
 
             <!-- ================= VIEW 5: SETTINGS ================= -->
             <section id="view-settings" class="view-section">
-                <h2 style="font-size: 20px; font-weight:700; margin-bottom: 20px; color: var(--primary-navy);">الإعدادات وإدارة النظام</h2>
-                
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">إعدادات المنظومة</h1>
+                        <p class="page-subtitle">ضبط معايير الفحص الأكاديمي، وتشخيص كفاءة المكونات، وإدارة النسخ الاحتياطي والمستخدمين.</p>
+                    </div>
+                </div>
+
+                <!-- 1. Friendly Academic Inspection Settings Card -->
                 <div class="card" style="margin-bottom: 20px;">
-                    <h3 class="section-title"><svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg><span>ضبط حساسية محرك الكشف</span></h3>
-                    <div style="max-width: 500px;">
-                        <div style="margin-bottom: 16px;">
-                            <label style="font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px;">عتبة كشف النسخ الحرفي (Jaccard Threshold): 40%</label>
-                            <input type="range" min="20" max="80" value="40" style="width: 100%;">
+                    <h3 class="section-title">
+                        <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <span>إعدادات الفحص</span>
+                    </h3>
+                    <div style="max-width: 680px;">
+                        <div style="margin-bottom: 18px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-weight: 700; font-size: 13.5px; color: var(--text-dark);">حساسية اكتشاف النسخ الحرفي:</label>
+                                <span id="label-jaccard-val" style="color: var(--primary-navy); font-weight: 800; font-size: 14px; background: #e0f2fe; padding: 2px 8px; border-radius: 5px;">40%</span>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">تحديد عتبة تطابق المتواليات لاعتبار الفقرة منسوخة حرفياً أو شبه حرفية.</p>
+                            <input type="range" id="setting-jaccard" min="20" max="80" value="40" style="width: 100%; accent-color: var(--primary-navy);" oninput="document.getElementById('label-jaccard-val').innerText = this.value + '%'">
                         </div>
-                        <div style="margin-bottom: 16px;">
-                            <label style="font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px;">عتبة كشف إعادة الصياغة (Cosine Similarity): 60%</label>
-                            <input type="range" min="40" max="90" value="60" style="width: 100%;">
+
+                        <div style="margin-bottom: 18px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                <label style="font-weight: 700; font-size: 13.5px; color: var(--text-dark);">حساسية اكتشاف إعادة الصياغة:</label>
+                                <span id="label-cosine-val" style="color: var(--primary-navy); font-weight: 800; font-size: 14px; background: #e0f2fe; padding: 2px 8px; border-radius: 5px;">40%</span>
+                            </div>
+                            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">تحديد عتبة تقارب المفردات والتراكيب لرصد الصياغات المتطابقة بالمعنى.</p>
+                            <input type="range" id="setting-cosine" min="20" max="80" value="40" style="width: 100%; accent-color: var(--primary-navy);" oninput="document.getElementById('label-cosine-val').innerText = this.value + '%'">
                         </div>
-                        <div style="margin-bottom: 16px;">
-                            <label style="font-weight: 600; font-size: 14px; display: block; margin-bottom: 6px;">الحد الأقصى المسموح للاقتباس من مصدر واحد: 5 صفحات (1,250 كلمة)</label>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                            <div>
+                                <label style="font-weight: 700; font-size: 13px; display: block; margin-bottom: 6px; color: var(--text-dark);">الحد الأقصى المسموح من المصدر (صفحات):</label>
+                                <input type="number" id="setting-max-pages" min="1" max="20" step="0.5" value="5.0" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 7px; font-weight: 700; font-size: 13.5px;">
+                                <span style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; display: block;">إطلاق تنبيه أكاديمي عند تجاوز 5 صفحات من مصدر واحد.</span>
+                            </div>
+                            <div>
+                                <label style="font-weight: 700; font-size: 13px; display: block; margin-bottom: 6px; color: var(--text-dark);">متوسط الكلمات التقديري للصفحة:</label>
+                                <input type="number" id="setting-words-per-page" min="100" max="500" value="250" style="width: 100%; padding: 9px 12px; border: 1px solid var(--border-color); border-radius: 7px; font-weight: 700; font-size: 13.5px;">
+                                <span style="font-size: 11.5px; color: var(--text-muted); margin-top: 4px; display: block;">المعيار الأكاديمي المعتمد لحساب الصفحات المقابلة.</span>
+                            </div>
                         </div>
-                        <button class="btn-primary" onclick="showToast('تم حفظ إعدادات الحساسية بنجاح', 'success')">حفظ الإعدادات</button>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-primary" onclick="saveSystemSettings()">حفظ معايير الفحص</button>
+                            <button class="btn-secondary" onclick="loadSystemSettings()">استعادة الإعدادات المحفوظة</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Separated Advanced Settings & System Diagnostics Card -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 class="section-title" style="margin-bottom: 2px;">
+                                <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
+                                <span>إعدادات متقدمة وتشخيص النظام</span>
+                            </h3>
+                            <p style="font-size: 12.5px; color: var(--text-muted); margin: 0;">المعاملات الرياضية الدقيقة، محركات المعالجة، ومؤشرات الجاهزية دون إنترنت.</p>
+                        </div>
+                        <button class="btn-secondary" onclick="loadSystemDiagnostics()" style="padding: 7px 14px; font-size: 12.5px;">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>فحص المكونات الآن</span>
+                        </button>
+                    </div>
+
+                    <!-- Technical Algorithm Parameters Strip -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px;">
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">خوارزمية النسخ الحرفي</div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-navy); margin-top: 3px;">معامل جاكارد (Jaccard: 0.40)</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Shingle N-Gram Size = 5</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">خوارزمية الصياغة المعجمية</div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-navy); margin-top: 3px;">تشابه جيب التمام (Cosine: 0.40)</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">TF-IDF Vector Space Model</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">قاعدة البيانات المحلية</div>
+                            <div style="font-size: 13.5px; font-weight: 700; color: #059669; margin-top: 3px;">SQLite WAL Engine</div>
+                            <div style="font-size: 11px; color: #64748b; margin-top: 2px;">Foreign Keys & Inverted Index</div>
+                        </div>
+                    </div>
+
+                    <!-- Component Diagnostics Grid -->
+                    <div id="diagnostics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                        <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 12px; color: var(--text-muted);">الاتصال بالشبكة</div>
+                            <div style="font-size: 13.5px; font-weight: 800; color: #059669; margin-top: 4px;">100% Offline</div>
+                        </div>
+                        <div id="diag-db-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 12px; color: var(--text-muted);">حالة قاعدة البيانات</div>
+                            <div id="diag-db-val" style="font-size: 13.5px; font-weight: 800; color: #0284c7; margin-top: 4px;">جاري الفحص...</div>
+                        </div>
+                        <div id="diag-pdf-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 12px; color: var(--text-muted);">محرك استخراج المستندات</div>
+                            <div id="diag-pdf-val" style="font-size: 13.5px; font-weight: 800; color: #0284c7; margin-top: 4px;">جاري الفحص...</div>
+                        </div>
+                        <div id="diag-ocr-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 12px; color: var(--text-muted);">محرك OCR المحلي</div>
+                            <div id="diag-ocr-val" style="font-size: 13.5px; font-weight: 800; color: #64748b; margin-top: 4px;">جاري الفحص...</div>
+                        </div>
+                        <div id="diag-storage-card" style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
+                            <div style="font-size: 12px; color: var(--text-muted);">مساحة القرص الشاغرة</div>
+                            <div id="diag-storage-val" style="font-size: 13.5px; font-weight: 800; color: #0284c7; margin-top: 4px;">جاري الفحص...</div>
+                        </div>
                     </div>
                 </div>
 
@@ -2368,7 +2680,12 @@
 
             <!-- ================= VIEW 6: HELP ================= -->
             <section id="view-help" class="view-section">
-                <h2 style="font-size: 20px; font-weight:700; margin-bottom: 20px; color: var(--primary-navy);">المساعدة والدليل</h2>
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <h1 class="page-title">دليل الاستخدام والتعليمات</h1>
+                        <p class="page-subtitle">إرشادات التعامل مع النظام وقواعد التوثيق الأكاديمي ومعايير فحص الاستلال.</p>
+                    </div>
+                </div>
                 <div class="card">
                     <h3 class="section-title">حول النظام</h3>
                     <p style="line-height: 1.8; color: var(--text-muted);">
@@ -2526,8 +2843,8 @@
             <div class="login-form-box">
                 <div class="login-brand-header">
                     <div style="font-size: 13px; font-weight: 800; color: #0284c7; margin-bottom: 4px;">أكاديمية الشرطة — كلية الدراسات العليا</div>
-                    <h2 class="login-form-title">نظام كشف الاستلال العلمي</h2>
-                    <div class="login-form-subtitle">تسجيل الدخول الآمن للمنظومة الأكاديمية (100% Offline)</div>
+                    <h2 class="login-form-title" id="login-title-heading">نظام كشف الاستلال العلمي</h2>
+                    <div class="login-form-subtitle" id="login-subtitle-heading">تسجيل الدخول الآمن للمنظومة الأكاديمية (100% Offline)</div>
                 </div>
 
                 <div id="login-error-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-bottom: 20px; align-items: center; gap: 8px;">
@@ -2535,7 +2852,8 @@
                     <span id="login-error-text">اسم المستخدم أو كلمة المرور غير صحيحة</span>
                 </div>
 
-                <form onsubmit="event.preventDefault(); submitLogin();">
+                <!-- Regular Login Form -->
+                <form id="form-login-standard" onsubmit="event.preventDefault(); submitLogin();">
                     <div class="login-input-group">
                         <label class="login-input-label">
                             <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -2564,6 +2882,29 @@
                         </button>
                         <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">الدعم الأكاديمي المحلي</span>
                     </div>
+                </form>
+
+                <!-- First-Time Administrator Setup Form -->
+                <form id="form-first-time-setup" style="display: none;" onsubmit="event.preventDefault(); submitFirstTimeSetup();">
+                    <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 12.5px; color: #0369a1; line-height: 1.6;">
+                        <strong>تهيئة المنظومة لأول مرة:</strong> يرجى إنشاء حساب مدير النظام الرئيسي وتعيين بيانات الدخول الخاصة به.
+                    </div>
+                    <div class="login-input-group">
+                        <label class="login-input-label">الاسم الكامل لمدير المنظومة:</label>
+                        <input type="text" id="setup-fullname" class="login-input-field" placeholder="مثال: د. طارق عبد الرحمن" required>
+                    </div>
+                    <div class="login-input-group">
+                        <label class="login-input-label">اسم المستخدم (Username):</label>
+                        <input type="text" id="setup-username" class="login-input-field" placeholder="مثال: admin" required>
+                    </div>
+                    <div class="login-input-group">
+                        <label class="login-input-label">كلمة المرور الجديدة:</label>
+                        <input type="password" id="setup-password" class="login-input-field" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" id="btn-setup-submit" class="login-submit-btn" style="background: #059669;">
+                        <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+                        <span>إنشاء حساب مدير المنظومة والبدء</span>
+                    </button>
                 </form>
             </div>
 
@@ -2965,8 +3306,6 @@
             }
         }
 
-        let batchFiles = [];
-
         /* ─── Custom UI Notifications & Confirm Modal (No Native Alerts) ────── */
         function showToast(message, type = 'success', duration = 3500) {
             const container = document.getElementById('toast-container');
@@ -3080,159 +3419,337 @@
             if (viewName === 'dashboard') loadDashboardStats();
             if (viewName === 'settings') {
                 loadBackupsList();
-                loadEmployeesList(); loadPasswordResetRequests();
+                loadEmployeesList();
+                loadPasswordResetRequests();
+                loadSystemSettings();
+                loadSystemDiagnostics();
             }
         }
 
+
+        let currentUploadMode = 'batch'; // 'batch' (default) or 'thesis' (secondary)
+        let batchFiles = [];             // Array of {file, title, author}
+        let thesisFiles = [];            // Array of File objects (ordered)
+        let currentBatchId = null;       // Active batch ID for report switcher
+        let currentBatchData = null;     // Cached batch state
+        let currentBatchIndex = 0;       // Selected index in batch
+        let batchPollTimer = null;       // Timer for polling batch progress
+
+        function toggleThesisMode() {
+            if (currentUploadMode === 'thesis') {
+                setUploadMode('batch');
+            } else {
+                setUploadMode('thesis');
+            }
+        }
+
+        function setUploadMode(mode) {
+            currentUploadMode = mode;
+            const toggleBtn = document.getElementById('toggle-thesis-mode-btn');
+            const toggleText = document.getElementById('toggle-thesis-mode-text');
+            const mainHeading = document.getElementById('upload-main-heading');
+            const dropTitle = document.getElementById('dropzone-title');
+            const dropSub = document.getElementById('dropzone-subtitle');
+            const thesisMeta = document.getElementById('thesis-metadata-container');
+            const thesisList = document.getElementById('thesis-files-list');
+            const batchList = document.getElementById('batch-files-list');
+            const btnText = document.getElementById('btn-start-analysis-text');
+            const rawContainer = document.getElementById('raw-text-container');
+
+            if (mode === 'thesis') {
+                if (toggleText) toggleText.innerText = 'العودة للفحص العادي (بحث فردي / متعدد)';
+                if (toggleBtn) toggleBtn.className = 'btn-secondary';
+                if (mainHeading) mainHeading.innerText = 'تجميع عدة ملفات لأطروحة / رسالة علمية واحدة';
+                if (dropTitle) dropTitle.innerText = 'اسحب ملفات الرسالة (الأبواب والفصول) هنا أو انقر للاختيار';
+                if (dropSub) dropSub.innerText = 'أضف جميع ملفات الرسالة مع إمكانية ترتيب الأبواب قبل الفحص';
+                if (thesisMeta) thesisMeta.style.display = 'block';
+                if (thesisList) thesisList.style.display = thesisFiles.length > 0 ? 'block' : 'none';
+                if (batchList) batchList.style.display = 'none';
+                if (btnText) btnText.innerText = 'تجميع الملفات وبدء الفحص';
+                if (rawContainer) rawContainer.style.display = 'none';
+            } else {
+                if (toggleText) toggleText.innerText = 'تجميع عدة ملفات كرسالة واحدة';
+                if (toggleBtn) toggleBtn.className = 'btn-secondary';
+                if (mainHeading) mainHeading.innerText = 'رفع المستندات والأبحاث للفحص الأكاديمي';
+                if (dropTitle) dropTitle.innerText = 'اسحب ملفات الأبحاث هنا أو انقر لاختيار ملف أو عدة ملفات';
+                if (dropSub) dropSub.innerText = 'يدعم رفع بحث واحد أو عدة أبحاث بصيغ PDF / Word / TXT (يُفحص كل ملف كبحث مستقل تلقائياً)';
+                if (thesisMeta) thesisMeta.style.display = 'none';
+                if (thesisList) thesisList.style.display = 'none';
+                if (batchList) batchList.style.display = batchFiles.length > 0 ? 'block' : 'none';
+                if (btnText) btnText.innerText = batchFiles.length > 1 ? 'بدء فحص جميع الأبحاث المختارة' : 'بدء فحص البحث';
+                if (rawContainer) rawContainer.style.display = 'block';
+            }
+        }
 
         function handleFileSelect(event) {
             if (event.target.files.length > 0) {
                 handleFileList(Array.from(event.target.files));
+                event.target.value = ''; // Reset input for re-selecting same files if needed
             }
         }
 
         function handleFileList(files) {
-            batchFiles = files;
-            const container = document.getElementById('batch-items-container');
+            if (currentUploadMode === 'thesis') {
+                files.forEach(f => {
+                    const exists = thesisFiles.some(tf => tf.name === f.name && tf.size === f.size);
+                    if (!exists) thesisFiles.push(f);
+                });
+                renderThesisFiles();
+            } else {
+                files.forEach(f => {
+                    const defaultTitle = f.name.replace(/\.[^/.]+$/, '');
+                    const exists = batchFiles.some(bf => bf.file.name === f.name && bf.file.size === f.size);
+                    if (!exists) {
+                        batchFiles.push({
+                            file: f,
+                            title: defaultTitle,
+                            author: ''
+                        });
+                    }
+                });
+                renderBatchFiles();
+            }
+        }
+
+        function renderThesisFiles() {
+            const container = document.getElementById('thesis-items-container');
+            const listWrapper = document.getElementById('thesis-files-list');
+            if (!container || !listWrapper) return;
+
+            if (thesisFiles.length === 0) {
+                listWrapper.style.display = 'none';
+                return;
+            }
+            listWrapper.style.display = 'block';
+
             let html = '';
-            batchFiles.forEach((file, idx) => {
-                const defaultTitle = file.name.replace(/\.[^/.]+$/, '');
+            thesisFiles.forEach((file, idx) => {
+                const ext = file.name.split('.').pop().toUpperCase();
+                const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+                const isFirst = (idx === 0);
+                const isLast = (idx === thesisFiles.length - 1);
+
                 html += `
-                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <svg class="nav-icon-svg" style="width:24px; height:24px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                <span style="font-weight: 700; font-size: 14px; color: var(--primary-navy);">${file.name}</span>
-                                <span style="font-size: 12px; color: var(--text-muted);">(${(file.size / (1024*1024)).toFixed(2)} MB)</span>
-                            </div>
-                            <span id="batch-pstatus-${idx}" style="font-size: 12px; font-weight: 700; color: var(--text-muted); background: #f1f5f9; padding: 3px 10px; border-radius: 12px;">جاهز للفحص</span>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
-                            <div>
-                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">عنوان البحث <span style="color:#dc2626;">*</span>:</label>
-                                <input type="text" id="batch-title-${idx}" value="${defaultTitle}" placeholder="ادخل عنوان البحث..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
-                            </div>
-                            <div>
-                                <label style="font-size: 12px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 4px;">اسم الباحث / صاحب البحث <span style="color:#dc2626;">*</span>:</label>
-                                <input type="text" id="batch-author-${idx}" placeholder="ادخل اسم الباحث..." style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #ffffff; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; gap: 12px;">
+                        <div style="display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;">
+                            <span style="display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 6px; background: var(--primary-navy); color: white; font-size: 12px; font-weight: 700; flex-shrink: 0;">${idx + 1}</span>
+                            <div style="min-width: 0; flex: 1;">
+                                <div style="font-weight: 700; font-size: 13.5px; color: var(--primary-navy); text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${file.name}</div>
+                                <div style="font-size: 11.5px; color: var(--text-muted); display: flex; gap: 8px; margin-top: 2px;">
+                                    <span style="background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-weight: 600;">${ext}</span>
+                                    <span>${sizeMB} ميجابايت</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="progress-bar-container" style="height: 8px; margin: 6px 0 0 0;">
-                            <div class="progress-bar-fill" id="batch-pbar-${idx}" style="width: 0%;"></div>
+                        <!-- Ordering & Remove Controls -->
+                        <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+                            <button type="button" class="btn-secondary" onclick="moveThesisFile(${idx}, -1)" ${isFirst ? 'disabled style="opacity:0.35; cursor:not-allowed; padding: 4px 8px;"' : 'style="padding: 4px 8px;"'} title="تقديم لأعلى">
+                                ▲
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="moveThesisFile(${idx}, 1)" ${isLast ? 'disabled style="opacity:0.35; cursor:not-allowed; padding: 4px 8px;"' : 'style="padding: 4px 8px;"'} title="تأخير لأسفل">
+                                ▼
+                            </button>
+                            <button type="button" class="btn-danger" onclick="removeThesisFile(${idx})" style="padding: 4px 8px; font-size: 12px; border-radius: 6px;" title="حذف الملف">
+                                ✕
+                            </button>
                         </div>
                     </div>
                 `;
             });
             container.innerHTML = html;
-            document.getElementById('batch-files-list').style.display = 'block';
+        }
+
+        function moveThesisFile(idx, delta) {
+            const targetIdx = idx + delta;
+            if (targetIdx < 0 || targetIdx >= thesisFiles.length) return;
+            const temp = thesisFiles[idx];
+            thesisFiles[idx] = thesisFiles[targetIdx];
+            thesisFiles[targetIdx] = temp;
+            renderThesisFiles();
+        }
+
+        function removeThesisFile(idx) {
+            thesisFiles.splice(idx, 1);
+            renderThesisFiles();
+        }
+
+        function renderBatchFiles() {
+            const container = document.getElementById('batch-items-container');
+            const listWrapper = document.getElementById('batch-files-list');
+            if (!container || !listWrapper) return;
+
+            if (batchFiles.length === 0) {
+                listWrapper.style.display = 'none';
+                return;
+            }
+            listWrapper.style.display = 'block';
+
+            let html = '';
+            batchFiles.forEach((item, idx) => {
+                const ext = item.file.name.split('.').pop().toUpperCase();
+                const sizeMB = (item.file.size / (1024 * 1024)).toFixed(2);
+
+                html += `
+                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
+                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: #e0f2fe; color: #0284c7; font-size: 11.5px; font-weight: 700;">${idx + 1}</span>
+                                <span style="font-weight: 700; font-size: 13.5px; color: var(--primary-navy);">${item.file.name}</span>
+                                <span style="font-size: 11.5px; color: var(--text-muted); background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">${ext}</span>
+                                <span style="font-size: 11.5px; color: var(--text-muted);">(${sizeMB} MB)</span>
+                            </div>
+                            <button type="button" class="btn-danger" onclick="removeBatchFile(${idx})" style="padding: 2px 8px; font-size: 11px; border-radius: 6px;" title="إزالة">
+                                ✕
+                            </button>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 3px;">عنوان البحث <span style="color:#dc2626;">*</span>:</label>
+                                <input type="text" id="batch-title-${idx}" value="${item.title}" oninput="batchFiles[${idx}].title = this.value" placeholder="ادخل عنوان البحث..." style="width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12.5px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 3px;">اسم الباحث / صاحب البحث <span style="color:#dc2626;">*</span>:</label>
+                                <input type="text" id="batch-author-${idx}" value="${item.author}" oninput="batchFiles[${idx}].author = this.value" placeholder="ادخل اسم الباحث..." style="width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12.5px;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function removeBatchFile(idx) {
+            batchFiles.splice(idx, 1);
+            renderBatchFiles();
         }
 
         async function startAnalysis() {
-            // فحص كروت الملفات المختارة دفعة واحدة
-            if (batchFiles.length > 0) {
-                let validated = true;
-                for (let i = 0; i < batchFiles.length; i++) {
-                    const titleVal = document.getElementById(`batch-title-${i}`).value.trim();
-                    const authorVal = document.getElementById(`batch-author-${i}`).value.trim();
-                    if (!titleVal || !authorVal) {
-                        showToast(`الرجاء إدخال عنوان البحث واسم الباحث للملف رقم ${i + 1} (${batchFiles[i].name})`, 'warning');
-                        document.getElementById(`batch-title-${i}`).focus();
-                        validated = false;
-                        break;
-                    }
+            const currentUserName = currentUser ? (currentUser.full_name || currentUser.username) : 'المستخدم';
+
+            // ─── 1. THESIS MULTI-FILE SCAN ──────────────────────────────────────────
+            if (currentUploadMode === 'thesis') {
+                if (thesisFiles.length === 0) {
+                    showToast('الرجاء اختيار ملفات الرسالة (أبواب / فصول) أولاً.', 'warning');
+                    return;
                 }
-                if (!validated) return;
+                const title = document.getElementById('thesis-title').value.trim();
+                const author = document.getElementById('thesis-author').value.trim();
+                const spec = document.getElementById('thesis-spec').value.trim();
+                const degree = document.getElementById('thesis-degree').value;
 
-                let lastReport = null;
-                for (let i = 0; i < batchFiles.length; i++) {
-                    const file = batchFiles[i];
-                    const title = document.getElementById(`batch-title-${i}`).value.trim();
-                    const author = document.getElementById(`batch-author-${i}`).value.trim();
-                    const pbar = document.getElementById(`batch-pbar-${i}`);
-                    const pstatus = document.getElementById(`batch-pstatus-${i}`);
-
-                    pstatus.innerText = 'جاري التحميل وبدء المعالجة...';
-                    pstatus.style.background = '#e0f2fe'; pstatus.style.color = '#0284c7';
-                    pbar.style.width = '15%';
-
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('title', title);
-                    formData.append('author', author);
-
-                    try {
-                        // استخدام المسار غير المتزامن لمعالجة الملفات الكبيرة في الخلفية
-                        const initRes = await fetch('/api/analyze_async', { method: 'POST', body: formData });
-                        const initData = await initRes.json();
-
-                        if (initData.task_id) {
-                            const taskId = initData.task_id;
-                            let completed = false;
-
-                            while (!completed) {
-                                await new Promise(r => setTimeout(r, 450));
-                                const statusRes = await fetch(`/api/tasks/${taskId}`);
-                                const task = await statusRes.json();
-
-                                if (task.progress) {
-                                    pbar.style.width = task.progress + '%';
-                                }
-                                if (task.stage) {
-                                    pstatus.innerText = task.stage;
-                                }
-
-                                if (task.status === 'completed') {
-                                    completed = true;
-                                    pbar.style.width = '100%';
-                                    pstatus.innerText = `تم الفحص (${task.result.overall_pct}%)`;
-                                    pstatus.style.background = '#d1fae5'; pstatus.style.color = '#059669';
-                                    lastReport = task.result;
-                                } else if (task.status === 'error') {
-                                    completed = true;
-                                    pbar.style.width = '100%';
-                                    pstatus.innerText = task.error || 'خطأ أثناء المعالجة';
-                                    pstatus.style.background = '#fee2e2'; pstatus.style.color = '#dc2626';
-                                }
-                            }
-                        } else {
-                            // مسار احتياطي
-                            const res = await fetch('/api/analyze', { method: 'POST', body: formData });
-                            const report = await res.json();
-                            pbar.style.width = '100%';
-                            if (report.error) {
-                                pstatus.innerText = 'خطأ في المعالجة';
-                                pstatus.style.background = '#fee2e2'; pstatus.style.color = '#dc2626';
-                            } else {
-                                pstatus.innerText = `تم الفحص (${report.overall_pct}%)`;
-                                pstatus.style.background = '#d1fae5'; pstatus.style.color = '#059669';
-                                lastReport = report;
-                            }
-                        }
-                    } catch (e) {
-                        pbar.style.width = '100%';
-                        pstatus.innerText = 'فشل الاتصال';
-                        pstatus.style.background = '#fee2e2'; pstatus.style.color = '#dc2626';
-                    }
+                if (!title) {
+                    showToast('يرجى إدخال عنوان الرسالة / الأطروحة.', 'warning');
+                    document.getElementById('thesis-title').focus();
+                    return;
+                }
+                if (!author) {
+                    showToast('يرجى إدخال اسم الباحث صاحب الرسالة.', 'warning');
+                    document.getElementById('thesis-author').focus();
+                    return;
                 }
 
-                if (lastReport) {
-                    currentReportId = lastReport.id;
-                    renderReport(lastReport);
+                showToast('جاري رفع ملفات الرسالة وبدء الفحص الموحد...', 'info');
+
+                const formData = new FormData();
+                thesisFiles.forEach((file, i) => {
+                    formData.append('files[]', file);
+                    formData.append('orders[]', i);
+                });
+                formData.append('title', title);
+                formData.append('author', author);
+                formData.append('specialization', spec);
+                formData.append('degree_type', degree);
+                formData.append('created_by', currentUserName);
+
+                try {
+                    const res = await fetch('/api/batch/thesis', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.error) {
+                        showToast('خطأ: ' + data.error, 'error');
+                        return;
+                    }
+
+                    showToast(`تم استقبال ${data.file_count} ملفات بنجاح. جاري التحليل...`, 'success');
                     switchView('reports');
-                    showToast(`تم فحص جميع الملفات بنجاح (${batchFiles.length} ملفات)`, 'success');
+
+                    const switcher = document.getElementById('batch-switcher-bar');
+                    if (switcher) switcher.style.display = 'none';
+
+                    // Poll task status
+                    const taskId = data.task_id;
+                    let completed = false;
+                    while (!completed) {
+                        await new Promise(r => setTimeout(r, 600));
+                        const statusRes = await fetch(`/api/tasks/${taskId}`);
+                        const task = await statusRes.json();
+
+                        if (task.status === 'completed' && task.result) {
+                            completed = true;
+                            currentReportId = task.result.id;
+                            renderReport(task.result);
+                            showToast('اكتمل فحص الرسالة بنجاح!', 'success');
+                        } else if (task.status === 'error') {
+                            completed = true;
+                            showToast('تعذر فحص الرسالة: ' + (task.error || 'خطأ غير محدد'), 'error');
+                        }
+                    }
+                } catch (e) {
+                    showToast('حدث خطأ أثناء رفع ملفات الرسالة.', 'error');
                 }
                 return;
             }
 
-            // فحص إدخال النص السريع
+            // ─── 2. BATCH INDEPENDENT MULTI-RESEARCH SCAN ───────────────────────────
+            if (currentUploadMode === 'batch' && batchFiles.length > 0) {
+                for (let i = 0; i < batchFiles.length; i++) {
+                    const t = (batchFiles[i].title || '').trim();
+                    const a = (batchFiles[i].author || '').trim();
+                    if (!t || !a) {
+                        showToast(`يرجى استكمال عنوان البحث واسم الباحث للبحث رقم ${i + 1}`, 'warning');
+                        const el = document.getElementById(`batch-title-${i}`) || document.getElementById(`batch-author-${i}`);
+                        if (el) el.focus();
+                        return;
+                    }
+                }
+
+                showToast(`جاري إطلاق فحص دفعة من ${batchFiles.length} أبحاث...`, 'info');
+
+                const formData = new FormData();
+                batchFiles.forEach(item => {
+                    formData.append('files[]', item.file);
+                    formData.append('titles[]', item.title.trim());
+                    formData.append('authors[]', item.author.trim());
+                });
+                formData.append('created_by', currentUserName);
+                formData.append('label', `دفعة ${batchFiles.length} أبحاث`);
+
+                try {
+                    const res = await fetch('/api/batch/independent', { method: 'POST', body: formData });
+                    const data = await res.json();
+                    if (data.error) {
+                        showToast('خطأ: ' + data.error, 'error');
+                        return;
+                    }
+
+                    currentBatchId = data.batch_id;
+                    switchView('reports');
+                    startBatchPolling(currentBatchId);
+                    showToast(`تم إطلاق فحص الدفعة بنجاح (معالجة تدريجية للأداء)`, 'success');
+                } catch (e) {
+                    showToast('حدث خطأ أثناء إطلاق الدفعة.', 'error');
+                }
+                return;
+            }
+
+            // ─── 3. RAW TEXT SINGLE SCAN ────────────────────────────────────────────
             const rawText = document.getElementById('raw-text-input').value.trim();
             const rawTitle = document.getElementById('raw-single-title').value.trim();
             const rawAuthor = document.getElementById('raw-single-author').value.trim();
 
             if (!rawText) {
-                showToast('الرجاء اختيار ملفات PDF أو إدخال نص البحث أولاً.', 'warning');
+                showToast('الرجاء اختيار ملفات أو إدخال نص البحث أولاً.', 'warning');
                 return;
             }
             if (!rawTitle) {
@@ -3244,7 +3761,7 @@
             const formData = new FormData();
             formData.append('text', rawText);
             formData.append('title', rawTitle);
-            formData.append('author', rawAuthor);
+            formData.append('author', rawAuthor || 'غير محدد');
 
             try {
                 const res = await fetch('/api/analyze', { method: 'POST', body: formData });
@@ -3254,6 +3771,8 @@
                     return;
                 }
                 currentReportId = report.id;
+                const switcher = document.getElementById('batch-switcher-bar');
+                if (switcher) switcher.style.display = 'none';
                 renderReport(report);
                 switchView('reports');
                 showToast('تم فحص النص بنجاح', 'success');
@@ -3262,36 +3781,270 @@
             }
         }
 
+        // ─── BATCH RESULTS WORKSPACE & SWITCHER LOGIC ─────────────────────────────
+        function startBatchPolling(batchId) {
+            currentBatchId = batchId;
+            if (batchPollTimer) clearInterval(batchPollTimer);
+
+            const switcher = document.getElementById('batch-switcher-bar');
+            if (switcher) switcher.style.display = 'block';
+
+            const poll = async () => {
+                try {
+                    const res = await fetch(`/api/batch/${batchId}`);
+                    if (!res.ok) return;
+                    const batch = await res.json();
+                    currentBatchData = batch;
+                    renderBatchTabs(batch);
+
+                    if (batch.status === 'completed' || batch.status === 'partial' || batch.status === 'error') {
+                        const allDone = batch.items.every(it => it.status === 'completed' || it.status === 'error');
+                        if (allDone) {
+                            clearInterval(batchPollTimer);
+                            batchPollTimer = null;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Batch polling error:', e);
+                }
+            };
+
+            poll();
+            batchPollTimer = setInterval(poll, 1200);
+        }
+
+        function renderBatchTabs(batch) {
+            const tabsContainer = document.getElementById('batch-tabs-container');
+            const posIndicator = document.getElementById('batch-position-indicator');
+            const badge = document.getElementById('batch-overall-status-badge');
+
+            if (!tabsContainer || !batch || !batch.items) return;
+
+            const total = batch.total_items || batch.items.length;
+            const completed = batch.completed_items || 0;
+            const failed = batch.failed_items || 0;
+
+            if (posIndicator) {
+                posIndicator.innerText = `${currentBatchIndex + 1} من ${total}`;
+            }
+
+            if (badge) {
+                if (batch.status === 'completed') {
+                    badge.innerText = `اكتمل فحص جميع الأبحاث (${completed}/${total})`;
+                    badge.style.color = '#059669'; badge.style.background = '#d1fae5';
+                } else if (batch.status === 'running' || batch.status === 'pending') {
+                    badge.innerText = `جاري الفحص (${completed} من ${total} مكتمل)`;
+                    badge.style.color = '#0284c7'; badge.style.background = '#e0f2fe';
+                } else {
+                    badge.innerText = `مكتمل مع تعذر ${failed} أبحاث`;
+                    badge.style.color = '#b45309'; badge.style.background = '#fef3c7';
+                }
+            }
+
+            let html = '';
+            batch.items.forEach((item, idx) => {
+                const isActive = (idx === currentBatchIndex);
+                let statusLabel = '⏳ في الانتظار';
+                let statusBg = '#f1f5f9';
+                let statusColor = '#64748b';
+
+                if (item.status === 'running') {
+                    statusLabel = '⚡ جاري الفحص';
+                    statusBg = '#e0f2fe'; statusColor = '#0284c7';
+                } else if (item.status === 'completed') {
+                    const pct = item.similarity_pct !== null ? `${Math.round(item.similarity_pct)}%` : '✓';
+                    statusLabel = `${pct}`;
+                    if (item.similarity_pct > 30) {
+                        statusBg = '#fee2e2'; statusColor = '#b91c1c';
+                    } else {
+                        statusBg = '#d1fae5'; statusColor = '#047857';
+                    }
+                } else if (item.status === 'error' || item.status === 'interrupted') {
+                    statusLabel = '⚠ تعذر الفحص';
+                    statusBg = '#fee2e2'; statusColor = '#b91c1c';
+                }
+
+                // ── Research.title as the primary visible identity with tooltip and ellipsis ──
+                const displayTitle = (item.research_title && item.research_title.trim()) 
+                    ? item.research_title.trim() 
+                    : `بحث ${idx + 1}`;
+                const escapedTitle = displayTitle.replace(/"/g, '&quot;');
+                const authorInfo = item.research_author ? ` | الباحث: ${item.research_author}` : '';
+                const tooltipText = `${escapedTitle}${authorInfo}`;
+
+                const activeBorder = isActive ? 'border: 2px solid var(--primary-navy); background: #f8fafc;' : 'border: 1px solid var(--border-color); background: #ffffff;';
+                const activeFont = isActive ? 'font-weight: 800; color: var(--primary-navy);' : 'font-weight: 600; color: var(--text-dark);';
+
+                html += `
+                    <div class="batch-tab-item" 
+                         data-title="${(item.research_title || '').toLowerCase()}" 
+                         data-author="${(item.research_author || '').toLowerCase()}" 
+                         onclick="selectBatchItem(${idx})" 
+                         title="${tooltipText}"
+                         style="flex-shrink: 0; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; ${activeBorder}">
+                        <span style="font-size: 12.5px; ${activeFont} max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${tooltipText}">${escapedTitle}</span>
+                        <span style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: ${statusBg}; color: ${statusColor}; flex-shrink: 0;">${statusLabel}</span>
+                        ${item.status === 'error' ? `<button type="button" onclick="event.stopPropagation(); retryBatchItem('${batch.id}', ${item.research_id})" style="border:none; background:#fee2e2; color:#b91c1c; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;" title="إعادة الفحص">إعادة</button>` : ''}
+                    </div>
+                `;
+            });
+            tabsContainer.innerHTML = html;
+
+            const activeItem = batch.items[currentBatchIndex];
+            if (activeItem && activeItem.status === 'completed' && activeItem.report_id && (!currentReportId || currentReportId !== activeItem.report_id)) {
+                loadBatchItemReport(batch.id, activeItem.research_id, currentBatchIndex);
+            }
+        }
+
+        async function selectBatchItem(idx) {
+            if (!currentBatchData || !currentBatchData.items || !currentBatchData.items[idx]) return;
+            currentBatchIndex = idx;
+            const item = currentBatchData.items[idx];
+
+            const posIndicator = document.getElementById('batch-position-indicator');
+            if (posIndicator) posIndicator.innerText = `${idx + 1} من ${currentBatchData.items.length}`;
+
+            renderBatchTabs(currentBatchData);
+
+            if (item.status === 'completed' && item.report_id) {
+                await loadBatchItemReport(currentBatchData.id, item.research_id, idx);
+            } else if (item.status === 'running') {
+                showToast(`البحث «${item.research_title}» جاري فحصه الآن...`, 'info');
+            } else if (item.status === 'queued') {
+                showToast(`البحث «${item.research_title}» في طابور الانتظار.`, 'info');
+            } else if (item.status === 'error') {
+                showToast(`تعذر فحص «${item.research_title}»: ${item.error_message || 'خطأ غير محدد'}`, 'error');
+            }
+        }
+
+        async function loadBatchItemReport(batchId, researchId, idx) {
+            try {
+                const res = await fetch(`/api/batch/${batchId}/item/${researchId}/report`);
+                if (!res.ok) return;
+                const report = await res.json();
+                if (report && !report.error) {
+                    currentReportId = report.id;
+                    renderReport(report);
+                }
+            } catch (e) {
+                console.error('Error loading batch item report:', e);
+            }
+        }
+
+        function prevBatchReport() {
+            if (!currentBatchData || !currentBatchData.items) return;
+            if (currentBatchIndex > 0) {
+                selectBatchItem(currentBatchIndex - 1);
+            }
+        }
+
+        function nextBatchReport() {
+            if (!currentBatchData || !currentBatchData.items) return;
+            if (currentBatchIndex < currentBatchData.items.length - 1) {
+                selectBatchItem(currentBatchIndex + 1);
+            }
+        }
+
+        function filterBatchTabs() {
+            const query = (document.getElementById('batch-search-input').value || '').trim().toLowerCase();
+            document.querySelectorAll('.batch-tab-item').forEach(el => {
+                const title = el.getAttribute('data-title') || '';
+                const author = el.getAttribute('data-author') || '';
+                if (!query || title.includes(query) || author.includes(query)) {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'none';
+                }
+            });
+        }
+
+        async function retryBatchItem(batchId, researchId) {
+            try {
+                const res = await fetch(`/api/batch/${batchId}/item/${researchId}/retry`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('تمت إعادة جدولة فحص البحث.', 'success');
+                    startBatchPolling(batchId);
+                } else {
+                    showToast('خطأ: ' + (data.error || 'تعذر إعادة الفحص'), 'error');
+                }
+            } catch (e) {
+                showToast('حدث خطأ أثناء طلب إعادة الفحص.', 'error');
+            }
+        }
+
+        function getEmptyStateHtml(title, description, colSpan = 8) {
+            return `
+                <tr>
+                    <td colspan="${colSpan}" style="padding: 0; border: none;">
+                        <div class="empty-state-container">
+                            <div class="empty-state-icon">
+                                <svg class="nav-icon-svg" style="width: 24px; height: 24px; stroke: #64748b;" viewBox="0 0 24 24">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="21" x2="16" y2="21"></line>
+                                    <line x1="12" y1="17" x2="12" y2="21"></line>
+                                </svg>
+                            </div>
+                            <h4 class="empty-state-title">${title}</h4>
+                            <p class="empty-state-desc">${description}</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+
         function renderReport(report) {
             const overallVal = report.overall_pct || 0;
-            document.getElementById('report-overall-val').innerText = overallVal + '%';
-            
-            const gaugeTextEl = document.getElementById('gauge-text-pct');
-            if (gaugeTextEl) gaugeTextEl.textContent = overallVal + '%';
-            
-            const fillSvg = document.getElementById('svg-gauge-fill');
-            if (fillSvg) fillSvg.setAttribute('stroke-dasharray', `${overallVal}, 100`);
+            const overallEl = document.getElementById('report-overall-val');
+            if (overallEl) overallEl.innerText = overallVal + '%';
+
+            // 1. Problematic Similarity (التشابه محل المراجعة)
+            const probVal = report.problematic_pct !== undefined ? report.problematic_pct : ((report.copied_pct || 0) + (report.paraphrase_pct || 0));
+            const probEl = document.getElementById('report-problematic-val');
+            if (probEl) probEl.innerText = probVal + '%';
+
+            // 2. Direct Copy (النسخ المباشر)
+            const copVal = report.copied_pct || 0;
+            const copEl = document.getElementById('report-copied-val');
+            if (copEl) copEl.innerText = copVal + '%';
+            const copWEl = document.getElementById('report-copied-words');
+            if (copWEl) copWEl.innerText = (report.copied_words || 0).toLocaleString() + ' كلمة مطابقة';
+
+            // 3. Possible Paraphrase (إعادة الصياغة المحتملة)
+            const paraVal = report.paraphrase_pct || 0;
+            const paraEl = document.getElementById('report-paraphrase-val');
+            if (paraEl) paraEl.innerText = paraVal + '%';
+            const paraWEl = document.getElementById('report-paraphrase-words');
+            if (paraWEl) paraWEl.innerText = (report.paraphrase_words || 0).toLocaleString() + ' كلمة متقاربة';
+
+            // 4. Properly Cited (الاقتباس الموثق)
+            const citedVal = report.cited_pct || 0;
+            const citedEl = document.getElementById('report-cited-val');
+            if (citedEl) citedEl.innerText = citedVal + '%';
+            const citedWEl = document.getElementById('report-cited-words');
+            if (citedWEl) citedWEl.innerText = (report.cited_words ? (report.cited_words).toLocaleString() + ' كلمة موثقة ومستبعدة' : 'موثق حسب الأصول ومستبعد');
 
             const statusBadge = document.getElementById('report-status-badge');
             const currentStatus = report.status || 'مفحوص';
-            statusBadge.innerText = currentStatus;
-            
-            if (currentStatus === 'قبول مبدئي') {
-                statusBadge.style.color = '#0284c7';
-            } else if (currentStatus === 'قبول نهائي') {
-                statusBadge.style.color = '#059669';
-            } else if (currentStatus === 'مرفوض') {
-                statusBadge.style.color = '#dc2626';
-            } else if (overallVal > 50) {
-                statusBadge.style.color = '#dc2626';
-            } else {
-                statusBadge.style.color = '#059669';
+            if (statusBadge) {
+                statusBadge.innerText = currentStatus;
+                if (currentStatus === 'قبول مبدئي') {
+                    statusBadge.style.color = '#0284c7';
+                } else if (currentStatus === 'قبول نهائي') {
+                    statusBadge.style.color = '#059669';
+                } else if (currentStatus === 'مرفوض') {
+                    statusBadge.style.color = '#dc2626';
+                } else if (overallVal > 50) {
+                    statusBadge.style.color = '#dc2626';
+                } else {
+                    statusBadge.style.color = '#059669';
+                }
             }
 
             document.getElementById('doc-report-title').innerText = report.title;
-            document.getElementById('doc-report-author').innerText = 'الباحث: ' + (report.author || 'غير محدد');
-            document.getElementById('report-date-str').innerText = 'التاريخ: ' + (report.date || '');
-            document.getElementById('report-domain-badge').innerText = 'التخصص المكتشف: ' + (report.category || 'عام');
+            document.getElementById('doc-report-author').innerHTML = '<strong>الباحث:</strong> ' + (report.author || 'غير محدد');
+            document.getElementById('report-date-str').innerHTML = '<strong>التاريخ:</strong> ' + (report.date || '');
+            document.getElementById('report-domain-badge').innerHTML = '<strong>التخصص:</strong> ' + (report.category || 'عام');
 
             // Volume stats (Pages & Words)
             const totalWords = report.total_words || 0;
@@ -3300,13 +4053,14 @@
             const plagPages = report.plagiarized_pages || (plagWords > 0 ? (plagWords / 250).toFixed(1) : 0);
             const volStatsEl = document.getElementById('report-volume-stats');
             if (volStatsEl) {
-                volStatsEl.innerText = `إجمالي حجم البحث: ${totalPages} صفحة تقريباً (${totalWords.toLocaleString()} كلمة) | المستل: ${plagPages} صفحة تقريباً (${plagWords.toLocaleString()} كلمة)`;
+                volStatsEl.innerText = `الحجم التقديري: ${totalPages} صفحة (${totalWords.toLocaleString()} كلمة) | المستل: ${plagPages} صفحة (${plagWords.toLocaleString()} كلمة)`;
             }
 
-            // AI Status
+            // AI Stylistic Indicator
             if (report.ai_analysis) {
                 const aiPct = report.ai_analysis.ai_percentage || 0;
-                document.getElementById('report-ai-status').innerText = `تحليل الذكاء الاصطناعي أوفلاين: ${aiPct}% (${report.ai_analysis.status})`;
+                const aiStat = report.ai_analysis.status || (aiPct > 50 ? 'خصائص تركيبية تستدعي الفحص' : 'طبيعي (نص بشري)');
+                document.getElementById('report-ai-status').innerText = `${aiPct}% — ${aiStat}`;
             }
 
             // Submitter notice banner
@@ -3337,17 +4091,18 @@
                 pageLimitBox.style.display = 'none';
             }
 
+            // Highlighted Full Document Text Viewer
             const docViewer = document.getElementById('document-text-content');
             let html = '';
-            report.segments.forEach(seg => {
-                // Wrap each segment text with Unicode BiDi isolation characters
-                // U+2068 = First Strong Isolate, U+2069 = Pop Directional Isolate
+            (report.segments || []).forEach(seg => {
                 const safeText = '\u2068' + seg.text + '\u2069';
-                if (seg.status === 'copied' || seg.status === 'paraphrased') {
-                    const cls = seg.status === 'copied' ? 'highlight-copied' : 'highlight-paraphrased';
+                if (seg.status === 'copied' || seg.status === 'paraphrased' || seg.status === 'cited') {
+                    let cls = 'highlight-copied';
+                    if (seg.status === 'paraphrased') cls = 'highlight-paraphrased';
+                    else if (seg.status === 'cited') cls = 'highlight-cited';
                     const srcTitle = (seg.source_title || 'مصدر غير معروف').replace(/"/g, '&quot;');
                     const srcAuthor = (seg.source_author || 'غير محدد').replace(/"/g, '&quot;');
-                    const srcText = (seg.source_text || seg.text).replace(/"/g, '&quot;');
+                    const srcText = (seg.source_text || seg.matched_text || seg.text).replace(/"/g, '&quot;');
                     const pct = seg.match_pct || 0;
                     const srcPages = seg.source_pages || 0;
                     const srcWords = (seg.source_words || 0).toLocaleString();
@@ -3358,11 +4113,11 @@
                     html += `<span dir="auto">${safeText}</span> `;
                 }
             });
-            docViewer.innerHTML = html;
+            docViewer.innerHTML = html || 'لا يوجد محتوى نصي لعرضه';
 
             // Hover Popover events
             const popover = document.getElementById('hover-popover');
-            docViewer.querySelectorAll('.highlight-copied, .highlight-paraphrased').forEach(el => {
+            docViewer.querySelectorAll('.highlight-copied, .highlight-paraphrased, .highlight-cited').forEach(el => {
                 el.addEventListener('mouseenter', () => {
                     document.getElementById('popover-title').innerText = el.getAttribute('data-src');
                     const popAuthor = document.getElementById('popover-author');
@@ -3388,59 +4143,89 @@
                 });
             });
 
-            // Sources list (Right cards) & Detailed Sources Table
-            const sourcesContainer = document.getElementById('sources-list-container');
+            // Detailed Matched Sources Table
             const detailedTableBody = document.getElementById('report-sources-table-body');
-            let srcHtml = '';
             let tableHtml = '';
-
-            report.sources.forEach((src, idx) => {
+            (report.sources || []).forEach((src, idx) => {
                 const isOverLimit = (src.pages >= 5.0);
                 const pagesVal = src.pages || (src.words ? (src.words / 250).toFixed(1) : 0);
                 const wordsVal = (src.words || 0).toLocaleString();
-                const pagesInfo = `${pagesVal} صفحة تقريباً (${wordsVal} كلمة)`;
-
-                srcHtml += `
-                    <div class="source-card" style="${isOverLimit ? 'border: 1.5px solid #f87171; background: #fff5f5;' : ''}">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span class="source-rank" style="${isOverLimit ? 'background: #dc2626;' : ''}">${idx + 1}</span>
-                            <div>
-                                <div class="source-title">${src.title}</div>
-                                <div style="font-size: 12px; color: #0369a1; font-weight: 600; margin-top: 2px;">الباحث: ${src.author || 'غير محدد'}</div>
-                                <div style="font-size: 11px; font-weight: 700; margin-top: 3px; color: ${isOverLimit ? '#dc2626' : '#64748b'};">
-                                    ${isOverLimit ? 'تجاوز الحد (أكثر من 5 صفحات): ' : 'الحجم المقتبس: '}${pagesInfo}
-                                </div>
-                            </div>
-                        </div>
-                        <div style="text-align: left;">
-                            <span style="font-size: 14px; font-weight: 800; color: ${isOverLimit ? '#dc2626' : 'var(--primary-navy)'};">${src.pct}%</span>
-                        </div>
-                    </div>
-                `;
+                const srcPagesList = (src.source_pages && src.source_pages.length > 0) 
+                    ? `ص. ${src.source_pages.join('، ')}` 
+                    : 'صفحات غير مرقمة';
 
                 tableHtml += `
                     <tr style="${isOverLimit ? 'background: #fff5f5;' : ''}">
                         <td><strong>${idx + 1}</strong></td>
                         <td style="font-weight: 700; color: var(--primary-navy);">${src.title}</td>
                         <td style="color: #0369a1; font-weight: 600;">${src.author || 'غير محدد'}</td>
-                        <td style="font-weight: 800; font-size: 14px; color: ${isOverLimit ? '#dc2626' : 'var(--primary-navy)'};">
-                            ${pagesVal} صفحة تقريباً
-                        </td>
-                        <td style="font-weight: 600; color: #64748b;">${wordsVal} كلمة</td>
-                        <td><span class="badge-pct ${src.pct > 50 ? 'high' : (src.pct > 20 ? 'medium' : 'low')}">${src.pct}%</span></td>
-                        <td>
+                        <td style="text-align: center;"><span class="badge-pct ${src.pct > 50 ? 'high' : (src.pct > 20 ? 'medium' : 'low')}">${src.pct}%</span></td>
+                        <td style="text-align: center; font-weight: 600; color: #475569;">${wordsVal} كلمة</td>
+                        <td style="text-align: center; font-weight: 800; color: ${isOverLimit ? '#dc2626' : 'var(--primary-navy)'};">${pagesVal} صفحة</td>
+                        <td style="text-align: center; font-size: 12px; color: #0284c7; font-weight: 600;">${srcPagesList}</td>
+                        <td style="text-align: center;">
                             ${isOverLimit ? 
-                                '<span style="background: #fee2e2; color: #991b1b; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#991b1b;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>تجاوز الحد (أكثر من 5 صفحات)</span>' : 
-                                '<span style="background: #ecfdf5; color: #065f46; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#065f46;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>ضمن المسموح (أقل من 5 صفحات)</span>'
+                                '<span style="background: #fee2e2; color: #991b1b; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700;">تجاوز (أكثر من 5)</span>' : 
+                                '<span style="background: #ecfdf5; color: #065f46; padding: 3px 8px; border-radius: 6px; font-size: 11.5px; font-weight: 700;">ضمن المسموح</span>'
                             }
                         </td>
                     </tr>
                 `;
             });
-
-            sourcesContainer.innerHTML = srcHtml || '<p style="color:var(--text-muted); font-size:13px;">لم يُكتشف أي مصدر مطابق</p>';
             if (detailedTableBody) {
-                detailedTableBody.innerHTML = tableHtml || '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:16px;">لم يتم العثور على مصادر مستلة</td></tr>';
+                detailedTableBody.innerHTML = tableHtml || getEmptyStateHtml('لم يتم تسجيل مصادر متطابقة', 'لم يُظهر التحليل أي تطابقات مستلة من المراجع المفهرسة.', 8);
+            }
+
+            // Detailed Evidence Comparison Section (Side-by-side Cards)
+            const evidenceContainer = document.getElementById('evidence-comparison-container');
+            if (evidenceContainer) {
+                let evidenceHtml = '';
+                const matchedSegs = (report.segments || []).filter(s => s.status === 'copied' || s.status === 'paraphrased' || s.status === 'cited');
+                if (matchedSegs.length === 0) {
+                    evidenceHtml = '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding: 24px 0;">لم يتم رصد شواهد تطابق أو تشابه نصوص في هذا المستند.</p>';
+                } else {
+                    matchedSegs.forEach((seg) => {
+                        let badgeBg = '#ecfdf5', badgeColor = '#065f46', badgeText = 'اقتباس موثق';
+                        if (seg.status === 'copied') {
+                            badgeBg = '#fee2e2'; badgeColor = '#991b1b'; badgeText = 'نسخ مباشر';
+                        } else if (seg.status === 'paraphrased') {
+                            badgeBg = '#ffedd5'; badgeColor = '#9a3412'; badgeText = 'إعادة صياغة محتملة';
+                        }
+                        const srcTitle = (seg.source_title || 'مرجع غير محدد').replace(/"/g, '&quot;');
+                        const srcAuthor = (seg.source_author || 'غير محدد').replace(/"/g, '&quot;');
+                        const srcPage = seg.source_page_display || (seg.source_pages && seg.source_pages.length ? 'ص. ' + seg.source_pages.join('، ') : 'غير محدد');
+                        const score = seg.match_pct ? `${seg.match_pct}%` : 'تطابق';
+                        const safeSubmitted = '\u2068' + (seg.text || '') + '\u2069';
+                        const safeMatched = '\u2068' + (seg.matched_text || seg.source_text || seg.text || '') + '\u2069';
+
+                        evidenceHtml += `
+                            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">${badgeText}</span>
+                                        <span style="font-size: 13px; font-weight: 700; color: var(--primary-navy);">${srcTitle}</span>
+                                        <span style="font-size: 12px; color: #64748b;">(${srcAuthor})</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; gap: 12px; font-size: 12px;">
+                                        <span style="color: #475569;"><strong>صفحة المرجع:</strong> ${srcPage}</span>
+                                        <span style="font-weight: 800; color: var(--primary-navy); background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">درجة التطابق: ${score}</span>
+                                    </div>
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; font-size: 13px; line-height: 1.7;">
+                                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px;">
+                                        <div style="font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">النص محل الفحص:</div>
+                                        <div dir="auto" style="color: #0f172a;">${safeSubmitted}</div>
+                                    </div>
+                                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px;">
+                                        <div style="font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">النص المطابق في المصدر:</div>
+                                        <div dir="auto" style="color: #0f172a;">${safeMatched}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                evidenceContainer.innerHTML = evidenceHtml;
             }
         }
 
@@ -3594,7 +4379,7 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">لا توجد أبحاث مطابقة لفترة الفلترة المحددة</td></tr>';
+            tbody.innerHTML = html || getEmptyStateHtml('لا توجد أبحاث في طابور الاعتماد المبدئي حالياً', 'ستظهر هنا الأبحاث المقبولة مبدئياً بانتظار استلام النسخة المحدثة أو الاعتماد النهائي.', 7);
         }
 
         async function loadRejectedPapers() {
@@ -3642,7 +4427,7 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">لا توجد أبحاث مرفوضة مطابقة لفترة الفلترة المحددة</td></tr>';
+            tbody.innerHTML = html || getEmptyStateHtml('سجل الأبحاث المرفوضة فارغ', 'لم يتم إصدار قرار رفض بحق أي بحث حتى الآن.', 7);
         }
 
         async function deleteReportArchive(reportId) {
@@ -3719,7 +4504,7 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center; color:var(--text-muted); padding:20px;">لا توجد أبحاث مطابقة لفترة البحث والفلترة المحددة</td></tr>';
+            tbody.innerHTML = html || getEmptyStateHtml('قاعدة الأبحاث المرجعية فارغة حالياً', 'يمكنك إضافة أول بحث مرجعي عبر زر «إضافة بحث للقاعدة المرجعية».', 7);
 
             const pagContainer = document.getElementById('db-pagination');
             if (pagContainer) pagContainer.innerHTML = '';
@@ -3956,13 +4741,23 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:20px;">لا توجد تقارير مطابقة لفترة الفلترة المحددة</td></tr>';
+            tbody.innerHTML = html || getEmptyStateHtml('لا توجد عمليات فحص سابقة', 'ستظهر هنا أحدث الأبحاث المفحوصة فور إجراء أول عملية تحليل.', 6);
         }
 
         // ─── Authentication & Session Management (100% Offline) ───────────
         let currentUser = null;
 
-        function checkAuthSession() {
+        async function checkAuthSession() {
+            // فحص هل المنظومة بحاجة إلى تهيئة أولى لتعيين حساب المدير
+            try {
+                const statusRes = await fetch('/api/auth/status');
+                const statusData = await statusRes.json();
+                if (statusData.needs_first_time_setup) {
+                    showFirstTimeSetupUI();
+                    return false;
+                }
+            } catch (e) {}
+
             try {
                 const saved = sessionStorage.getItem('police_academy_user');
                 if (saved) {
@@ -3979,11 +4774,59 @@
             // No active session -> show login gate
             currentUser = null;
             document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('form-login-standard').style.display = 'block';
+            document.getElementById('form-first-time-setup').style.display = 'none';
             setTimeout(() => {
                 const userInp = document.getElementById('login-username');
                 if (userInp) userInp.focus();
             }, 100);
             return false;
+        }
+
+        function showFirstTimeSetupUI() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('form-login-standard').style.display = 'none';
+            document.getElementById('form-first-time-setup').style.display = 'block';
+            document.getElementById('login-title-heading').innerText = 'تهيئة المنظومة لأول مرة';
+            document.getElementById('login-subtitle-heading').innerText = 'إنشاء حساب مدير النظام الرئيسي';
+        }
+
+        async function submitFirstTimeSetup() {
+            const fullname = document.getElementById('setup-fullname').value.trim();
+            const username = document.getElementById('setup-username').value.trim();
+            const password = document.getElementById('setup-password').value.trim();
+            const errAlert = document.getElementById('login-error-alert');
+            const errText = document.getElementById('login-error-text');
+
+            if (!fullname || !username || !password) {
+                errAlert.style.display = 'flex';
+                errText.innerText = 'يرجى ملء كافة بيانات مدير المنظومة';
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/auth/setup_admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name: fullname, username, password })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('تم إنشاء حساب مدير المنظومة بنجاح! جاري تسجيل الدخول...', 'success');
+                    // Automatically login
+                    document.getElementById('login-username').value = username;
+                    document.getElementById('login-password').value = password;
+                    document.getElementById('form-first-time-setup').style.display = 'none';
+                    document.getElementById('form-login-standard').style.display = 'block';
+                    await submitLogin();
+                } else {
+                    errAlert.style.display = 'flex';
+                    errText.innerText = data.error || 'فشلت التهيئة الأولى';
+                }
+            } catch (e) {
+                errAlert.style.display = 'flex';
+                errText.innerText = 'فشل الاتصال بالخادم لإتمام التهيئة';
+            }
         }
 
         async function submitLogin() {
@@ -4141,7 +4984,7 @@
             const filtered = _cacheInitialReviews.filter(p => checkDateMatch(p.created_at, filter.period, filter.from, filter.to));
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:24px;">لا توجد أبحاث مطابقة لفترة الفلترة المحددة</td></tr>';
+                tbody.innerHTML = getEmptyStateHtml('لا توجد أبحاث في طابور الفحص الأولي', 'ستظهر هنا الأبحاث المحولة من الموظفين لمراجعتها واتخاذ القرار.', 8);
                 return;
             }
 
@@ -4252,7 +5095,7 @@
                         </tr>
                     `;
                 });
-                tbody.innerHTML = html || '<tr><td colspan="6" style="text-align:center; color:var(--text-muted); padding:16px;">لا يوجد موظفون إضافيون</td></tr>';
+                tbody.innerHTML = html || getEmptyStateHtml('لا يوجد موظفون مسجلون', 'يمكنك إضافة موظف فحص جديد من النموذج أعلاه.', 6);
             } catch (e) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:#dc2626; padding:16px;">تعذر تحميل قائمة الموظفين</td></tr>';
             }
@@ -4334,7 +5177,7 @@
                         </tr>
                     `;
                 });
-                tbody.innerHTML = html || '<tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">لا توجد نسخ احتياطية سابقة حتى الآن</td></tr>';
+                tbody.innerHTML = html || getEmptyStateHtml('لا توجد نسخ احتياطية مسجلة', 'يتم إنشاء لقطات احتياطية دورية وتلقائية لقاعدة البيانات.', 4);
             } catch (e) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:16px;">تعذر جلب النسخ الاحتياطية</td></tr>';
             }
@@ -4368,8 +5211,94 @@
             }
         }
 
-        
-        
+        // ─── Academic Settings & Offline Diagnostics Handlers ───────────────
+        async function loadSystemSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                const data = await res.json();
+                if (data.settings) {
+                    const s = data.settings;
+                    const jVal = Math.round((s.jaccard_threshold !== undefined ? s.jaccard_threshold : 0.40) * 100);
+                    const cVal = Math.round((s.cosine_threshold !== undefined ? s.cosine_threshold : (s.tfidf_threshold !== undefined ? s.tfidf_threshold : 0.40)) * 100);
+                    const jEl = document.getElementById('setting-jaccard');
+                    const cEl = document.getElementById('setting-cosine');
+                    const mpEl = document.getElementById('setting-max-pages');
+                    const wppEl = document.getElementById('setting-words-per-page');
+
+                    if (jEl) { jEl.value = jVal; document.getElementById('label-jaccard-val').innerText = jVal + '%'; }
+                    if (cEl) { cEl.value = cVal; document.getElementById('label-cosine-val').innerText = cVal + '%'; }
+                    if (mpEl) mpEl.value = s.max_allowed_pages_per_source || 5.0;
+                    if (wppEl) wppEl.value = s.words_per_page || 250;
+                }
+            } catch (e) {
+                console.error('Failed to load settings', e);
+            }
+        }
+
+        async function saveSystemSettings() {
+            try {
+                const jEl = document.getElementById('setting-jaccard');
+                const cEl = document.getElementById('setting-cosine');
+                const mpEl = document.getElementById('setting-max-pages');
+                const wppEl = document.getElementById('setting-words-per-page');
+
+                const body = {
+                    jaccard_threshold: parseFloat(jEl.value) / 100.0,
+                    cosine_threshold: parseFloat(cEl.value) / 100.0,
+                    tfidf_threshold: parseFloat(cEl.value) / 100.0,
+                    max_allowed_pages_per_source: parseFloat(mpEl.value),
+                    words_per_page: parseInt(wppEl.value)
+                };
+
+                const res = await fetch('/api/settings', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast('تم حفظ معايير الفحص الأكاديمي بنجاح', 'success');
+                } else {
+                    showToast(data.error || 'فشل حفظ الإعدادات', 'error');
+                }
+            } catch (e) {
+                showToast('فشل الاتصال بالخادم لحفظ الإعدادات', 'error');
+            }
+        }
+
+        async function loadSystemDiagnostics() {
+            try {
+                const res = await fetch('/api/system/diagnostics');
+                const data = await res.json();
+                if (data.components) {
+                    const c = data.components;
+                    const dbVal = document.getElementById('diag-db-val');
+                    const pdfVal = document.getElementById('diag-pdf-val');
+                    const ocrVal = document.getElementById('diag-ocr-val');
+                    const storageVal = document.getElementById('diag-storage-val');
+
+                    if (dbVal) {
+                        dbVal.innerText = c.database?.status === 'ok' ? `متصل (${c.database.document_count} بحث مرجعي)` : 'غير متاح';
+                        dbVal.style.color = c.database?.status === 'ok' ? '#059669' : '#dc2626';
+                    }
+                    if (pdfVal) {
+                        pdfVal.innerText = c.pdf_extractor?.status === 'ok' ? 'جاهز (PyMuPDF)' : 'غير متاح';
+                        pdfVal.style.color = c.pdf_extractor?.status === 'ok' ? '#059669' : '#dc2626';
+                    }
+                    if (ocrVal) {
+                        ocrVal.innerText = c.ocr_engine?.status === 'ok' ? 'جاهز (Tesseract OCR)' : 'اختياري / غير مفعل';
+                        ocrVal.style.color = c.ocr_engine?.status === 'ok' ? '#059669' : '#64748b';
+                    }
+                    if (storageVal) {
+                        storageVal.innerText = c.storage?.free_gb ? `${c.storage.free_gb} GB متوفر` : 'متوفر محلياً';
+                        storageVal.style.color = '#0284c7';
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load diagnostics', e);
+            }
+        }
+
         async function submitEmployeeForgotRequest() {
             const userInp = document.getElementById('forgot-emp-username');
             const username = userInp ? userInp.value.trim() : '';
@@ -4414,7 +5343,7 @@
                 const requests = data.requests || [];
 
                 if (requests.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:14px;">لا توجد طلبات استعادة كلمة مرور حالياً</td></tr>';
+                    tbody.innerHTML = getEmptyStateHtml('لا توجد طلبات استعادة معلقة', 'ستظهر هنا طلبات استعادة وتعيين كلمة المرور الواردة من الموظفين.', 5);
                     return;
                 }
 
