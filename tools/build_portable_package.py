@@ -93,7 +93,10 @@ def build_package() -> dict:
             shutil.copy2(src_t, tools_target / t_name)
 
     # 4. نسخ ملفات التشغيل الدفعية والـ README إلى جذر الحزمة
-    for b_name in ["Setup-System.bat", "Start-System.bat", "Stop-System.bat", "Backup-System.bat", "Restore-System.bat", "Check-System.bat", "README-FIRST.txt"]:
+    for b_name in [
+        "Setup-System.bat", "Start-System.bat", "Stop-System.bat", "Backup-System.bat",
+        "Restore-System.bat", "Check-System.bat", "View-Logs.bat", "Create-Diagnostic-Package.bat", "README-FIRST.txt"
+    ]:
         src_b = ROOT_DIR / b_name
         if src_b.exists():
             shutil.copy2(src_b, TARGET_DIR / b_name)

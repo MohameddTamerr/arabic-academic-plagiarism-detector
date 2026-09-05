@@ -1,13 +1,64 @@
 @echo off
-chcp 65001 >nul
-title إعداد منظومة كشف الاستلال الأكاديمي
+setlocal EnableExtensions
+title Arabic Academic Plagiarism Detector - Setup System
 
-set "SCRIPT_DIR=%~dp0"
-if exist "%SCRIPT_DIR%Runtime\python.exe" (
-    set "PYTHON_EXE=%SCRIPT_DIR%Runtime\python.exe"
+set "ROOT=%~dp0"
+if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
+
+set "PYTHON="
+if exist "%ROOT%\Runtime\python.exe" (
+    set "PYTHON=%ROOT%\Runtime\python.exe"
 ) else (
-    set "PYTHON_EXE=python"
+    where python >nul 2>nul
+    if not errorlevel 1 (
+        set "PYTHON=python"
+    )
 )
 
-"%PYTHON_EXE%" "%SCRIPT_DIR%Tools\portable_cli.py" setup
+if "%PYTHON%"=="" (
+    echo ======================================================================
+    echo RUNTIME NOT FOUND
+    echo ======================================================================
+    echo Python executable was not found in:
+    echo   %ROOT%\Runtime\python.exe
+    echo nor in the system PATH.
+    echo Please install Python 3.11+ or provide the Runtime directory.
+    echo ======================================================================
+    pause
+    exit /b 1
+)
+
+set "CLI="
+if exist "%ROOT%\Tools\portable_cli.py" (
+    set "CLI=%ROOT%\Tools\portable_cli.py"
+) else if exist "%ROOT%\tools\portable_cli.py" (
+    set "CLI=%ROOT%\tools\portable_cli.py"
+)
+
+if "%CLI%"=="" (
+    echo ======================================================================
+    echo PORTABLE CLI NOT FOUND
+    echo ======================================================================
+    echo Could not locate portable_cli.py in:
+    echo   %ROOT%\Tools\portable_cli.py
+    echo ======================================================================
+    pause
+    exit /b 1
+)
+
+cd /d "%ROOT%"
+"%PYTHON%" "%CLI%" setup
+if errorlevel 1 (
+    echo.
+    echo ======================================================================
+    echo SETUP FAILED
+    echo ======================================================================
+    echo Check:
+    echo   Logs\server.log
+    echo   Logs\errors.log
+    echo ======================================================================
+    pause
+    exit /b 1
+)
+
 pause

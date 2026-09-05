@@ -129,89 +129,117 @@ def is_process_running(pid: int) -> bool:
         return False
 
 
-def cmd_setup():
-    """معالج الإعداد الأولي للمنظومة وضبط الشبكة والمنفذ."""
+def cmd_setup(quiet: bool = False):
+    """Initializes portable directories, config, and database."""
     ensure_directories()
     cfg = load_config()
     lan_ip = get_lan_ip()
 
-    print("=" * 70)
-    print("   معالج إعداد منظومة كشف الاستلال الأكاديمي (Portable Setup Wizard)")
-    print("=" * 70)
-    print(f"عنوان الـ LAN المكتشف للجهاز: {lan_ip}")
-    print(f"نمط التشغيل الحالي: {cfg.get('mode', 'lan').upper()}")
-    print(f"المنفذ الحالي: {cfg.get('port', 5000)}")
-    print("-" * 70)
+    if not quiet:
+        print("=" * 70)
+        print("   Portable System Setup")
+        print("=" * 70)
+        print(f"Detected LAN IP:   {lan_ip}")
+        print(f"Mode:              {cfg.get('mode', 'lan').upper()}")
+        print(f"Port:              {cfg.get('port', 5000)}")
+        print("-" * 70)
 
-    # حفظ الإعداد المعتمد
     cfg["host"] = "0.0.0.0" if cfg.get("mode") == "lan" else "127.0.0.1"
     save_config(cfg)
 
-    print("[✓] تم حفظ الإعدادات بنجاح في Config/system_config.json")
-    print(f"الرابط المحلي:   http://127.0.0.1:{cfg['port']}")
-    if cfg['mode'] == 'lan':
-        print(f"رابط الشبكة:    http://{lan_ip}:{cfg['port']}")
-    print("=" * 70)
+    # Initialize database schema if not present
+    db_path = DATABASE_DIR / "papers.db"
+    try:
+        from app.repositories import base_repo
+        base_repo.rebind_engine(f"sqlite:///{db_path.as_posix()}")
+        base_repo.init_database()
+        if not quiet:
+            print("[✓] Database initialized and verified successfully.")
+    except Exception as e:
+        if not quiet:
+            print(f"[!] Note on database init: {e}")
+
+    if not quiet:
+        print("[✓] Configuration saved to Config/system_config.json")
+        print(f"Local URL:         http://127.0.0.1:{cfg['port']}")
+        if cfg.get('mode') == 'lan':
+            print(f"LAN URL:           http://{lan_ip}:{cfg['port']}")
+        print("=" * 70)
 
 
 def cmd_start():
-    """بدء تشغيل المنظومة والعمال والتحقق من الجاهزية."""
+    """Starts the application server and background workers with strict readiness validation."""
     ensure_directories()
     cfg = load_config()
     port = cfg.get('port', 5000)
     host = cfg.get('host', '0.0.0.0')
     lan_ip = get_lan_ip()
 
-    # 1. فحص قفل التكرار (Single-Instance Protection)
+    # 1. Single-instance check
     if is_port_in_use(port, '127.0.0.1'):
-        print("=" * 70)
-        print("   [!] SYSTEM ALREADY RUNNING — المنظومة تعمل بالفعل مسبقاً")
-        print("=" * 70)
-        print(f"Local (الجهاز الحالي):  http://127.0.0.1:{port}")
-        if cfg.get('mode') == 'lan':
-            print(f"LAN (أجهزة الشبكة):     http://{lan_ip}:{port}")
-        print("=" * 70)
-        return
+        ping_url = f"http://127.0.0.1:{port}/api/system/ping"
+        alive = False
+        try:
+            req = urllib.request.Request(ping_url)
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
+                if resp.status == 200:
+                    alive = True
+        except Exception:
+            pass
 
-    # 2. فحص المساحة الحرة للقرص (Disk Space Guard)
+        if alive:
+            print("=" * 70)
+            print("SYSTEM ALREADY RUNNING")
+            print("=" * 70)
+            print("Local:")
+            print(f"  http://127.0.0.1:{port}")
+            print()
+            if cfg.get('mode') == 'lan':
+                print("LAN:")
+                print(f"  http://{lan_ip}:{port}")
+            print("=" * 70)
+            return
+        else:
+            print(f"[!] Warning: Port {port} is occupied by another process.")
+
+    # 2. Disk space pre-flight check
     disk_free_gb = psutil.disk_usage(str(ROOT_DIR)).free / (1024**3)
     if disk_free_gb < 1.0:
-        print(f"[خطأ حرج] المساحة الحرة على القرص غير كافية ({disk_free_gb:.2f} GB). يلزم توفر 1 GB على الأقل.")
+        print("=" * 70)
+        print("SYSTEM FAILED TO START")
+        print("=" * 70)
+        print(f"Insufficient disk space: {disk_free_gb:.2f} GB free. At least 1.0 GB is required.")
+        print("=" * 70)
         sys.exit(1)
 
-    # 3. إعداد السجلات المحلية
-    log_out = open(LOGS_DIR / "server.log", "a", encoding="utf-8")
-
     print("=" * 70)
-    print("   جاري بدء تشغيل المنظومة الأكاديمية والعمال في الخلفية...")
+    print("Starting Arabic Academic Plagiarism Detector...")
     print("=" * 70)
+    print("Checking database...")
 
-    # 4. تشغيل خادم الويب Waitress
+    db_path = DATABASE_DIR / "papers.db"
+    if not db_path.exists():
+        cmd_setup(quiet=True)
+
+    # 3. Process spawning configuration
+    py_exec = sys.executable
     env = os.environ.copy()
     env["PORTABLE_MODE"] = "1"
     env["PORTABLE_ROOT"] = str(ROOT_DIR)
     env["HOST"] = host
     env["PORT"] = str(port)
+    env["DATABASE_DIR"] = str(DATABASE_DIR)
+    env["LOGS_DIR"] = str(LOGS_DIR)
+    env["STORAGE_ROOT"] = str(STORAGE_DIR)
+    env["CONFIG_DIR"] = str(CONFIG_DIR)
+    env["BACKUP_DIR"] = str(BACKUPS_DIR)
 
-    # تحديد مشغل بايثون المتاح
-    py_exec = sys.executable
+    creationflags = 0
+    if sys.platform == "win32":
+        creationflags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
 
-    server_script = APP_DIR / "server.py"
-    if not server_script.exists():
-        server_script = ROOT_DIR / "server.py"
-
-    server_proc = subprocess.Popen(
-        [py_exec, str(server_script)],
-        env=env,
-        stdout=log_out,
-        stderr=log_out,
-        cwd=str(ROOT_DIR)
-    )
-
-    with open(PID_FILE, 'w') as f:
-        f.write(str(server_proc.pid))
-
-    # 5. تشغيل عمال المعالجة الخلفية
+    # 4. Start background workers
+    print("Starting workers...")
     worker_pids = []
     worker_count = cfg.get('workers_count', 2)
     worker_script = TOOLS_DIR / "run_worker.py"
@@ -225,32 +253,78 @@ def cmd_start():
                 env=w_env,
                 stdout=worker_log,
                 stderr=worker_log,
-                cwd=str(ROOT_DIR)
+                cwd=str(ROOT_DIR),
+                creationflags=creationflags
             )
             worker_pids.append(wp.pid)
 
     with open(WORKER_PID_FILE, 'w') as f:
         f.write(",".join(str(p) for p in worker_pids))
 
-    # 6. انتظار استجابة نقطة فحص الجاهزية (Readiness Probe)
-    print("   جاري التحقق من جاهزية واستقرار الخادم...")
+    # 5. Start Web Server
+    print("Starting web server...")
+    server_log = open(LOGS_DIR / "server.log", "a", encoding="utf-8")
+    server_script = APP_DIR / "server.py"
+    if not server_script.exists():
+        server_script = ROOT_DIR / "server.py"
+
+    server_proc = subprocess.Popen(
+        [py_exec, str(server_script)],
+        env=env,
+        stdout=server_log,
+        stderr=server_log,
+        cwd=str(ROOT_DIR),
+        creationflags=creationflags
+    )
+
+    with open(PID_FILE, 'w') as f:
+        f.write(str(server_proc.pid))
+
+    # 6. Strict health check polling
+    print("Waiting for health check...")
     ready = False
     ping_url = f"http://127.0.0.1:{port}/api/system/ping"
-    for _ in range(30):
+    
+    for poll_idx in range(60):  # 30 seconds max (60 * 0.5s)
         time.sleep(0.5)
+
+        # Verify server process hasn't exited prematurely
+        if server_proc.poll() is not None:
+            print()
+            print("=" * 70)
+            print("SYSTEM FAILED TO START")
+            print("=" * 70)
+            print(f"The server process terminated unexpectedly with exit code {server_proc.returncode}.")
+            print("Check:")
+            print(f"  {LOGS_DIR / 'server.log'}")
+            print(f"  {LOGS_DIR / 'errors.log'}")
+            print("=" * 70)
+            sys.exit(1)
+
         try:
             req = urllib.request.Request(ping_url)
-            with urllib.request.urlopen(req, timeout=1.0) as resp:
+            with urllib.request.urlopen(req, timeout=1.5) as resp:
                 if resp.status == 200:
-                    ready = True
-                    break
+                    data = json.loads(resp.read().decode('utf-8'))
+                    if data.get('status') == 'ok' or data.get('ready') is True:
+                        ready = True
+                        break
         except Exception:
             pass
 
     if not ready:
-        print("   [تنبيه] الخادم استغرق وقتاً أطول للبدء. تحقق من Logs/server.log.")
+        print()
+        print("=" * 70)
+        print("SYSTEM FAILED TO START")
+        print("=" * 70)
+        print("Health check timed out after 30 seconds.")
+        print("Check:")
+        print(f"  {LOGS_DIR / 'server.log'}")
+        print(f"  {LOGS_DIR / 'errors.log'}")
+        print("=" * 70)
+        sys.exit(1)
 
-    # 7. فتح المتصفح التلقائي
+    # 7. Automatic browser launch
     if cfg.get('auto_open_browser', True):
         def _open():
             time.sleep(0.5)
@@ -258,29 +332,30 @@ def cmd_start():
         import threading
         threading.Thread(target=_open, daemon=True).start()
 
-    # 8. عرض النتيجة النهائية للمسؤول
-    print("\n" + "=" * 70)
-    print("   [✓] SYSTEM READY — المنظومة الأكاديمية جاهزة للعمل بنجاح")
+    # 8. Display verified system ready banner
+    print()
     print("=" * 70)
-    print(f"Local (الجهاز الحالي):")
-    print(f"   http://127.0.0.1:{port}")
+    print("SYSTEM READY")
+    print("=" * 70)
+    print("Local:")
+    print(f"  http://127.0.0.1:{port}")
     print()
     if cfg.get('mode') == 'lan':
-        print(f"Ministry LAN (أجهزة الشبكة المحلية):")
-        print(f"   http://{lan_ip}:{port}")
+        print("LAN:")
+        print(f"  http://{lan_ip}:{port}")
     print("=" * 70)
-    print("للإيقاف الآمن في أي وقت: شغّل Stop-System.bat")
+    print("To stop system: run Stop-System.bat")
     print("=" * 70)
 
 
 def cmd_stop():
-    """الإيقاف السلس للعمال والخادم وعمل نقطة تفتيش لـ WAL."""
+    """Graceful shutdown for background workers and server with WAL checkpoint."""
     ensure_directories()
     print("=" * 70)
-    print("   جاري إيقاف المنظومة والعمال بشكل آمن (Graceful Shutdown)...")
+    print("Stopping system (Graceful Shutdown)...")
     print("=" * 70)
 
-    # 1. إيقاف العمال
+    # 1. Terminate workers
     if WORKER_PID_FILE.exists():
         try:
             with open(WORKER_PID_FILE, 'r') as f:
@@ -295,9 +370,9 @@ def cmd_stop():
                                 pass
             WORKER_PID_FILE.unlink(missing_ok=True)
         except Exception as e:
-            print(f"   ملاحظة أثناء إيقاف العمال: {e}")
+            print(f"Note on workers stop: {e}")
 
-    # 2. إيقاف خادم الويب
+    # 2. Terminate server
     if PID_FILE.exists():
         try:
             with open(PID_FILE, 'r') as f:
@@ -309,21 +384,21 @@ def cmd_stop():
                         pass
             PID_FILE.unlink(missing_ok=True)
         except Exception as e:
-            print(f"   ملاحظة أثناء إيقاف الخادم: {e}")
+            print(f"Note on server stop: {e}")
 
-    # 3. دمج معاملات WAL وحفظ قاعدة البيانات (Checkpoint)
+    # 3. WAL Checkpoint
     db_path = DATABASE_DIR / "papers.db"
     if db_path.exists():
         try:
             conn = sqlite3.connect(str(db_path), timeout=5.0)
             conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
             conn.close()
-            print("   [✓] تم دمج معاملات WAL وإغلاق قاعدة البيانات بأمان تام.")
+            print("[✓] WAL transactions safely checkpointed to disk.")
         except Exception as e:
-            print(f"   تعذر دمج WAL ({e})")
+            print(f"WAL checkpoint note: {e}")
 
     print("=" * 70)
-    print("   [✓] SYSTEM STOPPED SAFELY — تم إيقاف المنظومة بنجاح")
+    print("SYSTEM STOPPED SAFELY")
     print("=" * 70)
 
 
