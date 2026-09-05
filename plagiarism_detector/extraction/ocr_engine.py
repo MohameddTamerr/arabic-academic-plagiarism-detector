@@ -7,11 +7,192 @@
 """
 
 import os
+import time
+import json
+import uuid
 import shutil
 import logging
+import threading
 from pathlib import Path
+from datetime import datetime
+from typing import Optional
+
+import config
 
 logger = logging.getLogger(__name__)
+
+# حماية داخلية لتنفيذ Tesseract على مستوى خيوط العملية الواحدة (Intra-Process Thread Semaphore)
+_OCR_SEMAPHORE = threading.Semaphore(getattr(config, 'MAX_CONCURRENT_OCR_JOBS', 1))
+
+
+def get_ocr_semaphore() -> threading.Semaphore:
+    """الحصول على السيمافور الداخلي الحاكم لعمليات OCR على مستوى العملية."""
+    return _OCR_SEMAPHORE
+
+
+def get_ocr_lock_path() -> Path:
+    """استرجاع والتأكد من مسار ملف قفل OCR الحاكم عبر العمليات."""
+    custom_path = getattr(config, 'OCR_LOCK_FILE', None)
+    if custom_path:
+        p = Path(custom_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
+    s_root = getattr(config, 'STORAGE_ROOT', None)
+    if not s_root:
+        s_root = Path(getattr(config, 'TEMP_UPLOAD_DIR', None) or '.')
+    s_root.mkdir(parents=True, exist_ok=True)
+    return s_root / '.ocr.lock'
+
+
+class CrossProcessOcrLock:
+    """
+    قفل تنفيذ OCR الحاكم عبر العمليات المتعددة (Cross-Process Authoritative OCR Execution Slot):
+    - يضمن تشغيل عملية Tesseract واحدة فقط في نفس اللحظة عبر كافة عمليات نظام التشغيل (MAX_CONCURRENT_OCR_JOBS = 1).
+    - يعتمد على ملف قفل ذري (.ocr.lock) مدعوم برقم العملية (PID) وطابع زمني وهوية فريدة.
+    - يدعم كشف واسترداد الأقفال الميتة (Stale Locks) إذا توقفت العملية السابقة دون تحرير القفل.
+    - يضمن التحرير الحتمي للقفل في كتلة finally أو عند خروج مدير السياق.
+    """
+    def __init__(self, owner: str = 'system', timeout_seconds: int = 60, lock_file_path: Optional[Path] = None):
+        self.owner = owner
+        self.timeout_seconds = timeout_seconds
+        self.lock_file = lock_file_path or get_ocr_lock_path()
+        self.token = str(uuid.uuid4())
+        self._fd = None
+        self._acquired = False
+
+    def acquire(self, blocking: bool = True, timeout_seconds: Optional[float] = None, poll_interval: float = 0.05) -> bool:
+        max_timeout = timeout_seconds if timeout_seconds is not None else self.timeout_seconds
+        start_time = time.time()
+        while True:
+            # 1. فحص القفل الحالي إذا كان موجوداً
+            if self.lock_file.exists():
+                is_stale = self._check_and_clean_stale_lock()
+                if not is_stale:
+                    if not blocking:
+                        return False
+                    if time.time() - start_time > max_timeout:
+                        return False
+                    time.sleep(poll_interval)
+                    continue
+
+            # 2. محاولة إنشاء ملف القفل ذرياً على مستوى نظام التشغيل
+            try:
+                flags = os.O_CREAT | os.O_EXCL | os.O_RDWR
+                self._fd = os.open(str(self.lock_file), flags, 0o600)
+                payload = {
+                    'token': self.token,
+                    'owner': self.owner,
+                    'pid': os.getpid(),
+                    'acquired_at': datetime.utcnow().isoformat(),
+                    'expires_at': time.time() + self.timeout_seconds
+                }
+                os.write(self._fd, json.dumps(payload).encode('utf-8'))
+                self._acquired = True
+                return True
+            except (FileExistsError, OSError):
+                if not blocking:
+                    return False
+                if time.time() - start_time > max_timeout:
+                    return False
+                time.sleep(poll_interval)
+
+    def _check_and_clean_stale_lock(self) -> bool:
+        try:
+            if not self.lock_file.exists():
+                return True
+            with open(self.lock_file, 'r', encoding='utf-8') as f:
+                content = f.read().strip()
+                if not content:
+                    self._force_remove_lock_file()
+                    return True
+                data = json.loads(content)
+
+            expires_at = data.get('expires_at', 0)
+            pid = data.get('pid')
+
+            # فحص انتهاء مدة التأجير
+            if time.time() > expires_at:
+                logger.warning(f"تم اكتشاف قفل OCR منتهي الصلاحية (Stale Lock) لمالكه {data.get('owner')} (PID {pid}). جاري الاسترداد...")
+                self._force_remove_lock_file()
+                return True
+
+            # فحص ما إذا كانت العملية ميتة
+            if pid and not self._is_process_alive(pid):
+                logger.warning(f"تم اكتشاف قفل OCR لعملية غير موجودة (Dead PID {pid}). جاري الاسترداد...")
+                self._force_remove_lock_file()
+                return True
+
+            return False
+        except Exception as e:
+            logger.warning(f"تعذر فحص ملف قفل OCR: {e}. جاري تجاوزه...")
+            self._force_remove_lock_file()
+            return True
+
+    @staticmethod
+    def _is_process_alive(pid: int) -> bool:
+        if pid <= 0:
+            return False
+        try:
+            if os.name == 'nt':
+                import ctypes
+                kernel32 = ctypes.windll.kernel32
+                SYNCHRONIZE = 0x00100000
+                process = kernel32.OpenProcess(SYNCHRONIZE, False, pid)
+                if process:
+                    wait_res = kernel32.WaitForSingleObject(process, 0)
+                    kernel32.CloseHandle(process)
+                    # 0x00000102 (WAIT_TIMEOUT) means the process is still running (unsignaled)
+                    return wait_res == 0x00000102
+                return False
+            else:
+                os.kill(pid, 0)
+                return True
+        except Exception:
+            return False
+
+    def _force_remove_lock_file(self):
+        try:
+            if self._fd is not None:
+                try:
+                    os.close(self._fd)
+                except Exception:
+                    pass
+                self._fd = None
+            if self.lock_file.exists():
+                os.unlink(str(self.lock_file))
+        except Exception as e:
+            logger.error(f"خطأ أثناء إزالة ملف قفل OCR القديم: {e}")
+
+    def release(self):
+        if not self._acquired:
+            return
+        try:
+            if self._fd is not None:
+                try:
+                    os.close(self._fd)
+                except Exception:
+                    pass
+                self._fd = None
+
+            if self.lock_file.exists():
+                try:
+                    with open(self.lock_file, 'r', encoding='utf-8') as f:
+                        data = json.load(f)
+                    if data.get('token') == self.token or data.get('pid') == os.getpid():
+                        os.unlink(str(self.lock_file))
+                except Exception:
+                    if self.lock_file.exists():
+                        os.unlink(str(self.lock_file))
+        finally:
+            self._acquired = False
+
+    def __enter__(self):
+        if not self.acquire(blocking=True):
+            raise RuntimeError("تعذر حجز فتحة تشغيل OCR عبر العمليات ضمن المهلة المحددة (Cross-Process OCR Slot Busy).")
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.release()
 
 # مسارات تيسيراكت الافتراضية على أنظمة ويندوز
 _COMMON_TESSERACT_PATHS = [
@@ -84,17 +265,26 @@ def ocr_page_pixmap(pixmap_or_image) -> str:
 
         pytesseract.pytesseract.tesseract_cmd = status['cmd_path']
 
-        # إذا كان المدخل fitz Pixmap
-        if hasattr(pixmap_or_image, 'tobytes'):
+        # إذا كان المدخل صورة PIL مباشرة أو fitz Pixmap
+        if isinstance(pixmap_or_image, Image.Image):
+            image = pixmap_or_image
+        elif hasattr(pixmap_or_image, 'tobytes'):
             img_bytes = pixmap_or_image.tobytes('png')
             image = Image.open(io.BytesIO(img_bytes))
-        elif isinstance(pixmap_or_image, Image.Image):
-            image = pixmap_or_image
         else:
             return ''
 
-        text = pytesseract.image_to_string(image, lang='ara+eng', config='--psm 6')
-        return text.strip()
+        with _OCR_SEMAPHORE:
+            timeout = getattr(config, 'OCR_LOCK_TIMEOUT_SECONDS', 60)
+            ocr_lock = CrossProcessOcrLock(owner=f"ocr_proc_{os.getpid()}", timeout_seconds=timeout)
+            if not ocr_lock.acquire(blocking=True, timeout_seconds=timeout):
+                logger.warning("تعذر حجز فتحة تشغيل OCR عبر العمليات ضمن المهلة المحددة (Cross-Process OCR Slot Timeout).")
+                return ''
+            try:
+                text = pytesseract.image_to_string(image, lang='ara+eng', config='--psm 6')
+                return text.strip()
+            finally:
+                ocr_lock.release()
     except Exception as e:
         logger.warning(f"فشل أثناء إجراء OCR للصفحة: {e}")
         return ''

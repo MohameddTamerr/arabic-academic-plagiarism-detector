@@ -1,0 +1,104 @@
+{
+  "baseline_identifier": "PHASE_18_FROZEN_BASELINE",
+  "frozen_at": "2026-09-04 16:40:00 UTC",
+  "dataset_version": "1.0-phase18-baseline",
+  "dataset_composition": {
+    "total_samples": 323,
+    "DEVELOPER_SYNTHETIC": 323,
+    "EXPERT_REVIEWED": 0,
+    "REAL_ANONYMIZED": 0
+  },
+  "engine_configuration": {
+    "shingle_size": 5,
+    "jaccard_threshold": 0.40,
+    "tfidf_threshold": 0.40,
+    "enable_semantic_model": false,
+    "max_candidate_retrieval": 10,
+    "config_source": "config.DEFAULT_SETTINGS consumed by report_builder.py"
+  },
+  "overall_metrics": {
+    "overall_accuracy": 0.7028,
+    "macro_precision": 0.5950,
+    "macro_recall": 0.6636,
+    "macro_f1": 0.5911
+  },
+  "overlap_classification_metrics": {
+    "EXACT_COPY": {
+      "support": 55,
+      "tp": 54,
+      "fp": 0,
+      "fn": 1,
+      "tn": 160,
+      "precision": 1.0,
+      "recall": 0.9818,
+      "f1_score": 0.9908,
+      "recall_95ci": [0.9039, 0.9968]
+    },
+    "MODIFIED_COPY": {
+      "support": 55,
+      "tp": 37,
+      "fp": 1,
+      "fn": 18,
+      "tn": 159,
+      "precision": 0.9737,
+      "recall": 0.6727,
+      "f1_score": 0.7957,
+      "recall_95ci": [0.5410, 0.7819]
+    },
+    "PARAPHRASE": {
+      "support": 55,
+      "tp": 0,
+      "fp": 0,
+      "fn": 55,
+      "tn": 160,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "recall_95ci": [0.0, 0.0653]
+    },
+    "ORIGINAL_UNRELATED": {
+      "support": 50,
+      "tp": 50,
+      "fp": 73,
+      "fn": 0,
+      "tn": 92,
+      "precision": 0.4065,
+      "recall": 1.0,
+      "f1_score": 0.5780,
+      "recall_95ci": [0.9287, 1.0]
+    }
+  },
+  "overlap_confusion_matrix": {
+    "EXACT_COPY": {"EXACT_COPY": 54, "MODIFIED_COPY": 1, "PARAPHRASE": 0, "ORIGINAL_UNRELATED": 0},
+    "MODIFIED_COPY": {"EXACT_COPY": 0, "MODIFIED_COPY": 37, "PARAPHRASE": 0, "ORIGINAL_UNRELATED": 18},
+    "PARAPHRASE": {"EXACT_COPY": 0, "MODIFIED_COPY": 0, "PARAPHRASE": 0, "ORIGINAL_UNRELATED": 55},
+    "ORIGINAL_UNRELATED": {"EXACT_COPY": 0, "MODIFIED_COPY": 0, "PARAPHRASE": 0, "ORIGINAL_UNRELATED": 50}
+  },
+  "citation_metrics": {
+    "precision": 0.8333,
+    "recall": 1.0000,
+    "f1_score": 0.9091,
+    "false_citation_rate": 0.0366
+  },
+  "common_text_suppression_metrics": {
+    "suppression_rate": 0.0600,
+    "false_overlap_rate": 0.4400
+  },
+  "matcher_oracle_experiment": {
+    "exact_copy_oracle_recall": 0.9818,
+    "modified_copy_oracle_recall": 0.6727,
+    "paraphrase_oracle_recall": 0.0000
+  },
+  "candidate_retrieval_metrics": {
+    "recall_at_1": 0.3273,
+    "recall_at_5": 0.6667,
+    "recall_at_10": 0.7000
+  },
+  "paraphrase_score_distributions": {
+    "word_tfidf": {"min": 0.0, "median": 0.0, "p75": 0.0, "p95": 0.0, "max": 0.0},
+    "char_tfidf": {"min": 0.1935, "median": 0.3650, "p75": 0.3717, "p95": 0.3796, "max": 0.3796},
+    "jaccard": {"min": 0.0, "median": 0.0, "p75": 0.0, "p95": 0.0, "max": 0.0},
+    "semantic_score": "UNAVAILABLE"
+  },
+  "institutional_validation_disclaimer": "Phase 18 validates the evaluation framework and measures current behavior. It does NOT validate institutional detector accuracy."
+}

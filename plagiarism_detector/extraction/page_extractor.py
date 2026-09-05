@@ -203,9 +203,9 @@ def _extract_pages_from_docx(path: str) -> list[dict]:
 
 
 def _extract_pages_from_txt(path: str) -> list[dict]:
-    """استخراج النصوص العادية."""
+    """استخراج النصوص العادية بترميز UTF-8 القياسي أو Windows-1256 العربي."""
     try:
-        for enc in ['utf-8', 'utf-8-sig', 'windows-1256', 'latin-1']:
+        for enc in ['utf-8', 'utf-8-sig', 'windows-1256']:
             try:
                 with open(path, 'r', encoding=enc) as f:
                     text = f.read()

@@ -106,6 +106,19 @@ def export_report_to_html(report: dict) -> str:
         """)
 
     evidence_body = "".join(evidence_html) if evidence_html else "<p style='color: #64748b;'>لم يتم العثور على شواهد استلال.</p>"
+    ref_no = html.escape(str(report.get('reference_number', '') or report.get('research_reference_number', '') or '—'))
+    rev_no = html.escape(str(report.get('revision_number', 1)))
+    art_status = html.escape(str(report.get('artifact_status', 'draft')))
+    final_hash = str(report.get('finalization_hash', '')).strip()
+    short_hash = html.escape(final_hash[:16] + '...' if final_hash else 'مسودة — لم تعتمد بعد')
+    final_at = html.escape(str(report.get('finalized_at', '') or '—'))
+    
+    snapshot = report.get('snapshot', {})
+    eng_ver = html.escape(str(snapshot.get('engine_version', '1.2.0') if not snapshot.get('is_legacy') else 'إصدار سابق'))
+    norm_ver = html.escape(str(snapshot.get('normalization_version', 'arabic-normalizer-1.0')))
+    corpus_ver = html.escape(str(snapshot.get('reference_corpus_version', 'REF-2026') or '—'))
+    j_thresh_disp = f"{int(float(snapshot.get('jaccard_threshold', 0.40)) * 100)}%"
+    t_thresh_disp = f"{int(float(snapshot.get('tfidf_threshold', 0.40)) * 100)}%"
 
     # تنبيه تجاوز الصفحات المسموحة
     alert_box = ""
@@ -172,6 +185,7 @@ def export_report_to_html(report: dict) -> str:
         table {{
             width: 100%;
             border-collapse: collapse;
+            font-size: 14px;
         }}
         th, td {{
             padding: 12px 16px;
@@ -185,6 +199,7 @@ def export_report_to_html(report: dict) -> str:
             font-size: 13px;
         }}
         .badge {{
+            display: inline-block;
             padding: 4px 10px;
             border-radius: 20px;
             font-size: 12px;
@@ -225,6 +240,28 @@ def export_report_to_html(report: dict) -> str:
             padding: 20px;
             margin-bottom: 24px;
         }}
+        .repro-badge {{
+            display: inline-block;
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 12px;
+        }}
+        .integrity-badge {{
+            display: inline-block;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #15803d;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 700;
+            font-size: 11px;
+        }}
         @media print {{
             body {{ background: #ffffff; padding: 0; }}
             .no-print {{ display: none; }}
@@ -237,18 +274,21 @@ def export_report_to_html(report: dict) -> str:
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f2b5c; padding-bottom: 16px;">
             <div>
                 <h1 style="color: #0f2b5c; margin: 0 0 6px 0; font-size: 22px;">تقرير كشف الاستلال العلمي والأمانة الأكاديمية</h1>
-                <p style="margin: 0; color: #64748b; font-size: 13px;">نظام المراجعة الأكاديمية الذاتي (100% Offline Integrity System)</p>
+                <p style="margin: 0; color: #64748b; font-size: 13px;">نظام الفحص الأكاديمي المؤسسي (Tamper-Evident Academic Integrity)</p>
             </div>
             <div style="text-align: left;">
-                <div style="font-weight: 700; color: #0f2b5c;">رقم التقرير: #{rep_id}</div>
-                <div style="font-size: 12px; color: #64748b;">تاريخ الفحص: {date}</div>
+                <div style="font-weight: 700; color: #0f2b5c;">رقم التقرير: #{rep_id} (إصدار {rev_no})</div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 3px;">الرقم المرجعي للبحث: <span class="repro-badge">{ref_no}</span></div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">بصمة الاعتماد: <span class="integrity-badge">{short_hash}</span></div>
+                <div style="font-size: 12px; color: #64748b; margin-top: 2px;">تاريخ الفحص والاعتماد: {final_at if final_at != '—' else date}</div>
             </div>
         </div>
 
         <div style="display: flex; gap: 30px; margin-top: 16px; font-size: 14px;">
             <div><strong>عنوان البحث:</strong> {title}</div>
             <div><strong>اسم الباحث:</strong> {author}</div>
-            <div><strong>الحالة:</strong> {status}</div>
+            <div><strong>حالة التحكيم:</strong> {status}</div>
+            <div><strong>حالة الكائن:</strong> {art_status}</div>
         </div>
 
         <div class="grid-stats">
@@ -262,16 +302,24 @@ def export_report_to_html(report: dict) -> str:
             </div>
             <div class="stat-card">
                 <div class="stat-label">النسخ الحرفي المباشر</div>
-                <div class="stat-val" style="color: #ef4444;">{copied_pct}%</div>
+                <div class="stat-val" style="color: #ea580c;">{copied_pct}%</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">إعادة الصياغة</div>
-                <div class="stat-val" style="color: #f97316;">{para_pct}%</div>
+                <div class="stat-label">إعادة الصياغة المقاربة</div>
+                <div class="stat-val" style="color: #f59e0b;">{para_pct}%</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">اقتباس موثق بنظام التوثيق</div>
+                <div class="stat-label">الاقتباس الموثق والمراجع</div>
                 <div class="stat-val" style="color: #10b981;">{cited_pct}%</div>
             </div>
+        </div>
+
+        <div style="background: #f8fafc; border-radius: 8px; padding: 12px 16px; margin-top: 12px; font-size: 12px; color: #475569; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div><strong>إصدار المحرك:</strong> <span style="font-family: monospace;">v{eng_ver}</span></div>
+            <div><strong>معايير المطابقة:</strong> <span style="font-family: monospace;">{norm_ver}</span></div>
+            <div><strong>إصدار قاعدة المراجع:</strong> <span style="font-family: monospace;">{corpus_ver}</span></div>
+            <div><strong>عتبة التطابق اللفظي:</strong> <span style="font-family: monospace;">{j_thresh_disp}</span></div>
+            <div><strong>عتبة المتواليات (TF-IDF):</strong> <span style="font-family: monospace;">{t_thresh_disp}</span></div>
         </div>
     </div>
 

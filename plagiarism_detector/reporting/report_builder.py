@@ -24,12 +24,14 @@ from plagiarism_detector.preprocessing.cheating_detector import (
 from plagiarism_detector.preprocessing.segmenter import segment_pages, DocumentSegment
 from plagiarism_detector.citations.citation_detector import detect_citation
 from plagiarism_detector.citations.bibliography_detector import filter_bibliography_sections
+from plagiarism_detector.filters.common_phrases import filter_common_spans
 from plagiarism_detector.detection.candidate_retriever import CandidateRetriever
 from plagiarism_detector.detection.shingle_matcher import match_exact_or_near_copy
 from plagiarism_detector.detection.tfidf_matcher import match_lexical_paraphrase
 from plagiarism_detector.detection.semantic_matcher import match_semantic_similarity
 from plagiarism_detector.ai_analysis.stylistic_indicators import analyze_stylistic_ai_indicators
 from plagiarism_detector.reporting.page_allowance import compute_source_allowance
+from app import versioning
 
 logger = logging.getLogger(__name__)
 
@@ -37,83 +39,242 @@ logger = logging.getLogger(__name__)
 _CACHED_INDEX = None
 
 
-def build_pipeline_index() -> dict:
+def build_pipeline_index(job_id: Optional[str] = None) -> dict:
     """
-    بناء فهرس الاسترجاع السريع للمقاطع المرجعية من قاعدة البيانات.
-    يتم بناؤه مرة واحدة وتحديثه عند إضافة أو حذف أبحاث.
+    بناء فهرس الاسترجاع السريع للمقاطع المرجعية من قاعدة البيانات ومزامنة حالته المؤسسية.
+    الحالات: current, stale, building, failed
     """
     global _CACHED_INDEX
+    from datetime import datetime
+    from app.models.schema import IndexStateRecord
+    from app.repositories.base_repo import get_session
+    from app.services import audit_service, job_queue_service
+
+    if job_id and job_queue_service.is_cancellation_requested(job_id):
+        job_queue_service.finalize_cancellation(job_id)
+        return _CACHED_INDEX or {}
+
     logger.info("جاري استخراج المقاطع وبناء فهرس الفحص الأكاديمي...")
 
-    raw_segments = document_repo.get_all_segments_for_index()
+    # 1. تسجيل حالة البدء في البناء (building)
+    corpus_version = ''
+    corpus_fingerprint = ''
+    try:
+        from app.services import corpus_governance_service
+        c_info = corpus_governance_service.get_current_corpus_info()
+        corpus_version = c_info.get('corpus_version', '')
+        corpus_fingerprint = c_info.get('fingerprint', '')
+    except Exception:
+        pass
 
-    retriever = CandidateRetriever()
-    corpus_shingles = []
-    corpus_light_texts = []
-    corpus_aggr_texts = []
-    corpus_metadata = []
+    with get_session() as session:
+        idx_rec = session.query(IndexStateRecord).order_by(IndexStateRecord.id.desc()).first()
+        if not idx_rec:
+            idx_rec = IndexStateRecord(
+                index_corpus_version=corpus_version,
+                index_fingerprint=corpus_fingerprint,
+                state='building',
+                updated_at=datetime.utcnow()
+            )
+            session.add(idx_rec)
+        else:
+            idx_rec.state = 'building'
+            idx_rec.index_corpus_version = corpus_version
+            idx_rec.index_fingerprint = corpus_fingerprint
+            idx_rec.updated_at = datetime.utcnow()
+        session.commit()
 
-    shingle_size = config.DEFAULT_SETTINGS['shingle_size']
+    if job_id:
+        job_queue_service.update_job_progress(job_id, 25, "جاري استخراج المقاطع المرجعية...")
 
-    for idx, seg in enumerate(raw_segments):
-        raw_text = seg['raw_text']
-        n_light = seg.get('normalized_text') or normalize_light(raw_text)
-        n_aggr = normalize_aggressive(raw_text)
+    try:
+        raw_segments = document_repo.get_all_segments_for_index()
 
-        words_light = n_light.split()
-        shingles = get_shingles(n_aggr, size=shingle_size)
+        if job_id and job_queue_service.is_cancellation_requested(job_id):
+            job_queue_service.finalize_cancellation(job_id)
+            return _CACHED_INDEX or {}
 
-        retriever.add_segment(idx, words_light, shingles)
+        retriever = CandidateRetriever()
+        corpus_shingles = []
+        corpus_light_texts = []
+        corpus_aggr_texts = []
+        corpus_metadata = []
 
-        corpus_shingles.append(shingles)
-        corpus_light_texts.append(n_light)
-        corpus_aggr_texts.append(n_aggr)
-        corpus_metadata.append({
-            'doc_id': seg['doc_id'],
-            'title': seg['title'],
-            'author': seg.get('author', ''),
-            'page_number': seg.get('page_number'),  # رقم الصفحة المصدرية الحقيقي
-            'raw_text': raw_text
-        })
+        shingle_size = config.DEFAULT_SETTINGS['shingle_size']
 
-    # بناء مصفوفة TF-IDF مسبقة للمقاطع إن وجدت نصوص
-    vectorizer = None
-    tfidf_matrix = None
-    if corpus_light_texts:
+        for idx, seg in enumerate(raw_segments):
+            raw_text = seg['raw_text']
+            n_light = seg.get('normalized_text') or normalize_light(raw_text)
+            n_aggr = normalize_aggressive(raw_text)
+
+            words_light = n_light.split()
+            shingles = get_shingles(n_aggr, size=shingle_size)
+
+            retriever.add_segment(idx, words_light, shingles, norm_light=n_light)
+
+            corpus_shingles.append(shingles)
+            corpus_light_texts.append(n_light)
+            corpus_aggr_texts.append(n_aggr)
+            corpus_metadata.append({
+                'doc_id': seg['doc_id'],
+                'reference_id': seg.get('reference_id', ''),
+                'title': seg['title'],
+                'author': seg.get('author', ''),
+                'page_number': seg.get('page_number'),  # رقم الصفحة المصدرية الحقيقي
+                'raw_text': raw_text
+            })
+
+        if job_id:
+            job_queue_service.update_job_progress(job_id, 75, "جاري تهيئة مصفوفة TF-IDF والفهارس المعجمية...")
+
+        # بناء مصفوفة TF-IDF مسبقة للمقاطع إن وجدت نصوص
+        vectorizer = None
+        tfidf_matrix = None
+        if corpus_light_texts:
+            try:
+                vectorizer = TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=1)
+                tfidf_matrix = vectorizer.fit_transform(corpus_light_texts)
+            except Exception as e:
+                logger.debug(f"تخطي بناء مصفوفة TF-IDF الشاملة: {e}")
+
+        index_data = {
+            'retriever': retriever,
+            'corpus_shingles': corpus_shingles,
+            'corpus_light_texts': corpus_light_texts,
+            'corpus_aggr_texts': corpus_aggr_texts,
+            'corpus_metadata': corpus_metadata,
+            'vectorizer': vectorizer,
+            'tfidf_matrix': tfidf_matrix,
+            'total_segments': len(raw_segments),
+            'index_corpus_version': corpus_version,
+            'index_fingerprint': corpus_fingerprint,
+            'built_at': datetime.utcnow()
+        }
+
+        if job_id and job_queue_service.is_cancellation_requested(job_id):
+            job_queue_service.finalize_cancellation(job_id)
+            return _CACHED_INDEX or {}
+
+        # 2. تسجيل نجاح البناء (current) وترقية الفهرس ذرياً
+        with get_session() as session:
+            idx_rec = session.query(IndexStateRecord).order_by(IndexStateRecord.id.desc()).first()
+            if idx_rec:
+                idx_rec.state = 'current'
+                idx_rec.index_corpus_version = corpus_version
+                idx_rec.index_fingerprint = corpus_fingerprint
+                idx_rec.built_at = datetime.utcnow()
+                idx_rec.total_segments = len(raw_segments)
+                idx_rec.error_message = ''
+                idx_rec.updated_at = datetime.utcnow()
+            session.commit()
+
+        _CACHED_INDEX = index_data
+        logger.info(f"تم بناء وتحديث الفهرس بنجاح: {len(raw_segments)} مقطع مرجعي (الإصدار: {corpus_version}).")
+
+        if job_id:
+            job_queue_service.complete_job(job_id, result={"total_segments": len(raw_segments), "corpus_version": corpus_version})
+
         try:
-            vectorizer = TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=1)
-            tfidf_matrix = vectorizer.fit_transform(corpus_light_texts)
-        except Exception as e:
-            logger.debug(f"تخطي بناء مصفوفة TF-IDF الشاملة: {e}")
+            audit_service.record_event(
+                action="reference.index_rebuilt",
+                category="reference",
+                object_type="index_state",
+                object_id=corpus_version or "latest",
+                success=True,
+                metadata={"total_segments": len(raw_segments), "fingerprint": corpus_fingerprint}
+            )
+        except Exception:
+            pass
 
-    index_data = {
-        'retriever': retriever,
-        'corpus_shingles': corpus_shingles,
-        'corpus_light_texts': corpus_light_texts,
-        'corpus_aggr_texts': corpus_aggr_texts,
-        'corpus_metadata': corpus_metadata,
-        'vectorizer': vectorizer,
-        'tfidf_matrix': tfidf_matrix,
-        'total_segments': len(raw_segments)
-    }
+        return index_data
 
-    _CACHED_INDEX = index_data
-    logger.info(f"تم بناء الفهرس بنجاح: {len(raw_segments)} مقطع مرجعي.")
-    return index_data
+    except Exception as e:
+        logger.error(f"فشل بناء فهرس الاسترجاع: {e}", exc_info=True)
+        if job_id:
+            from app.errors.error_codes import ErrorCode
+            job_queue_service.fail_job(job_id, error_code=ErrorCode.CORPUS_INDEX_BUILD_FAILED, error_message=str(e))
+
+        with get_session() as session:
+            idx_rec = session.query(IndexStateRecord).order_by(IndexStateRecord.id.desc()).first()
+            if idx_rec:
+                idx_rec.state = 'failed'
+                idx_rec.error_message = str(e)[:500]
+                idx_rec.updated_at = datetime.utcnow()
+            session.commit()
+        raise e
 
 
-def get_pipeline_index() -> dict:
-    """استرجاع الفهرس المخزن في الذاكرة أو إعادة بنائه إن لم يكن جاهزاً."""
+def trigger_async_index_rebuild(target_corpus_version: Optional[str] = None, requested_by: str = 'system') -> str:
+    """
+    جدولة إعادة بناء الفهرس في الخلفية مع منع التكرار لنفس إصدار قاعدة المراجع.
+    """
+    from app.services import job_queue_service
+    from app.services.job_queue_service import JobType
+    from concurrent.futures import ThreadPoolExecutor
+
+    job_id, err = job_queue_service.enqueue_job(
+        job_type=JobType.REFERENCE_INDEX_REBUILD,
+        target_corpus_version=target_corpus_version,
+        requested_by=requested_by,
+        payload={'target_corpus_version': target_corpus_version}
+    )
+
+    if job_id:
+        def _run():
+            try:
+                build_pipeline_index(job_id=job_id)
+            except Exception as e:
+                logger.error(f"خطأ أثناء تشغيل بناء الفهرس غير المتزامن {job_id}: {e}")
+
+        ThreadPoolExecutor(max_workers=1).submit(_run)
+
+    return job_id or ''
+
+
+def get_pipeline_index(auto_rebuild_if_stale: bool = True) -> dict:
+    """استرجاع الفهرس المخزن في الذاكرة مع التحقق من عدم تقادمه (Staleness Protection)."""
     global _CACHED_INDEX
+    from app.models.schema import IndexStateRecord
+    from app.repositories.base_repo import get_session
+
+    is_stale = False
     if _CACHED_INDEX is None:
-        _CACHED_INDEX = build_pipeline_index()
+        is_stale = True
+    else:
+        try:
+            with get_session() as session:
+                idx_rec = session.query(IndexStateRecord).order_by(IndexStateRecord.id.desc()).first()
+                if idx_rec and idx_rec.state in ('stale', 'failed'):
+                    is_stale = True
+        except Exception:
+            pass
+
+    if is_stale:
+        if auto_rebuild_if_stale:
+            _CACHED_INDEX = build_pipeline_index()
+        else:
+            raise RuntimeError("فهرس الاسترجاع غير متطابق مع قاعدة المراجع الحالية (CORPUS_INDEX_STALE)")
+
     return _CACHED_INDEX
 
 
-def invalidate_pipeline_index():
-    """إلغاء الفهرس المؤقت لإعادة بنائه عند تغيير الأبحاث."""
+def invalidate_pipeline_index(mark_stale_in_db: bool = True):
+    """إلغاء الفهرس المؤقت وإعلانه كـ stale في قاعدة البيانات."""
     global _CACHED_INDEX
     _CACHED_INDEX = None
+    if mark_stale_in_db:
+        from datetime import datetime
+        from app.models.schema import IndexStateRecord
+        from app.repositories.base_repo import get_session
+        try:
+            with get_session() as session:
+                idx_rec = session.query(IndexStateRecord).order_by(IndexStateRecord.id.desc()).first()
+                if idx_rec:
+                    idx_rec.state = 'stale'
+                    idx_rec.updated_at = datetime.utcnow()
+                    session.commit()
+        except Exception:
+            pass
 
 
 def analyze_academic_document(
@@ -196,8 +357,36 @@ def analyze_academic_document(
             'citation_detail': ''
         }
 
-        # فحص وجود استشهاد أو علامات تنصيص
-        citation_check = detect_citation(seg.raw_text)
+        citation_mode = settings.get('citation_filter_mode', 'refined')
+        common_mode = settings.get('common_text_filter_mode', 'span_level')
+        retrieval_mode = settings.get('candidate_retrieval_mode', 'dual_channel')
+
+        # 0. فحص واستبعاد النصوص المؤسسية الشائعة على مستوى المقاطع (EXP-03)
+        substantive_text, has_common, extracted_spans = filter_common_spans(
+            seg.raw_text,
+            min_substantive_words=settings.get('min_sentence_words', 4),
+            mode=common_mode
+        )
+
+        if has_common and not substantive_text.strip():
+            seg_dict['status'] = 'suppressed'
+            seg_dict['match_type'] = 'COMMON TEXT'
+            seg_dict['is_common_phrase'] = True
+            seg_dict['common_spans'] = extracted_spans
+            processed_segments.append(seg_dict)
+            continue
+
+        if has_common and substantive_text.strip():
+            seg_dict['has_common_preamble'] = True
+            seg_dict['common_spans'] = extracted_spans
+            eval_aggr = normalize_aggressive(substantive_text)
+            eval_light = normalize_light(substantive_text)
+        else:
+            eval_aggr = seg.normalized_aggressive
+            eval_light = seg.normalized_light
+
+        # فحص وجود استشهاد أو علامات تنصيص (EXP-04)
+        citation_check = detect_citation(seg.raw_text, mode=citation_mode)
         if citation_check.is_cited:
             seg_dict['is_cited'] = True
             seg_dict['citation_detail'] = citation_check.citation_detail
@@ -207,7 +396,7 @@ def analyze_academic_document(
             continue
 
         # ── المرحلة A: كشف النسخ الحرفي عبر Shingles + Jaccard ───
-        q_shingles = get_shingles(seg.normalized_aggressive, size=settings['shingle_size'])
+        q_shingles = get_shingles(eval_aggr, size=settings['shingle_size'])
         shingle_candidates = retriever.retrieve_candidates_for_shingles(q_shingles)
 
         match_found = False
@@ -215,7 +404,7 @@ def analyze_academic_document(
         if shingle_candidates:
             res_a = match_exact_or_near_copy(
                 query_shingles=q_shingles,
-                query_norm_text=seg.normalized_aggressive,
+                query_norm_text=eval_aggr,
                 candidate_indices=shingle_candidates,
                 corpus_shingles=corpus_shingles,
                 corpus_norm_texts=corpus_aggr_texts,
@@ -251,15 +440,16 @@ def analyze_academic_document(
                 source_info[doc_id] = {'title': meta['title'], 'author': meta['author']}
                 match_found = True
 
-        # ── المرحلة B: كشف إعادة الصياغة عبر TF-IDF ───────────────
+        # ── المرحلة B: كشف إعادة الصياغة عبر TF-IDF و الاسترجاع المطور (EXP-01) ──
         if not match_found:
-            token_candidates = retriever.retrieve_candidates_by_tokens(
-                seg.normalized_light.split(),
-                top_k=settings['max_candidate_retrieval']
+            token_candidates = retriever.retrieve_candidates(
+                eval_light,
+                top_k=settings['max_candidate_retrieval'],
+                mode=retrieval_mode
             )
             if token_candidates:
                 res_b = match_lexical_paraphrase(
-                    query_norm_text=seg.normalized_light,
+                    query_norm_text=eval_light,
                     candidate_indices=token_candidates,
                     corpus_norm_texts=corpus_light_texts,
                     threshold=settings['tfidf_threshold'],
@@ -386,7 +576,16 @@ def analyze_academic_document(
         'segments': processed_segments,
         'sources': sources_list,
         'cheating': cheating_res,
-        'ai_analysis': ai_indicators,
         'page_limit_alert': page_limit_alert,
-        'bibliography_segments_count': bib_count
+        'bibliography_segments_count': bib_count,
+        'application_version': versioning.APPLICATION_VERSION,
+        'engine_version': versioning.ENGINE_VERSION,
+        'detector_version': versioning.DETECTOR_VERSION,
+        'citation_engine_version': versioning.CITATION_ENGINE_VERSION,
+        'common_text_version': versioning.COMMON_TEXT_HANDLING_VERSION,
+        'normalization_version': versioning.NORMALIZATION_VERSION,
+        'candidate_retrieval_mode': retrieval_mode,
+        'common_text_filter_mode': common_mode,
+        'citation_filter_mode': citation_mode,
+        'settings_snapshot': dict(settings)
     }

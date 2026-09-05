@@ -1,0 +1,72 @@
+{
+  "timestamp": "2026-09-05T20:43:31.871507+00:00",
+  "restart_cycles": [
+    {
+      "cycle": 1,
+      "ready": true,
+      "duration_sec": 4.46
+    },
+    {
+      "cycle": 2,
+      "ready": true,
+      "duration_sec": 4.35
+    },
+    {
+      "cycle": 3,
+      "ready": true,
+      "duration_sec": 4.36
+    },
+    {
+      "cycle": 4,
+      "ready": true,
+      "duration_sec": 4.35
+    },
+    {
+      "cycle": 5,
+      "ready": true,
+      "duration_sec": 4.36
+    },
+    {
+      "cycle": 6,
+      "ready": true,
+      "duration_sec": 4.35
+    },
+    {
+      "cycle": 7,
+      "ready": true,
+      "duration_sec": 4.35
+    },
+    {
+      "cycle": 8,
+      "ready": true,
+      "duration_sec": 4.36
+    },
+    {
+      "cycle": 9,
+      "ready": true,
+      "duration_sec": 4.34
+    },
+    {
+      "cycle": 10,
+      "ready": true,
+      "duration_sec": 4.37
+    }
+  ],
+  "abnormal_termination": {
+    "integrity": [
+      "ok"
+    ],
+    "rollback_success": true,
+    "status": "PASSED"
+  },
+  "backup_restore": {
+    "backup_count": 1,
+    "manifest_count": 1,
+    "status": "PASSED"
+  },
+  "large_db_check": {
+    "query_latency_ms": 0.073,
+    "status": "PASSED"
+  },
+  "overall_drills_verdict": "PASSED_100_PERCENT"
+}

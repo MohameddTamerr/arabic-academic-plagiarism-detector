@@ -32,6 +32,11 @@ _ACTIVE_SCANS = {}
 _BATCH_SEMAPHORE = threading.Semaphore(config.MAX_CONCURRENT_SCANS)
 
 
+from app.services import job_queue_service
+from app.services.job_queue_service import JobType, JobStatus
+from app.errors.error_codes import ErrorCode
+
+
 # ─── فحص بحث واحد (API الحالي — بدون تغيير) ─────────────────────────────────
 
 def start_async_scan(
@@ -39,7 +44,8 @@ def start_async_scan(
     title: str,
     author: str,
     raw_text: str = '',
-    file_name: str = ''
+    file_name: str = '',
+    requested_by: str = ''
 ) -> str:
     """بدء مهمة فحص في الخلفية وإرجاع task_id للمتابعة."""
     task_id = str(uuid.uuid4())[:10]
@@ -59,6 +65,14 @@ def start_async_scan(
         filename=file_name or title or 'نص مدخل',
         title=title,
         author=author
+    )
+
+    job_queue_service.enqueue_job(
+        job_type=JobType.SCAN,
+        payload={'file_path': file_path, 'title': title, 'author': author, 'file_name': file_name},
+        requested_by=requested_by,
+        custom_job_id=task_id,
+        scan_execution_id=task_id
     )
 
     _EXECUTOR.submit(_execute_scan_pipeline, task_id, file_path, title, author, raw_text, file_name)
@@ -81,7 +95,8 @@ def start_thesis_scan(
     research_id: int,
     file_entries: list[dict],   # [{'path': str, 'original_filename': str, 'file_type': str}, ...]
     title: str,
-    author: str
+    author: str,
+    requested_by: str = ''
 ) -> str:
     """
     فحص رسالة تتكون من عدة ملفات مرتبة.
@@ -108,6 +123,15 @@ def start_thesis_scan(
         author=author
     )
 
+    job_queue_service.enqueue_job(
+        job_type=JobType.THESIS_SCAN,
+        payload={'research_id': research_id, 'file_entries': file_entries, 'title': title, 'author': author},
+        requested_by=requested_by,
+        research_id=research_id,
+        custom_job_id=task_id,
+        scan_execution_id=task_id
+    )
+
     _EXECUTOR.submit(
         _execute_thesis_pipeline,
         task_id, research_id, file_entries, title, author
@@ -128,11 +152,19 @@ def _execute_thesis_pipeline(
     ثم يُشغّل المحرك الأكاديمي على النص الموحد.
     """
     try:
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
+
         settings = get_current_settings()
         all_pages_data = []    # قائمة موحدة بجميع الصفحات من جميع الملفات
         total_files = len(file_entries)
 
         for f_idx, entry in enumerate(file_entries):
+            if job_queue_service.is_cancellation_requested(task_id):
+                job_queue_service.finalize_cancellation(task_id)
+                return
+
             prog = 10 + int((f_idx / total_files) * 40)
             _update_progress(
                 task_id, prog,
@@ -155,6 +187,10 @@ def _execute_thesis_pipeline(
 
             all_pages_data.extend(pages)
 
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
+
         if not all_pages_data:
             _fail_scan(task_id, 'لم يتم العثور على نصوص قابلة للقراءة في ملفات الرسالة.')
             return
@@ -172,6 +208,10 @@ def _execute_thesis_pipeline(
             settings_override=settings
         )
 
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
+
         _update_progress(task_id, 88, 'جاري بناء التقرير النهائي وعزو المصادر...')
 
         # إثراء بيانات المطابقات بعزو الملف الأصلي
@@ -181,6 +221,12 @@ def _execute_thesis_pipeline(
         report_id = str(uuid.uuid4())[:8]
         now_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
 
+        # جلب الرقم المرجعي الرسمي للرسالة
+        from app.repositories import batch_repo
+        from app.repositories.batch_repo import update_research_scan
+        r_obj = batch_repo.get_research(research_id)
+        ref_no = r_obj.get('reference_number', '') if r_obj else ''
+
         report['id'] = report_id
         report['title'] = title or 'رسالة جديدة'
         report['author'] = author or 'غير محدد'
@@ -188,8 +234,20 @@ def _execute_thesis_pipeline(
         report['category'] = category
         report['status'] = 'مفحوص'
         report['research_id'] = research_id
+        report['reference_number'] = ref_no
+        report['research_reference_number'] = ref_no
         report['file_count'] = len(file_entries)
         report['file_names'] = [e['original_filename'] for e in file_entries]
+        # إدارة الإصدارات وسلسلة النسب (Revision Lineage)
+        from app.services import report_integrity_service
+        rev_num, prev_rep_id = report_integrity_service.create_report_revision(
+            research_id=research_id,
+            new_report_id=report_id,
+            scan_execution_id=task_id
+        )
+        report['revision_number'] = rev_num
+        report['supersedes_report_id'] = prev_rep_id
+        report['scan_execution_id'] = task_id
 
         report_repo.save_report(
             report_id=report_id,
@@ -200,11 +258,24 @@ def _execute_thesis_pipeline(
             report_dict=report,
             category=category,
             status='مفحوص',
-            author=report['author']
+            author=report['author'],
+            research_id=research_id,
+            scan_execution_id=task_id,
+            revision_number=rev_num,
+            supersedes_report_id=prev_rep_id
         )
 
+        # حفظ لقطة تشغيل ومعايير الفحص الأكاديمي الثابتة (Report Execution Snapshot)
+        from app.services import snapshot_service
+        snapshot_service.create_report_snapshot(
+            report_id=report_id,
+            research_id=research_id,
+            research_reference_number=ref_no,
+            settings_used=settings
+        )
+        report['snapshot'] = snapshot_service.get_report_snapshot(report_id)
+
         # تحديث Research بمعرف التقرير
-        from app.repositories.batch_repo import update_research_scan
         update_research_scan(research_id, task_id, report_id)
 
         if task_id in _ACTIVE_SCANS:
@@ -222,6 +293,7 @@ def _execute_thesis_pipeline(
             stage='اكتمل تحليل الرسالة بنجاح!',
             result_dict=report
         )
+        job_queue_service.complete_job(task_id, result=report, report_id=report_id)
 
     except Exception as e:
         logger.error(f"خطأ أثناء فحص الرسالة {task_id}: {e}", exc_info=True)
@@ -251,7 +323,7 @@ def _enrich_matches_with_file_provenance(report: dict, all_pages_data: list[dict
 
 # ─── فحص دفعة أبحاث مستقلة (Batch Scan) ─────────────────────────────────────
 
-def start_batch_scan(batch_id: str, batch_items: list[dict]):
+def start_batch_scan(batch_id: str, batch_items: list[dict], requested_by: str = ''):
     """
     جدولة فحص دفعة أبحاث مستقلة في الخلفية.
     batch_items: [{'research_id': int, 'file_path': str, 'title': str, 'author': str, 'file_name': str}, ...]
@@ -274,7 +346,8 @@ def start_batch_scan(batch_id: str, batch_items: list[dict]):
                     item['title'],
                     item['author'],
                     item.get('file_name', ''),
-                    item.get('raw_text', '')
+                    item.get('raw_text', ''),
+                    requested_by
                 )
                 futures[future] = item['research_id']
 
@@ -302,7 +375,8 @@ def _execute_batch_item(
     title: str,
     author: str,
     file_name: str,
-    raw_text: str
+    raw_text: str,
+    requested_by: str = ''
 ):
     """تنفيذ فحص عنصر واحد داخل الدفعة."""
     from app.repositories import batch_repo
@@ -333,6 +407,16 @@ def _execute_batch_item(
             filename=file_name or title or 'نص مدخل',
             title=title,
             author=author
+        )
+
+        job_queue_service.enqueue_job(
+            job_type=JobType.BATCH_SCAN,
+            payload={'batch_id': batch_id, 'research_id': research_id, 'file_path': file_path, 'title': title, 'author': author},
+            requested_by=requested_by,
+            batch_id=batch_id,
+            research_id=research_id,
+            custom_job_id=task_id,
+            scan_execution_id=task_id
         )
 
         # تنفيذ الفحص الفعلي مع Semaphore
@@ -384,6 +468,10 @@ def _execute_scan_pipeline(
 ):
     """تنفيذ خط أنابيب الفحص الأكاديمي الشامل في مسار الخلفية."""
     try:
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
+
         # المرحلة 1: استخراج الصفحات والنصوص
         _update_progress(task_id, 20, 'جاري استخراج وقراءة النصوص والصفحات من المستند...')
         pages_data = []
@@ -394,12 +482,20 @@ def _execute_scan_pipeline(
             if not raw_text:
                 raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])
 
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
+
         if not raw_text.strip():
             _fail_scan(task_id, 'لم يتم العثور على نصوص قابلة للقراءة في هذا الملف.')
             return
 
         # المرحلة 2: كشف التلاعب وتحليل الاستشهاد
         _update_progress(task_id, 45, 'جاري فحص المسافات المخفية وعلامات التنصيص والتوثيق...')
+
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
 
         # المرحلة 3: المطابقة متعددة المراحل واسترجاع المرشحين
         _update_progress(task_id, 70, 'جاري مطابقة المتواليات واسترجاع المرشحين من المراجع...')
@@ -409,6 +505,10 @@ def _execute_scan_pipeline(
             pages_data=pages_data if pages_data else None,
             settings_override=settings
         )
+
+        if job_queue_service.is_cancellation_requested(task_id):
+            job_queue_service.finalize_cancellation(task_id)
+            return
 
         # المرحلة 4: تصنيف التخصص واللمسات النهائية
         _update_progress(task_id, 90, 'جاري حساب أرقام الصفحات المصدرية والصفحات المسموحة...')
@@ -425,6 +525,59 @@ def _execute_scan_pipeline(
         report['file_path'] = file_path
         report['status'] = 'مفحوص'
 
+        # ربط أو إنشاء سجل Research للبحث وتعيين الرقم المرجعي
+        from app.repositories import batch_repo
+        from app.models.research_schema import Research
+        from app.repositories.base_repo import get_session
+
+        research_ref_no = ''
+        with get_session() as session:
+            existing_res = session.query(Research).filter(
+                (Research.scan_job_id == task_id) | (Research.report_id == report_id)
+            ).first()
+            if existing_res:
+                existing_res.report_id = report_id
+                research_ref_no = existing_res.reference_number or ''
+            else:
+                r_id = batch_repo.create_research(
+                    title=report['title'],
+                    author=report['author'],
+                    created_by=''
+                )
+                batch_repo.update_research_scan(r_id, task_id, report_id)
+                if file_path and os.path.exists(file_path):
+                    from app.services.integrity_service import compute_stream_sha256
+                    f_hash, f_size = compute_stream_sha256(file_path)
+                    ext_clean = os.path.splitext(file_name or file_path)[1].lower().lstrip('.')
+                    batch_repo.add_research_file(
+                        research_id=r_id,
+                        original_filename=file_name or os.path.basename(file_path),
+                        stored_filename=os.path.basename(file_path),
+                        file_path=file_path,
+                        file_type=ext_clean,
+                        file_size_bytes=f_size,
+                        file_order=0,
+                        file_hash=f_hash
+                    )
+                r_obj = batch_repo.get_research(r_id)
+                research_ref_no = r_obj.get('reference_number', '') if r_obj else ''
+
+        report['reference_number'] = research_ref_no
+        report['research_reference_number'] = research_ref_no
+
+        r_target_id = r_id if 'r_id' in locals() else None
+        rev_num, prev_rep_id = 1, None
+        if r_target_id:
+            from app.services import report_integrity_service
+            rev_num, prev_rep_id = report_integrity_service.create_report_revision(
+                research_id=r_target_id,
+                new_report_id=report_id,
+                scan_execution_id=task_id
+            )
+        report['revision_number'] = rev_num
+        report['supersedes_report_id'] = prev_rep_id
+        report['scan_execution_id'] = task_id
+
         # حفظ التقرير في قاعدة البيانات
         report_repo.save_report(
             report_id=report_id,
@@ -436,8 +589,22 @@ def _execute_scan_pipeline(
             category=category,
             status='مفحوص',
             author=report['author'],
-            file_path=file_path
+            file_path=file_path,
+            research_id=r_target_id,
+            scan_execution_id=task_id,
+            revision_number=rev_num,
+            supersedes_report_id=prev_rep_id
         )
+
+        # حفظ لقطة تشغيل ومعايير الفحص الأكاديمي الثابتة (Report Execution Snapshot)
+        from app.services import snapshot_service
+        snapshot_service.create_report_snapshot(
+            report_id=report_id,
+            research_id=r_id if 'r_id' in locals() else None,
+            research_reference_number=research_ref_no,
+            settings_used=settings
+        )
+        report['snapshot'] = snapshot_service.get_report_snapshot(report_id)
 
         # اكتمال المهمة
         if task_id in _ACTIVE_SCANS:
@@ -453,6 +620,7 @@ def _execute_scan_pipeline(
             stage='اكتمل التحليل بنجاح!',
             result_dict=report
         )
+        job_queue_service.complete_job(task_id, result=report, report_id=report_id)
 
     except Exception as e:
         logger.error(f"خطأ أثناء فحص المهمة {task_id}: {e}", exc_info=True)
@@ -464,10 +632,12 @@ def _update_progress(task_id: str, progress: int, stage: str):
         _ACTIVE_SCANS[task_id]['progress'] = progress
         _ACTIVE_SCANS[task_id]['stage'] = stage
     report_repo.update_scan_job(job_id=task_id, status='running', progress=progress, stage=stage)
+    job_queue_service.update_job_progress(task_id, progress=progress, stage=stage)
 
 
-def _fail_scan(task_id: str, error_msg: str):
+def _fail_scan(task_id: str, error_msg: str, error_code: str = ErrorCode.SCAN_FAILED):
     if task_id in _ACTIVE_SCANS:
         _ACTIVE_SCANS[task_id]['status'] = 'error'
         _ACTIVE_SCANS[task_id]['error'] = error_msg
     report_repo.update_scan_job(job_id=task_id, status='error', progress=0, stage='حدث خطأ', error=error_msg)
+    job_queue_service.fail_job(task_id, error_code=error_code, error_message=error_msg)

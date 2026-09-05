@@ -24,6 +24,7 @@ class Research(Base):
     __tablename__ = 'research'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
+    reference_number = Column(String(50), unique=True, nullable=True, index=True) # الرقم المرجعي الرسمي الفريد
     title = Column(String(500), nullable=False, index=True)
     author = Column(String(255), default='', index=True)
     specialization = Column(String(255), default='')     # التخصص
@@ -38,19 +39,31 @@ class Research(Base):
     report_id = Column(String(64), nullable=True, index=True)
     scan_job_id = Column(String(64), nullable=True, index=True)
 
+    # الحالات الصريحة للفحص والتحكيم (Phase 5 Workflow Statuses)
+    scan_status = Column(String(50), default='queued', index=True)          # queued, processing, completed, failed, interrupted
+    review_status = Column(String(50), default='pending_review', index=True) # pending_review, preliminary_accepted, rejected, final_accepted
+
     files = relationship('ResearchFile', back_populates='research',
                          cascade='all, delete-orphan', order_by='ResearchFile.file_order')
     batch = relationship('ScanBatch', back_populates='research_items')
 
     __table_args__ = (
         Index('idx_research_batch', 'batch_id'),
+        Index('idx_research_ref_num', 'reference_number'),
+        Index('idx_research_scan_status', 'scan_status'),
+        Index('idx_research_review_status', 'review_status'),
     )
+
+
+STORAGE_STATUS_FINALIZED = 'finalized'
+STORAGE_STATUS_REGISTRY_ONLY = 'registry_only'
+STORAGE_STATUS_STAGING = 'staging'
 
 
 class ResearchFile(Base):
     """
     ملف واحد منتمٍ لرسالة (باب أو فصل أو ملحق).
-    يحتفظ بالاسم الأصلي للعرض واسم التخزين الآمن للنظام.
+    يحتفظ بالاسم الأصلي للعرض واسم التخزين الآمن للنظام وحالة التخزين الصريحة.
     """
     __tablename__ = 'research_files'
 
@@ -63,11 +76,13 @@ class ResearchFile(Base):
     file_size_bytes = Column(BigInteger, default=0)
     file_order = Column(Integer, nullable=False, default=0)   # ترتيب الملف داخل الرسالة (0-indexed)
     file_hash = Column(String(64), default='', index=True)    # SHA-256 لكشف التكرار
+    storage_status = Column(String(50), default='finalized', nullable=False, index=True) # finalized, registry_only, staging
 
     research = relationship('Research', back_populates='files')
 
     __table_args__ = (
         Index('idx_rf_research_order', 'research_id', 'file_order'),
+        Index('idx_rf_storage_status', 'storage_status'),
     )
 
 
@@ -117,4 +132,24 @@ class ScanBatchItem(Base):
 
     __table_args__ = (
         Index('idx_sbi_batch_research', 'batch_id', 'research_id'),
+    )
+
+
+class ReferenceSequence(Base):
+    """
+    جدول إدارة السلاسل التراكمية لتوليد الأرقام المرجعية بأمان تام تحت التزامن.
+    - namespace: نوع السجل (مثال: 'research')
+    - year: السنة الميلادية (مثال: 2026)
+    - last_value: آخر قيمة تسلسلية تم حجزها
+    """
+    __tablename__ = 'reference_sequences'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    namespace = Column(String(50), nullable=False, default='research', index=True)
+    year = Column(Integer, nullable=False, index=True)
+    last_value = Column(Integer, nullable=False, default=0)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        Index('idx_ref_seq_ns_year', 'namespace', 'year', unique=True),
     )

@@ -1,0 +1,50 @@
+{
+  "release_version": "v1.1.0-ministry-db-alpha",
+  "build_timestamp": "2026-09-05 00:30:00 UTC",
+  "application_name": "Arabic Academic Plagiarism Detector (Ministry Architecture Foundation)",
+  "application_version": "2.5.0",
+  "engine_version": "1.3.0",
+  "detector_version": "shingle-jaccard-tfidf-dual-1.3",
+  "citation_engine_version": "citation-detector-refined-1.3",
+  "common_text_version": "common-phrases-span-1.3",
+  "database_schema_version": "1.0.0",
+  "report_schema_version": "1.0",
+  "database_backends_supported": [
+    "sqlite",
+    "postgresql"
+  ],
+  "default_database_backend": "sqlite",
+  "production_ministry_target": "postgresql",
+  "production_settings": {
+    "shingle_size": 5,
+    "jaccard_threshold": 0.4,
+    "tfidf_threshold": 0.4,
+    "semantic_threshold": 0.7,
+    "max_candidate_retrieval": 50,
+    "enable_semantic_model": false,
+    "enable_ocr": true,
+    "candidate_retrieval_mode": "dual_channel",
+    "common_text_filter_mode": "span_level",
+    "citation_filter_mode": "refined",
+    "db_pool_size": 10,
+    "db_max_overflow": 20
+  },
+  "critical_file_hashes_sha256": {
+    "config.py": "be1cbfed93fa26b5caf5b25baf2c3fb639efc55b86dd815ee1aa5687c857f311",
+    "app/__init__.py": "5527a009a5b099ff844c857bd19b8b870ea5c368752ce70d9c96911b16951afd",
+    "app/versioning.py": "ae19c0372718e21ea82d5075a1a21ac4e93b35d2650c243bc7d0fbb123242707",
+    "app/services/job_queue_service.py": "d7e6da6f4ed30d7d0d2bf28a2ff3f8cb564eba1e1826dfb19837361c7906d2ea",
+    "app/services/scan_service.py": "1d40a48cc4985b3f05142eb57fe881798caef0df6beb81f5667557628cefe4b0",
+    "app/services/report_integrity_service.py": "dba5ab3cb3b668fdc1608700b56a1a53326379e8e3914f76949545e0a293f6f5",
+    "app/services/backup_service.py": "7f5d414fdaa08479cb24c3298814703e19d18b980c70728a3a219268a4343a88",
+    "app/services/system_health_service.py": "6f8d69c319660ef092524caaf26b627e0d03357f1ad7f9b13c56e9b816c5c9e3",
+    "app/services/corpus_governance_service.py": "09dd272e4995d8378c086aa5cc06e1fd4a8c252484bfaddaee3462f08b964e86",
+    "plagiarism_detector/reporting/report_builder.py": "6afc1538742bf7dca4d88808ea0c4748cd371d9ce5a89a4fb6b541214b0b0740",
+    "plagiarism_detector/detection/shingle_matcher.py": "1989418d1f3ec7a31c58f9893bca120f582e06d113967f1fbc991261b8fde780",
+    "plagiarism_detector/detection/tfidf_matcher.py": "5d5464554810641ad08a1954d828a1cd9262ecbb96b6a41ad22f63c0287f84f9",
+    "plagiarism_detector/detection/candidate_retriever.py": "bf44507156436bf8a7e6d62c06362e2e53a38570f80c39a325a91e6ffb4b65ed",
+    "plagiarism_detector/citations/citation_detector.py": "a8e0823fe2f4b0e617b3e3f3e86358311b5ca6e8b91fa4dcbc8c15766fa1d400"
+  },
+  "readiness_verdict": "MINISTRY PROMPT 1 — PASSED WITH CONDITIONS (Database foundation ready; on-premises PostgreSQL server installation required in live deployment environment)",
+  "automated_tests_passed": 578
+}

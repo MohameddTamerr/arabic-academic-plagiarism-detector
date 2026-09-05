@@ -1,0 +1,1656 @@
+{
+  "benchmark_metadata": {
+    "suite_version": "1.4.0-sqlite-million-scale-validation",
+    "executed_at": "2026-09-05T19:43:27.050102+00:00",
+    "target_system": "Arabic Academic Plagiarism Detector (Offline Portable & Enterprise)",
+    "safety_boundary_verified": "Live database C:\\Users\\user\\AppData\\Roaming\\ArabicPlagiarismDetector\\papers.db UNTOUCHED"
+  },
+  "environment": {
+    "timestamp": "2026-09-05T19:20:43.707677+00:00",
+    "os_platform": "Windows-11-10.0.26200-SP0",
+    "os_system": "Windows",
+    "os_release": "11",
+    "os_version": "10.0.26200",
+    "machine": "AMD64",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "cpu_physical_cores": 12,
+    "cpu_logical_cores": 16,
+    "cpu_freq_mhz": 2500.0,
+    "ram_total_bytes": 34011582464,
+    "ram_total_gb": 31.68,
+    "ram_available_gb": 15.97,
+    "disk_total_gb": 829.99,
+    "disk_free_gb": 148.09,
+    "python_version": "3.13.2",
+    "sqlite_version": "3.45.3",
+    "sqlite_source_id": [
+      3,
+      45,
+      3
+    ]
+  },
+  "scale_metrics": {
+    "10000": {
+      "scale_target": 10000,
+      "total_research_rows": 10000,
+      "total_files_rows": 10000,
+      "total_reports_rows": 9029,
+      "total_audits_rows": 5000,
+      "total_queue_rows": 2000,
+      "total_relational_rows": 36029,
+      "relational_multiplier": 3.6,
+      "build_duration_seconds": 0.53,
+      "ingestion_throughput_research_per_sec": 18875.0,
+      "ingestion_throughput_total_rows_per_sec": 68004.6,
+      "db_size_bytes": 24698880,
+      "db_size_mb": 23.55,
+      "db_size_gb": 0.023,
+      "wal_size_bytes": 0,
+      "wal_size_mb": 0.0,
+      "bytes_per_research_record": 2469.9,
+      "bytes_per_relational_row": 685.5,
+      "ram_rss_delta_mb": 59.01,
+      "ram_rss_peak_mb": 87.98
+    },
+    "100000": {
+      "scale_target": 100000,
+      "total_research_rows": 100000,
+      "total_files_rows": 100000,
+      "total_reports_rows": 90059,
+      "total_audits_rows": 50000,
+      "total_queue_rows": 20000,
+      "total_relational_rows": 360059,
+      "relational_multiplier": 3.6,
+      "build_duration_seconds": 5.721,
+      "ingestion_throughput_research_per_sec": 17480.9,
+      "ingestion_throughput_total_rows_per_sec": 62941.4,
+      "db_size_bytes": 245215232,
+      "db_size_mb": 233.86,
+      "db_size_gb": 0.2284,
+      "wal_size_bytes": 0,
+      "wal_size_mb": 0.0,
+      "bytes_per_research_record": 2452.2,
+      "bytes_per_relational_row": 681.0,
+      "ram_rss_delta_mb": 115.47,
+      "ram_rss_peak_mb": 160.29
+    },
+    "500000": {
+      "scale_target": 500000,
+      "total_research_rows": 500000,
+      "total_files_rows": 500000,
+      "total_reports_rows": 449820,
+      "total_audits_rows": 250000,
+      "total_queue_rows": 100000,
+      "total_relational_rows": 1799820,
+      "relational_multiplier": 3.6,
+      "build_duration_seconds": 28.773,
+      "ingestion_throughput_research_per_sec": 17377.1,
+      "ingestion_throughput_total_rows_per_sec": 62551.3,
+      "db_size_bytes": 1229713408,
+      "db_size_mb": 1172.75,
+      "db_size_gb": 1.1453,
+      "wal_size_bytes": 0,
+      "wal_size_mb": 0.0,
+      "bytes_per_research_record": 2459.4,
+      "bytes_per_relational_row": 683.2,
+      "ram_rss_delta_mb": 94.93,
+      "ram_rss_peak_mb": 163.12
+    },
+    "1000000": {
+      "scale_target": 1000000,
+      "total_research_rows": 1000000,
+      "total_files_rows": 1000000,
+      "total_reports_rows": 899298,
+      "total_audits_rows": 500000,
+      "total_queue_rows": 200000,
+      "total_relational_rows": 3599298,
+      "relational_multiplier": 3.6,
+      "build_duration_seconds": 61.683,
+      "ingestion_throughput_research_per_sec": 16211.9,
+      "ingestion_throughput_total_rows_per_sec": 58351.3,
+      "db_size_bytes": 2460336128,
+      "db_size_mb": 2346.36,
+      "db_size_gb": 2.2914,
+      "wal_size_bytes": 0,
+      "wal_size_mb": 0.0,
+      "bytes_per_research_record": 2460.3,
+      "bytes_per_relational_row": 683.6,
+      "ram_rss_delta_mb": 91.69,
+      "ram_rss_peak_mb": 165.82
+    },
+    "2000000": {
+      "scale_target": 2000000,
+      "total_research_rows": 2000000,
+      "total_files_rows": 2000000,
+      "total_reports_rows": 1799792,
+      "total_audits_rows": 1000000,
+      "total_queue_rows": 400000,
+      "total_relational_rows": 7199792,
+      "relational_multiplier": 3.6,
+      "build_duration_seconds": 138.598,
+      "ingestion_throughput_research_per_sec": 14430.2,
+      "ingestion_throughput_total_rows_per_sec": 51947.2,
+      "db_size_bytes": 4941434880,
+      "db_size_mb": 4712.52,
+      "db_size_gb": 4.6021,
+      "wal_size_bytes": 0,
+      "wal_size_mb": 0.0,
+      "bytes_per_research_record": 2470.7,
+      "bytes_per_relational_row": 686.3,
+      "ram_rss_delta_mb": 94.45,
+      "ram_rss_peak_mb": 170.45
+    }
+  },
+  "single_insert_latencies": {
+    "10000": {
+      "scale": 10000,
+      "iterations": 1000,
+      "mode": "single_insert_autocommit_full_sync",
+      "min_ms": 0.693,
+      "mean_ms": 1.253,
+      "p50_ms": 1.089,
+      "p95_ms": 1.837,
+      "p99_ms": 3.213,
+      "max_ms": 54.017,
+      "inserts_per_sec": 798.4
+    },
+    "100000": {
+      "scale": 100000,
+      "iterations": 1000,
+      "mode": "single_insert_autocommit_full_sync",
+      "min_ms": 0.746,
+      "mean_ms": 1.117,
+      "p50_ms": 1.062,
+      "p95_ms": 1.322,
+      "p99_ms": 3.105,
+      "max_ms": 4.442,
+      "inserts_per_sec": 895.2
+    },
+    "500000": {
+      "scale": 500000,
+      "iterations": 500,
+      "mode": "single_insert_autocommit_full_sync",
+      "min_ms": 0.743,
+      "mean_ms": 4.59,
+      "p50_ms": 1.069,
+      "p95_ms": 34.786,
+      "p99_ms": 46.836,
+      "max_ms": 54.663,
+      "inserts_per_sec": 217.9
+    },
+    "1000000": {
+      "scale": 1000000,
+      "iterations": 500,
+      "mode": "single_insert_autocommit_full_sync",
+      "min_ms": 1.644,
+      "mean_ms": 8.631,
+      "p50_ms": 2.033,
+      "p95_ms": 38.727,
+      "p99_ms": 49.76,
+      "max_ms": 365.785,
+      "inserts_per_sec": 115.9
+    },
+    "2000000": {
+      "scale": 2000000,
+      "iterations": 500,
+      "mode": "single_insert_autocommit_full_sync",
+      "min_ms": 1.739,
+      "mean_ms": 2.02,
+      "p50_ms": 1.934,
+      "p95_ms": 2.152,
+      "p99_ms": 4.755,
+      "max_ms": 8.748,
+      "inserts_per_sec": 495.2
+    }
+  },
+  "search_query_latencies": {
+    "10000": {
+      "q01_pk_exact_id": {
+        "sql": "SELECT * FROM research WHERE id = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid=?)",
+        "min_ms": 0.007,
+        "mean_ms": 0.012,
+        "p50_ms": 0.011,
+        "p95_ms": 0.024,
+        "p99_ms": 0.039,
+        "max_ms": 0.039,
+        "qps": 84217.6
+      },
+      "q02_indexed_ref_num": {
+        "sql": "SELECT * FROM research WHERE reference_number = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INDEX sqlite_autoindex_research_1 (reference_number=?)",
+        "min_ms": 0.008,
+        "mean_ms": 0.011,
+        "p50_ms": 0.011,
+        "p95_ms": 0.022,
+        "p99_ms": 0.039,
+        "max_ms": 0.039,
+        "qps": 89023.4
+      },
+      "q03_indexed_exact_title": {
+        "sql": "SELECT * FROM research WHERE title = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SEARCH research USING INDEX idx_research_title (title=?)",
+        "min_ms": 0.004,
+        "mean_ms": 0.005,
+        "p50_ms": 0.005,
+        "p95_ms": 0.01,
+        "p99_ms": 0.042,
+        "max_ms": 0.042,
+        "qps": 182615.0
+      },
+      "q04_prefix_like_indexed": {
+        "sql": "SELECT * FROM research WHERE title LIKE 'دراسة تحليلية%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.126,
+        "mean_ms": 0.139,
+        "p50_ms": 0.138,
+        "p95_ms": 0.149,
+        "p99_ms": 0.366,
+        "max_ms": 0.366,
+        "qps": 7207.8
+      },
+      "q05_substring_fts_like": {
+        "sql": "SELECT * FROM research WHERE title LIKE '%الذكاء الاصطناعي%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.248,
+        "mean_ms": 0.26,
+        "p50_ms": 0.252,
+        "p95_ms": 0.311,
+        "p99_ms": 0.353,
+        "max_ms": 0.353,
+        "qps": 3846.4
+      },
+      "q06_status_filter_scan": {
+        "sql": "SELECT * FROM research WHERE scan_status = 'completed' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH research USING INDEX idx_research_scan_status (scan_status=?)",
+        "min_ms": 0.105,
+        "mean_ms": 0.11,
+        "p50_ms": 0.107,
+        "p95_ms": 0.119,
+        "p99_ms": 0.226,
+        "max_ms": 0.226,
+        "qps": 9124.9
+      },
+      "q07_composite_meta_filter": {
+        "sql": "SELECT * FROM research WHERE specialization = 'علوم الحاسب' AND degree_type = 'دكتوراه' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.182,
+        "mean_ms": 0.202,
+        "p50_ms": 0.186,
+        "p95_ms": 0.252,
+        "p99_ms": 0.926,
+        "max_ms": 0.926,
+        "qps": 4952.7
+      },
+      "q08_date_range_filter": {
+        "sql": "SELECT * FROM research WHERE created_at BETWEEN '2025-03-01 00:00:00' AND '2025-06-01 00:00:00' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SCAN research",
+        "min_ms": 0.552,
+        "mean_ms": 0.639,
+        "p50_ms": 0.604,
+        "p95_ms": 0.704,
+        "p99_ms": 3.414,
+        "max_ms": 3.414,
+        "qps": 1564.8
+      },
+      "q09_deep_offset_pagination": {
+        "sql": "SELECT * FROM research ORDER BY created_at DESC LIMIT 20 OFFSET 50000",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SCAN research | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 30.188,
+        "mean_ms": 33.773,
+        "p50_ms": 33.264,
+        "p95_ms": 37.58,
+        "p99_ms": 41.458,
+        "max_ms": 41.458,
+        "qps": 29.6
+      },
+      "q10_keyset_indexed_pagination": {
+        "sql": "SELECT * FROM research WHERE id > ? ORDER BY id ASC LIMIT 20",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid>?)",
+        "min_ms": 0.047,
+        "mean_ms": 0.049,
+        "p50_ms": 0.047,
+        "p95_ms": 0.06,
+        "p99_ms": 0.088,
+        "max_ms": 0.088,
+        "qps": 20476.3
+      },
+      "q11_relational_join_filter": {
+        "sql": "SELECT r.id, r.reference_number, r.title, rf.file_hash, rf.file_size_bytes FROM research r JOIN research_files rf ON r.id = rf.research_id WHERE r.scan_status = 'completed' AND r.degree_type = 'ماجستير' ORDER BY r.created_at DESC LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH r USING INDEX idx_research_scan_status (scan_status=?) | SEARCH rf USING INDEX idx_rf_research_order (research_id=?) | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 3.903,
+        "mean_ms": 4.172,
+        "p50_ms": 4.122,
+        "p95_ms": 4.576,
+        "p99_ms": 7.383,
+        "max_ms": 7.383,
+        "qps": 239.7
+      }
+    },
+    "100000": {
+      "q01_pk_exact_id": {
+        "sql": "SELECT * FROM research WHERE id = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid=?)",
+        "min_ms": 0.007,
+        "mean_ms": 0.013,
+        "p50_ms": 0.011,
+        "p95_ms": 0.02,
+        "p99_ms": 0.039,
+        "max_ms": 0.039,
+        "qps": 78845.7
+      },
+      "q02_indexed_ref_num": {
+        "sql": "SELECT * FROM research WHERE reference_number = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INDEX sqlite_autoindex_research_1 (reference_number=?)",
+        "min_ms": 0.008,
+        "mean_ms": 0.013,
+        "p50_ms": 0.012,
+        "p95_ms": 0.035,
+        "p99_ms": 0.044,
+        "max_ms": 0.044,
+        "qps": 75137.1
+      },
+      "q03_indexed_exact_title": {
+        "sql": "SELECT * FROM research WHERE title = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SEARCH research USING INDEX idx_research_title (title=?)",
+        "min_ms": 0.005,
+        "mean_ms": 0.007,
+        "p50_ms": 0.005,
+        "p95_ms": 0.014,
+        "p99_ms": 0.034,
+        "max_ms": 0.034,
+        "qps": 141223.0
+      },
+      "q04_prefix_like_indexed": {
+        "sql": "SELECT * FROM research WHERE title LIKE 'دراسة تحليلية%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.127,
+        "mean_ms": 0.141,
+        "p50_ms": 0.139,
+        "p95_ms": 0.153,
+        "p99_ms": 0.311,
+        "max_ms": 0.311,
+        "qps": 7082.8
+      },
+      "q05_substring_fts_like": {
+        "sql": "SELECT * FROM research WHERE title LIKE '%الذكاء الاصطناعي%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.248,
+        "mean_ms": 0.308,
+        "p50_ms": 0.273,
+        "p95_ms": 0.485,
+        "p99_ms": 0.512,
+        "max_ms": 0.512,
+        "qps": 3248.4
+      },
+      "q06_status_filter_scan": {
+        "sql": "SELECT * FROM research WHERE scan_status = 'completed' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH research USING INDEX idx_research_scan_status (scan_status=?)",
+        "min_ms": 0.112,
+        "mean_ms": 0.122,
+        "p50_ms": 0.116,
+        "p95_ms": 0.181,
+        "p99_ms": 0.281,
+        "max_ms": 0.281,
+        "qps": 8217.9
+      },
+      "q07_composite_meta_filter": {
+        "sql": "SELECT * FROM research WHERE specialization = 'علوم الحاسب' AND degree_type = 'دكتوراه' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.191,
+        "mean_ms": 0.205,
+        "p50_ms": 0.197,
+        "p95_ms": 0.23,
+        "p99_ms": 0.852,
+        "max_ms": 0.852,
+        "qps": 4866.5
+      },
+      "q08_date_range_filter": {
+        "sql": "SELECT * FROM research WHERE created_at BETWEEN '2025-03-01 00:00:00' AND '2025-06-01 00:00:00' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 6.459,
+        "mean_ms": 8.864,
+        "p50_ms": 7.847,
+        "p95_ms": 14.464,
+        "p99_ms": 38.519,
+        "max_ms": 38.519,
+        "qps": 112.8
+      },
+      "q09_deep_offset_pagination": {
+        "sql": "SELECT * FROM research ORDER BY created_at DESC LIMIT 20 OFFSET 50000",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SCAN research | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 353.964,
+        "mean_ms": 376.854,
+        "p50_ms": 370.365,
+        "p95_ms": 410.653,
+        "p99_ms": 622.009,
+        "max_ms": 622.009,
+        "qps": 2.7
+      },
+      "q10_keyset_indexed_pagination": {
+        "sql": "SELECT * FROM research WHERE id > ? ORDER BY id ASC LIMIT 20",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid>?)",
+        "min_ms": 0.044,
+        "mean_ms": 0.046,
+        "p50_ms": 0.045,
+        "p95_ms": 0.049,
+        "p99_ms": 0.096,
+        "max_ms": 0.096,
+        "qps": 21868.0
+      },
+      "q11_relational_join_filter": {
+        "sql": "SELECT r.id, r.reference_number, r.title, rf.file_hash, rf.file_size_bytes FROM research r JOIN research_files rf ON r.id = rf.research_id WHERE r.scan_status = 'completed' AND r.degree_type = 'ماجستير' ORDER BY r.created_at DESC LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH r USING INDEX idx_research_scan_status (scan_status=?) | SEARCH rf USING INDEX idx_rf_research_order (research_id=?) | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 72.493,
+        "mean_ms": 86.426,
+        "p50_ms": 86.474,
+        "p95_ms": 89.784,
+        "p99_ms": 90.366,
+        "max_ms": 90.366,
+        "qps": 11.6
+      }
+    },
+    "500000": {
+      "q01_pk_exact_id": {
+        "sql": "SELECT * FROM research WHERE id = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid=?)",
+        "min_ms": 0.007,
+        "mean_ms": 0.015,
+        "p50_ms": 0.014,
+        "p95_ms": 0.022,
+        "p99_ms": 0.046,
+        "max_ms": 0.046,
+        "qps": 66782.4
+      },
+      "q02_indexed_ref_num": {
+        "sql": "SELECT * FROM research WHERE reference_number = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INDEX sqlite_autoindex_research_1 (reference_number=?)",
+        "min_ms": 0.008,
+        "mean_ms": 0.014,
+        "p50_ms": 0.012,
+        "p95_ms": 0.022,
+        "p99_ms": 0.043,
+        "max_ms": 0.043,
+        "qps": 71720.6
+      },
+      "q03_indexed_exact_title": {
+        "sql": "SELECT * FROM research WHERE title = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SEARCH research USING INDEX idx_research_title (title=?)",
+        "min_ms": 0.005,
+        "mean_ms": 0.01,
+        "p50_ms": 0.009,
+        "p95_ms": 0.015,
+        "p99_ms": 0.062,
+        "max_ms": 0.062,
+        "qps": 103252.5
+      },
+      "q04_prefix_like_indexed": {
+        "sql": "SELECT * FROM research WHERE title LIKE 'دراسة تحليلية%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.135,
+        "mean_ms": 0.146,
+        "p50_ms": 0.137,
+        "p95_ms": 0.225,
+        "p99_ms": 0.366,
+        "max_ms": 0.366,
+        "qps": 6872.4
+      },
+      "q05_substring_fts_like": {
+        "sql": "SELECT * FROM research WHERE title LIKE '%الذكاء الاصطناعي%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.252,
+        "mean_ms": 0.283,
+        "p50_ms": 0.283,
+        "p95_ms": 0.308,
+        "p99_ms": 0.32,
+        "max_ms": 0.32,
+        "qps": 3530.1
+      },
+      "q06_status_filter_scan": {
+        "sql": "SELECT * FROM research WHERE scan_status = 'completed' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH research USING INDEX idx_research_scan_status (scan_status=?)",
+        "min_ms": 0.114,
+        "mean_ms": 0.12,
+        "p50_ms": 0.118,
+        "p95_ms": 0.124,
+        "p99_ms": 0.188,
+        "max_ms": 0.188,
+        "qps": 8337.0
+      },
+      "q07_composite_meta_filter": {
+        "sql": "SELECT * FROM research WHERE specialization = 'علوم الحاسب' AND degree_type = 'دكتوراه' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.183,
+        "mean_ms": 0.207,
+        "p50_ms": 0.201,
+        "p95_ms": 0.22,
+        "p99_ms": 0.773,
+        "max_ms": 0.773,
+        "qps": 4834.6
+      },
+      "q08_date_range_filter": {
+        "sql": "SELECT * FROM research WHERE created_at BETWEEN '2025-03-01 00:00:00' AND '2025-06-01 00:00:00' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 6.701,
+        "mean_ms": 7.67,
+        "p50_ms": 7.291,
+        "p95_ms": 8.307,
+        "p99_ms": 36.253,
+        "max_ms": 36.253,
+        "qps": 130.4
+      },
+      "q09_deep_offset_pagination": {
+        "sql": "SELECT * FROM research ORDER BY created_at DESC LIMIT 20 OFFSET 50000",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SCAN research | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 1866.325,
+        "mean_ms": 1936.776,
+        "p50_ms": 1938.356,
+        "p95_ms": 2005.803,
+        "p99_ms": 2041.877,
+        "max_ms": 2041.877,
+        "qps": 0.5
+      },
+      "q10_keyset_indexed_pagination": {
+        "sql": "SELECT * FROM research WHERE id > ? ORDER BY id ASC LIMIT 20",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid>?)",
+        "min_ms": 0.044,
+        "mean_ms": 0.047,
+        "p50_ms": 0.044,
+        "p95_ms": 0.056,
+        "p99_ms": 0.118,
+        "max_ms": 0.118,
+        "qps": 21080.6
+      },
+      "q11_relational_join_filter": {
+        "sql": "SELECT r.id, r.reference_number, r.title, rf.file_hash, rf.file_size_bytes FROM research r JOIN research_files rf ON r.id = rf.research_id WHERE r.scan_status = 'completed' AND r.degree_type = 'ماجستير' ORDER BY r.created_at DESC LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH r USING INDEX idx_research_scan_status (scan_status=?) | SEARCH rf USING INDEX idx_rf_research_order (research_id=?) | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 432.979,
+        "mean_ms": 447.718,
+        "p50_ms": 445.423,
+        "p95_ms": 461.346,
+        "p99_ms": 516.457,
+        "max_ms": 516.457,
+        "qps": 2.2
+      }
+    },
+    "1000000": {
+      "q01_pk_exact_id": {
+        "sql": "SELECT * FROM research WHERE id = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid=?)",
+        "min_ms": 0.009,
+        "mean_ms": 0.015,
+        "p50_ms": 0.014,
+        "p95_ms": 0.026,
+        "p99_ms": 0.046,
+        "max_ms": 0.046,
+        "qps": 67190.8
+      },
+      "q02_indexed_ref_num": {
+        "sql": "SELECT * FROM research WHERE reference_number = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INDEX sqlite_autoindex_research_1 (reference_number=?)",
+        "min_ms": 0.008,
+        "mean_ms": 0.015,
+        "p50_ms": 0.013,
+        "p95_ms": 0.021,
+        "p99_ms": 0.062,
+        "max_ms": 0.062,
+        "qps": 67792.0
+      },
+      "q03_indexed_exact_title": {
+        "sql": "SELECT * FROM research WHERE title = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SEARCH research USING INDEX idx_research_title (title=?)",
+        "min_ms": 0.005,
+        "mean_ms": 0.011,
+        "p50_ms": 0.009,
+        "p95_ms": 0.02,
+        "p99_ms": 0.063,
+        "max_ms": 0.063,
+        "qps": 93773.4
+      },
+      "q04_prefix_like_indexed": {
+        "sql": "SELECT * FROM research WHERE title LIKE 'دراسة تحليلية%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.124,
+        "mean_ms": 0.132,
+        "p50_ms": 0.127,
+        "p95_ms": 0.145,
+        "p99_ms": 0.306,
+        "max_ms": 0.306,
+        "qps": 7601.2
+      },
+      "q05_substring_fts_like": {
+        "sql": "SELECT * FROM research WHERE title LIKE '%الذكاء الاصطناعي%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.261,
+        "mean_ms": 0.278,
+        "p50_ms": 0.278,
+        "p95_ms": 0.29,
+        "p99_ms": 0.299,
+        "max_ms": 0.299,
+        "qps": 3596.8
+      },
+      "q06_status_filter_scan": {
+        "sql": "SELECT * FROM research WHERE scan_status = 'completed' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH research USING INDEX idx_research_scan_status (scan_status=?)",
+        "min_ms": 0.116,
+        "mean_ms": 0.12,
+        "p50_ms": 0.118,
+        "p95_ms": 0.131,
+        "p99_ms": 0.178,
+        "max_ms": 0.178,
+        "qps": 8314.1
+      },
+      "q07_composite_meta_filter": {
+        "sql": "SELECT * FROM research WHERE specialization = 'علوم الحاسب' AND degree_type = 'دكتوراه' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.195,
+        "mean_ms": 0.211,
+        "p50_ms": 0.202,
+        "p95_ms": 0.218,
+        "p99_ms": 0.849,
+        "max_ms": 0.849,
+        "qps": 4750.2
+      },
+      "q08_date_range_filter": {
+        "sql": "SELECT * FROM research WHERE created_at BETWEEN '2025-03-01 00:00:00' AND '2025-06-01 00:00:00' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 6.5,
+        "mean_ms": 7.554,
+        "p50_ms": 7.174,
+        "p95_ms": 8.065,
+        "p99_ms": 36.464,
+        "max_ms": 36.464,
+        "qps": 132.4
+      },
+      "q09_deep_offset_pagination": {
+        "sql": "SELECT * FROM research ORDER BY created_at DESC LIMIT 20 OFFSET 50000",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SCAN research | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 2118.147,
+        "mean_ms": 2210.912,
+        "p50_ms": 2206.53,
+        "p95_ms": 2289.165,
+        "p99_ms": 2438.462,
+        "max_ms": 2438.462,
+        "qps": 0.5
+      },
+      "q10_keyset_indexed_pagination": {
+        "sql": "SELECT * FROM research WHERE id > ? ORDER BY id ASC LIMIT 20",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid>?)",
+        "min_ms": 0.043,
+        "mean_ms": 0.045,
+        "p50_ms": 0.044,
+        "p95_ms": 0.048,
+        "p99_ms": 0.113,
+        "max_ms": 0.113,
+        "qps": 22012.4
+      },
+      "q11_relational_join_filter": {
+        "sql": "SELECT r.id, r.reference_number, r.title, rf.file_hash, rf.file_size_bytes FROM research r JOIN research_files rf ON r.id = rf.research_id WHERE r.scan_status = 'completed' AND r.degree_type = 'ماجستير' ORDER BY r.created_at DESC LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH r USING INDEX idx_research_scan_status (scan_status=?) | SEARCH rf USING INDEX idx_rf_research_order (research_id=?) | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 666.401,
+        "mean_ms": 681.901,
+        "p50_ms": 680.64,
+        "p95_ms": 701.554,
+        "p99_ms": 735.458,
+        "max_ms": 735.458,
+        "qps": 1.5
+      }
+    },
+    "2000000": {
+      "q01_pk_exact_id": {
+        "sql": "SELECT * FROM research WHERE id = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid=?)",
+        "min_ms": 0.007,
+        "mean_ms": 0.017,
+        "p50_ms": 0.015,
+        "p95_ms": 0.019,
+        "p99_ms": 0.105,
+        "max_ms": 0.105,
+        "qps": 60408.4
+      },
+      "q02_indexed_ref_num": {
+        "sql": "SELECT * FROM research WHERE reference_number = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 1,
+        "query_plan": "SEARCH research USING INDEX sqlite_autoindex_research_1 (reference_number=?)",
+        "min_ms": 0.008,
+        "mean_ms": 0.015,
+        "p50_ms": 0.015,
+        "p95_ms": 0.021,
+        "p99_ms": 0.045,
+        "max_ms": 0.045,
+        "qps": 64762.6
+      },
+      "q03_indexed_exact_title": {
+        "sql": "SELECT * FROM research WHERE title = ?",
+        "repetitions": 100,
+        "rows_returned_sample": 0,
+        "query_plan": "SEARCH research USING INDEX idx_research_title (title=?)",
+        "min_ms": 0.005,
+        "mean_ms": 0.011,
+        "p50_ms": 0.009,
+        "p95_ms": 0.018,
+        "p99_ms": 0.062,
+        "max_ms": 0.062,
+        "qps": 90670.1
+      },
+      "q04_prefix_like_indexed": {
+        "sql": "SELECT * FROM research WHERE title LIKE 'دراسة تحليلية%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.127,
+        "mean_ms": 0.14,
+        "p50_ms": 0.136,
+        "p95_ms": 0.166,
+        "p99_ms": 0.4,
+        "max_ms": 0.4,
+        "qps": 7152.6
+      },
+      "q05_substring_fts_like": {
+        "sql": "SELECT * FROM research WHERE title LIKE '%الذكاء الاصطناعي%' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.269,
+        "mean_ms": 0.305,
+        "p50_ms": 0.298,
+        "p95_ms": 0.321,
+        "p99_ms": 0.852,
+        "max_ms": 0.852,
+        "qps": 3282.1
+      },
+      "q06_status_filter_scan": {
+        "sql": "SELECT * FROM research WHERE scan_status = 'completed' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH research USING INDEX idx_research_scan_status (scan_status=?)",
+        "min_ms": 0.119,
+        "mean_ms": 0.123,
+        "p50_ms": 0.121,
+        "p95_ms": 0.128,
+        "p99_ms": 0.179,
+        "max_ms": 0.179,
+        "qps": 8136.7
+      },
+      "q07_composite_meta_filter": {
+        "sql": "SELECT * FROM research WHERE specialization = 'علوم الحاسب' AND degree_type = 'دكتوراه' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 0.201,
+        "mean_ms": 0.217,
+        "p50_ms": 0.208,
+        "p95_ms": 0.219,
+        "p99_ms": 0.936,
+        "max_ms": 0.936,
+        "qps": 4614.0
+      },
+      "q08_date_range_filter": {
+        "sql": "SELECT * FROM research WHERE created_at BETWEEN '2025-03-01 00:00:00' AND '2025-06-01 00:00:00' LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SCAN research",
+        "min_ms": 6.389,
+        "mean_ms": 7.522,
+        "p50_ms": 7.106,
+        "p95_ms": 8.226,
+        "p99_ms": 37.125,
+        "max_ms": 37.125,
+        "qps": 133.0
+      },
+      "q09_deep_offset_pagination": {
+        "sql": "SELECT * FROM research ORDER BY created_at DESC LIMIT 20 OFFSET 50000",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SCAN research | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 2761.383,
+        "mean_ms": 2856.338,
+        "p50_ms": 2852.937,
+        "p95_ms": 2926.409,
+        "p99_ms": 3387.088,
+        "max_ms": 3387.088,
+        "qps": 0.4
+      },
+      "q10_keyset_indexed_pagination": {
+        "sql": "SELECT * FROM research WHERE id > ? ORDER BY id ASC LIMIT 20",
+        "repetitions": 100,
+        "rows_returned_sample": 20,
+        "query_plan": "SEARCH research USING INTEGER PRIMARY KEY (rowid>?)",
+        "min_ms": 0.044,
+        "mean_ms": 0.048,
+        "p50_ms": 0.045,
+        "p95_ms": 0.052,
+        "p99_ms": 0.115,
+        "max_ms": 0.115,
+        "qps": 21048.2
+      },
+      "q11_relational_join_filter": {
+        "sql": "SELECT r.id, r.reference_number, r.title, rf.file_hash, rf.file_size_bytes FROM research r JOIN research_files rf ON r.id = rf.research_id WHERE r.scan_status = 'completed' AND r.degree_type = 'ماجستير' ORDER BY r.created_at DESC LIMIT 50",
+        "repetitions": 100,
+        "rows_returned_sample": 50,
+        "query_plan": "SEARCH r USING INDEX idx_research_scan_status (scan_status=?) | SEARCH rf USING INDEX idx_rf_research_order (research_id=?) | USE TEMP B-TREE FOR ORDER BY",
+        "min_ms": 1093.981,
+        "mean_ms": 1125.213,
+        "p50_ms": 1125.468,
+        "p95_ms": 1145.523,
+        "p99_ms": 1177.449,
+        "max_ms": 1177.449,
+        "qps": 0.9
+      }
+    }
+  },
+  "report_access_latencies": {
+    "10000": {
+      "scale": 10000,
+      "sample_count": 100,
+      "fetch_report_p50_ms": 0.01,
+      "fetch_report_p95_ms": 0.014,
+      "fetch_report_p99_ms": 0.054,
+      "json_parse_p50_ms": 0.003,
+      "json_parse_p95_ms": 0.004
+    },
+    "100000": {
+      "scale": 100000,
+      "sample_count": 100,
+      "fetch_report_p50_ms": 0.009,
+      "fetch_report_p95_ms": 0.016,
+      "fetch_report_p99_ms": 0.421,
+      "json_parse_p50_ms": 0.003,
+      "json_parse_p95_ms": 0.004
+    },
+    "500000": {
+      "scale": 500000,
+      "sample_count": 100,
+      "fetch_report_p50_ms": 0.009,
+      "fetch_report_p95_ms": 0.013,
+      "fetch_report_p99_ms": 0.042,
+      "json_parse_p50_ms": 0.003,
+      "json_parse_p95_ms": 0.003
+    },
+    "1000000": {
+      "scale": 1000000,
+      "sample_count": 100,
+      "fetch_report_p50_ms": 0.009,
+      "fetch_report_p95_ms": 0.015,
+      "fetch_report_p99_ms": 0.051,
+      "json_parse_p50_ms": 0.003,
+      "json_parse_p95_ms": 0.004
+    },
+    "2000000": {
+      "scale": 2000000,
+      "sample_count": 100,
+      "fetch_report_p50_ms": 0.009,
+      "fetch_report_p95_ms": 0.015,
+      "fetch_report_p99_ms": 0.049,
+      "json_parse_p50_ms": 0.003,
+      "json_parse_p95_ms": 0.003
+    }
+  },
+  "queue_scale_latencies": {
+    "1000_jobs": {
+      "queue_depth": 1000,
+      "measured_claims": 100,
+      "claim_p50_ms": 0.105,
+      "claim_p95_ms": 0.177,
+      "claim_p99_ms": 8.441,
+      "complete_p50_ms": 0.031,
+      "complete_p95_ms": 0.094,
+      "heartbeat_p50_ms": 0.013,
+      "stale_reclaim_scan_ms": 0.043
+    },
+    "10000_jobs": {
+      "queue_depth": 10000,
+      "measured_claims": 100,
+      "claim_p50_ms": 0.708,
+      "claim_p95_ms": 0.794,
+      "claim_p99_ms": 9.445,
+      "complete_p50_ms": 0.03,
+      "complete_p95_ms": 0.053,
+      "heartbeat_p50_ms": 0.014,
+      "stale_reclaim_scan_ms": 0.055
+    },
+    "100000_jobs": {
+      "queue_depth": 100000,
+      "measured_claims": 100,
+      "claim_p50_ms": 8.015,
+      "claim_p95_ms": 8.69,
+      "claim_p99_ms": 14.789,
+      "complete_p50_ms": 0.033,
+      "complete_p95_ms": 0.054,
+      "heartbeat_p50_ms": 0.016,
+      "stale_reclaim_scan_ms": 0.066
+    },
+    "500000_jobs": {
+      "queue_depth": 500000,
+      "measured_claims": 100,
+      "claim_p50_ms": 90.849,
+      "claim_p95_ms": 99.095,
+      "claim_p99_ms": 123.183,
+      "complete_p50_ms": 0.034,
+      "complete_p95_ms": 0.053,
+      "heartbeat_p50_ms": 0.018,
+      "stale_reclaim_scan_ms": 0.051
+    }
+  },
+  "os_worker_concurrency": {
+    "1_workers": {
+      "worker_count": 1,
+      "target_jobs": 200,
+      "completed_jobs": 200,
+      "total_busy_errors": 0,
+      "lock_contention_rate_pct": 0.0,
+      "elapsed_seconds": 2.094,
+      "throughput_jobs_per_minute": 5729.56,
+      "throughput_jobs_per_sec": 95.49,
+      "worker_details": {
+        "0": {
+          "worker_id": "proc_worker_0_21228",
+          "pid": 21228,
+          "jobs_processed": 200,
+          "busy_errors": 0,
+          "duration_seconds": 1.971,
+          "p50_claim_ms": 2.188
+        }
+      }
+    },
+    "2_workers": {
+      "worker_count": 2,
+      "target_jobs": 200,
+      "completed_jobs": 200,
+      "total_busy_errors": 0,
+      "lock_contention_rate_pct": 0.0,
+      "elapsed_seconds": 1.544,
+      "throughput_jobs_per_minute": 7773.99,
+      "throughput_jobs_per_sec": 129.57,
+      "worker_details": {
+        "1": {
+          "worker_id": "proc_worker_1_16472",
+          "pid": 16472,
+          "jobs_processed": 100,
+          "busy_errors": 0,
+          "duration_seconds": 1.411,
+          "p50_claim_ms": 2.264
+        },
+        "0": {
+          "worker_id": "proc_worker_0_9420",
+          "pid": 9420,
+          "jobs_processed": 100,
+          "busy_errors": 0,
+          "duration_seconds": 1.418,
+          "p50_claim_ms": 2.245
+        }
+      }
+    },
+    "4_workers": {
+      "worker_count": 4,
+      "target_jobs": 200,
+      "completed_jobs": 200,
+      "total_busy_errors": 0,
+      "lock_contention_rate_pct": 0.0,
+      "elapsed_seconds": 2.82,
+      "throughput_jobs_per_minute": 4254.87,
+      "throughput_jobs_per_sec": 70.91,
+      "worker_details": {
+        "1": {
+          "worker_id": "proc_worker_1_4840",
+          "pid": 4840,
+          "jobs_processed": 55,
+          "busy_errors": 0,
+          "duration_seconds": 1.56,
+          "p50_claim_ms": 2.36
+        },
+        "2": {
+          "worker_id": "proc_worker_2_19848",
+          "pid": 19848,
+          "jobs_processed": 55,
+          "busy_errors": 0,
+          "duration_seconds": 1.771,
+          "p50_claim_ms": 3.914
+        },
+        "3": {
+          "worker_id": "proc_worker_3_11688",
+          "pid": 11688,
+          "jobs_processed": 55,
+          "busy_errors": 0,
+          "duration_seconds": 2.56,
+          "p50_claim_ms": 4.74
+        },
+        "0": {
+          "worker_id": "proc_worker_0_16596",
+          "pid": 16596,
+          "jobs_processed": 35,
+          "busy_errors": 0,
+          "duration_seconds": 2.67,
+          "p50_claim_ms": 2.478
+        }
+      }
+    },
+    "8_workers": {
+      "worker_count": 8,
+      "target_jobs": 200,
+      "completed_jobs": 200,
+      "total_busy_errors": 0,
+      "lock_contention_rate_pct": 0.0,
+      "elapsed_seconds": 1.813,
+      "throughput_jobs_per_minute": 6618.6,
+      "throughput_jobs_per_sec": 110.31,
+      "worker_details": {
+        "7": {
+          "worker_id": "proc_worker_7_4576",
+          "pid": 4576,
+          "jobs_processed": 30,
+          "busy_errors": 0,
+          "duration_seconds": 0.641,
+          "p50_claim_ms": 2.163
+        },
+        "3": {
+          "worker_id": "proc_worker_3_19176",
+          "pid": 19176,
+          "jobs_processed": 30,
+          "busy_errors": 0,
+          "duration_seconds": 0.852,
+          "p50_claim_ms": 2.112
+        },
+        "1": {
+          "worker_id": "proc_worker_1_23356",
+          "pid": 23356,
+          "jobs_processed": 30,
+          "busy_errors": 0,
+          "duration_seconds": 0.955,
+          "p50_claim_ms": 2.117
+        },
+        "2": {
+          "worker_id": "proc_worker_2_5620",
+          "pid": 5620,
+          "jobs_processed": 30,
+          "busy_errors": 0,
+          "duration_seconds": 1.27,
+          "p50_claim_ms": 2.136
+        },
+        "0": {
+          "worker_id": "proc_worker_0_33592",
+          "pid": 33592,
+          "jobs_processed": 30,
+          "busy_errors": 0,
+          "duration_seconds": 1.44,
+          "p50_claim_ms": 2.084
+        },
+        "6": {
+          "worker_id": "proc_worker_6_33392",
+          "pid": 33392,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 1.549,
+          "p50_claim_ms": 2.149
+        },
+        "4": {
+          "worker_id": "proc_worker_4_23332",
+          "pid": 23332,
+          "jobs_processed": 27,
+          "busy_errors": 0,
+          "duration_seconds": 1.552,
+          "p50_claim_ms": 2.107
+        },
+        "5": {
+          "worker_id": "proc_worker_5_23488",
+          "pid": 23488,
+          "jobs_processed": 6,
+          "busy_errors": 0,
+          "duration_seconds": 1.593,
+          "p50_claim_ms": 2.045
+        }
+      }
+    },
+    "16_workers": {
+      "worker_count": 16,
+      "target_jobs": 200,
+      "completed_jobs": 200,
+      "total_busy_errors": 0,
+      "lock_contention_rate_pct": 0.0,
+      "elapsed_seconds": 1.785,
+      "throughput_jobs_per_minute": 6721.32,
+      "throughput_jobs_per_sec": 112.02,
+      "worker_details": {
+        "3": {
+          "worker_id": "proc_worker_3_14296",
+          "pid": 14296,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.351,
+          "p50_claim_ms": 2.135
+        },
+        "0": {
+          "worker_id": "proc_worker_0_20800",
+          "pid": 20800,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.57,
+          "p50_claim_ms": 2.089
+        },
+        "11": {
+          "worker_id": "proc_worker_11_19784",
+          "pid": 19784,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.593,
+          "p50_claim_ms": 2.11
+        },
+        "15": {
+          "worker_id": "proc_worker_15_32876",
+          "pid": 32876,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.709,
+          "p50_claim_ms": 2.131
+        },
+        "8": {
+          "worker_id": "proc_worker_8_15936",
+          "pid": 15936,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.824,
+          "p50_claim_ms": 2.077
+        },
+        "14": {
+          "worker_id": "proc_worker_14_16856",
+          "pid": 16856,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 0.844,
+          "p50_claim_ms": 2.103
+        },
+        "4": {
+          "worker_id": "proc_worker_4_444",
+          "pid": 444,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 1.08,
+          "p50_claim_ms": 2.107
+        },
+        "9": {
+          "worker_id": "proc_worker_9_16100",
+          "pid": 16100,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 1.231,
+          "p50_claim_ms": 2.103
+        },
+        "13": {
+          "worker_id": "proc_worker_13_22972",
+          "pid": 22972,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 1.233,
+          "p50_claim_ms": 1.96
+        },
+        "12": {
+          "worker_id": "proc_worker_12_2188",
+          "pid": 2188,
+          "jobs_processed": 17,
+          "busy_errors": 0,
+          "duration_seconds": 1.281,
+          "p50_claim_ms": 1.933
+        },
+        "5": {
+          "worker_id": "proc_worker_5_33300",
+          "pid": 33300,
+          "jobs_processed": 14,
+          "busy_errors": 0,
+          "duration_seconds": 1.332,
+          "p50_claim_ms": 1.996
+        },
+        "7": {
+          "worker_id": "proc_worker_7_984",
+          "pid": 984,
+          "jobs_processed": 0,
+          "busy_errors": 0,
+          "duration_seconds": 1.351,
+          "p50_claim_ms": 0.0
+        },
+        "6": {
+          "worker_id": "proc_worker_6_13912",
+          "pid": 13912,
+          "jobs_processed": 10,
+          "busy_errors": 0,
+          "duration_seconds": 1.384,
+          "p50_claim_ms": 2.109
+        },
+        "2": {
+          "worker_id": "proc_worker_2_10252",
+          "pid": 10252,
+          "jobs_processed": 0,
+          "busy_errors": 0,
+          "duration_seconds": 1.441,
+          "p50_claim_ms": 0.0
+        },
+        "1": {
+          "worker_id": "proc_worker_1_32272",
+          "pid": 32272,
+          "jobs_processed": 6,
+          "busy_errors": 0,
+          "duration_seconds": 1.48,
+          "p50_claim_ms": 2.538
+        },
+        "10": {
+          "worker_id": "proc_worker_10_4312",
+          "pid": 4312,
+          "jobs_processed": 0,
+          "busy_errors": 0,
+          "duration_seconds": 1.442,
+          "p50_claim_ms": 0.0
+        }
+      }
+    }
+  },
+  "multi_user_read_concurrency": {
+    "1_concurrent_users": {
+      "users_count": 1,
+      "test_duration_sec": 8.01,
+      "total_reads": 1444,
+      "read_qps": 180.4,
+      "read_errors": 0,
+      "read_p50_ms": 0.085,
+      "read_p95_ms": 0.244,
+      "read_p99_ms": 0.294,
+      "total_writes": 633,
+      "write_wps": 79.1,
+      "write_errors": 0,
+      "write_p50_ms": 2.11,
+      "write_p95_ms": 2.314
+    },
+    "5_concurrent_users": {
+      "users_count": 5,
+      "test_duration_sec": 8.01,
+      "total_reads": 7214,
+      "read_qps": 900.5,
+      "read_errors": 0,
+      "read_p50_ms": 0.086,
+      "read_p95_ms": 0.267,
+      "read_p99_ms": 0.353,
+      "total_writes": 633,
+      "write_wps": 79.0,
+      "write_errors": 0,
+      "write_p50_ms": 2.112,
+      "write_p95_ms": 2.367
+    },
+    "10_concurrent_users": {
+      "users_count": 10,
+      "test_duration_sec": 8.03,
+      "total_reads": 14364,
+      "read_qps": 1788.3,
+      "read_errors": 0,
+      "read_p50_ms": 0.099,
+      "read_p95_ms": 0.318,
+      "read_p99_ms": 0.525,
+      "total_writes": 632,
+      "write_wps": 78.7,
+      "write_errors": 0,
+      "write_p50_ms": 2.143,
+      "write_p95_ms": 2.447
+    },
+    "25_concurrent_users": {
+      "users_count": 25,
+      "test_duration_sec": 8.03,
+      "total_reads": 35673,
+      "read_qps": 4441.6,
+      "read_errors": 0,
+      "read_p50_ms": 0.145,
+      "read_p95_ms": 0.655,
+      "read_p99_ms": 1.53,
+      "total_writes": 634,
+      "write_wps": 78.9,
+      "write_errors": 0,
+      "write_p50_ms": 2.113,
+      "write_p95_ms": 2.429
+    },
+    "50_concurrent_users": {
+      "users_count": 50,
+      "test_duration_sec": 8.05,
+      "total_reads": 39733,
+      "read_qps": 4937.3,
+      "read_errors": 0,
+      "read_p50_ms": 5.357,
+      "read_p95_ms": 8.516,
+      "read_p99_ms": 9.714,
+      "total_writes": 605,
+      "write_wps": 75.2,
+      "write_errors": 0,
+      "write_p50_ms": 2.678,
+      "write_p95_ms": 3.371
+    },
+    "100_concurrent_users": {
+      "users_count": 100,
+      "test_duration_sec": 8.07,
+      "total_reads": 36115,
+      "read_qps": 4474.9,
+      "read_errors": 0,
+      "read_p50_ms": 19.429,
+      "read_p95_ms": 28.266,
+      "read_p99_ms": 31.985,
+      "total_writes": 532,
+      "write_wps": 65.9,
+      "write_errors": 0,
+      "write_p50_ms": 4.034,
+      "write_p95_ms": 6.294
+    }
+  },
+  "sustained_mixed_workload_1m": {
+    "scale": 1000000,
+    "duration_seconds": 34.54,
+    "os_worker_count": 4,
+    "concurrent_users_count": 10,
+    "total_jobs_completed": 500,
+    "worker_throughput_jpm": 868.55,
+    "worker_busy_errors": 0,
+    "total_user_queries": 27110,
+    "user_qps": 784.9,
+    "user_query_errors": 0,
+    "avg_cpu_percent": 30.5,
+    "peak_cpu_percent": 46.7,
+    "avg_rss_mem_mb": 79.7,
+    "peak_rss_mem_mb": 79.8
+  },
+  "backup_restore_drill": {
+    "source_db": "C:\\Users\\user\\Downloads\\Baba\\benchmark\\data\\scale_1000000.benchmark.db",
+    "backup_duration_seconds": 8.71,
+    "backup_size_bytes": 2461220864,
+    "backup_size_mb": 2347.2,
+    "backup_throughput_mb_sec": 269.49,
+    "integrity_check_result": [
+      "ok"
+    ],
+    "integrity_status": "PASSED",
+    "verified_research_count": 1000000,
+    "verified_files_count": 1000000
+  },
+  "crash_recovery_drill": {
+    "integrity_check": [
+      "ok"
+    ],
+    "uncommitted_transaction_rolled_back": true,
+    "stale_jobs_reclaimed_count": 1,
+    "recovery_verdict": "PERFECT_CONSISTENCY"
+  },
+  "index_optimization_audit": {
+    "candidate_index": "idx_research_status_deg_created (scan_status, degree_type, created_at)",
+    "query_latency_before_ms": 110.865,
+    "query_latency_after_ms": 0.431,
+    "query_acceleration_factor": 256.9,
+    "index_creation_duration_sec": 0.14,
+    "batch_5k_insert_duration_sec": 0.038,
+    "batch_5k_insert_rate_per_sec": 130211.4
+  },
+  "storage_capacity_model": {
+    "scale_10000": {
+      "documents_count": 10000,
+      "metadata_db_mb": 23.55,
+      "projections": {
+        "2MB_per_doc": {
+          "avg_doc_size_mb": 2,
+          "cas_storage_gb": 19.53,
+          "cas_storage_tb": 0.019,
+          "metadata_db_gb": 0.023,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 58.66,
+          "total_recommended_disk_gb": 78.72,
+          "total_recommended_disk_tb": 0.077
+        },
+        "5MB_per_doc": {
+          "avg_doc_size_mb": 5,
+          "cas_storage_gb": 48.83,
+          "cas_storage_tb": 0.048,
+          "metadata_db_gb": 0.023,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 146.55,
+          "total_recommended_disk_gb": 195.9,
+          "total_recommended_disk_tb": 0.191
+        },
+        "10MB_per_doc": {
+          "avg_doc_size_mb": 10,
+          "cas_storage_gb": 97.66,
+          "cas_storage_tb": 0.095,
+          "metadata_db_gb": 0.023,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 293.04,
+          "total_recommended_disk_gb": 391.22,
+          "total_recommended_disk_tb": 0.382
+        }
+      }
+    },
+    "scale_100000": {
+      "documents_count": 100000,
+      "metadata_db_mb": 233.86,
+      "projections": {
+        "2MB_per_doc": {
+          "avg_doc_size_mb": 2,
+          "cas_storage_gb": 195.31,
+          "cas_storage_tb": 0.191,
+          "metadata_db_gb": 0.228,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 586.62,
+          "total_recommended_disk_gb": 782.66,
+          "total_recommended_disk_tb": 0.764
+        },
+        "5MB_per_doc": {
+          "avg_doc_size_mb": 5,
+          "cas_storage_gb": 488.28,
+          "cas_storage_tb": 0.477,
+          "metadata_db_gb": 0.228,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 1465.53,
+          "total_recommended_disk_gb": 1954.54,
+          "total_recommended_disk_tb": 1.909
+        },
+        "10MB_per_doc": {
+          "avg_doc_size_mb": 10,
+          "cas_storage_gb": 976.56,
+          "cas_storage_tb": 0.954,
+          "metadata_db_gb": 0.228,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 2930.37,
+          "total_recommended_disk_gb": 3907.66,
+          "total_recommended_disk_tb": 3.816
+        }
+      }
+    },
+    "scale_500000": {
+      "documents_count": 500000,
+      "metadata_db_mb": 1172.75,
+      "projections": {
+        "2MB_per_doc": {
+          "avg_doc_size_mb": 2,
+          "cas_storage_gb": 976.56,
+          "cas_storage_tb": 0.954,
+          "metadata_db_gb": 1.145,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 2933.12,
+          "total_recommended_disk_gb": 3911.33,
+          "total_recommended_disk_tb": 3.82
+        },
+        "5MB_per_doc": {
+          "avg_doc_size_mb": 5,
+          "cas_storage_gb": 2441.41,
+          "cas_storage_tb": 2.384,
+          "metadata_db_gb": 1.145,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 7327.65,
+          "total_recommended_disk_gb": 9770.71,
+          "total_recommended_disk_tb": 9.542
+        },
+        "10MB_per_doc": {
+          "avg_doc_size_mb": 10,
+          "cas_storage_gb": 4882.81,
+          "cas_storage_tb": 4.768,
+          "metadata_db_gb": 1.145,
+          "wal_headroom_gb": 0.5,
+          "backup_3_copies_gb": 14651.87,
+          "total_recommended_disk_gb": 19536.33,
+          "total_recommended_disk_tb": 19.078
+        }
+      }
+    },
+    "scale_1000000": {
+      "documents_count": 1000000,
+      "metadata_db_mb": 2346.36,
+      "projections": {
+        "2MB_per_doc": {
+          "avg_doc_size_mb": 2,
+          "cas_storage_gb": 1953.12,
+          "cas_storage_tb": 1.907,
+          "metadata_db_gb": 2.291,
+          "wal_headroom_gb": 0.573,
+          "backup_3_copies_gb": 5866.25,
+          "total_recommended_disk_gb": 7822.24,
+          "total_recommended_disk_tb": 7.639
+        },
+        "5MB_per_doc": {
+          "avg_doc_size_mb": 5,
+          "cas_storage_gb": 4882.81,
+          "cas_storage_tb": 4.768,
+          "metadata_db_gb": 2.291,
+          "wal_headroom_gb": 0.573,
+          "backup_3_copies_gb": 14655.31,
+          "total_recommended_disk_gb": 19540.99,
+          "total_recommended_disk_tb": 19.083
+        },
+        "10MB_per_doc": {
+          "avg_doc_size_mb": 10,
+          "cas_storage_gb": 9765.62,
+          "cas_storage_tb": 9.537,
+          "metadata_db_gb": 2.291,
+          "wal_headroom_gb": 0.573,
+          "backup_3_copies_gb": 29303.75,
+          "total_recommended_disk_gb": 39072.24,
+          "total_recommended_disk_tb": 38.156
+        }
+      }
+    },
+    "scale_2000000": {
+      "documents_count": 2000000,
+      "metadata_db_mb": 4712.52,
+      "projections": {
+        "2MB_per_doc": {
+          "avg_doc_size_mb": 2,
+          "cas_storage_gb": 3906.25,
+          "cas_storage_tb": 3.815,
+          "metadata_db_gb": 4.602,
+          "wal_headroom_gb": 1.151,
+          "backup_3_copies_gb": 11732.56,
+          "total_recommended_disk_gb": 15644.56,
+          "total_recommended_disk_tb": 15.278
+        },
+        "5MB_per_doc": {
+          "avg_doc_size_mb": 5,
+          "cas_storage_gb": 9765.62,
+          "cas_storage_tb": 9.537,
+          "metadata_db_gb": 4.602,
+          "wal_headroom_gb": 1.151,
+          "backup_3_copies_gb": 29310.68,
+          "total_recommended_disk_gb": 39082.06,
+          "total_recommended_disk_tb": 38.166
+        },
+        "10MB_per_doc": {
+          "avg_doc_size_mb": 10,
+          "cas_storage_gb": 19531.25,
+          "cas_storage_tb": 19.073,
+          "metadata_db_gb": 4.602,
+          "wal_headroom_gb": 1.151,
+          "backup_3_copies_gb": 58607.56,
+          "total_recommended_disk_gb": 78144.56,
+          "total_recommended_disk_tb": 76.313
+        }
+      }
+    }
+  }
+}

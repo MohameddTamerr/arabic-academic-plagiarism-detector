@@ -1,0 +1,64 @@
+{
+  "release_version": "v1.0.0-rc1",
+  "build_timestamp": "2026-09-04 17:25:00 UTC",
+  "application_name": "Arabic Academic Plagiarism Detector",
+  "application_version": "2.4.0",
+  "engine_version": "1.2.0",
+  "database_schema_version": "1.0.0",
+  "report_schema_version": "1.0",
+  "detector_profile": "LIGHT (Jaccard + TF-IDF)",
+  "production_settings": {
+    "shingle_size": 5,
+    "jaccard_threshold": 0.4,
+    "tfidf_threshold": 0.4,
+    "semantic_threshold": 0.7,
+    "max_candidate_retrieval": 50,
+    "enable_semantic_model": false,
+    "enable_ocr": true,
+    "max_concurrent_scans": 2,
+    "max_concurrent_ocr_jobs": 1
+  },
+  "phase19_proposals_status": {
+    "EXP-01_dual_channel_retrieval": "NOT DEPLOYED (Accepted candidate, deferred to post-pilot release)",
+    "EXP-02_standalone_char_tfidf_paraphrase": "REJECTED (High false positive rate on domain hard negatives)",
+    "EXP-03_span_level_common_text_filter": "NOT DEPLOYED (Accepted candidate, deferred to post-pilot release)",
+    "EXP-04_refined_citation_filter": "NOT DEPLOYED (Accepted candidate, deferred to post-pilot release)",
+    "EXP-05_air_gapped_semantic_fail_closed": "CONFIRMED_BASELINE (Active in production fallback)",
+    "EXP-06_segment_length_guard": "CONFIRMED_BASELINE (Active in production segmenter)",
+    "EXP-07_shingle_k5_confirmation": "CONFIRMED_BASELINE (Active in production settings)"
+  },
+  "optional_components": {
+    "semantic_model": "UNAVAILABLE (Air-gapped safe fail-closed without network requests)",
+    "ocr_tesseract": "OPTIONAL COMPONENT UNAVAILABLE FOR ARABIC (Tesseract binary detected, but ara.traineddata language pack is missing from tessdata)"
+  },
+  "validation_scope": {
+    "DEVELOPER_SYNTHETIC": 323,
+    "DEVELOPER_SYNTHETIC_HOLDOUT": 11,
+    "EXPERT_REVIEWED": 0,
+    "REAL_ANONYMIZED": 0,
+    "disclaimer": "Internal synthetic evaluation only; no institutional or ministry-wide accuracy claim."
+  },
+  "readiness_verdict": "READY FOR CONTROLLED PILOT WITH MANDATORY HUMAN REVIEW",
+  "mandatory_conditions": [
+    "1. Decision-support only: The detector assists human reviewers; automated academic accusations or disciplinary rejections are strictly prohibited.",
+    "2. Single-node institutional deployment: Maximum 2 concurrent active scans; SQLite DB size <= 10GB (Governance Recommendation); reference corpus <= 50,000 items.",
+    "3. Strict air-gapped zero-network isolation on local LAN or standalone workstation with zero external WAN connectivity.",
+    "4. Post-pilot calibration: The pilot must be used to collect and expert-review >= 100 real anonymized samples via reviewer_tool.py before wider deployment."
+  ],
+  "critical_file_hashes_sha256": {
+    "config.py": "0eb5cfe6fba150e6e28ded276cba70ec9b92ee420451e7f4d45d579959525793",
+    "app/__init__.py": "5527a009a5b099ff844c857bd19b8b870ea5c368752ce70d9c96911b16951afd",
+    "app/versioning.py": "3b274acd1c488e7563aedf9c2879f6b759762a7b7844cf0cbe2eac4f93211f16",
+    "app/services/job_queue_service.py": "d7e6da6f4ed30d7d0d2bf28a2ff3f8cb564eba1e1826dfb19837361c7906d2ea",
+    "app/services/scan_service.py": "1d40a48cc4985b3f05142eb57fe881798caef0df6beb81f5667557628cefe4b0",
+    "app/services/report_integrity_service.py": "dba5ab3cb3b668fdc1608700b56a1a53326379e8e3914f76949545e0a293f6f5",
+    "app/services/backup_service.py": "0cc9014e3dcc3b9a4f415b52c4c14c92b4c5623c98496051716deb598c4ecd32",
+    "app/services/system_health_service.py": "ea67abaa5a61184aa46668917f079583ef35ac34289ae7086d3af95e414b865d",
+    "app/services/corpus_governance_service.py": "09dd272e4995d8378c086aa5cc06e1fd4a8c252484bfaddaee3462f08b964e86",
+    "plagiarism_detector/reporting/report_builder.py": "2ee0bb4f57543e83f805ee8f7035ede89e41c21a73a052bf12f7a5252c708568",
+    "plagiarism_detector/detection/shingle_matcher.py": "1989418d1f3ec7a31c58f9893bca120f582e06d113967f1fbc991261b8fde780",
+    "plagiarism_detector/detection/tfidf_matcher.py": "5d5464554810641ad08a1954d828a1cd9262ecbb96b6a41ad22f63c0287f84f9",
+    "plagiarism_detector/detection/candidate_retriever.py": "45f289bc83e210315684408b21735ab2e51417d316a8731f3c878ae8e1a74e18",
+    "plagiarism_detector/citations/citation_detector.py": "98710451acbf8ab3a274459408437fb4a71d46ecff0415a015ca64af156cf355"
+  }
+}

@@ -40,13 +40,22 @@
             cursor: default;
         }
 
+        html {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             background-color: var(--bg-main);
             color: var(--text-dark);
             display: flex;
             flex-direction: column;
+            height: 100vh;
             min-height: 100vh;
+            margin: 0;
+            padding: 0;
             direction: rtl;
+            overflow: hidden;
             user-select: none !important;
             -webkit-user-select: none !important;
         }
@@ -316,6 +325,7 @@
         .topbar {
             background-color: #ffffff;
             height: 64px;
+            min-height: 64px;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -323,7 +333,9 @@
             padding: 0 24px;
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 1000;
+            flex-shrink: 0;
+            width: 100%;
         }
 
         .logo-placeholder {
@@ -355,6 +367,11 @@
         .app-container {
             display: flex;
             flex: 1;
+            height: calc(100vh - 64px);
+            min-height: 0;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
         }
 
         /* ─── Sidebar (Right Side) ──────────────────────────────────── */
@@ -364,18 +381,50 @@
             color: #ffffff;
             display: flex;
             flex-direction: column;
-            padding-top: 16px;
+            padding-top: 12px;
             flex-shrink: 0;
+            height: 100%;
+            overflow: hidden;
+            z-index: 100;
+            border-left: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            padding-bottom: 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 4px;
+        }
+
+        .sidebar-footer {
+            flex-shrink: 0;
+            margin-top: auto;
+            padding: 8px 16px 18px 16px;
+            background-color: var(--primary-navy);
         }
 
         .nav-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 24px;
+            padding: 13px 22px;
             color: #cbd5e1;
             text-decoration: none;
-            font-size: 15px;
+            font-size: 14.5px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -434,8 +483,61 @@
             flex: 1;
             padding: 28px 32px;
             overflow-y: auto;
+            overflow-x: hidden;
+            min-height: 0;
+            height: 100%;
             position: relative;
             background-color: var(--bg-main);
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f8fafc;
+        }
+
+        .main-content::-webkit-scrollbar {
+            width: 8px;
+        }
+        .main-content::-webkit-scrollbar-track {
+            background: #f8fafc;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .main-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* ─── Print & Responsive Shell Hardening ─────────────────────── */
+        @media print {
+            html, body {
+                height: auto !important;
+                min-height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                background: #ffffff !important;
+            }
+            .topbar, .sidebar, #login-screen, .modal {
+                display: none !important;
+            }
+            .app-container {
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+            .main-content {
+                height: auto !important;
+                overflow: visible !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 960px) {
+            .sidebar {
+                width: 220px;
+            }
+            .main-content {
+                padding: 20px;
+            }
         }
 
         .view-section {
@@ -1616,50 +1718,57 @@
     <div class="app-container">
 
         <!-- ─── Sidebar Navigation (Right Side) ─────────────────────────────── -->
-        <aside class="sidebar">
-            <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                <span>الرئيسية</span>
-            </a>
-            <a class="nav-item" data-view="upload" onclick="switchView('upload')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                <span>رفع بحث جديد (متعدد)</span>
-            </a>
-            <a class="nav-item admin-only" data-view="initial-review" onclick="switchView('initial-review')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
-                <span>الفحص الأولي</span>
-                <span class="badge-notif-circle zero" id="badge-initial-review-count">0</span>
-            </a>
-            <a class="nav-item admin-only" data-view="preliminary" onclick="switchView('preliminary')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-                <span>الأبحاث المقبولة مبدئياً</span>
-            </a>
-            <a class="nav-item admin-only" data-view="rejected" onclick="switchView('rejected')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
-                <span>سجل الباحثين المرفوضين</span>
-            </a>
-            <a class="nav-item admin-only" data-view="database" onclick="switchView('database')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-                <span>قاعدة الأبحاث الأساسية</span>
-            </a>
-            <a class="nav-item" data-view="reports" onclick="switchView('reports')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
-                <span>التقارير</span>
-            </a>
-            <a class="nav-item admin-only" data-view="settings" onclick="switchView('settings')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span>إدارة الموظفين والإعدادات</span>
-            </a>
-            <a class="nav-item" data-view="help" onclick="switchView('help')">
-                <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                <span>المساعدة</span>
-            </a>
+        <aside class="sidebar" id="app-sidebar">
+            <div class="sidebar-nav" id="sidebar-nav-container">
+                <a class="nav-item active" data-view="dashboard" onclick="switchView('dashboard')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    <span>الرئيسية</span>
+                </a>
+                <a class="nav-item" data-view="upload" onclick="switchView('upload')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>رفع بحث جديد (متعدد)</span>
+                </a>
+                <a class="nav-item admin-only" data-view="initial-review" onclick="switchView('initial-review')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+                    <span>الفحص الأولي</span>
+                    <span class="badge-notif-circle zero" id="badge-initial-review-count">0</span>
+                </a>
+                <a class="nav-item admin-only" data-view="preliminary" onclick="switchView('preliminary')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span>الأبحاث المقبولة مبدئياً</span>
+                </a>
+                <a class="nav-item admin-only" data-view="rejected" onclick="switchView('rejected')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                    <span>سجل الباحثين المرفوضين</span>
+                </a>
+                <a class="nav-item admin-only" data-view="database" onclick="switchView('database')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                    <span>قاعدة الأبحاث الأساسية</span>
+                </a>
+                <a class="nav-item" data-view="reports" onclick="switchView('reports')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                    <span>التقارير</span>
+                </a>
+                <a class="nav-item admin-only" data-view="settings" onclick="switchView('settings')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    <span>إدارة الموظفين والإعدادات</span>
+                </a>
+                <a class="nav-item admin-only" data-view="audit" onclick="switchView('audit')" id="nav-audit-logs">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    <span>سجل التدقيق والمراجعة</span>
+                </a>
+                <a class="nav-item admin-only" data-view="system-health" onclick="switchView('system-health')" id="nav-system-health">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    <span>حالة النظام</span>
+                </a>
+                <a class="nav-item" data-view="help" onclick="switchView('help')">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span>المساعدة</span>
+                </a>
+            </div>
 
-            <!-- Spacer to push logout to bottom -->
-            <div style="flex:1;"></div>
-
-            <!-- Logout Button -->
-            <div style="padding: 8px 16px 18px 16px;">
+            <!-- Logout Button (Anchored at Bottom) -->
+            <div class="sidebar-footer">
                 <div style="border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px;"></div>
                 <a class="nav-item-logout" onclick="logoutUser()" title="تسجيل الخروج من النظام" id="sidebar-logout-btn">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px; height:20px;">
@@ -2300,11 +2409,15 @@
                 <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
                         <div>
-                            <div style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title">عنوان البحث</div>
+                            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                <span style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title">عنوان البحث</span>
+                                <span id="report-ref-badge" style="font-size: 11.5px; font-weight: 800; font-family: monospace; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; border: 1px solid #bae6fd; display: none;"></span>
+                            </div>
                             <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap;">
                                 <span id="doc-report-author"><strong>الباحث:</strong> غير محدد</span>
                                 <span id="report-date-str"><strong>التاريخ:</strong> غير محدد</span>
                                 <span id="report-domain-badge"><strong>التخصص:</strong> عام</span>
+                                <span id="report-scan-status-badge" style="color: var(--primary-navy);"><strong>حالة الفحص:</strong> مكتمل الفحص</span>
                                 <span id="report-volume-stats" style="color: var(--primary-navy); font-weight: 600;">الحجم: 0 صفحة</span>
                             </div>
                         </div>
@@ -2370,6 +2483,40 @@
                     </h3>
                     <div class="document-viewer" id="document-text-content">
                         اختر بحثاً من القائمة أو ابدأ بفحص جديد لعرض النص الكامل المظلل هنا.
+                    </div>
+                </div>
+
+                <!-- ─── 6. Reproducibility & Engine Execution Metadata ────────── -->
+                <div class="card" style="margin-top: 20px; padding: 18px 22px; background: #fafcff; border: 1px solid #e2e8f0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #0284c7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <span style="font-weight: 800; color: var(--primary-navy); font-size: 14px;">بيانات الفحص ومعايير الاستنساخ الأكاديمي</span>
+                        </div>
+                        <button type="button" onclick="toggleTechDetails()" id="btn-toggle-tech-details" style="background: none; border: 1px solid #bae6fd; background: #f0f9ff; color: #0369a1; border-radius: 6px; font-size: 12px; font-weight: 700; padding: 4px 10px; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                            <span>عرض التفاصيل التقنية الكاملة</span>
+                            <svg class="nav-icon-svg" id="icon-toggle-tech" style="width: 12px; height: 12px; stroke: #0369a1;" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                    </div>
+
+                    <!-- Summary Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 12.5px;">
+                        <div><span style="color: var(--text-muted); display: block; font-size: 11px;">إصدار محرك الفحص:</span> <strong id="rep-snap-engine" style="font-family: monospace; color: var(--primary-navy);">—</strong></div>
+                        <div><span style="color: var(--text-muted); display: block; font-size: 11px;">نموذج التطبيع اللغوي:</span> <strong id="rep-snap-norm" style="font-family: monospace; color: var(--primary-navy);">—</strong></div>
+                        <div><span style="color: var(--text-muted); display: block; font-size: 11px;">إصدار قاعدة المراجع:</span> <strong id="rep-snap-corpus" style="font-family: monospace; color: #0369a1;">—</strong></div>
+                        <div><span style="color: var(--text-muted); display: block; font-size: 11px;">حالة النموذج الدلالي:</span> <strong id="rep-snap-semantic" style="color: var(--primary-navy);">معطل (100% Offline)</strong></div>
+                    </div>
+
+                    <!-- Collapsible Technical Details -->
+                    <div id="tech-details-drawer" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #cbd5e1;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; font-size: 12px; color: #475569;">
+                            <div><strong>عتبة التطابق اللفظي (Jaccard):</strong> <span id="rep-snap-jaccard" style="font-family: monospace;">—</span></div>
+                            <div><strong>عتبة المتواليات (TF-IDF):</strong> <span id="rep-snap-tfidf" style="font-family: monospace;">—</span></div>
+                            <div><strong>حجم متواليات الفحص (Shingles):</strong> <span id="rep-snap-shingle" style="font-family: monospace;">5 كلمات</span></div>
+                            <div><strong>الحد الأقصى المسموح للاستلال:</strong> <span id="rep-snap-max-pages" style="font-family: monospace;">5 صفحات</span></div>
+                            <div><strong>مخطط التقرير (Schema):</strong> <span id="rep-snap-schema" style="font-family: monospace;">v1.0</span></div>
+                            <div><strong>بصمة قاعدة المراجع (Fingerprint):</strong> <span id="rep-snap-fingerprint" style="font-family: monospace; font-size: 11px; word-break: break-all;">—</span></div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2562,13 +2709,54 @@
                     </div>
                 </div>
 
+                <!-- Database Health & SQLite Hardening Card (Phase 9) -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <h3 class="section-title" style="margin: 0;"><svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg><span>صحة ومقاييس قاعدة البيانات (SQLite WAL Engine)</span></h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="triggerDbQuickCheck()">
+                                <span>فحص سريع (Quick Check)</span>
+                            </button>
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="triggerDbIntegrityCheck()">
+                                <span>فحص شامل (Integrity Check)</span>
+                            </button>
+                            <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="triggerDbCheckpoint()">
+                                <span>دمج WAL (Checkpoint)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 14px;">
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">حالة المحرك</div>
+                            <div id="db-health-status" style="font-size: 13px; font-weight: 800; color: #059669; margin-top: 3px;">سليم ومتصل</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">وضع السجل (Journal)</div>
+                            <div id="db-health-mode" style="font-size: 13px; font-weight: 800; color: #1e40af; margin-top: 3px;">WAL (متزامن)</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">حجم قاعدة البيانات</div>
+                            <div id="db-health-size" style="font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 3px;">... MB</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">حجم ملف WAL</div>
+                            <div id="db-health-wal" style="font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 3px;">... MB</div>
+                        </div>
+                        <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px;">
+                            <div style="font-size: 11.5px; color: var(--text-muted);">إصدار المخطط (Schema)</div>
+                            <div id="db-health-schema" style="font-size: 13px; font-weight: 800; color: #7c3aed; margin-top: 3px;">v1.0.0</div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Database Backup & Security Card -->
                 <div class="card" style="margin-bottom: 20px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                        <h3 class="section-title" style="margin: 0;"><svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>النسخ الاحتياطي الآمن لقاعدة البيانات (100% Offline)</span></h3>
+                        <h3 class="section-title" style="margin: 0;"><svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg><span>النسخ الاحتياطي والتعافي المؤسسي من الكوارث (100% Offline)</span></h3>
                         <div style="display: flex; gap: 10px;">
                             <button class="btn-primary" onclick="triggerInstantBackup()">
-                                <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:white; display:inline-block; vertical-align:middle; margin-left:4px;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>إنشاء نسخة احتياطية فورية</span>
+                                <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:white; display:inline-block; vertical-align:middle; margin-left:4px;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg><span>إنشاء نسخة احتياطية شاملة</span>
                             </button>
                             <button class="btn-secondary" onclick="triggerCleanupTemp()">
                                 <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:currentColor; display:inline-block; vertical-align:middle; margin-left:4px;" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span>تنظيف الملفات المؤقتة</span>
@@ -2578,23 +2766,24 @@
                     
                     <div style="display: flex; align-items: center; gap: 8px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 8px 14px; margin-bottom: 14px; width: fit-content;">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; display: inline-block;"></span>
-                        <span style="font-size: 12px; font-weight: 700; color: #065f46;">النسخ الاحتياطي التلقائي: نشط ويعمل تلقائياً عند إضافة أو اعتماد الأبحاث لحماية البيانات</span>
+                        <span style="font-size: 12px; font-weight: 700; color: #065f46;">حزم النسخ الاحتياطي الذاتية: متسقة رقمياً ومحمية بـ SQLite Online Backup API وتضم قواعد البيانات والملفات والبيان الشامل</span>
                     </div>
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
-                        يقوم النظام بأخذ لقطات تلقائية دورية من قاعدة البيانات على القرص المحلي بدون الحاجة لتدخل يدوي، كما يمكنك الضغط على زر النسخ الفوري عند الرغبة في أخذ نسخة يدوية فورية إضافية في أي وقت.
-                    </p>
 
                     <table class="custom-table">
                         <thead>
                             <tr>
-                                <th>اسم ملف النسخة الاحتياطية</th>
-                                <th>الحجم (ميجابايت)</th>
+                                <th>رقم النسخة</th>
                                 <th>تاريخ الإنشاء</th>
                                 <th>الحالة</th>
+                                <th>الحجم</th>
+                                <th>إصدار النظام</th>
+                                <th>حالة التحقق</th>
+                                <th>المنشئ</th>
+                                <th>الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="backups-table-body">
-                            <tr><td colspan="4" style="text-align:center; color:var(--text-muted); padding:16px;">جاري تحميل النسخ الاحتياطية...</td></tr>
+                            <tr><td colspan="8" style="text-align:center; color:var(--text-muted); padding:16px;">جاري تحميل النسخ الاحتياطية...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -2678,7 +2867,106 @@
                 </div>
             </section>
 
-            <!-- ================= VIEW 6: HELP ================= -->
+            <!-- ================= VIEW 6: AUDIT TRAIL (ADMIN ONLY) ================= -->
+            <section id="view-audit" class="view-section admin-only">
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <h1 class="page-title">سجل المراجعة والتدقيق المؤسسي</h1>
+                            <span class="badge-tag" style="background:#e0f2fe; color:#0369a1; font-size:12px; font-weight:800; padding:3px 10px;">Admin Only • 100% Offline</span>
+                        </div>
+                        <p class="page-subtitle">سجل تراكمي شامل يوثق كافة العمليات الإدارية، وتغييرات الصلاحيات، وقرارات التحكيم، واستعراض التقارير، والنسخ الاحتياطي.</p>
+                    </div>
+                </div>
+
+                <!-- Audit Filters Card -->
+                <div class="card" style="margin-bottom: 20px; padding: 16px 20px;">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; flex: 1;">
+                            <!-- Category Filter -->
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">التصنيف:</label>
+                                <select id="audit-filter-category" onchange="applyAuditFilters()" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: white;">
+                                    <option value="">كافة التصنيفات</option>
+                                    <option value="auth">المصادقة والأمان</option>
+                                    <option value="research">الأبحاث والرسائل</option>
+                                    <option value="review">التحكيم والاعتماد</option>
+                                    <option value="batch">الدفعات المجمعة</option>
+                                    <option value="report">استعراض وتصدير التقارير</option>
+                                    <option value="admin">إدارة المستخدمين</option>
+                                    <option value="settings">القواعد والإعدادات</option>
+                                    <option value="backup">النسخ الاحتياطي</option>
+                                </select>
+                            </div>
+
+                            <!-- Success Filter -->
+                            <div style="display: flex; align-items: center; gap: 6px;">
+                                <label style="font-size: 12px; font-weight: 700; color: var(--text-muted);">النتيجة:</label>
+                                <select id="audit-filter-success" onchange="applyAuditFilters()" style="padding: 6px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; font-weight: 600; outline: none; background: white;">
+                                    <option value="">الكل</option>
+                                    <option value="true">ناجح (Success)</option>
+                                    <option value="false">فشل (Failed)</option>
+                                </select>
+                            </div>
+
+                            <!-- Search Input -->
+                            <div style="flex: 1; min-width: 220px; position: relative;">
+                                <input type="text" id="audit-search-input" onkeyup="if(event.key==='Enter') applyAuditFilters()" placeholder="بحث بالرقم المرجعي (RES-...)، المستخدم، الإجراء..." style="width: 100%; padding: 7px 32px 7px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none;">
+                                <svg class="nav-icon-svg" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: #94a3b8;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-primary" onclick="applyAuditFilters()" style="padding: 7px 16px; font-size: 13px;">
+                                <svg class="nav-icon-svg" style="width: 14px; height: 14px; stroke: white;" viewBox="0 0 24 24"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
+                                <span>تطبيق الفلترة</span>
+                            </button>
+                            <button class="btn-secondary" onclick="resetAuditFilters()" style="padding: 7px 14px; font-size: 13px;">إعادة ضبط</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audit Log Dense Table -->
+                <div class="card" style="padding: 0; overflow: hidden;">
+                    <div style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fafcff;">
+                        <div style="font-weight: 800; color: var(--primary-navy); font-size: 14px;">سجلات العمليات الموثقة (<span id="audit-total-count">0</span> حدث)</div>
+                        <div style="font-size: 12px; color: var(--text-muted);" id="audit-page-info">الصفحة 1 من 1</div>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;">#</th>
+                                    <th>التاريخ والوقت</th>
+                                    <th>المستخدم</th>
+                                    <th>الدور</th>
+                                    <th>نوع الإجراء</th>
+                                    <th>رقم البحث المرجعي</th>
+                                    <th>الكيان المستهدف</th>
+                                    <th>النتيجة</th>
+                                    <th style="width: 90px; text-align: center;">التفاصيل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <tr><td colspan="9" style="text-align: center; padding: 30px; color: var(--text-muted);">جاري تحميل سجلات التدقيق...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination Controls -->
+                    <div style="padding: 12px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fafcff;">
+                        <div style="font-size: 13px; color: var(--text-muted);">عرض 20 سجلاً لكل صفحة</div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="btn-secondary" id="btn-audit-prev" onclick="prevAuditPage()" style="padding: 5px 12px; font-size: 12px;" disabled>السابق</button>
+                            <span style="font-size: 13px; font-weight: 700; color: var(--primary-navy);" id="audit-current-page-num">1</span>
+                            <button class="btn-secondary" id="btn-audit-next" onclick="nextAuditPage()" style="padding: 5px 12px; font-size: 12px;" disabled>التالي</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW 7: HELP ================= -->
             <section id="view-help" class="view-section">
                 <div class="page-header">
                     <div class="page-header-info">
@@ -2692,6 +2980,61 @@
                         نظام كشف الاستلال العلمي والاستشهادات هو نظام مكتبي يعمل محليًا بالكامل بدون اتصال بالإنترنت.
                         يمنحك النظام إمكانية رفع عدة ملفات PDF مع أشرطة تقدم منفصلة، مع خيار القبول المبدئي للأبحاث وتخزينها لحين استلام التحديث الأخير لملف PDF ثم إجراء القبول النهائي لإضافتها إلى القاعدة المرجعية الأساسية للمقارنة.
                     </p>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: SYSTEM HEALTH (Phase 11) ================= -->
+            <section id="view-system-health" class="view-section">
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                            <h1 class="page-title">حالة النظام والجاهزية التشغيلية</h1>
+                            <span id="health-overall-badge" style="padding: 4px 14px; border-radius: 20px; font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 6px; background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0;">
+                                <span style="width: 8px; height: 8px; border-radius: 50%; background: currentColor;"></span>
+                                <span id="health-overall-text">سليم</span>
+                            </span>
+                        </div>
+                        <p class="page-subtitle">مراقبة تشغيلية شاملة لكافة مكونات المنظومة محلياً (100% Offline) دون أي اتصال خارجي.</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;" id="health-last-checked">آخر فحص: —</span>
+                        <button class="btn-secondary" onclick="loadSystemHealth(true)" style="padding: 6px 14px; font-size: 13px;" id="btn-refresh-health">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                            <span>تحديث الفحص الآن</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 1. Grid of Component Health Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; margin-bottom: 24px;" id="health-cards-grid">
+                    <!-- Dynamic Component Cards -->
+                </div>
+
+                <!-- 2. Recent Operational Incidents Summary Table -->
+                <div class="card" style="padding: 0; overflow: hidden; margin-top: 16px;">
+                    <div style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #fafcff; flex-wrap: wrap; gap: 8px;">
+                        <div style="font-weight: 800; color: var(--primary-navy); font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                            <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: var(--primary-navy);" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                            <span>ملخص الأحداث والتحذيرات التشغيلية الحديثة (Operational Incidents)</span>
+                        </div>
+                        <div style="font-size: 12px; color: var(--text-muted);">أحدث الأحداث غير المكتملة أو التنبيهات المسجلة بالسجل</div>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="table" style="margin: 0;">
+                            <thead>
+                                <tr>
+                                    <th>التاريخ والوقت</th>
+                                    <th>الفئة</th>
+                                    <th>نوع الإجراء</th>
+                                    <th>رمز التنبيه / الخطأ</th>
+                                    <th>المستخدم</th>
+                                </tr>
+                            </thead>
+                            <tbody id="health-incidents-tbody">
+                                <tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">لا توجد حوادث تشغيلية مسجلة حديثاً. المنظومة تعمل باستقرار تام.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -2735,6 +3078,62 @@
                     <svg class="nav-icon-svg" style="width: 14px; height: 14px; stroke: white;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     <span>إرسال للمدير الآن</span>
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ─── Modal: Audit Event Details ──────────────────────────────────── -->
+    <div class="modal-overlay" id="audit-detail-modal" style="display: none;">
+        <div class="modal-card" style="max-width: 640px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: #0f2b5c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <svg class="nav-icon-svg" style="width: 18px; height: 18px; stroke: white;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 16px; font-weight: 800; color: var(--primary-navy); margin: 0;">تفاصيل حدث التدقيق المؤسسي</h3>
+                        <div style="font-size: 11px; font-family: monospace; color: var(--text-muted); margin-top: 2px;" id="audit-modal-event-id">—</div>
+                    </div>
+                </div>
+                <button type="button" onclick="closeAuditDetailModal()" style="background: none; border: none; cursor: pointer; color: #94a3b8;" title="إغلاق">
+                    <svg class="nav-icon-svg" style="width: 20px; height: 20px; stroke: #64748b;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; font-size: 13px;">
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">التاريخ والوقت:</span>
+                    <strong id="audit-modal-created-at" style="color: var(--primary-navy);">—</strong>
+                </div>
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">المستخدم والدور:</span>
+                    <strong id="audit-modal-user" style="color: var(--primary-navy);">—</strong>
+                </div>
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">الإجراء والتصنيف:</span>
+                    <strong id="audit-modal-action" style="color: var(--primary-navy); font-family: monospace;">—</strong>
+                </div>
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">الرقم المرجعي للبحث:</span>
+                    <strong id="audit-modal-ref-num" style="color: #0369a1; font-family: monospace;">—</strong>
+                </div>
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">معرف الطلب (Request ID):</span>
+                    <span id="audit-modal-request-id" style="font-family: monospace; font-size: 12px; color: #475569;">—</span>
+                </div>
+                <div style="background: #f8fafc; padding: 8px 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <span style="color: var(--text-muted); display: block; font-size: 11px; margin-bottom: 2px;">النتيجة والحالة:</span>
+                    <span id="audit-modal-status">—</span>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 12px; font-weight: 700; color: var(--primary-navy); display: block; margin-bottom: 6px;">البيانات الوصفية الآمنة (Sanitized Metadata):</label>
+                <pre id="audit-modal-metadata" style="background: #0f172a; color: #38bdf8; padding: 12px; border-radius: 8px; font-family: monospace; font-size: 12px; max-height: 180px; overflow-y: auto; direction: ltr; text-align: left; margin: 0;"></pre>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="btn-secondary" onclick="closeAuditDetailModal()">إغلاق</button>
             </div>
         </div>
     </div>
@@ -3306,8 +3705,22 @@
             }
         }
 
+        function getErrorMessage(data, fallback = 'حدث خطأ أثناء معالجة الطلب') {
+            if (!data) return fallback;
+            if (typeof data === 'string') return data;
+            if (data.error) {
+                if (typeof data.error === 'object' && data.error.message) return data.error.message;
+                if (typeof data.error === 'string') return data.error;
+            }
+            if (data.message && typeof data.message === 'string') return data.message;
+            return fallback;
+        }
+
         /* ─── Custom UI Notifications & Confirm Modal (No Native Alerts) ────── */
         function showToast(message, type = 'success', duration = 3500) {
+            if (typeof message === 'object' && message !== null) {
+                message = message.message || message.code || 'حدث خطأ أثناء المعالجة';
+            }
             const container = document.getElementById('toast-container');
             if (!container) return;
 
@@ -3423,6 +3836,20 @@
                 loadPasswordResetRequests();
                 loadSystemSettings();
                 loadSystemDiagnostics();
+            }
+            if (viewName === 'audit') {
+                if (!currentUser || currentUser.role !== 'admin') {
+                    showToast('هذا القسم مخصص لمدير النظام فقط', 'error');
+                    switchView('dashboard');
+                    return;
+                }
+                loadAuditLogs(1);
+            }
+            if (viewName === 'system-health') {
+                loadSystemHealth();
+                startSystemHealthTimer();
+            } else {
+                stopSystemHealthTimer();
             }
         }
 
@@ -3870,7 +4297,8 @@
                     : `بحث ${idx + 1}`;
                 const escapedTitle = displayTitle.replace(/"/g, '&quot;');
                 const authorInfo = item.research_author ? ` | الباحث: ${item.research_author}` : '';
-                const tooltipText = `${escapedTitle}${authorInfo}`;
+                const refInfo = item.research_reference_number ? ` | الرقم المرجعي: ${item.research_reference_number}` : '';
+                const tooltipText = `${escapedTitle}${authorInfo}${refInfo}`;
 
                 const activeBorder = isActive ? 'border: 2px solid var(--primary-navy); background: #f8fafc;' : 'border: 1px solid var(--border-color); background: #ffffff;';
                 const activeFont = isActive ? 'font-weight: 800; color: var(--primary-navy);' : 'font-weight: 600; color: var(--text-dark);';
@@ -3879,6 +4307,7 @@
                     <div class="batch-tab-item" 
                          data-title="${(item.research_title || '').toLowerCase()}" 
                          data-author="${(item.research_author || '').toLowerCase()}" 
+                         data-ref="${(item.research_reference_number || '').toLowerCase()}" 
                          onclick="selectBatchItem(${idx})" 
                          title="${tooltipText}"
                          style="flex-shrink: 0; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; ${activeBorder}">
@@ -3950,7 +4379,8 @@
             document.querySelectorAll('.batch-tab-item').forEach(el => {
                 const title = el.getAttribute('data-title') || '';
                 const author = el.getAttribute('data-author') || '';
-                if (!query || title.includes(query) || author.includes(query)) {
+                const ref = el.getAttribute('data-ref') || '';
+                if (!query || title.includes(query) || author.includes(query) || ref.includes(query)) {
                     el.style.display = 'flex';
                 } else {
                     el.style.display = 'none';
@@ -3993,6 +4423,19 @@
             `;
         }
 
+        function toggleTechDetails() {
+            const drawer = document.getElementById('tech-details-drawer');
+            const btn = document.getElementById('btn-toggle-tech-details');
+            if (!drawer) return;
+            if (drawer.style.display === 'none' || !drawer.style.display) {
+                drawer.style.display = 'block';
+                if (btn) btn.querySelector('span').innerText = 'إخفاء التفاصيل التقنية';
+            } else {
+                drawer.style.display = 'none';
+                if (btn) btn.querySelector('span').innerText = 'عرض التفاصيل التقنية الكاملة';
+            }
+        }
+
         function renderReport(report) {
             const overallVal = report.overall_pct || 0;
             const overallEl = document.getElementById('report-overall-val');
@@ -4024,27 +4467,45 @@
             const citedWEl = document.getElementById('report-cited-words');
             if (citedWEl) citedWEl.innerText = (report.cited_words ? (report.cited_words).toLocaleString() + ' كلمة موثقة ومستبعدة' : 'موثق حسب الأصول ومستبعد');
 
+            const reviewStatus = report.review_status || 'pending_review';
+            const scanStatus = report.scan_status || 'completed';
+            const reviewLabel = report.review_status_label || (reviewStatus === 'preliminary_accepted' ? 'قبول مبدئي' : (reviewStatus === 'rejected' ? 'مرفوض' : (reviewStatus === 'final_accepted' ? 'اعتماد نهائي' : 'قيد المراجعة')));
+            const scanLabel = report.scan_status_label || (scanStatus === 'completed' ? 'مكتمل الفحص' : (scanStatus === 'failed' ? 'تعذر الفحص' : (scanStatus === 'processing' ? 'جاري المعالجة' : 'في الانتظار')));
+
             const statusBadge = document.getElementById('report-status-badge');
-            const currentStatus = report.status || 'مفحوص';
             if (statusBadge) {
-                statusBadge.innerText = currentStatus;
-                if (currentStatus === 'قبول مبدئي') {
+                statusBadge.innerText = `حالة المراجعة: ${reviewLabel}`;
+                if (reviewStatus === 'preliminary_accepted') {
                     statusBadge.style.color = '#0284c7';
-                } else if (currentStatus === 'قبول نهائي') {
+                } else if (reviewStatus === 'final_accepted') {
                     statusBadge.style.color = '#059669';
-                } else if (currentStatus === 'مرفوض') {
-                    statusBadge.style.color = '#dc2626';
-                } else if (overallVal > 50) {
+                } else if (reviewStatus === 'rejected') {
                     statusBadge.style.color = '#dc2626';
                 } else {
-                    statusBadge.style.color = '#059669';
+                    statusBadge.style.color = '#64748b';
                 }
+            }
+
+            const scanBadgeEl = document.getElementById('report-scan-status-badge');
+            if (scanBadgeEl) {
+                scanBadgeEl.innerHTML = '<strong>حالة الفحص:</strong> ' + scanLabel;
             }
 
             document.getElementById('doc-report-title').innerText = report.title;
             document.getElementById('doc-report-author').innerHTML = '<strong>الباحث:</strong> ' + (report.author || 'غير محدد');
             document.getElementById('report-date-str').innerHTML = '<strong>التاريخ:</strong> ' + (report.date || '');
             document.getElementById('report-domain-badge').innerHTML = '<strong>التخصص:</strong> ' + (report.category || 'عام');
+
+            const refBadge = document.getElementById('report-ref-badge');
+            const refNo = report.reference_number || report.research_reference_number || '';
+            if (refBadge) {
+                if (refNo) {
+                    refBadge.innerText = `رقم البحث المرجعي: ${refNo}`;
+                    refBadge.style.display = 'inline-block';
+                } else {
+                    refBadge.style.display = 'none';
+                }
+            }
 
             // Volume stats (Pages & Words)
             const totalWords = report.total_words || 0;
@@ -4072,6 +4533,33 @@
             } else {
                 subBanner.style.display = 'none';
             }
+
+            // Reproducibility Snapshot Metadata
+            const snap = report.snapshot || {};
+            const engEl = document.getElementById('rep-snap-engine');
+            const normEl = document.getElementById('rep-snap-norm');
+            const corpEl = document.getElementById('rep-snap-corpus');
+            const semEl = document.getElementById('rep-snap-semantic');
+            const jaccEl = document.getElementById('rep-snap-jaccard');
+            const tfidfEl = document.getElementById('rep-snap-tfidf');
+            const shingleEl = document.getElementById('rep-snap-shingle');
+            const maxPagesEl = document.getElementById('rep-snap-max-pages');
+            const schemaEl = document.getElementById('rep-snap-schema');
+            const fpEl = document.getElementById('rep-snap-fingerprint');
+
+            if (engEl) engEl.innerText = snap.is_legacy ? 'إصدار سابق — غير مسجل تفصيلياً' : ('v' + (snap.engine_version || '1.2.0'));
+            if (normEl) normEl.innerText = snap.normalization_version || 'arabic-normalizer-1.0';
+            if (corpEl) corpEl.innerText = snap.reference_corpus_version || 'REF-2026';
+            if (semEl) semEl.innerText = snap.semantic_enabled ? (snap.semantic_model_identifier || 'مفعل') : 'معطل (100% Offline)';
+            
+            const jVal = snap.jaccard_threshold !== undefined ? Math.round(snap.jaccard_threshold * 100) + '%' : '40%';
+            const tVal = snap.tfidf_threshold !== undefined ? Math.round(snap.tfidf_threshold * 100) + '%' : '40%';
+            if (jaccEl) jaccEl.innerText = jVal;
+            if (tfidfEl) tfidfEl.innerText = tVal;
+            if (shingleEl) shingleEl.innerText = (snap.shingle_size || 5) + ' كلمات';
+            if (maxPagesEl) maxPagesEl.innerText = (snap.max_pages_per_source || 5) + ' صفحات';
+            if (schemaEl) schemaEl.innerText = 'v' + (snap.report_schema_version || '1.0');
+            if (fpEl) fpEl.innerText = snap.reference_fingerprint || '—';
 
             // Cheating alert
             const cheatingBox = document.getElementById('cheating-alert-box');
@@ -4331,31 +4819,96 @@
             }
         }
 
-        async function loadPreliminaryPapers() {
+        // ─── Debounce & Server-Side Pagination Helpers (Phase 10) ───────────
+        function debounce(func, wait = 300) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function renderPaginationHTML(currentPage, totalPages, totalItems, onPageChangeFnName) {
+            if (totalPages <= 1) {
+                return `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px 4px; font-size:12.5px; color:var(--text-muted);">
+                    <span>إجمالي النتائج: <strong>${totalItems}</strong></span>
+                    <span>الصفحة 1 من 1</span>
+                </div>`;
+            }
+
+            return `
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 6px; flex-wrap:wrap; gap:10px; border-top:1px solid var(--border-color); margin-top:8px;">
+                    <div style="font-size:12.5px; color:var(--text-muted);">
+                        إجمالي النتائج: <strong style="color:var(--primary-navy);">${totalItems}</strong> | الصفحة <strong>${currentPage}</strong> من <strong>${totalPages}</strong>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:12px;" onclick="${onPageChangeFnName}(${currentPage - 1})" ${currentPage <= 1 ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>
+                            ◀ السابق
+                        </button>
+                        <span style="font-size:12px; font-weight:700; padding:2px 8px; background:#f1f5f9; border-radius:4px;">${currentPage} / ${totalPages}</span>
+                        <button type="button" class="btn-secondary" style="padding:4px 10px; font-size:12px;" onclick="${onPageChangeFnName}(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled style="opacity:0.4; cursor:not-allowed;"' : ''}>
+                            التالي ▶
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        let _preliminaryCurrentPage = 1;
+        let _rejectedCurrentPage = 1;
+        let _databaseCurrentPage = 1;
+
+        async function loadPreliminaryPapers(page = 1) {
+            _preliminaryCurrentPage = page;
+            const tbody = document.getElementById('preliminary-table-body');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع الأبحاث المقبولة مبدئياً...</td></tr>';
+            }
             try {
-                const res = await fetch('/api/preliminary_papers');
+                const filter = _dateFilterState.preliminary;
+                const params = new URLSearchParams();
+                params.set('page', page);
+                params.set('page_size', 25);
+                if (filter.from) params.set('date_from', filter.from);
+                if (filter.to) params.set('date_to', filter.to);
+
+                const res = await fetch(`/api/preliminary_papers?${params.toString()}`);
                 const data = await res.json();
-                _cachePreliminaryPapers = data.papers || [];
-                renderPreliminaryTable();
+                _cachePreliminaryPapers = data.items || data.papers || [];
+                renderPreliminaryTable(data);
             } catch (e) {
                 console.error('Failed to load preliminary papers', e);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#dc2626; padding:20px;">تعذر الاتصال بالخادم لتحميل الأبحاث المقبولة مبدئياً</td></tr>';
+                }
             }
         }
 
-        function renderPreliminaryTable() {
+        function renderPreliminaryTable(meta = {}) {
             const tbody = document.getElementById('preliminary-table-body');
             if (!tbody) return;
 
-            const filter = _dateFilterState.preliminary;
-            const filtered = _cachePreliminaryPapers.filter(p => checkDateMatch(p.created_at, filter.period, filter.from, filter.to));
+            const totalItems = meta.total_items !== undefined ? meta.total_items : _cachePreliminaryPapers.length;
+            const totalPages = meta.total_pages || 1;
+            const curPage = meta.page || _preliminaryCurrentPage;
+
+            if (_cachePreliminaryPapers.length === 0) {
+                tbody.innerHTML = getEmptyStateHtml('لا توجد أبحاث في طابور الاعتماد المبدئي حالياً', 'ستظهر هنا الأبحاث المقبولة مبدئياً بانتظار استلام النسخة المحدثة أو الاعتماد النهائي.', 7);
+                return;
+            }
 
             let html = '';
-            filtered.forEach((p, idx) => {
+            _cachePreliminaryPapers.forEach((p, idx) => {
                 let badgeClass = p.overall_pct > 50 ? 'high' : (p.overall_pct > 20 ? 'medium' : 'low');
+                const rowNum = (curPage - 1) * 25 + idx + 1;
                 html += `
                     <tr>
-                        <td>${idx + 1}</td>
-                        <td style="font-weight: 700;">${p.title}</td>
+                        <td>${rowNum}</td>
+                        <td style="font-weight: 700;">${p.title}${p.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0369a1; margin-top:2px;">${p.reference_number}</div>` : ''}</td>
                         <td>${p.author || 'غير محدد'}</td>
                         <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:700;">${p.category || 'عام'}</span></td>
                         <td><span class="badge-pct ${badgeClass}">${p.overall_pct}%</span></td>
@@ -4379,34 +4932,54 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || getEmptyStateHtml('لا توجد أبحاث في طابور الاعتماد المبدئي حالياً', 'ستظهر هنا الأبحاث المقبولة مبدئياً بانتظار استلام النسخة المحدثة أو الاعتماد النهائي.', 7);
+            tbody.innerHTML = html;
         }
 
-        async function loadRejectedPapers() {
+        async function loadRejectedPapers(page = 1) {
+            _rejectedCurrentPage = page;
+            const tbody = document.getElementById('rejected-table-body');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع الأبحاث المرفوضة...</td></tr>';
+            }
             try {
-                const res = await fetch('/api/rejected_papers');
+                const filter = _dateFilterState.rejected;
+                const params = new URLSearchParams();
+                params.set('page', page);
+                params.set('page_size', 25);
+                if (filter.from) params.set('date_from', filter.from);
+                if (filter.to) params.set('date_to', filter.to);
+
+                const res = await fetch(`/api/rejected_papers?${params.toString()}`);
                 const data = await res.json();
-                _cacheRejectedPapers = data.papers || [];
-                renderRejectedTable();
+                _cacheRejectedPapers = data.items || data.papers || [];
+                renderRejectedTable(data);
             } catch (e) {
                 console.error('Failed to load rejected papers', e);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#dc2626; padding:20px;">تعذر الاتصال بالخادم لتحميل الأبحاث المرفوضة</td></tr>';
+                }
             }
         }
 
-        function renderRejectedTable() {
+        function renderRejectedTable(meta = {}) {
             const tbody = document.getElementById('rejected-table-body');
             if (!tbody) return;
 
-            const filter = _dateFilterState.rejected;
-            const filtered = _cacheRejectedPapers.filter(p => checkDateMatch(p.created_at, filter.period, filter.from, filter.to));
+            const curPage = meta.page || _rejectedCurrentPage;
+
+            if (_cacheRejectedPapers.length === 0) {
+                tbody.innerHTML = getEmptyStateHtml('سجل الأبحاث المرفوضة فارغ', 'لم يتم إصدار قرار رفض بحق أي بحث حتى الآن.', 7);
+                return;
+            }
 
             let html = '';
-            filtered.forEach((p, idx) => {
+            _cacheRejectedPapers.forEach((p, idx) => {
                 let badgeClass = p.overall_pct > 50 ? 'high' : (p.overall_pct > 20 ? 'medium' : 'low');
+                const rowNum = (curPage - 1) * 25 + idx + 1;
                 html += `
                     <tr>
-                        <td>${idx + 1}</td>
-                        <td style="font-weight: 700;">${p.title}</td>
+                        <td>${rowNum}</td>
+                        <td style="font-weight: 700;">${p.title}${p.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0369a1; margin-top:2px;">${p.reference_number}</div>` : ''}</td>
                         <td style="color: #dc2626; font-weight: 700;">${p.author || 'غير محدد'}</td>
                         <td><span style="background:#fee2e2; color:#991b1b; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:700;">${p.category || 'عام'}</span></td>
                         <td><span class="badge-pct ${badgeClass}">${p.overall_pct}%</span></td>
@@ -4427,7 +5000,7 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || getEmptyStateHtml('سجل الأبحاث المرفوضة فارغ', 'لم يتم إصدار قرار رفض بحق أي بحث حتى الآن.', 7);
+            tbody.innerHTML = html;
         }
 
         async function deleteReportArchive(reportId) {
@@ -4459,33 +5032,61 @@
         }
 
         async function loadDatabasePapers(page = 1) {
-            const query = document.getElementById('db-search-input')?.value || '';
+            _databaseCurrentPage = page;
+            const query = document.getElementById('db-search-input')?.value.trim() || '';
+            const tbody = document.getElementById('db-table-body');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع الأبحاث المرجعية...</td></tr>';
+            }
+
             try {
-                const res = await fetch(`/api/papers?q=${encodeURIComponent(query)}&page=${page}&per_page=100`);
+                const filter = _dateFilterState.database;
+                const params = new URLSearchParams();
+                params.set('page', page);
+                params.set('page_size', 25);
+                if (query) params.set('q', query);
+                if (filter.from) params.set('date_from', filter.from);
+                if (filter.to) params.set('date_to', filter.to);
+
+                const res = await fetch(`/api/papers?${params.toString()}`);
                 const data = await res.json();
-                _cacheDatabasePapers = data.papers || [];
-                renderDatabaseTable();
+                _cacheDatabasePapers = data.items || data.papers || [];
+                renderDatabaseTable(data);
             } catch (e) {
                 console.error('Failed to load database papers', e);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#dc2626; padding:20px;">تعذر الاتصال بالخادم لتحميل الأبحاث المرجعية</td></tr>';
+                }
             }
         }
 
-        function renderDatabaseTable() {
+        const debouncedLoadDatabasePapers = debounce(() => loadDatabasePapers(1), 300);
+
+        function renderDatabaseTable(meta = {}) {
             const tbody = document.getElementById('db-table-body');
             if (!tbody) return;
 
-            const filter = _dateFilterState.database;
-            const filtered = _cacheDatabasePapers.filter(p => checkDateMatch(p.added_at, filter.period, filter.from, filter.to));
+            const totalItems = meta.total_items !== undefined ? meta.total_items : _cacheDatabasePapers.length;
+            const totalPages = meta.total_pages || 1;
+            const curPage = meta.page || _databaseCurrentPage;
+
+            if (_cacheDatabasePapers.length === 0) {
+                tbody.innerHTML = getEmptyStateHtml('قاعدة الأبحاث المرجعية فارغة حالياً', 'يمكنك إضافة أول بحث مرجعي عبر زر «إضافة بحث للقاعدة المرجعية».', 7);
+                const pagContainer = document.getElementById('db-pagination');
+                if (pagContainer) pagContainer.innerHTML = '';
+                return;
+            }
 
             let html = '';
-            filtered.forEach((p, idx) => {
-                const escapedTitle = (p.title || '').replace(/'/g, "\'");
-                const escapedAuthor = (p.author || '').replace(/'/g, "\'");
-                const escapedCategory = (p.category || 'عام').replace(/'/g, "\'");
+            _cacheDatabasePapers.forEach((p, idx) => {
+                const escapedTitle = (p.title || '').replace(/'/g, "\\'");
+                const escapedAuthor = (p.author || '').replace(/'/g, "\\'");
+                const escapedCategory = (p.category || 'عام').replace(/'/g, "\\'");
                 const addedAtStr = p.added_at || '';
+                const rowNum = (curPage - 1) * 25 + idx + 1;
                 html += `
                     <tr>
-                        <td>${idx + 1}</td>
+                        <td>${rowNum}</td>
                         <td style="font-weight: 700;">${p.title}</td>
                         <td style="color: #0369a1; font-weight: 700;">${p.author || 'غير محدد'}</td>
                         <td><span style="background:#e0f2fe; color:#0369a1; padding:2px 8px; border-radius:12px; font-size:12px; font-weight:700;">${p.category || 'عام'}</span></td>
@@ -4504,10 +5105,12 @@
                     </tr>
                 `;
             });
-            tbody.innerHTML = html || getEmptyStateHtml('قاعدة الأبحاث المرجعية فارغة حالياً', 'يمكنك إضافة أول بحث مرجعي عبر زر «إضافة بحث للقاعدة المرجعية».', 7);
+            tbody.innerHTML = html;
 
             const pagContainer = document.getElementById('db-pagination');
-            if (pagContainer) pagContainer.innerHTML = '';
+            if (pagContainer) {
+                pagContainer.innerHTML = renderPaginationHTML(curPage, totalPages, totalItems, 'loadDatabasePapers');
+            }
         }
 
         function openEditPaperModal(paperId, title, author, category, addedAt) {
@@ -4728,7 +5331,7 @@
                 let statusTag = r.status || 'مفحوص';
                 html += `
                     <tr>
-                        <td style="font-weight: 700;">${r.title}</td>
+                        <td style="font-weight: 700;">${r.title}${r.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0369a1; margin-top:2px;">${r.reference_number}</div>` : ''}</td>
                         <td>${r.author || 'غير محدد'}</td>
                         <td style="font-size:13px; color:var(--text-muted);">${r.date}</td>
                         <td><span style="font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; background:#f1f5f9;">${statusTag}</span></td>
@@ -4960,44 +5563,61 @@
             }
         }
 
-        async function loadInitialReviewsQueue() {
+        let _initialCurrentPage = 1;
+
+        async function loadInitialReviewsQueue(page = 1) {
+            _initialCurrentPage = page;
             const searchVal = document.getElementById('initial-review-search-input')?.value.trim() || '';
             const tbody = document.getElementById('initial-reviews-table-body');
-            if (!tbody) return;
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع طابور الفحص الأولي...</td></tr>';
+            }
 
             try {
-                const res = await fetch(`/api/initial_reviews?q=${encodeURIComponent(searchVal)}`);
+                const filter = _dateFilterState.initial;
+                const params = new URLSearchParams();
+                params.set('page', page);
+                params.set('page_size', 25);
+                if (searchVal) params.set('q', searchVal);
+                if (filter.from) params.set('date_from', filter.from);
+                if (filter.to) params.set('date_to', filter.to);
+
+                const res = await fetch(`/api/initial_reviews?${params.toString()}`);
                 const data = await res.json();
-                _cacheInitialReviews = data.papers || [];
+                _cacheInitialReviews = data.items || data.papers || [];
                 updateInitialReviewsCount();
-                renderInitialReviewsTable();
+                renderInitialReviewsTable(data);
             } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:20px;">حدث خطأ أثناء تحميل طابور الفحص الأولي</td></tr>';
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:20px;">حدث خطأ أثناء تحميل طابور الفحص الأولي</td></tr>';
+                }
             }
         }
 
-        function renderInitialReviewsTable() {
+        const debouncedLoadInitialReviewsQueue = debounce(() => loadInitialReviewsQueue(1), 300);
+
+        function renderInitialReviewsTable(meta = {}) {
             const tbody = document.getElementById('initial-reviews-table-body');
             if (!tbody) return;
 
-            const filter = _dateFilterState.initial;
-            const filtered = _cacheInitialReviews.filter(p => checkDateMatch(p.created_at, filter.period, filter.from, filter.to));
+            const curPage = meta.page || _initialCurrentPage;
 
-            if (filtered.length === 0) {
+            if (_cacheInitialReviews.length === 0) {
                 tbody.innerHTML = getEmptyStateHtml('لا توجد أبحاث في طابور الفحص الأولي', 'ستظهر هنا الأبحاث المحولة من الموظفين لمراجعتها واتخاذ القرار.', 8);
                 return;
             }
 
             let html = '';
-            filtered.forEach((p, idx) => {
+            _cacheInitialReviews.forEach((p, idx) => {
                 let badgeClass = p.overall_pct > 50 ? 'high' : (p.overall_pct > 20 ? 'medium' : 'low');
                 let submitter = p.submitted_by || 'موظف غير محدد';
                 let notes = p.submitted_notes || '—';
+                const rowNum = (curPage - 1) * 25 + idx + 1;
 
                 html += `
                     <tr>
-                        <td style="font-weight: 700; color: var(--text-muted);">${idx + 1}</td>
-                        <td style="font-weight: 700; color: var(--primary-navy);">${p.title}</td>
+                        <td style="font-weight: 700; color: var(--text-muted);">${rowNum}</td>
+                        <td style="font-weight: 700; color: var(--primary-navy);">${p.title}${p.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0369a1; margin-top:2px;">${p.reference_number}</div>` : ''}</td>
                         <td>${p.author || 'غير محدد'}</td>
                         <td><span style="background: #e0f2fe; color: #0284c7; padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; display:inline-flex; align-items:center; gap:4px;"><svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#0284c7;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>${submitter}</span></td>
                         <td style="font-size: 12px; color: var(--text-muted); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${notes}">${notes}</td>
@@ -5072,12 +5692,13 @@
 
                 let html = '';
                 users.forEach((u, idx) => {
-                    const isAdmin = (u.role === 'admin');
-                    const roleBadge = isAdmin
-                        ? `<span style="background: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display:inline-flex; align-items:center; gap:4px;"><svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#0369a1;" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>مدير النظام (كامل الصلاحيات)</span>`
-                        : `<span style="background: #ecfdf5; color: #047857; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display:inline-flex; align-items:center; gap:4px;"><svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#047857;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>موظف فحص (رفع وإرسال فقط)</span>`;
+                    const isSystemAdmin = (u.role === 'admin' || u.role === 'system_admin');
+                    const roleLabel = u.role_label_ar || (isSystemAdmin ? 'مدير النظام' : (u.role === 'senior_reviewer' ? 'مراجع أول / مراجع نهائي' : (u.role === 'data_entry' ? 'مدخل بيانات' : (u.role === 'unit_manager' ? 'مسؤول وحدة' : 'مراجع أكاديمي'))));
+                    const roleColor = isSystemAdmin ? '#0369a1' : (u.role === 'senior_reviewer' ? '#7e22ce' : (u.role === 'data_entry' ? '#d97706' : '#047857'));
+                    const roleBg = isSystemAdmin ? '#e0f2fe' : (u.role === 'senior_reviewer' ? '#faf5ff' : (u.role === 'data_entry' ? '#fef3c7' : '#ecfdf5'));
+                    const roleBadge = `<span style="background: ${roleBg}; color: ${roleColor}; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display:inline-flex; align-items:center; gap:4px;">${roleLabel}</span>`;
 
-                    const deleteBtn = isAdmin
+                    const deleteBtn = isSystemAdmin
                         ? `<span style="color: var(--text-muted); font-size: 12px; font-weight:700;">حساب رئيسي</span>`
                         : `<div style="display:flex; gap:6px; align-items:center;">
                             <button class="btn-secondary" style="padding: 4px 10px; font-size:12px; color: #0284c7; border-color: #bae6fd; display:inline-flex; align-items:center; gap:4px;" onclick="adminResetEmployeePass(${u.id}, '${u.full_name}')" title="إعادة تعيين كلمة المرور"><svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#0284c7;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>تعيين كلمة مرور</button>
@@ -5159,7 +5780,7 @@
             }
         }
 
-        // ─── Automated Database Backups & Maintenance ───────────────────────
+        // ─── Automated Database Backups & Disaster Recovery ─────────────────
         async function loadBackupsList() {
             const tbody = document.getElementById('backups-table-body');
             if (!tbody) return;
@@ -5168,28 +5789,50 @@
                 const data = await res.json();
                 let html = '';
                 (data.backups || []).forEach(b => {
+                    const statusBadge = b.status === 'completed' 
+                        ? `<span style="background:#ecfdf5; color:#065f46; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">جاهزة</span>`
+                        : (b.status === 'restored' 
+                            ? `<span style="background:#eff6ff; color:#1e40af; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">تمت استعادتها</span>`
+                            : `<span style="background:#fef2f2; color:#991b1b; padding:3px 8px; border-radius:6px; font-size:11px; font-weight:700;">${b.status}</span>`);
+
+                    const valBadge = b.validation_status === 'valid'
+                        ? `<span style="color:#059669; font-weight:700; font-size:11px;">✓ سليمة</span>`
+                        : (b.validation_status === 'invalid'
+                            ? `<span style="color:#dc2626; font-weight:700; font-size:11px;">✗ غير صالحة</span>`
+                            : `<span style="color:#6b7280; font-size:11px;">غير مفحوصة</span>`);
+
                     html += `
                         <tr>
-                            <td style="font-weight: 700; font-family: monospace; direction: ltr; text-align: right;">${b.filename}</td>
-                            <td><span style="font-weight: 700;">${b.size_mb} MB</span></td>
-                            <td style="color: var(--text-muted);">${b.created_at}</td>
-                            <td><span style="background: #ecfdf5; color: #065f46; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; display:inline-flex; align-items:center; gap:4px;"><svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#065f46;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>محفوظة محلياً</span></td>
+                            <td style="font-weight: 800; font-family: monospace; color: var(--primary-navy);">${b.backup_identifier || b.filename}</td>
+                            <td style="color: var(--text-muted); font-size: 12px;">${b.created_at}</td>
+                            <td>${statusBadge}</td>
+                            <td><span style="font-weight: 700;">${b.size_mb || 0} MB</span></td>
+                            <td style="font-size: 12px; color: var(--text-muted);">${b.application_version || '1.0.0'}</td>
+                            <td>${valBadge}</td>
+                            <td style="font-size: 12px;">${b.created_by || 'system'}</td>
+                            <td>
+                                <div style="display:flex; gap:6px;">
+                                    <button class="btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="validateBackup('${b.backup_identifier}')">فحص السلامة</button>
+                                    <button class="btn-danger" style="padding:4px 8px; font-size:11px; background:#dc2626; color:white; border:none; border-radius:4px;" onclick="restoreBackup('${b.backup_identifier}')">استعادة</button>
+                                    <a href="/api/admin/backups/${b.backup_identifier}/download" class="btn-secondary" style="padding:4px 8px; font-size:11px; text-decoration:none; display:inline-block;" download>تحميل</a>
+                                </div>
+                            </td>
                         </tr>
                     `;
                 });
-                tbody.innerHTML = html || getEmptyStateHtml('لا توجد نسخ احتياطية مسجلة', 'يتم إنشاء لقطات احتياطية دورية وتلقائية لقاعدة البيانات.', 4);
+                tbody.innerHTML = html || getEmptyStateHtml('لا توجد نسخ احتياطية مسجلة', 'يمكنك إنشاء نسخة احتياطية شاملة الآن.', 8);
             } catch (e) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#dc2626; padding:16px;">تعذر جلب النسخ الاحتياطية</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#dc2626; padding:16px;">تعذر جلب النسخ الاحتياطية</td></tr>';
             }
         }
 
         async function triggerInstantBackup() {
-            showToast('جاري أخذ لقطة فورية من قاعدة البيانات على القرص...', 'info');
+            showToast('جاري إنشاء حزمة النسخ الاحتياطي المتسقة وفحص سلامتها...', 'info');
             try {
                 const res = await fetch('/api/admin/backup', { method: 'POST' });
                 const data = await res.json();
                 if (data.success) {
-                    showToast(data.message, 'success');
+                    showToast(data.message || 'تم إنشاء النسخة الاحتياطية بنجاح', 'success');
                     loadBackupsList();
                 } else {
                     showToast(data.error || 'فشل إنشاء النسخة الاحتياطية', 'error');
@@ -5199,8 +5842,52 @@
             }
         }
 
+        async function validateBackup(backupId) {
+            showToast(`جاري فحص سلامة النسخة ${backupId}...`, 'info');
+            try {
+                const res = await fetch(`/api/admin/backups/${backupId}/validate`, { method: 'POST' });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(data.message || 'تم التحقق من سلامة النسخة بنجاح', 'success');
+                } else {
+                    showToast(data.error || 'فشل التحقق من سلامة النسخة', 'error');
+                }
+                loadBackupsList();
+            } catch (e) {
+                showToast('فشل الاتصال بالخادم للتحقق من النسخة', 'error');
+            }
+        }
+
+        async function restoreBackup(backupId) {
+            const userInput = prompt(`تحذير أمني خطير:\nاستعادة النسخة الاحتياطية ستستبدل البيانات الحالية ببيانات النسخة.\n\nلتأكيد الاستعادة، يرجى كتابة رقم النسخة الاحتياطية بالضبط:\n${backupId}`);
+            if (!userInput) return;
+            if (userInput.trim() !== backupId.trim()) {
+                alert('رمز التأكيد غير مطابق. تم إلغاء عملية الاستعادة.');
+                return;
+            }
+
+            showToast(`جاري بدء الاستعادة الآمنة للنسخة ${backupId} مع أخذ نسخة طوارئ مسبقة...`, 'info');
+            try {
+                const res = await fetch(`/api/admin/backups/${backupId}/restore`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ confirmation: userInput.trim() })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    alert(`اكتملت الاستعادة بنجاح!\n${data.message}\n(تم حفظ نسخة أمان للوضع السابق برقم: ${data.safety_backup_id})`);
+                    location.reload();
+                } else {
+                    alert(`فشلت الاستعادة:\n${data.error}`);
+                }
+                loadBackupsList();
+            } catch (e) {
+                alert(`خطأ أثناء تنفيذ الاستعادة: ${e.message}`);
+            }
+        }
+
         async function triggerCleanupTemp() {
-            const confirmed = await showConfirm('هل أنت متأكد من رغبتك في تنظيف وحذف الملفات المؤقتة التي مضى عليها أكثر من 24 ساعة؟', 'تنظيف الملفات المؤقتة', 'تنظيف الآن', false);
+            const confirmed = await showConfirm('هل أنت متأكد من رغبتك في تنظيف وحذف الملفات المؤقتة؟', 'تنظيف الملفات المؤقتة', 'تنظيف الآن', false);
             if (!confirmed) return;
             try {
                 const res = await fetch('/api/admin/cleanup_temp', { method: 'POST' });
@@ -5208,6 +5895,83 @@
                 showToast(data.message || 'تم تنظيف الملفات المؤقتة بنجاح', 'success');
             } catch (e) {
                 showToast('فشل تنظيف الملفات المؤقتة', 'error');
+            }
+        }
+
+        // ─── Database Health & Maintenance Handlers (Phase 9) ────────────────
+        async function loadDbHealth() {
+            try {
+                const res = await fetch('/api/system/db_health');
+                const data = await res.json();
+                if (data && data.database_reachable) {
+                    const stEl = document.getElementById('db-health-status');
+                    const mdEl = document.getElementById('db-health-mode');
+                    const szEl = document.getElementById('db-health-size');
+                    const wlEl = document.getElementById('db-health-wal');
+                    const scEl = document.getElementById('db-health-schema');
+
+                    if (stEl) stEl.textContent = data.status === 'healthy' ? '✓ سليم ومتصل' : 'تنبيه في الاتصال';
+                    if (mdEl) mdEl.textContent = `${data.pragmas?.journal_mode || 'WAL'} (متزامن)`;
+                    if (szEl) szEl.textContent = `${data.database_file_size_mb || 0} MB`;
+                    if (wlEl) wlEl.textContent = `${data.wal_file_size_mb || 0} MB`;
+                    if (scEl) scEl.textContent = `v${data.schema_version || '1.0.0'}`;
+                }
+            } catch (e) {
+                console.error('Failed to load DB health:', e);
+            }
+        }
+
+        async function triggerDbQuickCheck() {
+            showToast('جاري تنفيذ الفحص السريع PRAGMA quick_check...', 'info');
+            try {
+                const res = await fetch('/api/admin/db/quick_check', { method: 'POST' });
+                const data = await res.json();
+                if (data.success && data.is_clean) {
+                    showToast(`اكتمل الفحص السريع بنجاح (النتيجة: ok خلال ${data.duration_ms}ms)`, 'success');
+                } else {
+                    showToast(`تنبيه: أظهر الفحص السريع أخطاء: ${JSON.stringify(data.result || data.error)}`, 'error');
+                }
+                loadDbHealth();
+            } catch (e) {
+                showToast('فشل تشغيل الفحص السريع', 'error');
+            }
+        }
+
+        async function triggerDbIntegrityCheck() {
+            const confirmed = await showConfirm('هل ترغب في تشغيل الفحص الشامل لسلامة قاعدة البيانات (PRAGMA integrity_check)؟', 'فحص السلامة الشامل', 'بدء الفحص', false);
+            if (!confirmed) return;
+            showToast('جاري تشغيل الفحص الشامل والعميق لسلامة البيانات...', 'info');
+            try {
+                const res = await fetch('/api/admin/db/integrity_check', { method: 'POST' });
+                const data = await res.json();
+                if (data.success && data.is_clean) {
+                    showToast(`اكتمل الفحص الشامل بنجاح تام (النتيجة: ok خلال ${data.duration_ms}ms)`, 'success');
+                } else {
+                    showToast(`تحذير: أظهر الفحص الشامل مشاكل: ${JSON.stringify(data.result || data.error)}`, 'error');
+                }
+                loadDbHealth();
+            } catch (e) {
+                showToast('فشل تشغيل فحص السلامة الشامل', 'error');
+            }
+        }
+
+        async function triggerDbCheckpoint() {
+            showToast('جاري دمج سجل معاملات WAL مع ملف قاعدة البيانات...', 'info');
+            try {
+                const res = await fetch('/api/admin/db/checkpoint', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mode: 'PASSIVE' })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    showToast(`تم تنفيذ نقطة تفتيش WAL بنجاح (الإطارات المدمجة: ${data.checkpointed_frames})`, 'success');
+                } else {
+                    showToast(`تعذر دمج WAL: ${data.error}`, 'error');
+                }
+                loadDbHealth();
+            } catch (e) {
+                showToast('فشل تنفيذ نقطة تفتيش WAL', 'error');
             }
         }
 
@@ -5294,6 +6058,7 @@
                         storageVal.style.color = '#0284c7';
                     }
                 }
+                loadDbHealth();
             } catch (e) {
                 console.error('Failed to load diagnostics', e);
             }
@@ -5417,7 +6182,476 @@
             }
         }
 
+        // ─── Institutional Audit Trail Engine (Admin Only) ─────────────────
+        let _auditCurrentPage = 1;
+        let _auditTotalPages = 1;
+
+        function getAuthHeaders() {
+            const headers = {};
+            if (currentUser) {
+                if (currentUser.id) headers['X-User-Id'] = String(currentUser.id);
+                if (currentUser.username) headers['X-User-Name'] = currentUser.username;
+                if (currentUser.role) headers['X-User-Role'] = currentUser.role;
+            }
+            return headers;
+        }
+
+        async function loadAuditLogs(page = 1) {
+            const tbody = document.getElementById('audit-table-body');
+            if (!tbody) return;
+
+            _auditCurrentPage = page;
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; color: var(--text-muted);"><div class="loading-spinner" style="margin: 0 auto 10px;"></div>جاري استرجاع سجلات التدقيق المؤسسي...</td></tr>';
+
+            const catEl = document.getElementById('audit-filter-category');
+            const successEl = document.getElementById('audit-filter-success');
+            const searchEl = document.getElementById('audit-search-input');
+
+            const params = new URLSearchParams();
+            params.set('page', page);
+            params.set('per_page', 20);
+            if (catEl && catEl.value) params.set('category', catEl.value);
+            if (successEl && successEl.value) params.set('success', successEl.value);
+            if (searchEl && searchEl.value.trim()) params.set('q', searchEl.value.trim());
+
+            try {
+                const res = await fetch(`/api/admin/audit_logs?${params.toString()}`, {
+                    headers: getAuthHeaders()
+                });
+
+                if (res.status === 403) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #dc2626; padding: 24px; font-weight: 700;">غير مصرح: هذا السجل متاح لمدير النظام فقط.</td></tr>';
+                    return;
+                }
+
+                const data = await res.json();
+                renderAuditTable(data);
+            } catch (e) {
+                console.error('Failed to load audit logs', e);
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: #dc2626; padding: 24px;">تعذر الاتصال بالخادم لجلب سجلات التدقيق.</td></tr>';
+            }
+        }
+
+        function renderAuditTable(data) {
+            const tbody = document.getElementById('audit-table-body');
+            const totalCountEl = document.getElementById('audit-total-count');
+            const pageInfoEl = document.getElementById('audit-page-info');
+            const curPageEl = document.getElementById('audit-current-page-num');
+            const prevBtn = document.getElementById('btn-audit-prev');
+            const nextBtn = document.getElementById('btn-audit-next');
+
+            const events = data.events || [];
+            const total = data.total || 0;
+            _auditTotalPages = data.total_pages || 1;
+
+            if (totalCountEl) totalCountEl.innerText = total;
+            if (pageInfoEl) pageInfoEl.innerText = `الصفحة ${_auditCurrentPage} من ${_auditTotalPages}`;
+            if (curPageEl) curPageEl.innerText = _auditCurrentPage;
+            if (prevBtn) prevBtn.disabled = (_auditCurrentPage <= 1);
+            if (nextBtn) nextBtn.disabled = (_auditCurrentPage >= _auditTotalPages);
+
+            if (events.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; color: var(--text-muted); font-weight: 600;">لا توجد سجلات تدقيق مطابقة للبحث أو الفلترة الحالية.</td></tr>';
+                return;
+            }
+
+            let html = '';
+            events.forEach((ev, idx) => {
+                const rowNum = (data.page - 1) * data.per_page + idx + 1;
+                const badgeStatus = ev.success 
+                    ? '<span style="background: #ecfdf5; color: #059669; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width: 12px; height: 12px; stroke: #059669;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>ناجح</span>'
+                    : `<span style="background: #fef2f2; color: #dc2626; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width: 12px; height: 12px; stroke: #dc2626;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>${ev.failure_reason_code || 'فشل'}</span>`;
+
+                const roleBadge = ev.role === 'admin'
+                    ? '<span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700;">مدير</span>'
+                    : (ev.role === 'employee' ? '<span style="background: #f1f5f9; color: #475569; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700;">موظف</span>' : '<span style="color: var(--text-muted); font-size: 11px;">نظام</span>');
+
+                const refCell = ev.research_reference_number
+                    ? `<span style="font-family: monospace; font-weight: 700; color: #0369a1; background: #f0f9ff; padding: 2px 6px; border-radius: 4px; font-size: 11.5px;">${ev.research_reference_number}</span>`
+                    : '<span style="color: #94a3b8; font-size: 12px;">—</span>';
+
+                html += `
+                    <tr>
+                        <td style="color: var(--text-muted); font-weight: 700;">${rowNum}</td>
+                        <td style="font-size: 12px; color: #475569; white-space: nowrap;">${ev.created_at}</td>
+                        <td style="font-weight: 700; color: var(--primary-navy);">${ev.username}</td>
+                        <td>${roleBadge}</td>
+                        <td><span style="font-family: monospace; font-weight: 700; font-size: 12px; color: #0f172a;">${ev.action}</span></td>
+                        <td>${refCell}</td>
+                        <td style="font-size: 12px; color: var(--text-muted);">${ev.object_type || '—'}${ev.object_id ? ` (#${ev.object_id})` : ''}</td>
+                        <td>${badgeStatus}</td>
+                        <td style="text-align: center;">
+                            <button class="btn-secondary" style="padding: 4px 10px; font-size: 11.5px; border-radius: 6px;" onclick="openAuditDetailModal('${ev.event_id}')" title="عرض التفاصيل الكاملة">
+                                <svg class="nav-icon-svg" style="width: 13px; height: 13px;" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function applyAuditFilters() {
+            loadAuditLogs(1);
+        }
+
+        function resetAuditFilters() {
+            const catEl = document.getElementById('audit-filter-category');
+            const successEl = document.getElementById('audit-filter-success');
+            const searchEl = document.getElementById('audit-search-input');
+            if (catEl) catEl.value = '';
+            if (successEl) successEl.value = '';
+            if (searchEl) searchEl.value = '';
+            loadAuditLogs(1);
+        }
+
+        function prevAuditPage() {
+            if (_auditCurrentPage > 1) {
+                loadAuditLogs(_auditCurrentPage - 1);
+            }
+        }
+
+        function nextAuditPage() {
+            if (_auditCurrentPage < _auditTotalPages) {
+                loadAuditLogs(_auditCurrentPage + 1);
+            }
+        }
+
+        async function openAuditDetailModal(eventId) {
+            const modal = document.getElementById('audit-detail-modal');
+            if (!modal) return;
+
+            document.getElementById('audit-modal-event-id').innerText = eventId;
+            document.getElementById('audit-modal-created-at').innerText = '...';
+            document.getElementById('audit-modal-user').innerText = '...';
+            document.getElementById('audit-modal-action').innerText = '...';
+            document.getElementById('audit-modal-ref-num').innerText = '...';
+            document.getElementById('audit-modal-request-id').innerText = '...';
+            document.getElementById('audit-modal-status').innerHTML = '...';
+            document.getElementById('audit-modal-metadata').innerText = '...';
+
+            modal.style.display = 'flex';
+
+            try {
+                const res = await fetch(`/api/admin/audit_logs/${eventId}`, {
+                    headers: getAuthHeaders()
+                });
+                const data = await res.json();
+                if (data.event) {
+                    const ev = data.event;
+                    document.getElementById('audit-modal-created-at').innerText = ev.created_at || '—';
+                    document.getElementById('audit-modal-user').innerText = `${ev.username || 'system'} (${ev.role || '—'})`;
+                    document.getElementById('audit-modal-action').innerText = `${ev.action} [${ev.category}]`;
+                    document.getElementById('audit-modal-ref-num').innerText = ev.research_reference_number || '—';
+                    document.getElementById('audit-modal-request-id').innerText = ev.request_id ? `${ev.request_id} (IP: ${ev.ip_address || 'local'})` : (ev.ip_address || '—');
+                    document.getElementById('audit-modal-status').innerHTML = ev.success 
+                        ? '<span style="color: #059669; font-weight: 800;">ناجح (Success)</span>'
+                        : `<span style="color: #dc2626; font-weight: 800;">فشل: ${ev.failure_reason_code || 'ERROR'}</span>`;
+                    document.getElementById('audit-modal-metadata').innerText = JSON.stringify(ev.metadata || {}, null, 2);
+                }
+            } catch (e) {
+                document.getElementById('audit-modal-metadata').innerText = 'تعذر استرجاع تفاصيل الحدث من الخادم.';
+            }
+        }
+
+        function closeAuditDetailModal() {
+            const modal = document.getElementById('audit-detail-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
         
+        // ─── Institutional System Health & Operational Monitoring (Phase 11) ─
+        let _systemHealthTimer = null;
+        let _isHealthLoading = false;
+        let _healthReqSequence = 0;
+
+        function startSystemHealthTimer() {
+            stopSystemHealthTimer();
+            _systemHealthTimer = setInterval(() => {
+                const healthView = document.getElementById('view-system-health');
+                if (healthView && healthView.classList.contains('active')) {
+                    loadSystemHealth(false);
+                } else {
+                    stopSystemHealthTimer();
+                }
+            }, 30000); // Gentle 30s auto-refresh
+        }
+
+        function stopSystemHealthTimer() {
+            if (_systemHealthTimer) {
+                clearInterval(_systemHealthTimer);
+                _systemHealthTimer = null;
+            }
+        }
+
+        async function loadSystemHealth(manual = false) {
+            if (_isHealthLoading && !manual) return;
+            _isHealthLoading = true;
+            const currentReqSeq = ++_healthReqSequence;
+
+            const refreshBtn = document.getElementById('btn-refresh-health');
+            if (manual && refreshBtn) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<span class="loading-spinner" style="width:14px; height:14px; border-width:2px; display:inline-block; vertical-align:middle; margin-left:6px;"></span> جاري الفحص...';
+            }
+
+            try {
+                const res = await fetch('/api/system/health', {
+                    headers: getAuthHeaders()
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    stopSystemHealthTimer();
+                    if (manual) showToast('غير مصرح لك باستعراض لوحة صحة النظام', 'error');
+                    return;
+                }
+
+                const data = await res.json();
+                // Stale response protection: ignore response if a newer request was dispatched
+                if (currentReqSeq !== _healthReqSequence) return;
+
+                renderSystemHealth(data);
+                if (manual) showToast('تم تحديث الفحص التشغيلي للنظام بنجاح', 'success');
+            } catch (e) {
+                console.error('Failed to load system health', e);
+                if (manual) showToast('فشل الاتصال بالخادم لجلب صحة النظام', 'error');
+            } finally {
+                _isHealthLoading = false;
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg><span>تحديث الفحص الآن</span>';
+                }
+            }
+        }
+
+        function getStatusBadgeHtml(status, statusAr) {
+            if (status === 'healthy') {
+                return `<span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:4px;"><span style="width:6px; height:6px; border-radius:50%; background:#059669;"></span>${statusAr || 'سليم'}</span>`;
+            } else if (status === 'degraded') {
+                return `<span style="background:#fffbeb; color:#d97706; border:1px solid #fde68a; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:4px;"><span style="width:6px; height:6px; border-radius:50%; background:#d97706;"></span>${statusAr || 'يحتاج متابعة'}</span>`;
+            } else if (status === 'critical') {
+                return `<span style="background:#fef2f2; color:#dc2626; border:1px solid #fecaca; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:4px;"><span style="width:6px; height:6px; border-radius:50%; background:#dc2626;"></span>${statusAr || 'حالة حرجة'}</span>`;
+            } else if (status === 'disabled') {
+                return `<span style="background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:800; display:inline-flex; align-items:center; gap:4px;"><span style="width:6px; height:6px; border-radius:50%; background:#94a3b8;"></span>${statusAr || 'غير مفعّل'}</span>`;
+            } else {
+                return `<span style="background:#f8fafc; color:#64748b; border:1px solid #e2e8f0; padding:2px 8px; border-radius:6px; font-size:11.5px; font-weight:700; display:inline-flex; align-items:center; gap:4px;">${statusAr || 'لم يتم التحقق'}</span>`;
+            }
+        }
+
+        function renderSystemHealth(data) {
+            if (!data) return;
+
+            // 1. Overall Status Badge & Checked Time
+            const overallBadge = document.getElementById('health-overall-badge');
+            const overallText = document.getElementById('health-overall-text');
+            const lastChecked = document.getElementById('health-last-checked');
+
+            if (lastChecked) {
+                lastChecked.innerText = `آخر فحص: ${data.timestamp || 'الآن'}`;
+            }
+
+            if (overallBadge && overallText) {
+                overallText.innerText = data.overall_status_ar || 'سليم';
+                if (data.overall_status === 'healthy') {
+                    overallBadge.style.background = '#ecfdf5';
+                    overallBadge.style.color = '#059669';
+                    overallBadge.style.borderColor = '#a7f3d0';
+                } else if (data.overall_status === 'degraded') {
+                    overallBadge.style.background = '#fffbeb';
+                    overallBadge.style.color = '#d97706';
+                    overallBadge.style.borderColor = '#fde68a';
+                } else if (data.overall_status === 'critical') {
+                    overallBadge.style.background = '#fef2f2';
+                    overallBadge.style.color = '#dc2626';
+                    overallBadge.style.borderColor = '#fecaca';
+                }
+            }
+
+            // 2. Component Cards Grid
+            const grid = document.getElementById('health-cards-grid');
+            if (!grid) return;
+
+            const c = data.components || {};
+
+            const cardsConfig = [
+                {
+                    key: 'database',
+                    title: 'قاعدة البيانات التشغيلية (SQLite)',
+                    icon: '<ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M21 19c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>',
+                    comp: c.database,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>نمط التسجيل:</strong> ${meta.journal_mode || '—'}</div>
+                            <div><strong>حجم القاعدة:</strong> ${meta.database_size_mb !== undefined ? meta.database_size_mb + ' MB' : '—'}</div>
+                            <div><strong>حجم سجل WAL:</strong> ${meta.wal_size_mb !== undefined ? meta.wal_size_mb + ' MB' : '—'}</div>
+                            <div><strong>إصدار المخطط:</strong> ${meta.schema_version || 'v2.4'}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'storage',
+                    title: 'مساحة التخزين والقرص المحلي',
+                    icon: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>',
+                    comp: c.storage,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>المساحة الحرة:</strong> ${meta.free_gb !== undefined ? meta.free_gb + ' GB' : '—'}</div>
+                            <div><strong>النسبة المتاحة:</strong> ${meta.free_percent !== undefined ? meta.free_percent + '%' : '—'}</div>
+                            <div><strong>الإجمالي:</strong> ${meta.total_gb !== undefined ? meta.total_gb + ' GB' : '—'}</div>
+                            <div><strong>حد التحذير:</strong> ${meta.warning_threshold_percent || 15}%</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'backup',
+                    title: 'النسخ الاحتياطي والسلامة',
+                    icon: '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline>',
+                    comp: c.backup,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div style="grid-column: span 2;"><strong>آخر نسخة:</strong> <span style="font-family:monospace; color:#0369a1;">${meta.latest_backup_id || 'لا توجد نسخة بعد'}</span></div>
+                            <div><strong>عمر النسخة:</strong> ${meta.backup_age_hours !== null && meta.backup_age_hours !== undefined ? meta.backup_age_hours + ' ساعة' : '—'}</div>
+                            <div><strong>حالة التحقق:</strong> ${meta.latest_backup_validation || '—'}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'scan_jobs',
+                    title: 'طابور مهام الفحص الفردية',
+                    icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
+                    comp: c.scan_jobs,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>في الانتظار:</strong> ${meta.queued || 0}</div>
+                            <div><strong>قيد المعالجة:</strong> ${meta.processing || 0}</div>
+                            <div><strong>المكتملة:</strong> ${meta.completed || 0}</div>
+                            <div><strong>المهام العالقة:</strong> <span style="${meta.stuck_jobs_count > 0 ? 'color:#dc2626; font-weight:800;' : ''}">${meta.stuck_jobs_count || 0}</span></div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'batches',
+                    title: 'دفعات الفحص والأطروحات',
+                    icon: '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>',
+                    comp: c.batches,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>الدفعات النشطة:</strong> ${meta.active_batches || 0}</div>
+                            <div><strong>عناصر بالانتظار:</strong> ${meta.queued_items || 0}</div>
+                            <div><strong>عناصر فاشلة:</strong> ${meta.failed_items || 0}</div>
+                            <div><strong>دفعات مكتملة:</strong> ${meta.completed_batches || 0}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'reference_corpus',
+                    title: 'قاعدة المراجع المفهرسة',
+                    icon: '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>',
+                    comp: c.reference_corpus,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>إصدار المراجع:</strong> <span style="font-family:monospace; color:#0369a1;">${meta.corpus_version || 'REF-ACTIVE'}</span></div>
+                            <div><strong>عدد الوثائق:</strong> ${meta.documents_count || 0} وثيقة</div>
+                            <div><strong>البصمة الرقمية:</strong> ${meta.fingerprint_present ? 'متوفرة ومحققة' : 'غير متوفرة'}</div>
+                            <div><strong>آخر تحديث:</strong> ${(meta.last_updated || '—').substring(0, 10)}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'ocr',
+                    title: 'محرك التعرف الضوئي (OCR)',
+                    icon: '<polyline points="4 7 4 4 20 4 20 7"></polyline><line x1="9" y1="20" x2="15" y2="20"></line><line x1="12" y1="4" x2="12" y2="20"></line>',
+                    comp: c.ocr,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>التفعيل بالإعدادات:</strong> ${meta.enabled ? 'مفعّل' : 'معطل'}</div>
+                            <div><strong>جاهزية المحرك:</strong> ${meta.available ? 'جاهز محلياً' : 'غير متاح'}</div>
+                            <div style="grid-column: span 2;"><strong>دعم اللغة العربية:</strong> ${meta.has_arabic ? 'متوفر (ara.traineddata)' : 'غير متوفر'}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'semantic_model',
+                    title: 'النموذج الدلالي (Semantic AI)',
+                    icon: '<circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>',
+                    comp: c.semantic_model,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>الحالة:</strong> ${meta.enabled ? 'مفعّل' : 'غير مفعّل (الوضع الافتراضي)'}</div>
+                            <div><strong>وضع التشغيل:</strong> ${meta.offline_only ? 'أوفلاين 100%' : 'محلي'}</div>
+                            <div style="grid-column: span 2;"><strong>الملفات المحلية:</strong> ${meta.available ? 'جاهزة ومحمّلة' : (meta.enabled ? 'غير موجودة محلياً' : 'غير مطلوبة')}</div>
+                        </div>
+                    `
+                },
+                {
+                    key: 'application',
+                    title: 'إصدارات ومخططات المنظومة',
+                    icon: '<rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line>',
+                    comp: c.application,
+                    renderDetails: (meta) => `
+                        <div style="font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:6px; color:#475569;">
+                            <div><strong>إصدار التطبيق:</strong> ${meta.application_version || '2.4.0'}</div>
+                            <div><strong>محرك الفحص:</strong> ${meta.engine_version || '2.4.0'}</div>
+                            <div><strong>مخطط التقرير:</strong> ${meta.report_schema_version || 'v2.4'}</div>
+                            <div><strong>مخطط القاعدة:</strong> ${meta.database_schema_version || 'v2.4'}</div>
+                        </div>
+                    `
+                }
+            ];
+
+            let html = '';
+            cardsConfig.forEach(card => {
+                const comp = card.comp || { status: 'healthy', status_ar: 'سليم', message: 'يعمل بصورة طبيعية', metadata: {} };
+                const badge = getStatusBadgeHtml(comp.status, comp.status_ar);
+
+                html += `
+                    <div class="card" style="padding: 16px 18px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--border-color); background: #ffffff;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: var(--primary-navy);" viewBox="0 0 24 24">${card.icon}</svg>
+                                    <span style="font-weight: 800; font-size: 13.5px; color: var(--primary-navy);">${card.title}</span>
+                                </div>
+                                ${badge}
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                ${card.renderDetails(comp.metadata || {})}
+                            </div>
+                        </div>
+                        <div style="font-size: 11.5px; color: ${comp.status === 'critical' ? '#dc2626' : (comp.status === 'degraded' ? '#d97706' : 'var(--text-muted)')}; background: #f8fafc; padding: 6px 10px; border-radius: 6px; border: 1px solid #f1f5f9; margin-top: 8px;">
+                            ${comp.message || 'المكون يعمل بحالة سليمة.'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+
+            // 3. Operational Incidents Table
+            const incidentsTbody = document.getElementById('health-incidents-tbody');
+            if (incidentsTbody) {
+                const incidents = data.recent_incidents || [];
+                if (incidents.length === 0) {
+                    incidentsTbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: var(--text-muted);">لا توجد حوادث تشغيلية مسجلة حديثاً. المنظومة تعمل باستقرار تام.</td></tr>';
+                } else {
+                    let incHtml = '';
+                    incidents.forEach(inc => {
+                        incHtml += `
+                            <tr>
+                                <td style="font-size: 12px; color: #475569; white-space: nowrap;">${inc.created_at || '—'}</td>
+                                <td><span style="font-size: 11px; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-weight: 700;">${inc.category || 'نظام'}</span></td>
+                                <td style="font-family: monospace; font-size: 12px; font-weight: 700;">${inc.action || '—'}</td>
+                                <td><span style="color: #dc2626; font-weight: 800; font-size: 11.5px; background: #fef2f2; padding: 2px 8px; border-radius: 4px;">${inc.failure_reason_code || 'ERROR'}</span></td>
+                                <td style="font-size: 12px;">${inc.username || 'system'}</td>
+                            </tr>
+                        `;
+                    });
+                    incidentsTbody.innerHTML = incHtml;
+                }
+            }
+        }
+
         function openForgotPasswordModal() {
             const modal = document.getElementById('forgot-password-modal');
             const uInp = document.getElementById('forgot-emp-username');

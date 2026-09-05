@@ -89,6 +89,21 @@ def save_settings(new_settings: dict) -> tuple[bool, str]:
         if 'enable_ocr' in new_settings:
             current['enable_ocr'] = bool(new_settings['enable_ocr'])
 
+        if 'candidate_retrieval_mode' in new_settings:
+            mode = str(new_settings['candidate_retrieval_mode']).lower()
+            if mode in ('dual_channel', 'baseline'):
+                current['candidate_retrieval_mode'] = mode
+
+        if 'common_text_filter_mode' in new_settings:
+            mode = str(new_settings['common_text_filter_mode']).lower()
+            if mode in ('span_level', 'baseline'):
+                current['common_text_filter_mode'] = mode
+
+        if 'citation_filter_mode' in new_settings:
+            mode = str(new_settings['citation_filter_mode']).lower()
+            if mode in ('refined', 'baseline'):
+                current['citation_filter_mode'] = mode
+
         if 'detection_profile' in new_settings:
             prof = str(new_settings['detection_profile']).upper()
             if prof in ('LIGHT', 'BALANCED', 'ADVANCED'):

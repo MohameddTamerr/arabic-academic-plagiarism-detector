@@ -26,6 +26,8 @@ _ROOT = _HERE.parent.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+import config
+
 from plagiarism_detector.preprocessing.normalizer import (
     normalize_aggressive, normalize_light, get_shingles
 )
@@ -33,13 +35,14 @@ from plagiarism_detector.detection.shingle_matcher import match_exact_or_near_co
 from plagiarism_detector.detection.tfidf_matcher import match_lexical_paraphrase
 from plagiarism_detector.citations.citation_detector import detect_citation
 
-CATEGORIES = ['EXACT_COPY', 'MODIFIED_COPY', 'PARAPHRASE', 'CITED_QUOTE', 'COMMON_TEXT', 'ORIGINAL']
-PARAPHRASE_NEIGHBOURS = {'PARAPHRASE', 'ORIGINAL', 'COMMON_TEXT', 'MODIFIED_COPY'}
+CATEGORIES = ['EXACT_COPY', 'MODIFIED_COPY', 'PARAPHRASE', 'PROPERLY_CITED', 'COMMON_INSTITUTIONAL_TEXT', 'ORIGINAL_UNRELATED']
+PARAPHRASE_NEIGHBOURS = {'PARAPHRASE', 'ORIGINAL_UNRELATED', 'COMMON_INSTITUTIONAL_TEXT', 'MODIFIED_COPY'}
 
 COMMON_MARKERS = [
     'بناء على ما تقدم', 'مما لا شك فيه', 'في ضوء ما سبق',
     'من الجدير بالذكر', 'يتضح مما سبق', 'وفقاً لما تقدم',
-    'مما تقدم يتبين', 'استناداً للمعطيات'
+    'مما تقدم يتبين', 'استناداً للمعطيات', 'بعد الاطلاع على',
+    'قرر مجلس الوزراء', 'لجنة المناقشة والحكم', 'خالص الشكر والتقدير'
 ]
 
 
@@ -49,7 +52,7 @@ def classify_pair(source_text: str, submitted_text: str, para_threshold: float) 
     # 1. فحص الاستشهاد
     cite_check = detect_citation(submitted_text)
     if cite_check.is_cited:
-        return 'CITED_QUOTE'
+        return 'PROPERLY_CITED'
 
     # 2. فحص النسخ الحرفي
     src_aggr = normalize_aggressive(source_text)
@@ -58,8 +61,8 @@ def classify_pair(source_text: str, submitted_text: str, para_threshold: float) 
     if src_aggr == sub_aggr:
         return 'EXACT_COPY'
 
-    src_shingles = [get_shingles(src_aggr, size=4)]
-    sub_shingles = get_shingles(sub_aggr, size=4)
+    src_shingles = [get_shingles(src_aggr, size=config.DEFAULT_SETTINGS.get('shingle_size', 5))]
+    sub_shingles = get_shingles(sub_aggr, size=config.DEFAULT_SETTINGS.get('shingle_size', 5))
 
     exact_res = match_exact_or_near_copy(
         query_shingles=sub_shingles,
@@ -67,7 +70,7 @@ def classify_pair(source_text: str, submitted_text: str, para_threshold: float) 
         candidate_indices=[0],
         corpus_shingles=src_shingles,
         corpus_norm_texts=[src_aggr],
-        threshold=0.35
+        threshold=config.DEFAULT_SETTINGS.get('jaccard_threshold', 0.40)
     )
 
     if exact_res:
@@ -80,7 +83,7 @@ def classify_pair(source_text: str, submitted_text: str, para_threshold: float) 
     # 3. فحص التراكيب الشائعة (قبل paraphrase لتجنب FP)
     sub_light_early = normalize_light(submitted_text)
     if any(m in sub_light_early for m in COMMON_MARKERS):
-        return 'COMMON_TEXT'
+        return 'COMMON_INSTITUTIONAL_TEXT'
 
     # 4. فحص إعادة الصياغة اللفظية بالعتبة المُختبَرة
     src_light = normalize_light(source_text)
@@ -98,7 +101,7 @@ def classify_pair(source_text: str, submitted_text: str, para_threshold: float) 
         if score >= para_threshold:
             return 'PARAPHRASE'
 
-    return 'ORIGINAL'
+    return 'ORIGINAL_UNRELATED'
 
 
 def evaluate_at_threshold(samples: list, threshold: float) -> dict:
@@ -106,9 +109,13 @@ def evaluate_at_threshold(samples: list, threshold: float) -> dict:
     confusion = {a: {p: 0 for p in CATEGORIES} for a in CATEGORIES}
     correct = 0
 
-    for item in samples:
-        actual = item['expected_category']
-        predicted = classify_pair(item['source_text'], item['submitted_text'], threshold)
+    valid_samples = [s for s in samples if (s.get('expected_class') or s.get('expected_category')) in CATEGORIES]
+
+    for item in valid_samples:
+        actual = item.get('expected_class') or item.get('expected_category')
+        src = item.get('reference_text') or item.get('source_text', '')
+        sub = item.get('query_text') or item.get('submitted_text', '')
+        predicted = classify_pair(src, sub, threshold)
         confusion[actual][predicted] += 1
         if actual == predicted:
             correct += 1
@@ -126,11 +133,11 @@ def evaluate_at_threshold(samples: list, threshold: float) -> dict:
     f1        = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
 
     # خلط PARAPHRASE مع جيرانها
-    paraphrase_as_original  = confusion['PARAPHRASE']['ORIGINAL']
-    paraphrase_as_common    = confusion['PARAPHRASE']['COMMON_TEXT']
+    paraphrase_as_original  = confusion['PARAPHRASE']['ORIGINAL_UNRELATED']
+    paraphrase_as_common    = confusion['PARAPHRASE']['COMMON_INSTITUTIONAL_TEXT']
     paraphrase_as_modified  = confusion['PARAPHRASE']['MODIFIED_COPY']
-    original_as_paraphrase  = confusion['ORIGINAL']['PARAPHRASE']
-    common_as_paraphrase    = confusion['COMMON_TEXT']['PARAPHRASE']
+    original_as_paraphrase  = confusion['ORIGINAL_UNRELATED']['PARAPHRASE']
+    common_as_paraphrase    = confusion['COMMON_INSTITUTIONAL_TEXT']['PARAPHRASE']
     modified_as_paraphrase  = confusion['MODIFIED_COPY']['PARAPHRASE']
 
     return {
@@ -156,10 +163,10 @@ def evaluate_at_threshold(samples: list, threshold: float) -> dict:
 def print_full_confusion(confusion: dict, threshold: float):
     """طباعة مصفوفة ارتباك كاملة لعتبة معينة."""
     print(f"\n  مصفوفة الارتباك عند threshold={threshold:.2f}:")
-    header = f"  {'الفعلي\\المتوقع':<18}" + "".join(f"{c[:10]:<12}" for c in CATEGORIES)
+    header = f"  {'الفعلي\\المتوقع':<26}" + "".join(f"{c[:10]:<12}" for c in CATEGORIES)
     print(header)
     for actual in CATEGORIES:
-        row = f"  {actual:<18}"
+        row = f"  {actual:<26}"
         for pred in CATEGORIES:
             v = confusion[actual][pred]
             marker = ' *' if (actual != pred and v > 0) else '  '
@@ -179,7 +186,8 @@ def main():
     total = len(samples)
     by_cat = defaultdict(int)
     for s in samples:
-        by_cat[s['expected_category']] += 1
+        c = s.get('expected_class') or s.get('expected_category')
+        by_cat[c] += 1
 
     thresholds = [0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60]
 

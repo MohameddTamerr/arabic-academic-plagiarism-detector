@@ -1,48 +1,98 @@
 # -*- coding: utf-8 -*-
 """
-مسارات الفحص الأكاديمي ومهام المعالجة (Scan Routes):
-- فحص غير متزامن في الخلفية لضمان عدم توقف المتصفح.
-- فحص فوري متزامن للنصوص القصيرة.
-- استعلام ومتابعة التقدم.
+مسارات الفحص الأكاديمي والتحليل (Scan Routes)
 """
 
 import os
 import uuid
-from werkzeug.utils import secure_filename
 from flask import Blueprint, request, jsonify
+from werkzeug.utils import secure_filename
 
 import config
 from app.services.scan_service import start_async_scan, get_scan_status
-from plagiarism_detector.extraction.page_extractor import extract_document_pages
-from plagiarism_detector.reporting.report_builder import analyze_academic_document
-from app.services.settings_service import get_current_settings
 from app.repositories import report_repo
+from app.security.authorization import require_permission, get_authenticated_user
+from app.security.permissions import Permission
+from app.services import integrity_service, audit_service, upload_validation_service
+from plagiarism_detector.reporting.report_builder import analyze_academic_document
+from plagiarism_detector.extraction.page_extractor import extract_document_pages
+from app.services.settings_service import get_current_settings
 
 scan_bp = Blueprint('scan_bp', __name__)
 
 
+@scan_bp.route('/api/scan', methods=['POST'])
 @scan_bp.route('/api/analyze_async', methods=['POST'])
-def analyze_async_route():
-    """بدء فحص أكاديمي غير متزامن في الخلفية."""
+@require_permission(Permission.SCAN_START)
+def start_scan_route():
+    """بدء فحص أكاديمي غير متزامن (صلاحية scan.start)."""
     title = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
     raw_text = request.form.get('text', '').strip()
-    file_name = ''
+    allow_rescan = request.form.get('allow_rescan', '0') in ('1', 'true', 'True')
     file_path = ''
+    file_name = ''
+    safe_stored_name = ''
+
+    current_user = get_authenticated_user()
 
     if 'file' in request.files and request.files['file'].filename:
         file = request.files['file']
-        ext = os.path.splitext(file.filename)[1].lower()
-        if ext not in config.ALLOWED_EXTENSIONS:
-            return jsonify({'error': f"نوع الملف غير مدعوم ({ext}). الصيغ المسموح بها هي: PDF, DOCX, TXT"}), 400
+        orig_name = file.filename
 
-        file_name = secure_filename(file.filename) or 'document.pdf'
+        # تدقيق وتحصين الملف المرفوع في بيئة Staging
+        val_res = upload_validation_service.validate_and_stage_upload(
+            file_stream=file,
+            original_filename=orig_name,
+            max_bytes=config.MAX_UPLOAD_BYTES,
+            allowed_extensions=config.ALLOWED_EXTENSIONS
+        )
+
+        file_hash = val_res['sha256']
+        file_name = val_res['original_filename']
         if not title:
             title = os.path.splitext(file_name)[0]
 
-        save_path = config.TEMP_UPLOAD_DIR / f"{uuid.uuid4().hex[:6]}_{file_name}"
-        file.save(save_path)
-        file_path = str(save_path)
+        # فحص التكرار الدقيق قبل إطلاق الفحص المكلف
+        if not allow_rescan and file_hash:
+            dup_info = integrity_service.check_file_duplicate_in_repository(file_hash, current_user=current_user)
+            if dup_info:
+                upload_validation_service.cleanup_staging_file(val_res['staging_path'])
+                audit_service.record_event(
+                    action="research.duplicate_detected",
+                    category="research",
+                    object_type="research",
+                    object_id=str(dup_info.get('existing_research_id', '')),
+                    research_reference_number=dup_info.get('existing_research_reference', ''),
+                    success=True,
+                    metadata={
+                        "filename": file_name,
+                        "hash_prefix": file_hash[:16],
+                        "scope": "existing_research"
+                    }
+                )
+                return jsonify(dup_info), 200
+
+        # النقل الذري من Staging إلى التخزين المعتمد
+        final_res = upload_validation_service.finalize_validated_upload(
+            val_res,
+            target_dir=config.TEMP_UPLOAD_DIR
+        )
+        safe_stored_name = final_res['stored_filename']
+        file_path = final_res['file_path']
+
+        if allow_rescan and file_hash:
+            audit_service.record_event(
+                action="research.duplicate_rescan_requested",
+                category="research",
+                object_type="research",
+                success=True,
+                metadata={
+                    "filename": file_name,
+                    "hash_prefix": file_hash[:16],
+                    "title": title
+                }
+            )
 
     task_id = start_async_scan(
         file_path=file_path,
@@ -56,8 +106,9 @@ def analyze_async_route():
 
 
 @scan_bp.route('/api/tasks/<task_id>', methods=['GET'])
+@require_permission(Permission.RESEARCH_VIEW)
 def get_task_status_route(task_id):
-    """استعلام عن تقدم مهمة الفحص."""
+    """استعلام عن تقدم مهمة الفحص (صلاحية research.view)."""
     res = get_scan_status(task_id)
     if 'error' in res and res['error'] == 'المهمة غير موجودة':
         return jsonify(res), 404
@@ -65,8 +116,9 @@ def get_task_status_route(task_id):
 
 
 @scan_bp.route('/api/analyze', methods=['POST'])
+@require_permission(Permission.SCAN_START)
 def analyze_sync_route():
-    """فحص متزامن سريع للنصوص المباشرة."""
+    """فحص متزامن سريع للنصوص المباشرة (صلاحية scan.start)."""
     title = request.form.get('title', '').strip()
     author = request.form.get('author', '').strip()
     raw_text = request.form.get('text', '').strip()
@@ -75,13 +127,23 @@ def analyze_sync_route():
 
     if 'file' in request.files and request.files['file'].filename:
         file = request.files['file']
-        file_name = secure_filename(file.filename) or 'document.pdf'
+        orig_name = file.filename
+
+        val_res = upload_validation_service.validate_and_stage_upload(
+            file_stream=file,
+            original_filename=orig_name,
+            max_bytes=config.MAX_UPLOAD_BYTES,
+            allowed_extensions=config.ALLOWED_EXTENSIONS
+        )
+        final_res = upload_validation_service.finalize_validated_upload(
+            val_res,
+            target_dir=config.TEMP_UPLOAD_DIR
+        )
+        file_path = final_res['file_path']
+        file_name = final_res['original_filename']
         if not title:
             title = os.path.splitext(file_name)[0]
 
-        save_path = config.TEMP_UPLOAD_DIR / f"{uuid.uuid4().hex[:6]}_{file_name}"
-        file.save(save_path)
-        file_path = str(save_path)
         pages_data = extract_document_pages(file_path, enable_ocr=True)
         if not raw_text:
             raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])

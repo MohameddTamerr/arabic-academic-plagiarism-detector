@@ -1,45 +1,77 @@
-# Build artifacts
+# ==============================================================================
+# Git Ignore Rules — Arabic Academic Plagiarism Detector
+# ==============================================================================
+
+# Build & distribution outputs
 dist/
 build/
 *.exe
 *.spec
 
-# Python cache
+# Python runtime & test caches
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
+*$py.class
 *.pyd
 .Python
 *.egg-info/
 .eggs/
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Vendor (third-party libs bundled locally)
-vendor/
-
-# Temp uploads & runtime files
-temp_uploads/
+# Local databases & journal files (NEVER COMMIT)
 *.db
+*.db-wal
+*.db-shm
 *.sqlite
 *.sqlite3
+Database/
+database/
+*.benchmark.db*
 
-# Scratch files
+# Operational logs & diagnostics (NEVER COMMIT)
+logs/
+Logs/
+*.log
+Diagnostics/
+diagnostics/
+
+# Content-Addressed Storage & document repositories (NEVER COMMIT)
+Storage/
+storage/
+temp_uploads/
+vendor/
+
+# System backups (NEVER COMMIT)
+Backups/
+backups/
+
+# Process PID & lock files & local runtime configs
+Config/
+config/
+*.pid
+*.lock
+.secret_key
+
+# Benchmark heavy generated datasets
+benchmark/data/
 scratch/
 
-# Environment
+# Secrets, keys, and environment overrides (NEVER COMMIT)
 .env
-.env.local
-*.env
+.env.*
+!.env.example
+secrets/
+*.key
+*.pem
 
-# IDE
+# IDE & OS specific files
 .vscode/
 .idea/
 *.suo
 *.user
-
-# OS
 .DS_Store
 Thumbs.db
 desktop.ini
-
-# Sample data
 sample_pdf_text.txt

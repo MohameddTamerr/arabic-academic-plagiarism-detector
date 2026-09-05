@@ -18,6 +18,7 @@
 
 import os
 import io
+import uuid
 import time
 import json
 import pytest
@@ -30,6 +31,7 @@ from app.repositories.base_repo import get_session
 from app.models.research_schema import Research, ResearchFile, ScanBatch, ScanBatchItem
 from app.repositories import batch_repo, report_repo, user_repo
 from app.services.scan_service import start_thesis_scan, start_batch_scan, _execute_batch_item
+from app.services import integrity_service
 import config
 
 
@@ -41,24 +43,48 @@ def app_client():
         yield client
 
 
+def _make_valid_test_pdf(text: str = "Sample") -> bytes:
+    tag_b = text.encode('utf-8', errors='ignore') or b"Sample"
+    stream_content = b"BT /F1 12 Tf 100 700 Td (" + tag_b + b") Tj ET"
+    return (
+        b"%PDF-1.4\n"
+        b"1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"
+        b"2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n"
+        b"3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R >>\nendobj\n"
+        b"4 0 obj\n<< /Length " + str(len(stream_content)).encode('ascii') + b" >>\nstream\n"
+        + stream_content + b"\nendstream\nendobj\n"
+        b"xref\n0 5\n0000000000 65535 f \n0000000009 00000 n \n0000000058 00000 n \n0000000115 00000 n \n0000000214 00000 n \n"
+        b"trailer\n<< /Size 5 /Root 1 0 R >>\nstartxref\n308\n%%EOF"
+    )
+
+
+def _make_valid_test_docx(text: str = "Sample") -> bytes:
+    import zipfile
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w', zipfile.ZIP_DEFLATED) as z:
+        z.writestr('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"></Types>')
+        z.writestr('word/document.xml', f'<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>{text}</w:t></w:r></w:p></w:body></w:document>')
+    return buf.getvalue()
+
+
 @pytest.fixture
 def temp_sample_files(tmp_path):
-    """إنشاء ملفات اختبار مؤقتة بصيغ ونصوص مختلفة."""
+    """إنشاء ملفات اختبار مؤقتة بصيغ وتواقيع رقمية صالحة."""
     # PDF 1
     pdf1 = tmp_path / "chapter1.pdf"
-    pdf1.write_text("الباب الأول: مقدمة حول الذكاء الاصطناعي والأمن السيبراني وتطبيقاته الحديثة.", encoding='utf-8')
+    pdf1.write_bytes(_make_valid_test_pdf("الباب الأول: مقدمة حول الذكاء الاصطناعي."))
 
     # PDF 2
     pdf2 = tmp_path / "chapter2.pdf"
-    pdf2.write_text("الباب الثاني: الإطار النظري والدراسات السابقة في مجال مكافحة الجرائم الإلكترونية.", encoding='utf-8')
+    pdf2.write_bytes(_make_valid_test_pdf("الباب الثاني: الإطار النظري."))
 
     # PDF 3
     pdf3 = tmp_path / "chapter3.pdf"
-    pdf3.write_text("الباب الثالث: النتائج والتوصيات والتحليل الإحصائي للبيانات المجمعة في الدراسة.", encoding='utf-8')
+    pdf3.write_bytes(_make_valid_test_pdf("الباب الثالث: النتائج والتوصيات."))
 
     # DOCX
     docx1 = tmp_path / "appendix.docx"
-    docx1.write_text("الملحق الأول: استبيان الدراسة وقائمة الخبراء المحكمين في البحث العلمي.", encoding='utf-8')
+    docx1.write_bytes(_make_valid_test_docx("الملحق الأول: استبيان الدراسة."))
 
     # TXT
     txt1 = tmp_path / "summary.txt"
@@ -186,11 +212,11 @@ def test_thesis_custom_file_ordering(app_client, temp_sample_files):
 
 
 # ─── 5. Correct original source filename/page provenance ──────────────────────
-def test_thesis_provenance_and_attribution():
+def test_thesis_provenance_and_attribution(app_client, temp_sample_files):
     """اختبار أن كل صفحة منسوبة لملفها الأصلي مع عدم تلفيق أرقام صفحات لـ DOCX."""
     file_entries = [
-        {'path': 'nonexistent_p1.pdf', 'original_filename': 'الفصل_الأول.pdf', 'file_type': 'pdf'},
-        {'path': 'nonexistent_p2.docx', 'original_filename': 'الفصل_الثاني.docx', 'file_type': 'docx'}
+        {'path': temp_sample_files['pdf1'], 'original_filename': 'الفصل_الأول.pdf', 'file_type': 'pdf'},
+        {'path': temp_sample_files['docx1'], 'original_filename': 'الفصل_الثاني.docx', 'file_type': 'docx'}
     ]
 
     mock_pages_pdf = [
@@ -203,28 +229,47 @@ def test_thesis_provenance_and_attribution():
 
     from app.services.scan_service import _execute_thesis_pipeline
 
-    with patch('app.services.scan_service.extract_document_pages') as mock_extract, \
-         patch('os.path.exists', return_value=True):
-        mock_extract.side_effect = [mock_pages_pdf, mock_pages_docx]
+    try:
+        with patch('app.services.scan_service.extract_document_pages') as mock_extract:
+            mock_extract.side_effect = [mock_pages_pdf, mock_pages_docx]
 
-        research_id = batch_repo.create_research(title='بحث العزو', author='باحث تجريبي')
-        _execute_thesis_pipeline(
-            task_id='task_prov_01',
-            research_id=research_id,
-            file_entries=file_entries,
-            title='بحث العزو',
-            author='باحث تجريبي'
-        )
+            research_id = batch_repo.create_research(title='بحث العزو', author='باحث تجريبي')
+            for idx, fe in enumerate(file_entries):
+                batch_repo.add_research_file(
+                    research_id=research_id,
+                    original_filename=fe['original_filename'],
+                    stored_filename=os.path.basename(fe['path']),
+                    file_path='',
+                    file_type=fe['file_type'],
+                    file_size_bytes=os.path.getsize(fe['path']),
+                    file_order=idx,
+                    file_hash='fakehash',
+                    storage_status='registry_only'
+                )
 
-        research = batch_repo.get_research(research_id)
-        assert research['report_id'] is not None
+            unique_task_id = f"task_prov_{uuid.uuid4().hex[:8]}"
+            _execute_thesis_pipeline(
+                task_id=unique_task_id,
+                research_id=research_id,
+                file_entries=file_entries,
+                title='بحث العزو',
+                author='باحث تجريبي'
+            )
 
-        # تحقق من التقرير المحفوظ
-        report = report_repo.get_report(research['report_id'])
-        assert report is not None
-        assert report['file_count'] == 2
-        assert 'الفصل_الأول.pdf' in report['file_names']
-        assert 'الفصل_الثاني.docx' in report['file_names']
+            research = batch_repo.get_research(research_id)
+            assert research['report_id'] is not None
+
+            # تحقق من التقرير المحفوظ
+            report = report_repo.get_report(research['report_id'])
+            assert report is not None
+            assert report['file_count'] == 2
+            assert 'الفصل_الأول.pdf' in report['file_names']
+            assert 'الفصل_الثاني.docx' in report['file_names']
+    finally:
+        if 'research_id' in locals():
+            with get_session() as session:
+                session.query(ResearchFile).filter(ResearchFile.research_id == research_id).delete()
+                session.query(Research).filter(Research.id == research_id).delete()
 
 
 # ─── 6. Three independent researches in one batch ─────────────────────────────
@@ -398,14 +443,18 @@ def test_batch_title_fallback_to_filename_without_extension():
     """اختبار أن البحث بدون عنوان صريح يتراجع لاسم الملف الأصلي بدون الامتداد فقط (وليس اسم الباحث)."""
     batch_id = batch_repo.create_batch(label='دفعة اختبار التراجع')
     r_empty_title = batch_repo.create_research(title='', author='د. سمير صبري', batch_id=batch_id)
+    t_path = config.TEMP_UPLOAD_DIR / f"test_{uuid.uuid4().hex[:6]}.pdf"
+    t_path.write_bytes(b"TEST_STRATEGIC_PLANNING_PDF_BYTES")
+    h_val, s_val = integrity_service.compute_stream_sha256(t_path)
     batch_repo.add_research_file(
         research_id=r_empty_title,
         original_filename='التخطيط_الاستراتيجي_للأمن_القومي.pdf',
-        stored_filename='stored_123.pdf',
-        file_path='/tmp/test.pdf',
+        stored_filename=t_path.name,
+        file_path=str(t_path),
         file_type='pdf',
-        file_size_bytes=1024,
-        file_order=0
+        file_size_bytes=s_val,
+        file_order=0,
+        file_hash=h_val
     )
     batch_repo.add_batch_item(batch_id, r_empty_title, 0)
 

@@ -1,0 +1,137 @@
+[
+  {
+    "experiment_id": "EXP-01",
+    "title": "Dual-Channel Candidate Retrieval (Word + Char 3-gram)",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "CandidateRetriever",
+    "changed_parameters": {
+      "indexing": "Dual-Channel Word + Char 3-gram Inverted Index",
+      "top_k": 20
+    },
+    "dataset_split": "Holdout (30% Stratified + Unseen Holdout)",
+    "metrics_delta": {
+      "Recall@1": "41.7% -> 66.7%",
+      "Recall@5": "52.8% -> 87.5%",
+      "Recall@10": "52.8% -> 93.1%",
+      "Recall@20": "52.8% -> 97.2%"
+    },
+    "runtime_impact": "p50 = 0.18ms, p95 = 0.26ms (< 15MB RAM)",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Substantially increases Recall@10 from 52.8% to 93.1% on unseen holdout with negligible latency impact and zero data leakage."
+  },
+  {
+    "experiment_id": "EXP-02",
+    "title": "Morphological Lexical Blending (char_wb fallback for Paraphrase)",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "tfidf_matcher",
+    "changed_parameters": {
+      "threshold": 0.30,
+      "analyzer": "char_wb (3,4)"
+    },
+    "dataset_split": "Holdout (30% Stratified + Unseen Hard Negatives)",
+    "metrics_delta": {
+      "Paraphrase_recall": "0.0% -> 64.7%",
+      "Original_unrelated_FP_rate": "0.0% -> 60.0%",
+      "Hard_negatives_FP_rate": "0.0% -> 66.7%"
+    },
+    "runtime_impact": "Negligible (< 0.5 ms)",
+    "decision": "REJECT",
+    "reason": "Lowering standalone char n-gram threshold to 0.30 introduces unacceptably high false-positive rates (60.0% - 66.7%) on unrelated academic texts sharing domain vocabulary."
+  },
+  {
+    "experiment_id": "EXP-03",
+    "title": "Corpus Frequency & Institutional Boilerplate Suppression",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "common_text_filter",
+    "changed_parameters": {
+      "dictionary_size": 45,
+      "granularity": "span_level"
+    },
+    "dataset_split": "Holdout (30% Stratified + Unseen Holdout Spans)",
+    "metrics_delta": {
+      "Suppression_rate": "6.0% -> 100.0%",
+      "False_overlap_rate": "44.0% -> 8.0%",
+      "Span_substantive_overlap_preserved": "100.0% (0 False Negatives)"
+    },
+    "runtime_impact": "Negligible (< 0.2 ms)",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Eliminates false overlap from institutional boilerplate while preserving 100% of substantive copied academic content at the span level."
+  },
+  {
+    "experiment_id": "EXP-04",
+    "title": "Refined Citation Detection (Excluding Isolated Years & Administrative Labels)",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "citation_detector",
+    "changed_parameters": {
+      "non_author_filter": "expanded administrative/legal dictionary + punctuation strip"
+    },
+    "dataset_split": "Holdout (Unseen Citation Test Cases)",
+    "metrics_delta": {
+      "Citation_precision": "83.3% -> 100.0% (on standard author-year)",
+      "False_citation_rate_on_years": "100.0% eliminated (0.0%)",
+      "Policy_independence": "Verified (Citation presence does not cancel overlap flag)"
+    },
+    "runtime_impact": "Negligible (< 0.1 ms)",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Eliminates false citation triggers on plan years, vision tags, and law articles without masking underlying text plagiarism."
+  },
+  {
+    "experiment_id": "EXP-05",
+    "title": "Air-Gapped Offline Semantic Fail-Closed Guarantee",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "semantic_matcher",
+    "changed_parameters": {
+      "air_gapped_policy": "STRICT_FAIL_CLOSED_NO_DOWNLOAD"
+    },
+    "dataset_split": "Holdout (Network-isolated Socket Trap)",
+    "metrics_delta": {
+      "Network_attempts": "0",
+      "Status_reported": "UNAVAILABLE",
+      "Similarity_returned": "0.0"
+    },
+    "runtime_impact": "0.0 ms (Instant fail-closed)",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Guarantees complete air-gapped security without network requests or socket calls when weights are absent."
+  },
+  {
+    "experiment_id": "EXP-06",
+    "title": "Document Segment Length Guard",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "segmenter",
+    "changed_parameters": {
+      "min_words": 4
+    },
+    "dataset_split": "Holdout (Short fragment noise)",
+    "metrics_delta": {
+      "Short_fragment_FP_matches": "Eliminated"
+    },
+    "runtime_impact": "0.0 ms",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Guards against spurious similarity hits on ultra-short sentences without affecting substantive paragraphs."
+  },
+  {
+    "experiment_id": "EXP-07",
+    "title": "Shingle Size Parameter Sweep (k=3, 4, 5)",
+    "date": "2026-09-04",
+    "baseline_version": "1.0-phase18-baseline",
+    "changed_component": "shingle_matcher",
+    "changed_parameters": {
+      "evaluated_k": [3, 4, 5]
+    },
+    "dataset_split": "Holdout (Stratified)",
+    "metrics_delta": {
+      "k=5 F1": "0.796",
+      "k=4 F1": "0.781",
+      "k=3 F1": "0.690"
+    },
+    "runtime_impact": "Minimal",
+    "decision": "ACCEPT_FOR_PRODUCTION_PROPOSAL",
+    "reason": "Confirms k=5 as the optimal production baseline providing highest F1 and lowest false overlap."
+  }
+]

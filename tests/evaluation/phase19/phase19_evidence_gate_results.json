@@ -1,0 +1,298 @@
+{
+  "gate": "FINAL_PHASE_19_EVIDENCE_GATE",
+  "timestamp": "2026-09-04 19:36:18 UTC",
+  "data_composition": {
+    "dev_samples": 225,
+    "holdout_samples": 98,
+    "unseen_holdout_samples": 11,
+    "total_evaluated_holdout": 109,
+    "DEVELOPER_SYNTHETIC": 323,
+    "DEVELOPER_SYNTHETIC_HOLDOUT": 11,
+    "EXPERT_REVIEWED": 0,
+    "REAL_ANONYMIZED": 0
+  },
+  "retrieval_generalization_EXP01": {
+    "query_count": 72,
+    "production": {
+      "recall_at_1": 0.4166666666666667,
+      "recall_at_5": 0.5277777777777778,
+      "recall_at_10": 0.5277777777777778,
+      "recall_at_20": 0.5277777777777778,
+      "p50_latency_ms": 0.0020000006770715117,
+      "p95_latency_ms": 0.008099999831756577
+    },
+    "dual_channel_holdout": {
+      "recall_at_1": 0.625,
+      "recall_at_5": 0.875,
+      "recall_at_10": 0.9305555555555556,
+      "recall_at_20": 0.9722222222222222,
+      "p50_latency_ms": 0.19285000053059775,
+      "p95_latency_ms": 0.25955999772122595
+    },
+    "remaining_misses_count": 5,
+    "remaining_misses_details": [
+      {
+        "sample_id": "para_01",
+        "expected_class": "PARAPHRASE",
+        "target_idx": 81,
+        "top_retrieved": [
+          100,
+          35,
+          66
+        ],
+        "query_snippet": "توظف الحكومات الحديثة تقنيات تعلم الآلة في تعزيز ا",
+        "target_snippet": "تعتمد الدول المتقدمة على الذكاء الاصطناعي لتطوير أ",
+        "failure_reason": "High paraphrase divergence with low morphological root overlap in top-10"
+      },
+      {
+        "sample_id": "para_02",
+        "expected_class": "PARAPHRASE",
+        "target_idx": 82,
+        "top_retrieved": [
+          19,
+          28,
+          101
+        ],
+        "query_snippet": "على الرغم من إسهام الأجهزة المحمولة في تقريب المسا",
+        "target_snippet": "أدى انتشار الهواتف الذكية إلى تسهيل التواصل الاجتم",
+        "failure_reason": "High paraphrase divergence with low morphological root overlap in top-10"
+      },
+      {
+        "sample_id": "para_16",
+        "expected_class": "PARAPHRASE",
+        "target_idx": 87,
+        "top_retrieved": [
+          96,
+          88,
+          94
+        ],
+        "query_snippet": "يستحيل التصدي للانتهاكات الرقمية الدولية دون تنسيق",
+        "target_snippet": "الجرائم السيبرانية العابرة للحدود تتطلب تعاوناً أم",
+        "failure_reason": "High paraphrase divergence with low morphological root overlap in top-10"
+      },
+      {
+        "sample_id": "para_36",
+        "expected_class": "PARAPHRASE",
+        "target_idx": 87,
+        "top_retrieved": [
+          96,
+          88,
+          94
+        ],
+        "query_snippet": "يستحيل التصدي للانتهاكات الرقمية الدولية دون تنسيق",
+        "target_snippet": "الجرائم السيبرانية العابرة للحدود تتطلب تعاوناً أم",
+        "failure_reason": "High paraphrase divergence with low morphological root overlap in top-10"
+      },
+      {
+        "sample_id": "para_41",
+        "expected_class": "PARAPHRASE",
+        "target_idx": 87,
+        "top_retrieved": [
+          96,
+          88,
+          94
+        ],
+        "query_snippet": "يستحيل التصدي للانتهاكات الرقمية الدولية دون تنسيق",
+        "target_snippet": "الجرائم السيبرانية العابرة للحدود تتطلب تعاوناً أم",
+        "failure_reason": "High paraphrase divergence with low morphological root overlap in top-10"
+      }
+    ]
+  },
+  "paraphrase_tradeoff_sweep_EXP02": {
+    "0.2": {
+      "threshold": 0.2,
+      "paraphrase_precision": 0.85,
+      "paraphrase_recall": 1.0,
+      "paraphrase_f1": 0.9189,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.6,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.25": {
+      "threshold": 0.25,
+      "paraphrase_precision": 0.8333,
+      "paraphrase_recall": 0.8824,
+      "paraphrase_f1": 0.8571,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.6,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.3": {
+      "threshold": 0.3,
+      "paraphrase_precision": 0.7857,
+      "paraphrase_recall": 0.6471,
+      "paraphrase_f1": 0.7097,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.6,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.35": {
+      "threshold": 0.35,
+      "paraphrase_precision": 0.7,
+      "paraphrase_recall": 0.4118,
+      "paraphrase_f1": 0.5185,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.6,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.4": {
+      "threshold": 0.4,
+      "paraphrase_precision": 0.0,
+      "paraphrase_recall": 0.0,
+      "paraphrase_f1": 0.0,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.4,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.45": {
+      "threshold": 0.45,
+      "paraphrase_precision": 0.0,
+      "paraphrase_recall": 0.0,
+      "paraphrase_f1": 0.0,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.0,
+      "common_text_false_overlap_rate": 0.0
+    },
+    "0.5": {
+      "threshold": 0.5,
+      "paraphrase_precision": 0.0,
+      "paraphrase_recall": 0.0,
+      "paraphrase_f1": 0.0,
+      "modified_copy_recall": 1.0,
+      "exact_copy_recall": 1.0,
+      "original_unrelated_fp_rate": 0.0,
+      "common_text_false_overlap_rate": 0.0
+    }
+  },
+  "hard_negatives_char_audit": {
+    "hard_negatives_evaluated": 3,
+    "false_positives_count": 2,
+    "false_positive_rate": 0.6666666666666666,
+    "details": [
+      {
+        "sample_id": "HOLDOUT_HN_01",
+        "char_similarity": 0.4261,
+        "is_false_positive_at_0.40": true,
+        "domain": "law"
+      },
+      {
+        "sample_id": "HOLDOUT_HN_02",
+        "char_similarity": 0.4137,
+        "is_false_positive_at_0.40": true,
+        "domain": "cs"
+      },
+      {
+        "sample_id": "HOLDOUT_HN_03",
+        "char_similarity": 0.3928,
+        "is_false_positive_at_0.40": false,
+        "domain": "education"
+      }
+    ]
+  },
+  "common_text_span_safety_EXP03": {
+    "span_tests_evaluated": 2,
+    "all_substantive_overlaps_preserved": true,
+    "details": [
+      {
+        "sample_id": "HOLDOUT_SPAN_01",
+        "full_text_suppressed_as_harmless": false,
+        "substantive_overlap_detected": true,
+        "safety_verdict": "SAFE"
+      },
+      {
+        "sample_id": "HOLDOUT_SPAN_02",
+        "full_text_suppressed_as_harmless": false,
+        "substantive_overlap_detected": true,
+        "safety_verdict": "SAFE"
+      }
+    ]
+  },
+  "citation_generalization_EXP04": {
+    "precision": 0.6667,
+    "recall": 0.6667,
+    "f1_score": 0.6667,
+    "false_citation_rate": 0.1667,
+    "sample_evaluations": [
+      {
+        "sample_id": "HOLDOUT_CIT_YEAR_ONLY",
+        "is_cited": false,
+        "citation_type": "none",
+        "detail": "",
+        "expected_cited": false,
+        "status": "CORRECT_NON_CITATION"
+      },
+      {
+        "sample_id": "HOLDOUT_CIT_LAW_ARTICLE",
+        "is_cited": false,
+        "citation_type": "none",
+        "detail": "",
+        "expected_cited": false,
+        "status": "CORRECT_NON_CITATION"
+      },
+      {
+        "sample_id": "HOLDOUT_CIT_MULTI_AUTHOR",
+        "is_cited": true,
+        "citation_type": "author_year",
+        "detail": "توثيق أكاديمي: (القحطاني والعتيبي، 2022، ص. 88)",
+        "expected_cited": true,
+        "status": "CORRECT_CITATION"
+      },
+      {
+        "sample_id": "HOLDOUT_CIT_MIXED_EN_AR",
+        "is_cited": false,
+        "citation_type": "none",
+        "detail": "",
+        "expected_cited": true,
+        "status": "MISSED_CITATION"
+      },
+      {
+        "sample_id": "HOLDOUT_CIT_POLICY_COPY_CITED",
+        "is_cited": true,
+        "citation_type": "quoted_brackets",
+        "detail": "اقتباس منصوص: «يعتبر التزوير في المحررات الرسمية جناية ...»",
+        "expected_cited": true,
+        "status": "CORRECT_CITATION"
+      },
+      {
+        "sample_id": "HOLDOUT_CIT_POLICY_COPY_UNCITED_WITH_UNRELATED_REF",
+        "is_cited": true,
+        "citation_type": "author_year",
+        "detail": "توثيق أكاديمي: (الغامدي، 2019)",
+        "expected_cited": false,
+        "status": "FALSE_CITATION"
+      }
+    ]
+  },
+  "combined_system_holdout_metrics": {
+    "EXACT_COPY": {
+      "tp": 17,
+      "fp": 1,
+      "fn": 2,
+      "support": 19
+    },
+    "MODIFIED_COPY": {
+      "tp": 0,
+      "fp": 7,
+      "fn": 18,
+      "support": 18
+    },
+    "PARAPHRASE": {
+      "tp": 0,
+      "fp": 41,
+      "fn": 17,
+      "support": 17
+    },
+    "ORIGINAL": {
+      "tp": 3,
+      "fp": 40,
+      "fn": 2,
+      "support": 5
+    }
+  }
+}
