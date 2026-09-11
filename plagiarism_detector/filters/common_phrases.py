@@ -61,7 +61,29 @@ EXPANDED_COMMON_INSTITUTIONAL_MARKERS = [
 ]
 
 # تجهيز النسخ المطبوعة للتطابق السريع
-_NORM_MARKERS = [(m, normalize_aggressive(m)) for m in EXPANDED_COMMON_INSTITUTIONAL_MARKERS]
+_CUSTOM_PHRASES_RUNTIME: list = []  # تُحدَّث في وقت التشغيل بدون إعادة تشغيل
+
+
+def _load_custom_phrases_from_disk() -> list:
+    """تحميل الجمل المخصصة من ملف JSON عند بدء التشغيل."""
+    try:
+        import json
+        import config as _cfg
+        _path = _cfg.CONFIG_DIR / 'custom_phrases.json'
+        if _path.exists():
+            with open(_path, 'r', encoding='utf-8') as _f:
+                _data = json.load(_f)
+                if isinstance(_data, list):
+                    return [str(p) for p in _data if p]
+    except Exception:
+        pass
+    return []
+
+
+# تحميل الجمل المخصصة عند الإقلاع
+_CUSTOM_PHRASES_RUNTIME = _load_custom_phrases_from_disk()
+
+_NORM_MARKERS = [(m, normalize_aggressive(m)) for m in EXPANDED_COMMON_INSTITUTIONAL_MARKERS + _CUSTOM_PHRASES_RUNTIME]
 
 
 def is_common_institutional_text(text: str, mode: str = 'span_level') -> bool:

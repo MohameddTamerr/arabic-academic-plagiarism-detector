@@ -31,14 +31,23 @@ from app.routes.system_routes import system_bp
 from app.routes.batch_routes import batch_bp
 from app.routes.audit_routes import audit_bp
 from app.routes.job_routes import job_bp
+from app.routes.recovery_routes import recovery_bp
+from app.routes.user_routes import user_bp
+from app.routes.thesis_routes import thesis_bp
+from app.routes.common_phrases_routes import common_phrases_bp
 
 
 def create_app() -> Flask:
     # 1. تهيئة التسجيل المركزي
     setup_logging()
 
-    template_dir = config.BASE_DIR / 'templates'
-    static_dir = config.BASE_DIR / 'static'
+    bundle_dir = getattr(config, 'BUNDLE_DIR', config.BASE_DIR)
+    template_dir = bundle_dir / 'templates'
+    if not template_dir.exists():
+        template_dir = config.BASE_DIR / 'templates'
+    static_dir = bundle_dir / 'static'
+    if not static_dir.exists():
+        static_dir = config.BASE_DIR / 'static'
 
     app = Flask(
         __name__,
@@ -82,6 +91,10 @@ def create_app() -> Flask:
     app.register_blueprint(batch_bp)
     app.register_blueprint(audit_bp)
     app.register_blueprint(job_bp)
+    app.register_blueprint(recovery_bp)
+    app.register_blueprint(user_bp)
+    app.register_blueprint(thesis_bp)
+    app.register_blueprint(common_phrases_bp)
 
     @app.route('/')
     def index():
@@ -90,7 +103,10 @@ def create_app() -> Flask:
     @app.route('/static/logo.png')
     @app.route('/logo.png')
     def get_logo():
-        logo_path = config.BASE_DIR / 'Police-Academy-College-of-Graduate-Studies.png'
+        bundle_dir = getattr(config, 'BUNDLE_DIR', config.BASE_DIR)
+        logo_path = bundle_dir / 'Police-Academy-College-of-Graduate-Studies.png'
+        if not logo_path.exists():
+            logo_path = config.BASE_DIR / 'Police-Academy-College-of-Graduate-Studies.png'
         if logo_path.exists():
             return send_file(str(logo_path), mimetype='image/png')
         return '', 404

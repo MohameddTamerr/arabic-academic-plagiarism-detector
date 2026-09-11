@@ -7,26 +7,55 @@
 
 import os
 import secrets
+import sys
+import tempfile
 from pathlib import Path
 
 # المسارات الأساسية للنظام
 BASE_DIR = Path(__file__).resolve().parent
 
-# مسارات النمط المحمول والتوزيع المستقل (Portable Offline Deployment Layout)
-PORTABLE_MODE = os.environ.get('PORTABLE_MODE', '0') == '1'
+# مسار الحزمة المجمعة (Frozen Bundle Directory)
+IS_FROZEN = getattr(sys, 'frozen', False)
+BUNDLE_DIR = Path(getattr(sys, '_MEIPASS', BASE_DIR)).resolve()
+
+# مسارات النمط المحمول ونمط الملف التنفيذي الموحد (Single EXE & Portable Layout)
+SINGLE_EXE_MODE = IS_FROZEN or os.environ.get('SINGLE_EXE_MODE', '0') == '1'
+PORTABLE_MODE = SINGLE_EXE_MODE or os.environ.get('PORTABLE_MODE', '0') == '1'
+PRODUCTION_MODE = SINGLE_EXE_MODE or PORTABLE_MODE or os.environ.get('PRODUCTION_MODE', '0') == '1'
 PORTABLE_ROOT = Path(os.environ.get('PORTABLE_ROOT', BASE_DIR)).resolve()
+
 
 # مجلد بيانات التطبيق المحلي (أوفلاين)
 _RAW_APPDATA = os.environ.get('APPDATA', os.path.expanduser('~'))
+_RAW_LOCALAPPDATA = os.environ.get('LOCALAPPDATA', _RAW_APPDATA)
 LIVE_DEFAULT_SQLITE_PATH = (Path(_RAW_APPDATA) / 'ArabicPlagiarismDetector' / 'papers.db').resolve()
+LIVE_SINGLE_EXE_SQLITE_PATH = (Path(_RAW_LOCALAPPDATA) / 'ArabicAcademicPlagiarismSystem' / 'Data' / 'Database' / 'papers.db').resolve()
 
-if PORTABLE_MODE:
+if SINGLE_EXE_MODE:
+    DATA_ROOT = Path(os.environ.get('ARABIC_APP_DATA_DIR', Path(_RAW_LOCALAPPDATA) / 'ArabicAcademicPlagiarismSystem' / 'Data')).resolve()
+    APPDATA_DIR = DATA_ROOT
+    DATABASE_DIR = Path(os.environ.get('DATABASE_DIR', DATA_ROOT / 'Database'))
+    CONFIG_DIR = Path(os.environ.get('CONFIG_DIR', DATA_ROOT / 'Config'))
+    LOGS_DIR = Path(os.environ.get('LOGS_DIR', DATA_ROOT / 'Logs'))
+    STORAGE_ROOT = Path(os.environ.get('STORAGE_ROOT', DATA_ROOT / 'Storage'))
+    BACKUP_DIR = Path(os.environ.get('BACKUP_DIR', DATA_ROOT / 'Backups'))
+    DIAGNOSTICS_DIR = Path(os.environ.get('DIAGNOSTICS_DIR', DATA_ROOT / 'Diagnostics'))
+elif PORTABLE_MODE:
     APPDATA_DIR = PORTABLE_ROOT
     DATABASE_DIR = Path(os.environ.get('DATABASE_DIR', PORTABLE_ROOT / 'Database'))
     CONFIG_DIR = Path(os.environ.get('CONFIG_DIR', PORTABLE_ROOT / 'Config'))
     LOGS_DIR = Path(os.environ.get('LOGS_DIR', PORTABLE_ROOT / 'Logs'))
     STORAGE_ROOT = Path(os.environ.get('STORAGE_ROOT', PORTABLE_ROOT / 'Storage'))
     BACKUP_DIR = Path(os.environ.get('BACKUP_DIR', PORTABLE_ROOT / 'Backups'))
+    DIAGNOSTICS_DIR = Path(os.environ.get('DIAGNOSTICS_DIR', PORTABLE_ROOT / 'Diagnostics'))
+elif os.environ.get('TESTING') == '1' and 'APPDATA_OVERRIDE' not in os.environ:
+    APPDATA_DIR = Path(tempfile.gettempdir()) / 'ArabicPlagiarismDetector_test'
+    DATABASE_DIR = APPDATA_DIR
+    CONFIG_DIR = APPDATA_DIR
+    LOGS_DIR = Path(os.environ.get('LOGS_DIR', APPDATA_DIR / 'logs'))
+    STORAGE_ROOT = Path(os.environ.get('STORAGE_ROOT', APPDATA_DIR / 'storage'))
+    BACKUP_DIR = Path(os.environ.get('BACKUP_DIR', STORAGE_ROOT / 'backups'))
+    DIAGNOSTICS_DIR = Path(os.environ.get('DIAGNOSTICS_DIR', APPDATA_DIR / 'diagnostics'))
 else:
     APPDATA_DIR = Path(os.environ.get('APPDATA_OVERRIDE', _RAW_APPDATA)) / 'ArabicPlagiarismDetector'
     DATABASE_DIR = APPDATA_DIR
@@ -34,6 +63,8 @@ else:
     LOGS_DIR = Path(os.environ.get('LOGS_DIR', APPDATA_DIR / 'logs'))
     STORAGE_ROOT = Path(os.environ.get('STORAGE_ROOT', APPDATA_DIR / 'storage'))
     BACKUP_DIR = Path(os.environ.get('BACKUP_DIR', STORAGE_ROOT / 'backups'))
+    DIAGNOSTICS_DIR = Path(os.environ.get('DIAGNOSTICS_DIR', APPDATA_DIR / 'diagnostics'))
+
 
 # التأكد من إنشاء المجلدات المطلوبة محلياً
 APPDATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -42,6 +73,16 @@ CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 STORAGE_ROOT.mkdir(parents=True, exist_ok=True)
 BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+DIAGNOSTICS_DIR.mkdir(parents=True, exist_ok=True)
+
+# تطبيق سمة الإخفاء في بيئة ويندوز (استعراض ملفات) دون إخفاء السجلات أو النسخ الاحتياطية
+if sys.platform == "win32" and (SINGLE_EXE_MODE or PORTABLE_MODE):
+    try:
+        from app.utils.windows_security import apply_windows_hidden_attribute
+        apply_windows_hidden_attribute(DATABASE_DIR)
+        apply_windows_hidden_attribute(CONFIG_DIR)
+    except Exception:
+        pass
 
 # مسار التخزين وقواعد البيانات (محلي دائماً على القرص الصلب)
 DEFAULT_SQLITE_PATH = (DATABASE_DIR / 'papers.db').resolve()
@@ -89,7 +130,7 @@ TEMP_UPLOAD_DIR = Path(os.environ.get('TEMP_UPLOAD_DIR', STORAGE_ROOT / 'temp_up
 TEMP_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # مجلد النماذج المحلية أوفلاين
-MODELS_DIR = BASE_DIR / 'models'
+MODELS_DIR = BUNDLE_DIR / 'models'
 SEMANTIC_MODEL_PATH = Path(os.environ.get('SEMANTIC_MODEL_PATH', MODELS_DIR / 'semantic_model'))
 
 # مفتاح الجلسة الآمن (Flask Secret Key)
@@ -113,13 +154,14 @@ SETTINGS_FILE = CONFIG_DIR / 'academic_settings.json'
 # إعدادات تشغيل الخادم
 HOST = os.environ.get('HOST', '127.0.0.1')
 PORT = int(os.environ.get('PORT', 5000))
-DEBUG = os.environ.get('FLASK_DEBUG', '0') == '1'
+DEBUG = False if PRODUCTION_MODE else (os.environ.get('FLASK_DEBUG', '0') == '1')
+
 
 # الحدود الأكاديمية الافتراضية القابلة للتخصيص
 DEFAULT_SETTINGS = {
-    'shingle_size': 5,                     # حجم متوالية الكلمات لكشف النسخ الحرفي
-    'jaccard_threshold': 0.40,             # عتبة النسخ الحرفي (Jaccard >= 40%)
-    'tfidf_threshold': 0.40,               # عتبة إعادة الصياغة اللفظية (Cosine >= 40%)
+    'shingle_size': 4,                     # حجم متوالية الكلمات لكشف النسخ الحرفي (4 أنسب للعربي)
+    'jaccard_threshold': 0.33,             # عتبة النسخ الحرفي (Jaccard >= 33%) — خُفِّضت لتناسب التصريف العربي
+    'tfidf_threshold': 0.35,               # عتبة إعادة الصياغة اللفظية (Cosine >= 35%)
     'semantic_threshold': 0.70,            # عتبة التشابه الدلالي (Semantic >= 70%)
     'min_sentence_words': 4,               # الحد الأدنى لكلمات الجملة المعتبرة
     'allowed_similarity_pct': 20.0,        # النسبة الكلية المسموح بها للاستلال
@@ -127,7 +169,7 @@ DEFAULT_SETTINGS = {
     'max_allowed_pages_per_source': 5.0,   # الحد الأقصى للصفحات المقتبسة من مرجع واحد
     'enable_semantic_model': False,        # النموذج الدلالي (معطل افتراضياً لسرعة المعالج)
     'enable_ocr': True,                    # تفعيل OCR المشروط عند توفر Tesseract
-    'detection_profile': 'LIGHT',          # أنماط الكشف: LIGHT, BALANCED, ADVANCED
+    'detection_profile': 'BALANCED',       # أنماط الكشف: LIGHT, BALANCED, ADVANCED
     'max_candidate_retrieval': 50,         # أقصى عدد مرشحين للفقرة الواحدة لتفادي البطء
     'candidate_retrieval_mode': 'dual_channel',  # نمط الاسترجاع: 'dual_channel' (RC2) أو 'baseline' (RC1)
     'common_text_filter_mode': 'span_level',    # فلترة النصوص الشائعة: 'span_level' (RC2) أو 'baseline' (RC1)
@@ -142,26 +184,29 @@ ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
 BCRYPT_ROUNDS = 12
 
 # الحدود القصوى للأحجام والملفات
-MAX_UPLOAD_BYTES = int(os.environ.get('MAX_UPLOAD_BYTES', 50 * 1024 * 1024))          # 50 MB للملف الفردي
-MAX_BATCH_TOTAL_BYTES = int(os.environ.get('MAX_BATCH_TOTAL_BYTES', 150 * 1024 * 1024)) # 150 MB لإجمالي الدفعة
-MAX_THESIS_TOTAL_BYTES = int(os.environ.get('MAX_THESIS_TOTAL_BYTES', 100 * 1024 * 1024)) # 100 MB لإجمالي الرسالة
-MAX_REFERENCE_UPLOAD_BYTES = int(os.environ.get('MAX_REFERENCE_UPLOAD_BYTES', 50 * 1024 * 1024)) # 50 MB لملف المرجع
+MAX_UPLOAD_BYTES = int(os.environ.get('MAX_UPLOAD_BYTES', 500 * 1024 * 1024))          # 500 MB للملف الفردي
+MAX_BATCH_TOTAL_BYTES = int(os.environ.get('MAX_BATCH_TOTAL_BYTES', 1024 * 1024 * 1024)) # 1024 MB لإجمالي الدفعة
+MAX_THESIS_TOTAL_BYTES = int(os.environ.get('MAX_THESIS_TOTAL_BYTES', 500 * 1024 * 1024)) # 500 MB لإجمالي الرسالة
+MAX_REFERENCE_UPLOAD_BYTES = int(os.environ.get('MAX_REFERENCE_UPLOAD_BYTES', 500 * 1024 * 1024)) # 500 MB لملف المرجع
 
-MAX_FILES_PER_BATCH = int(os.environ.get('MAX_FILES_PER_BATCH', 30))
-MAX_FILES_PER_THESIS = int(os.environ.get('MAX_FILES_PER_THESIS', 20))
+MAX_FILES_PER_BATCH = int(os.environ.get('MAX_FILES_PER_BATCH', 100))
+MAX_FILES_PER_THESIS = int(os.environ.get('MAX_FILES_PER_THESIS', 50))
 
-MAX_PDF_PAGES = int(os.environ.get('MAX_PDF_PAGES', 1000))
-MAX_DOCX_ENTRIES = int(os.environ.get('MAX_DOCX_ENTRIES', 1000))
-MAX_DOCX_UNCOMPRESSED_BYTES = int(os.environ.get('MAX_DOCX_UNCOMPRESSED_BYTES', 100 * 1024 * 1024)) # 100 MB
-MAX_DOCX_COMPRESSION_RATIO = float(os.environ.get('MAX_DOCX_COMPRESSION_RATIO', 50.0))
-MAX_DOCX_SINGLE_ENTRY_BYTES = int(os.environ.get('MAX_DOCX_SINGLE_ENTRY_BYTES', 30 * 1024 * 1024)) # 30 MB
-MAX_TXT_BYTES = int(os.environ.get('MAX_TXT_BYTES', 20 * 1024 * 1024)) # 20 MB
+MAX_PDF_PAGES = int(os.environ.get('MAX_PDF_PAGES', 10000))
+MAX_DOCX_ENTRIES = int(os.environ.get('MAX_DOCX_ENTRIES', 5000))
+MAX_DOCX_UNCOMPRESSED_BYTES = int(os.environ.get('MAX_DOCX_UNCOMPRESSED_BYTES', 500 * 1024 * 1024)) # 500 MB
+MAX_DOCX_COMPRESSION_RATIO = float(os.environ.get('MAX_DOCX_COMPRESSION_RATIO', 100.0))
+MAX_DOCX_SINGLE_ENTRY_BYTES = int(os.environ.get('MAX_DOCX_SINGLE_ENTRY_BYTES', 100 * 1024 * 1024)) # 100 MB
+MAX_TXT_BYTES = int(os.environ.get('MAX_TXT_BYTES', 100 * 1024 * 1024)) # 100 MB
 
-MAX_CONTENT_LENGTH = MAX_BATCH_TOTAL_BYTES  # سقف طلب Flask الإجمالي (150 MB)
+MAX_CONTENT_LENGTH = MAX_BATCH_TOTAL_BYTES  # سقف طلب Flask الإجمالي (1024 MB)
 
 # الحد الأقصى لعمليات الفحص والمهام المتزامنة لحماية موارد الخادم (Phase 17 Concurrency Bounds)
 MAX_CONCURRENT_SCANS = int(os.environ.get('MAX_CONCURRENT_SCANS', 2))
-MAX_CONCURRENT_OCR_JOBS = int(os.environ.get('MAX_CONCURRENT_OCR_JOBS', 1))
+_DEFAULT_OCR_CONCURRENCY = 2 if (os.cpu_count() or 1) >= 4 else 1
+MAX_CONCURRENT_OCR_JOBS = max(1, int(os.environ.get('MAX_CONCURRENT_OCR_JOBS', _DEFAULT_OCR_CONCURRENCY)))
+PDF_OCR_WORKERS = max(1, int(os.environ.get('PDF_OCR_WORKERS', MAX_CONCURRENT_OCR_JOBS)))
+PDF_OCR_DPI = max(150, min(300, int(os.environ.get('PDF_OCR_DPI', 220))))
 MAX_CONCURRENT_INDEX_BUILDS = int(os.environ.get('MAX_CONCURRENT_INDEX_BUILDS', 1))
 MAX_CONCURRENT_BACKUPS = int(os.environ.get('MAX_CONCURRENT_BACKUPS', 1))
 OCR_LOCK_TIMEOUT_SECONDS = int(os.environ.get('OCR_LOCK_TIMEOUT_SECONDS', 60))
@@ -197,7 +242,7 @@ AUTH_COOKIE_HTTPONLY = True
 AUTH_COOKIE_SAMESITE = os.environ.get('AUTH_COOKIE_SAMESITE', 'Lax')
 AUTH_COOKIE_SECURE = os.environ.get('AUTH_COOKIE_SECURE', 'false').lower() in ('true', '1', 'yes')
 AUTH_CSRF_ENABLED = os.environ.get('AUTH_CSRF_ENABLED', 'true').lower() in ('true', '1', 'yes')
-APP_ENV = os.environ.get('APP_ENV', 'development')
+APP_ENV = 'production' if PRODUCTION_MODE else os.environ.get('APP_ENV', 'development')
 
 
 

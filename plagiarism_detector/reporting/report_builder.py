@@ -447,6 +447,11 @@ def analyze_academic_document(
                 top_k=settings['max_candidate_retrieval'],
                 mode=retrieval_mode
             )
+            if excluded_doc_ids:
+                token_candidates = [
+                    cand_idx for cand_idx in token_candidates
+                    if corpus_metadata[cand_idx]['doc_id'] not in excluded_doc_ids
+                ]
             if token_candidates:
                 res_b = match_lexical_paraphrase(
                     query_norm_text=eval_light,
@@ -503,13 +508,18 @@ def analyze_academic_document(
     problematic_words = 0
     clean_total_words = 0
 
+    # إعادة بناء إحصائيات المصادر بعد استبعاد Bibliography لضمان توافق نسب المصادر مع overall_pct
+    words_by_source_clean: dict[int, int] = defaultdict(int)
+    pages_by_source_clean: dict[int, set] = defaultdict(set)
+
     for seg in processed_segments:
         w_cnt = len(seg['text'].split())
-        clean_total_words += w_cnt
 
         if seg.get('is_bibliography'):
-            # استبعاد فقرات المراجع من الاستلال الإشكالي والنسخ
+            # استبعاد فقرات المراجع من البسط والمقام معاً لتفادي تضخم النسب
             continue
+
+        clean_total_words += w_cnt
 
         if seg['status'] == 'copied':
             copied_words += w_cnt
@@ -519,6 +529,12 @@ def analyze_academic_document(
             problematic_words += w_cnt
         elif seg['status'] == 'cited':
             cited_words += w_cnt
+
+        # إعادة تجميع كلمات المصادر من النص القابل للتحليل فقط
+        s_id = seg.get('source_id')
+        if s_id is not None and seg['status'] in ('copied', 'paraphrased', 'cited'):
+            words_by_source_clean[s_id] += w_cnt
+            pages_by_source_clean[s_id].add(seg.get('source_page'))
 
     total_safe_words = max(clean_total_words, 1)
     matched_total_words = copied_words + para_words + cited_words
@@ -533,10 +549,10 @@ def analyze_academic_document(
     # 6. تفاصيل المصادر ومنطق الصفحات المسموحة (Phase 8)
     sources_list = []
     exceeded_sources = []
-    for s_id, s_words in words_by_source.items():
+    for s_id, s_words in words_by_source_clean.items():
         s_title = source_info[s_id]['title']
         s_author = source_info[s_id]['author']
-        s_pages_set = pages_by_source[s_id]
+        s_pages_set = pages_by_source_clean[s_id]
 
         allowance = compute_source_allowance(
             source_id=s_id,

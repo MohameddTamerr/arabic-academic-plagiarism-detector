@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -508,28 +508,25 @@
 
         /* ─── Print & Responsive Shell Hardening ─────────────────────── */
         @media print {
-            html, body {
-                height: auto !important;
-                min-height: auto !important;
-                overflow: visible !important;
-                display: block !important;
-                background: #ffffff !important;
-            }
-            .topbar, .sidebar, #login-screen, .modal {
-                display: none !important;
-            }
-            .app-container {
-                height: auto !important;
-                overflow: visible !important;
-                display: block !important;
-            }
-            .main-content {
-                height: auto !important;
-                overflow: visible !important;
-                padding: 0 !important;
-                display: block !important;
-            }
+            html, body { height:auto!important;min-height:auto!important;overflow:visible!important;display:block!important;background:#fff!important;color:#000!important;font-size:12pt!important; }
+            .topbar,.sidebar,#login-screen,.modal,#hover-popover,.toast-container,#scan-notification-toast,.page-header-actions,#evidence-comparison-container,#load-more-evidence-btn { display:none!important; }
+            #risk-verdict-banner { display:flex!important; }
+            .app-container,.main-content { height:auto!important;overflow:visible!important;display:block!important;padding:0!important;width:100%!important; }
+            .view-section { display:none!important; }
+            .view-section.active { display:block!important; }
+            .print-header { display:block!important;text-align:center;border-bottom:3px double #1e3a5f;padding-bottom:14px;margin-bottom:20px; }
+            .print-header h1 { font-size:16pt;color:#1e3a5f;margin:0 0 4px 0; }
+            .print-header p  { font-size:10pt;color:#555;margin:0; }
+            .card { border:1px solid #ccc!important;box-shadow:none!important;page-break-inside:avoid;background:#fff!important; }
+            .report-metrics-grid { grid-template-columns:repeat(5,1fr)!important;gap:8px!important; }
+            .custom-table th { background:#1e3a5f!important;color:#fff!important;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
+            .custom-table td,.custom-table th { border:1px solid #ddd!important;padding:6px 10px!important; }
+            .highlight-copied { background:#ffe4e4!important;border-bottom:1.5px solid #c00!important;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
+            .highlight-paraphrased { background:#fff3e0!important;border-bottom:1.5px solid #f90!important;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
+            .highlight-cited { background:#e6f9f0!important;border-bottom:1.5px solid #090!important;-webkit-print-color-adjust:exact;print-color-adjust:exact; }
+            @page { margin:18mm; }
         }
+        .print-header { display:none; }
 
         @media (max-width: 960px) {
             .sidebar {
@@ -1761,7 +1758,14 @@
                     <svg class="nav-icon-svg" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     <span>حالة النظام</span>
                 </a>
-                <a class="nav-item" data-view="help" onclick="switchView('help')">
+                                <a class="nav-item admin-only" data-view="stats-dashboard" onclick="switchView('stats-dashboard')" id="nav-stats-dashboard">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><rect x="2" y="2" width="8" height="8" rx="1"/><rect x="14" y="2" width="8" height="8" rx="1"/><rect x="2" y="14" width="8" height="8" rx="1"/><rect x="14" y="14" width="8" height="8" rx="1"/></svg>
+                    <span>لوحة الإحصائيات</span>
+                </a>
+                <a class="nav-item admin-only" data-view="common-phrases" onclick="switchView('common-phrases')" id="nav-common-phrases">
+                    <svg class="nav-icon-svg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>الجمل الشائعة</span>
+                </a><a class="nav-item" data-view="help" onclick="switchView('help')">
                     <svg class="nav-icon-svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
                     <span>المساعدة</span>
                 </a>
@@ -2337,6 +2341,7 @@
 
                 <!-- Submitter Notice Banner -->
                 <div id="report-submitted-banner" style="display: none; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; align-items: center; gap: 12px;">
+                <div style='display:flex;justify-content:flex-start;margin:12px 0 0;'><button onclick="printReport()" style="background:#1e3a5f;color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;" title="طباعة التقرير كـ PDF"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' style='width:15px;height:15px;'><polyline points='6 9 6 2 18 2 18 9'/><path d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/><rect x='6' y='14' width='12' height='8'/></svg>طباعة / PDF</button></div>
                     <div style="width:32px; height:32px; border-radius:50%; background:#e0f2fe; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg class="nav-icon-svg" style="width:16px; height:16px; stroke:#0369a1;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></div>
                     <div style="flex: 1;">
                         <div style="font-size: 13px; font-weight: 700; color: #0369a1;">مرسل للفحص الأولي بواسطة: <span id="report-submitter-name" style="color: var(--primary-navy);"></span></div>
@@ -2364,44 +2369,61 @@
                     </div>
                 </div>
 
+                <!-- Risk Verdict Banner -->
+                <div id="risk-verdict-banner" style="display:none;border-radius:12px;padding:16px 20px;margin-bottom:18px;align-items:center;gap:16px;transition:all 0.3s ease;">
+                    <div id="risk-verdict-icon" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:22px;font-weight:900;"></div>
+                    <div style="flex:1;"><div id="risk-verdict-title" style="font-size:16px;font-weight:800;margin-bottom:3px;"></div><div id="risk-verdict-desc" style="font-size:13px;font-weight:500;opacity:0.85;"></div></div>
+                    <div id="risk-verdict-pct" style="font-size:32px;font-weight:900;white-space:nowrap;"></div>
+                </div>
+
                 <!-- ─── 1. Five Main Operational Metric Cards ─────────────────── -->
-                <div class="report-metrics-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
-                    <!-- 1. Total Similarity -->
-                    <div class="card" style="padding: 16px; margin-bottom: 0;">
-                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">نسبة التشابه الإجمالية</div>
-                        <div style="font-size: 26px; font-weight: 800; color: var(--primary-navy);" id="report-overall-val">0%</div>
-                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-status-badge">تشمل كافة أشكال التطابق</div>
-                    </div>
-
-                    <!-- 2. Problematic Similarity (VISUALLY DISTINGUISHED) -->
-                    <div class="card" style="padding: 16px; margin-bottom: 0; background: #fff5f5; border: 1.5px solid #fca5a5; border-right: 5px solid #dc2626;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <span style="font-size: 12.5px; font-weight: 700; color: #991b1b;">التشابه محل المراجعة</span>
-                            <span style="background: #fee2e2; color: #b91c1c; font-size: 10.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px;">فحص أكاديمي</span>
+                <div class="report-metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:20px;">
+                    <div class="card" style="padding:16px;margin-bottom:0;">
+                        <div style="font-size:12.5px;font-weight:600;color:#64748b;margin-bottom:6px;">نسبة التشابه الإجمالية</div>
+                        <div style="font-size:26px;font-weight:800;color:var(--primary-navy);" id="report-overall-val">0%</div>
+                        <div style="font-size:11.5px;color:#94a3b8;margin-top:4px;" id="report-status-badge">تشمل كافة أشكال التطابق</div>
+                        <div style="margin-top:10px;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;position:relative;">
+                            <div id="bar-overall" style="height:100%;background:var(--primary-navy);border-radius:99px;width:0%;transition:width 0.6s ease;"></div>
+                            <div style="position:absolute;top:0;bottom:0;left:80%;width:1.5px;background:rgba(100,116,139,0.4);"></div>
                         </div>
-                        <div style="font-size: 26px; font-weight: 800; color: #dc2626;" id="report-problematic-val">0%</div>
-                        <div style="font-size: 11.5px; color: #b91c1c; margin-top: 4px;" id="report-problematic-status">الاستلال غير الموثق رسمياً</div>
+                        <div style="font-size:10px;color:#94a3b8;margin-top:3px;text-align:left;">الحد: 20%</div>
                     </div>
-
-                    <!-- 3. Direct Copy -->
-                    <div class="card" style="padding: 16px; margin-bottom: 0;">
-                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">النسخ المباشر</div>
-                        <div style="font-size: 24px; font-weight: 800; color: #ea580c;" id="report-copied-val">0%</div>
-                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-copied-words">0 كلمة مطابقة</div>
+                    <div class="card" style="padding:16px;margin-bottom:0;background:#fff5f5;border:1.5px solid #fca5a5;border-right:5px solid #dc2626;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:12.5px;font-weight:700;color:#991b1b;">التشابه محل المراجعة</span>
+                            <span style="background:#fee2e2;color:#b91c1c;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:4px;">فحص أكاديمي</span>
+                        </div>
+                        <div style="font-size:26px;font-weight:800;color:#dc2626;" id="report-problematic-val">0%</div>
+                        <div style="font-size:11.5px;color:#b91c1c;margin-top:4px;" id="report-problematic-status">الاستلال غير الموثق رسمياً</div>
+                        <div style="margin-top:10px;height:6px;background:#fee2e2;border-radius:99px;overflow:hidden;position:relative;">
+                            <div id="bar-problematic" style="height:100%;background:#dc2626;border-radius:99px;width:0%;transition:width 0.6s ease;"></div>
+                            <div style="position:absolute;top:0;bottom:0;left:80%;width:1.5px;background:rgba(185,28,28,0.35);"></div>
+                        </div>
+                        <div style="font-size:10px;color:#b91c1c;margin-top:3px;text-align:left;">الحد: 20%</div>
                     </div>
-
-                    <!-- 4. Possible Paraphrase -->
-                    <div class="card" style="padding: 16px; margin-bottom: 0;">
-                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">إعادة الصياغة المحتملة</div>
-                        <div style="font-size: 24px; font-weight: 800; color: #d97706;" id="report-paraphrase-val">0%</div>
-                        <div style="font-size: 11.5px; color: #94a3b8; margin-top: 4px;" id="report-paraphrase-words">0 كلمة متقاربة</div>
+                    <div class="card" style="padding:16px;margin-bottom:0;">
+                        <div style="font-size:12.5px;font-weight:600;color:#64748b;margin-bottom:6px;">النسخ المباشر</div>
+                        <div style="font-size:24px;font-weight:800;color:#ea580c;" id="report-copied-val">0%</div>
+                        <div style="font-size:11.5px;color:#94a3b8;margin-top:4px;" id="report-copied-words">0 كلمة مطابقة</div>
+                        <div style="margin-top:10px;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;">
+                            <div id="bar-copied" style="height:100%;background:#ea580c;border-radius:99px;width:0%;transition:width 0.6s ease;"></div>
+                        </div>
                     </div>
-
-                    <!-- 5. Properly Cited -->
-                    <div class="card" style="padding: 16px; margin-bottom: 0;">
-                        <div style="font-size: 12.5px; font-weight: 600; color: #64748b; margin-bottom: 6px;">الاقتباس الموثق</div>
-                        <div style="font-size: 24px; font-weight: 800; color: #059669;" id="report-cited-val">0%</div>
-                        <div style="font-size: 11.5px; color: #059669; margin-top: 4px;" id="report-cited-words">موثق حسب الأصول ومستبعد</div>
+                    <div class="card" style="padding:16px;margin-bottom:0;">
+                        <div style="font-size:12.5px;font-weight:600;color:#64748b;margin-bottom:6px;">إعادة الصياغة المحتملة</div>
+                        <div style="font-size:24px;font-weight:800;color:#d97706;" id="report-paraphrase-val">0%</div>
+                        <div style="font-size:11.5px;color:#94a3b8;margin-top:4px;" id="report-paraphrase-words">0 كلمة متقاربة</div>
+                        <div style="margin-top:10px;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;">
+                            <div id="bar-paraphrase" style="height:100%;background:#d97706;border-radius:99px;width:0%;transition:width 0.6s ease;"></div>
+                        </div>
+                    </div>
+                    <div class="card" style="padding:16px;margin-bottom:0;">
+                        <div style="font-size:12.5px;font-weight:600;color:#64748b;margin-bottom:6px;">الاقتباس الموثق</div>
+                        <div style="font-size:24px;font-weight:800;color:#059669;" id="report-cited-val">0%</div>
+                        <div style="font-size:11.5px;color:#059669;margin-top:4px;" id="report-cited-words">موثق حسب الأصول ومستبعد</div>
+                        <div style="margin-top:10px;height:6px;background:#e2e8f0;border-radius:99px;overflow:hidden;">
+                            <div id="bar-cited" style="height:100%;background:#059669;border-radius:99px;width:0%;transition:width 0.6s ease;"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -3037,6 +3059,101 @@
                     </div>
                 </div>
             </section>
+            <!-- ================= VIEW: STATS DASHBOARD ================= -->
+            <section id="view-stats-dashboard" class="view-section admin-only">
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <div class="page-title">لوحة الإحصائيات الإدارية</div>
+                        <div class="page-subtitle">نظرة شاملة على أداء النظام وإحصائيات الفحص</div>
+                    </div>
+                    <div class="page-header-actions">
+                        <button onclick="loadStatsDashboard()" style="background:var(--primary-navy);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">تحديث</button>
+                    </div>
+                </div>
+
+                <!-- Stat Cards -->
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px;">
+                    <div class="card" style="padding:20px;text-align:center;">
+                        <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;">إجمالي الفحوصات</div>
+                        <div id="stat-total-scans" style="font-size:36px;font-weight:900;color:var(--primary-navy);">—</div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center;">
+                        <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;">متوسط نسبة الاستلال</div>
+                        <div id="stat-avg-pct" style="font-size:36px;font-weight:900;color:#dc2626;">—</div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center;">
+                        <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;">في انتظار المراجعة</div>
+                        <div id="stat-pending" style="font-size:36px;font-weight:900;color:#d97706;">—</div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center;">
+                        <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;">مقبول نهائياً</div>
+                        <div id="stat-final" style="font-size:36px;font-weight:900;color:#059669;">—</div>
+                    </div>
+                    <div class="card" style="padding:20px;text-align:center;">
+                        <div style="font-size:12px;color:#64748b;font-weight:600;margin-bottom:8px;">مرفوض</div>
+                        <div id="stat-rejected" style="font-size:36px;font-weight:900;color:#b91c1c;">—</div>
+                    </div>
+                </div>
+
+                <!-- Risk Distribution Bar Chart (CSS only) -->
+                <div class="card" style="padding:22px;margin-bottom:20px;">
+                    <h3 class="section-title" style="margin-bottom:16px;">توزيع حالات الفحص</h3>
+                    <div id="stats-risk-chart" style="display:flex;flex-direction:column;gap:12px;">
+                        <div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px;">جاري تحميل البيانات...</div>
+                    </div>
+                </div>
+
+                <!-- Top 5 Highest Plagiarism -->
+                <div class="card" style="padding:22px;">
+                    <h3 class="section-title" style="margin-bottom:16px;">أعلى 5 نسب استلال مكتشفة</h3>
+                    <table class="custom-table" style="width:100%;">
+                        <thead><tr>
+                            <th>#</th><th>عنوان البحث</th><th>الباحث</th>
+                            <th style="text-align:center;">نسبة الاستلال</th>
+                            <th style="text-align:center;">الحالة</th>
+                        </tr></thead>
+                        <tbody id="stats-top-table-body">
+                            <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:16px;">جاري التحميل...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: COMMON PHRASES ================= -->
+            <section id="view-common-phrases" class="view-section admin-only">
+                <div class="page-header">
+                    <div class="page-header-info">
+                        <div class="page-title">إدارة الجمل المؤسسية الشائعة</div>
+                        <div class="page-subtitle">الجمل المضافة هنا تُستبعد تلقائياً من تحليل الاستلال في كل الفحوصات القادمة</div>
+                    </div>
+                </div>
+
+                <!-- Add phrase form -->
+                <div class="card" style="padding:20px;margin-bottom:20px;">
+                    <div style="font-size:14px;font-weight:700;color:var(--primary-navy);margin-bottom:12px;">إضافة جملة شائعة مخصصة</div>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <input id="new-phrase-input" type="text" dir="rtl"
+                            placeholder="أدخل الجملة أو الديباجة الشائعة هنا..."
+                            style="flex:1;padding:10px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:14px;font-family:inherit;direction:rtl;"
+                            onkeydown="if(event.key==='Enter') addCustomPhrase()">
+                        <button onclick="addCustomPhrase()" style="background:var(--primary-navy);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;">إضافة</button>
+                    </div>
+                    <div id="add-phrase-msg" style="font-size:12px;margin-top:8px;min-height:16px;"></div>
+                </div>
+
+                <!-- Tabs: Custom / Default -->
+                <div style="display:flex;gap:8px;margin-bottom:16px;">
+                    <button onclick="showPhrasesTab('custom')" id="tab-custom-phrases" style="padding:8px 18px;border-radius:8px;border:none;font-size:13px;font-weight:700;cursor:pointer;background:var(--primary-navy);color:#fff;">المخصصة</button>
+                    <button onclick="showPhrasesTab('default')" id="tab-default-phrases" style="padding:8px 18px;border-radius:8px;border:1px solid #e2e8f0;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:var(--primary-navy);">الافتراضية (للقراءة فقط)</button>
+                </div>
+
+                <div class="card" style="padding:20px;">
+                    <div id="phrases-list-container">
+                        <div style="color:#94a3b8;font-size:13px;text-align:center;padding:20px;">جاري التحميل...</div>
+                    </div>
+                </div>
+            </section>
+
 
         </main>
     </div>
@@ -3816,6 +3933,8 @@
         });
 
         function switchView(viewName) {
+            if (viewName === 'stats-dashboard') { setTimeout(loadStatsDashboard, 100); }
+            if (viewName === 'common-phrases') { setTimeout(loadCommonPhrases, 100); }
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
 
@@ -4229,6 +4348,13 @@
                         if (allDone) {
                             clearInterval(batchPollTimer);
                             batchPollTimer = null;
+                            // إشعار اكتمال الفحص
+                            try {
+                                const doneItem = batch.items.find(it => it.status === "completed");
+                                const errItem = batch.items.find(it => it.status === "error");
+                                if (doneItem) showScanNotification(doneItem.title || "البحث", doneItem.similarity_pct, false);
+                                else if (errItem) showScanNotification(errItem.title, null, true);
+                            } catch(_e) {}
                         }
                     }
                 } catch (e) {
@@ -4466,6 +4592,46 @@
             if (citedEl) citedEl.innerText = citedVal + '%';
             const citedWEl = document.getElementById('report-cited-words');
             if (citedWEl) citedWEl.innerText = (report.cited_words ? (report.cited_words).toLocaleString() + ' كلمة موثقة ومستبعدة' : 'موثق حسب الأصول ومستبعد');
+
+            // ── Progress Bars
+            const _setBar = (id, pct) => { const el = document.getElementById(id); if (el) el.style.width = Math.min(pct,100)+'%'; };
+            _setBar('bar-overall', overallVal); _setBar('bar-problematic', probVal);
+            _setBar('bar-copied', copVal); _setBar('bar-paraphrase', paraVal); _setBar('bar-cited', citedVal);
+
+            // ── Risk Verdict Banner
+            const _allowedPct = (report.settings_snapshot && report.settings_snapshot.allowed_similarity_pct) || 20;
+            const _banner = document.getElementById('risk-verdict-banner');
+            const _bIcon = document.getElementById('risk-verdict-icon');
+            const _bTitle = document.getElementById('risk-verdict-title');
+            const _bDesc = document.getElementById('risk-verdict-desc');
+            const _bPct = document.getElementById('risk-verdict-pct');
+            if (_banner && _bTitle) {
+                _banner.style.display = 'flex';
+                if (probVal <= _allowedPct) {
+                    _banner.style.background='linear-gradient(135deg,#ecfdf5,#d1fae5)'; _banner.style.border='1.5px solid #6ee7b7';
+                    _bIcon.style.background='#059669'; _bIcon.innerHTML='✓'; _bIcon.style.color='#fff';
+                    _bTitle.style.color='#065f46'; _bTitle.innerText='✅ النتيجة: مقبول — نسبة الاستلال ضمن الحد المسموح';
+                    _bDesc.style.color='#047857'; _bDesc.innerText=`نسبة التشابه المشبوه (${probVal}%) أقل من الحد المسموح (${_allowedPct}%).`;
+                    _bPct.style.color='#059669';
+                } else if (probVal <= _allowedPct * 1.5) {
+                    _banner.style.background='linear-gradient(135deg,#fffbeb,#fef3c7)'; _banner.style.border='1.5px solid #fcd34d';
+                    _bIcon.style.background='#d97706'; _bIcon.innerHTML='!'; _bIcon.style.color='#fff';
+                    _bTitle.style.color='#92400e'; _bTitle.innerText='⚠️ النتيجة: يحتاج مراجعة — تجاوز بسيط للحد المسموح';
+                    _bDesc.style.color='#b45309'; _bDesc.innerText=`نسبة التشابه المشبوه (${probVal}%) تتجاوز الحد المسموح (${_allowedPct}%) وتستوجب مراجعة أكاديمية.`;
+                    _bPct.style.color='#d97706';
+                } else {
+                    _banner.style.background='linear-gradient(135deg,#fff1f2,#fee2e2)'; _banner.style.border='1.5px solid #fca5a5';
+                    _bIcon.style.background='#dc2626'; _bIcon.innerHTML='✗'; _bIcon.style.color='#fff';
+                    _bTitle.style.color='#7f1d1d'; _bTitle.innerText='🔴 النتيجة: مرفوض — نسبة الاستلال عالية جداً';
+                    _bDesc.style.color='#991b1b'; _bDesc.innerText=`نسبة التشابه المشبوه (${probVal}%) تتجاوز الحد المسموح (${_allowedPct}%) بصورة جوهرية وتستوجب الرفض.`;
+                    _bPct.style.color='#dc2626';
+                }
+                _bPct.innerText = probVal + '%';
+            }
+
+            // Update print date meta
+            const _pd = document.getElementById('print-date');
+            if (_pd) _pd.innerText = new Date().toLocaleDateString('ar-EG', {year:'numeric',month:'long',day:'numeric'});
 
             const reviewStatus = report.review_status || 'pending_review';
             const scanStatus = report.scan_status || 'completed';
@@ -6677,7 +6843,23 @@
         window.addEventListener('load', () => {
             if (!currentUser) checkAuthSession();
         });
-    </script>
+    
+        async function deleteCustomPhrase(idx) {
+            if (!confirm('هل تريد حذف هذه الجملة؟')) return;
+            try {
+                const csrfToken = document.cookie.match(/csrf_token=([^;]+)/)?.[1] || '';
+                const res = await fetch(`/api/common-phrases/${idx}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-Token': csrfToken }
+                });
+                const data = await res.json();
+                if (data.success) {
+                    _phrasesData.custom_phrases = data.custom_phrases;
+                    renderPhrasesList();
+                } else { alert(data.error || 'حدث خطأ'); }
+            } catch(e) { alert('خطأ في الحذف'); }
+        }
+</script>
 
 <!-- ─── Global Custom Arabic Date Range Picker Popover ─────────────── -->
     <div id="arabic-datepicker-popover" class="arabic-datepicker-popover">
@@ -6714,8 +6896,38 @@
         </div>
     </div>
 
+        <!-- ── Scan Completion Toast Notification ────────────── -->
+        <div id="scan-notification-toast" style="display:none;position:fixed;bottom:24px;left:24px;z-index:9999;min-width:300px;max-width:420px;background:#1e3a5f;color:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:slideInToast 0.4s ease;direction:rtl;font-family:inherit;">
+            <div style="display:flex;align-items:center;gap:12px;">
+                <div id="toast-icon" style="width:36px;height:36px;border-radius:50%;background:#059669;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✓</div>
+                <div style="flex:1;">
+                    <div id="toast-title" style="font-weight:800;font-size:14px;margin-bottom:2px;">اكتمل الفحص</div>
+                    <div id="toast-desc" style="font-size:12px;opacity:0.85;">تم الانتهاء من تحليل البحث</div>
+                </div>
+                <button onclick="document.getElementById('scan-notification-toast').style.display='none'" style="background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:0;line-height:1;opacity:0.7;">×</button>
+            </div>
+        </div>
+        <style>
+        @keyframes slideInToast {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+        .toast-container { position:fixed;bottom:24px;left:24px;z-index:9999; }
+        </style>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

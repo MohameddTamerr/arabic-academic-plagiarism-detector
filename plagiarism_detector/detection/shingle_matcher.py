@@ -30,34 +30,39 @@ def match_exact_or_near_copy(
     candidate_indices: set[int] | list[int],
     corpus_shingles: list[set[tuple]],
     corpus_norm_texts: list[str],
-    threshold: float = 0.40
+    threshold: float = 0.33
 ) -> Optional[tuple[int, float, str]]:
     """
     مقارنة المقطع المدخل بمجموعة المرشحين لكشف النسخ الحرفي أو شبه الحرفي.
+    يقيّم كلاً من Jaccard و SequenceMatcher على جميع المرشحين ويختار الأفضل عالمياً.
     يرجع: (أفضل مؤشر مرشح، درجة التشابه من 0 إلى 1، نوع التطابق).
     """
     best_idx = -1
     best_score = 0.0
-    match_type = 'DIRECT COPY'
+    best_match_type = 'DIRECT COPY'
 
-    for idx in candidate_indices:
+    candidate_list = list(candidate_indices)
+
+    for idx in candidate_list:
         cand_shingles = corpus_shingles[idx]
-        j_score = jaccard_similarity(query_shingles, cand_shingles)
 
+        # 1. فحص Jaccard على مستوى الـ Shingles
+        j_score = jaccard_similarity(query_shingles, cand_shingles)
         if j_score > best_score:
             best_score = j_score
             best_idx = idx
+            best_match_type = 'DIRECT COPY'
 
-    # إذا كان تشابه جاكارد دون العتبة، نفحص تشابه التسلسل للمرشحين بشرط نسبة عالية (>= 65%)
-    if best_score < threshold and candidate_indices:
-        for idx in candidate_indices:
-            seq_score = sequence_ratio(query_norm_text, corpus_norm_texts[idx])
-            if seq_score >= 0.65 and seq_score > best_score:
-                best_score = seq_score
-                best_idx = idx
-                match_type = 'NEAR COPY'
+        # 2. فحص SequenceMatcher على مستوى التسلسل الحرفي للكلمات
+        #    يُشغَّل على كل مرشح (ليس فقط عند فشل Jaccard) لضمان اختيار الأفضل عالمياً
+        seq_score = sequence_ratio(query_norm_text, corpus_norm_texts[idx])
+        # نقبل SequenceMatcher فقط إذا تجاوز 65% (حد أدنى للنسخ شبه الحرفي)
+        if seq_score >= 0.65 and seq_score > best_score:
+            best_score = seq_score
+            best_idx = idx
+            best_match_type = 'NEAR COPY'
 
     if best_score >= threshold and best_idx != -1:
-        return best_idx, best_score, match_type
+        return best_idx, best_score, best_match_type
 
     return None
