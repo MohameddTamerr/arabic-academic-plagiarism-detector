@@ -56,6 +56,7 @@
             padding: 0;
             direction: rtl;
             overflow: hidden;
+            min-width: 0;
             user-select: none !important;
             -webkit-user-select: none !important;
         }
@@ -336,6 +337,12 @@
             z-index: 1000;
             flex-shrink: 0;
             width: 100%;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .topbar > div {
+            min-width: 0;
         }
 
         .logo-placeholder {
@@ -352,6 +359,10 @@
             font-size: 18px;
             font-weight: 700;
             color: var(--primary-navy);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .menu-toggle {
@@ -372,6 +383,7 @@
             overflow: hidden;
             position: relative;
             width: 100%;
+            min-width: 0;
         }
 
         /* ─── Sidebar (Right Side) ──────────────────────────────────── */
@@ -382,7 +394,7 @@
             display: flex;
             flex-direction: column;
             padding-top: 12px;
-            flex-shrink: 0;
+            flex: 0 0 260px;
             height: 100%;
             overflow: hidden;
             z-index: 100;
@@ -480,7 +492,10 @@
 
         /* ─── Main Content Area (Clean Institutional Canvas) ────────── */
         .main-content {
-            flex: 1;
+            flex: 1 1 0;
+            width: 0;
+            min-width: 0;
+            max-width: 100%;
             padding: 28px 32px;
             overflow-y: auto;
             overflow-x: hidden;
@@ -531,6 +546,7 @@
         @media (max-width: 960px) {
             .sidebar {
                 width: 220px;
+                flex-basis: 220px;
             }
             .main-content {
                 padding: 20px;
@@ -539,6 +555,21 @@
 
         .view-section {
             display: none;
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .view-section > *,
+        .main-content .card {
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        #health-cards-grid {
+            grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)) !important;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .view-section.active {
@@ -1320,6 +1351,438 @@
             animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        .first-login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200010;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(15, 43, 92, 0.82);
+            backdrop-filter: blur(8px);
+            direction: rtl;
+        }
+
+        .first-login-card {
+            width: min(560px, 100%);
+            max-height: calc(100dvh - 40px);
+            overflow-y: auto;
+            padding: 28px;
+            border: 1px solid #dbeafe;
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 28px 80px rgba(15, 23, 42, 0.35);
+        }
+
+        .first-login-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .first-login-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .first-login-field.full-width { grid-column: 1 / -1; }
+        .first-login-field label { font-size: 13px; font-weight: 800; color: var(--primary-navy); }
+        .first-login-field input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px 13px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 14px;
+            outline: none;
+        }
+        .first-login-field input:focus { border-color: #0f2b5c; box-shadow: 0 0 0 3px rgba(15, 43, 92, 0.1); }
+        .first-login-help { margin: 0; color: #64748b; font-size: 12px; line-height: 1.7; }
+        .first-login-error {
+            display: none;
+            margin: 14px 0 0;
+            padding: 10px 12px;
+            border: 1px solid #fecaca;
+            border-radius: 8px;
+            background: #fef2f2;
+            color: #991b1b;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .recovery-card-result { display: none; text-align: center; }
+        .recovery-card-result img {
+            width: min(260px, 75vw);
+            height: auto;
+            padding: 10px;
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            background: white;
+        }
+        .recovery-manual-code {
+            overflow-wrap: anywhere;
+            margin: 12px 0;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f1f5f9;
+            color: #0f2b5c;
+            font-family: Consolas, monospace;
+            font-size: 12px;
+            user-select: text;
+        }
+
+        /* ─── Responsive application shell ─────────────────────────────── */
+        .mobile-menu-toggle,
+        .sidebar-mobile-overlay {
+            display: none;
+        }
+
+        .table-scroll {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: auto;
+            overscroll-behavior-inline: contain;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .toast-container {
+            width: min(440px, calc(100vw - 24px));
+            max-width: none;
+            left: 50%;
+            right: auto;
+            transform: translateX(-50%);
+            z-index: 210000;
+        }
+
+        .custom-toast {
+            width: 100%;
+            max-width: 100%;
+            align-items: flex-start;
+            line-height: 1.65;
+        }
+
+        .custom-toast-message {
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            white-space: normal;
+        }
+
+        .modal-overlay,
+        .confirm-modal-overlay {
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-card,
+        .confirm-modal-card {
+            width: min(100%, 640px);
+            max-height: calc(100dvh - 32px);
+            overflow-y: auto;
+        }
+
+        @media (max-width: 1200px) {
+            .report-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+
+            .main-content {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .table-scroll .custom-table {
+                min-width: 720px;
+            }
+
+            .page-header-info,
+            .page-header-actions {
+                min-width: 0;
+            }
+
+            .page-header-actions {
+                justify-content: flex-start;
+            }
+
+            .report-summary-card,
+            .hero-welcome {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .first-login-card { padding: 20px 16px; max-height: calc(100dvh - 20px); }
+            .first-login-grid { grid-template-columns: 1fr; }
+            .first-login-field.full-width { grid-column: auto; }
+            html,
+            body,
+            .login-screen-wrapper {
+                height: 100dvh;
+                min-height: 100dvh;
+            }
+
+            .topbar {
+                height: 58px;
+                min-height: 58px;
+                padding: 0 12px;
+                gap: 8px;
+                overflow: visible;
+            }
+
+            .topbar-brand {
+                flex: 1;
+                gap: 8px !important;
+                overflow: hidden;
+            }
+
+            .topbar-brand img {
+                height: 38px !important;
+                flex-shrink: 0;
+            }
+
+            .topbar-brand > div {
+                min-width: 0;
+            }
+
+            .topbar-brand > div > span {
+                display: none;
+            }
+
+            .topbar-title {
+                font-size: 14px !important;
+            }
+
+            .topbar-actions {
+                gap: 6px !important;
+                flex-shrink: 0;
+            }
+
+            #user-profile-badge {
+                padding: 5px 8px !important;
+                max-width: 125px;
+            }
+
+            #current-user-name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            #current-user-role-badge,
+            .topbar-logout {
+                display: none !important;
+            }
+
+            .mobile-menu-toggle {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 38px;
+                height: 38px;
+                flex: 0 0 38px;
+                border: 1px solid var(--border-color);
+                border-radius: 9px;
+                background: #ffffff;
+                color: var(--primary-navy);
+                z-index: 1301;
+            }
+
+            .app-container {
+                height: calc(100dvh - 58px);
+            }
+
+            .sidebar {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: min(82vw, 290px);
+                max-width: 290px;
+                height: 100%;
+                flex-basis: auto;
+                transform: translateX(105%);
+                transition: transform 0.25s ease;
+                z-index: 1201;
+                box-shadow: -16px 0 40px rgba(15, 23, 42, 0.24);
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .sidebar-mobile-overlay {
+                position: absolute;
+                inset: 0;
+                z-index: 1200;
+                background: rgba(15, 23, 42, 0.45);
+                backdrop-filter: blur(2px);
+            }
+
+            .sidebar-mobile-overlay.visible {
+                display: block;
+            }
+
+            .main-content {
+                width: 100%;
+                flex-basis: 100%;
+                padding: 16px;
+            }
+
+            .card {
+                padding: 16px;
+                margin-bottom: 14px;
+                border-radius: 9px;
+            }
+
+            .page-header {
+                align-items: stretch;
+                gap: 10px;
+                margin-bottom: 16px;
+            }
+
+            .page-header-info,
+            .page-header-actions {
+                width: 100%;
+            }
+
+            .page-header-actions > button,
+            .page-header-actions > .btn-primary,
+            .page-header-actions > .btn-secondary {
+                flex: 1 1 auto;
+                justify-content: center;
+            }
+
+            .page-title {
+                font-size: 18px;
+            }
+
+            .stats-grid,
+            .report-metrics-grid,
+            #health-cards-grid {
+                grid-template-columns: minmax(0, 1fr) !important;
+                gap: 12px !important;
+            }
+
+            .main-content [style*="grid-template-columns"] {
+                grid-template-columns: minmax(0, 1fr) !important;
+            }
+
+            .upload-dropzone {
+                padding: 30px 14px;
+            }
+
+            .document-viewer {
+                padding: 18px;
+                font-size: 14px;
+                min-height: 300px;
+            }
+
+            .document-viewer::after {
+                width: min(240px, 70vw);
+                height: min(240px, 70vw);
+            }
+
+            .legend-group,
+            .pagination,
+            .modal-tab-container {
+                flex-wrap: wrap;
+            }
+
+            .source-card {
+                align-items: flex-start;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+
+            .empty-state-container {
+                padding: 30px 12px;
+            }
+
+            .login-hero-side {
+                display: none;
+            }
+
+            .login-form-side {
+                width: 100%;
+                min-width: 0;
+                max-width: none;
+                padding: 24px 18px;
+            }
+
+            .login-brand-logo {
+                height: 82px;
+                margin: 0 auto 18px;
+            }
+
+            .login-brand-header {
+                text-align: center;
+                margin-bottom: 24px;
+            }
+
+            #scan-notification-toast {
+                left: 12px !important;
+                right: 12px !important;
+                bottom: 12px !important;
+                min-width: 0 !important;
+                max-width: none !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 13px;
+            }
+
+            .toast-container {
+                top: 10px;
+                width: calc(100vw - 20px);
+            }
+
+            .custom-toast {
+                padding: 11px 12px;
+                gap: 9px;
+                font-size: 13px;
+            }
+
+            .btn-primary,
+            .btn-secondary,
+            .btn-success,
+            .btn-danger {
+                max-width: 100%;
+                white-space: normal;
+                text-align: center;
+            }
+
+            .stat-card {
+                padding: 18px;
+            }
+
+            .stat-card-value {
+                font-size: 27px;
+            }
+
+            .modal-overlay,
+            .confirm-modal-overlay {
+                padding: 10px;
+                align-items: flex-start;
+            }
+
+            .modal-card,
+            .confirm-modal-card {
+                padding: 18px 14px;
+                max-width: 100%;
+                max-height: calc(100dvh - 20px);
+            }
+        }
+
         @keyframes popIn {
             from { opacity: 0; transform: scale(0.93); }
             to { opacity: 1; transform: scale(1); }
@@ -1692,20 +2155,23 @@
 
     <!-- ─── Top Bar ────────────────────────────────────────────────────────── -->
     <header class="topbar">
-        <div style="display: flex; align-items: center; gap: 14px;">
+        <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="فتح القائمة الرئيسية" aria-expanded="false">
+            <svg class="nav-icon-svg" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="topbar-brand" style="display: flex; align-items: center; gap: 14px;">
             <img src="/static/logo.png" alt="شعار أكاديمية الشرطة - كلية الدراسات العليا" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.08));">
             <div style="display: flex; flex-direction: column;">
                 <span style="font-size: 11px; font-weight: 700; color: #64748b; letter-spacing: 0.2px;">أكاديمية الشرطة — كلية الدراسات العليا</span>
                 <h1 class="topbar-title" style="margin: 0; font-size: 17px; line-height: 1.2;">نظام كشف الاستلال العلمي والاستشهادات</h1>
             </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="topbar-actions" style="display: flex; align-items: center; gap: 12px;">
             <div id="user-profile-badge" style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--primary-navy);">
                 <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <span id="current-user-name">مدير النظام</span>
                 <span id="current-user-role-badge" style="background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 800;">Admin</span>
             </div>
-            <button class="btn-secondary" style="padding: 5px 12px; font-size: 12px; color: #dc2626; border-color: #fca5a5; background: #fef2f2;" onclick="logoutUser()" title="تسجيل الخروج من النظام">
+            <button class="btn-secondary topbar-logout" style="padding: 5px 12px; font-size: 12px; color: #dc2626; border-color: #fca5a5; background: #fef2f2;" onclick="logoutUser()" title="تسجيل الخروج من النظام">
                 <svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#dc2626;" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                 <span>خروج</span>
             </button>
@@ -1713,6 +2179,8 @@
     </header>
 
     <div class="app-container">
+
+        <div class="sidebar-mobile-overlay" id="sidebar-mobile-overlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
 
         <!-- ─── Sidebar Navigation (Right Side) ─────────────────────────────── -->
         <aside class="sidebar" id="app-sidebar">
@@ -2859,8 +3327,9 @@
                                 <input type="text" id="new-emp-username" placeholder="مثال: hosam" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none;">
                             </div>
                             <div>
-                                <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">كلمة المرور:</label>
-                                <input type="password" id="new-emp-password" placeholder="••••••••" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none;">
+                                <label style="font-size: 12px; font-weight: 600; display: block; margin-bottom: 4px;">كلمة المرور المؤقتة:</label>
+                                <input type="password" id="new-emp-password" minlength="4" autocomplete="new-password" placeholder="4 خانات أو أكثر" style="width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px; outline: none;">
+                                <small style="display:block; margin-top:4px; color:var(--text-muted); font-size:11px;">سيُطلب من الموظف تغييرها وإنشاء QR عند أول دخول.</small>
                             </div>
                             <div>
                                 <button class="btn-primary" onclick="submitAddEmployee()" style="height: 36px; padding: 0 16px;">
@@ -3442,6 +3911,54 @@
         </div>
     </div>
 
+    <!-- ─── Mandatory employee first-login setup ──────────────────────── -->
+    <div id="first-login-overlay" class="first-login-overlay" role="dialog" aria-modal="true" aria-labelledby="first-login-title">
+        <div class="first-login-card">
+            <div id="first-login-form-step">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <div style="width:46px; height:46px; border-radius:12px; background:#0f2b5c; color:white; display:flex; align-items:center; justify-content:center; font-size:23px; flex:0 0 auto;">🔐</div>
+                    <div>
+                        <h2 id="first-login-title" style="margin:0; color:#0f2b5c; font-size:20px;">تأمين حسابك في أول دخول</h2>
+                        <p id="first-login-welcome" style="margin:4px 0 0; color:#64748b; font-size:13px;"></p>
+                    </div>
+                </div>
+                <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:10px; padding:11px 13px; color:#1e3a8a; font-size:13px; line-height:1.7; margin-bottom:16px;">
+                    كلمة المرور التي سلّمها لك مدير النظام مؤقتة. أنشئ الآن كلمة مرور دائمة ورمز PIN خاصاً بك، وسيصدر النظام بطاقة QR للاسترداد لا تظهر إلا هذه المرة.
+                </div>
+                <form onsubmit="event.preventDefault(); submitFirstLoginSetup();">
+                    <div class="first-login-grid">
+                        <div class="first-login-field">
+                            <label for="first-login-password">كلمة المرور الدائمة</label>
+                            <input type="password" id="first-login-password" autocomplete="new-password" placeholder="12 خانة على الأقل" required>
+                        </div>
+                        <div class="first-login-field">
+                            <label for="first-login-confirm">تأكيد كلمة المرور</label>
+                            <input type="password" id="first-login-confirm" autocomplete="new-password" placeholder="أعد كتابة كلمة المرور" required>
+                        </div>
+                        <div class="first-login-field full-width">
+                            <label for="first-login-pin">PIN استرداد الحساب</label>
+                            <input type="password" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" id="first-login-pin" autocomplete="off" placeholder="من 6 إلى 10 أرقام" required>
+                            <p class="first-login-help">احتفظ بالـPIN بعيداً عن بطاقة QR. سيُطلب الاثنان معاً عند استرداد الحساب.</p>
+                        </div>
+                    </div>
+                    <div id="first-login-error" class="first-login-error" role="alert"></div>
+                    <button type="submit" id="first-login-submit" class="login-submit-btn" style="margin-top:16px;">
+                        اعتماد كلمة المرور وإنشاء بطاقة QR
+                    </button>
+                </form>
+            </div>
+
+            <div id="first-login-recovery-step" class="recovery-card-result">
+                <h2 style="margin:0 0 6px; color:#0f2b5c;">بطاقة استرداد الحساب جاهزة</h2>
+                <p class="first-login-help" style="margin-bottom:14px;">نزّل البطاقة واحتفظ بها في مكان آمن. لن يعرض النظام سر الاسترداد الكامل مرة أخرى.</p>
+                <img id="first-login-qr" alt="رمز QR لاسترداد الحساب">
+                <div id="first-login-manual-code" class="recovery-manual-code"></div>
+                <a id="first-login-download" class="btn-secondary" download="account-recovery-qr.png" style="display:inline-flex; margin-bottom:10px; text-decoration:none;">تنزيل بطاقة QR</a>
+                <button type="button" class="login-submit-btn" onclick="finishFirstLoginSetup()">حفظت البطاقة — الدخول للمنظومة</button>
+            </div>
+        </div>
+    </div>
+
     <!-- ─── Professional Modal: Employee Password Recovery (100% Offline) ── -->
     <div id="forgot-password-modal" style="position: fixed; inset: 0; z-index: 200005; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; direction: rtl;">
         <div style="background: #ffffff; border-radius: 16px; padding: 30px 34px; width: 100%; max-width: 480px; box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35); border: 1px solid #e2e8f0; animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);">
@@ -3500,6 +4017,33 @@
     </div>
 
 <script>
+        // CSRF tokens are bound to the server-side login session. Keep the
+        // token in memory and attach it to every state-changing same-origin
+        // request so UI actions cannot silently fail after CSRF was enabled.
+        let csrfToken = '';
+        const nativeFetch = window.fetch.bind(window);
+        window.fetch = function(input, init = {}) {
+            const requestMethod = String(
+                init.method || (input instanceof Request ? input.method : 'GET')
+            ).toUpperCase();
+            const isStateChanging = !['GET', 'HEAD', 'OPTIONS'].includes(requestMethod);
+            let isSameOrigin = true;
+            try {
+                const requestUrl = input instanceof Request ? input.url : String(input);
+                isSameOrigin = new URL(requestUrl, window.location.href).origin === window.location.origin;
+            } catch (e) {
+                isSameOrigin = false;
+            }
+
+            if (isSameOrigin && isStateChanging && csrfToken) {
+                const headers = new Headers(input instanceof Request ? input.headers : undefined);
+                new Headers(init.headers || {}).forEach((value, key) => headers.set(key, value));
+                headers.set('X-CSRF-Token', csrfToken);
+                init = { ...init, headers };
+            }
+
+            return nativeFetch(input, init);
+        };
         let currentReportId = null;
 
         /* ─── Universal Date / Days Filtering Engine ─────────────────────────── */
@@ -3857,7 +4401,7 @@
 
             toast.innerHTML = `
                 ${iconSvg}
-                <span style="flex: 1;">${message}</span>
+                <span class="custom-toast-message">${message}</span>
             `;
 
             container.appendChild(toast);
@@ -3932,7 +4476,40 @@
             setupDropzone('modal-dropzone-area', setModalFiles);
         });
 
+        function toggleMobileSidebar(forceOpen) {
+            const sidebar = document.getElementById('app-sidebar');
+            const overlay = document.getElementById('sidebar-mobile-overlay');
+            const toggle = document.getElementById('mobile-menu-toggle');
+            if (!sidebar || !overlay || !toggle) return;
+
+            const shouldOpen = typeof forceOpen === 'boolean'
+                ? forceOpen
+                : !sidebar.classList.contains('mobile-open');
+            sidebar.classList.toggle('mobile-open', shouldOpen);
+            overlay.classList.toggle('visible', shouldOpen);
+            toggle.setAttribute('aria-expanded', String(shouldOpen));
+            toggle.setAttribute('aria-label', shouldOpen ? 'إغلاق القائمة الرئيسية' : 'فتح القائمة الرئيسية');
+        }
+
+        function closeMobileSidebar() {
+            toggleMobileSidebar(false);
+        }
+
+        function initializeResponsiveTables() {
+            document.querySelectorAll('.custom-table').forEach(table => {
+                if (table.parentElement?.classList.contains('table-scroll')) return;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'table-scroll';
+                wrapper.setAttribute('role', 'region');
+                wrapper.setAttribute('aria-label', 'جدول قابل للتمرير أفقياً');
+                wrapper.tabIndex = 0;
+                table.parentNode.insertBefore(wrapper, table);
+                wrapper.appendChild(table);
+            });
+        }
+
         function switchView(viewName) {
+            if (window.innerWidth <= 768) closeMobileSidebar();
             if (viewName === 'stats-dashboard') { setTimeout(loadStatsDashboard, 100); }
             if (viewName === 'common-phrases') { setTimeout(loadCommonPhrases, 100); }
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
@@ -3957,7 +4534,7 @@
                 loadSystemDiagnostics();
             }
             if (viewName === 'audit') {
-                if (!currentUser || currentUser.role !== 'admin') {
+                if (!isSystemAdmin(currentUser)) {
                     showToast('هذا القسم مخصص لمدير النظام فقط', 'error');
                     switchView('dashboard');
                     return;
@@ -5516,6 +6093,135 @@
         // ─── Authentication & Session Management (100% Offline) ───────────
         let currentUser = null;
 
+        // Keep the browser aligned with the canonical RBAC role names returned
+        // by the server.  Older installations may still contain the legacy
+        // `admin` value, while every newly bootstrapped super-admin is stored as
+        // `system_admin`.
+        function normalizeUserRole(role) {
+            const normalized = String(role || '').trim().toLowerCase();
+            if (['system_admin', 'superadmin', 'super_admin', 'sysadmin'].includes(normalized)) {
+                return 'system_admin';
+            }
+            if (['admin', 'administrator'].includes(normalized)) {
+                return 'admin';
+            }
+            return normalized || 'employee';
+        }
+
+        function isSystemAdmin(user = currentUser) {
+            if (!user) return false;
+            const role = normalizeUserRole(user.role);
+            return role === 'system_admin' || role === 'admin';
+        }
+
+        function requiresFirstLoginSetup(user = currentUser) {
+            return Boolean(user && (Number(user.must_change_password) === 1 || Number(user.must_enroll_recovery) === 1));
+        }
+
+        function openFirstLoginSetup() {
+            const overlay = document.getElementById('first-login-overlay');
+            const passwordFields = document.querySelectorAll('#first-login-password, #first-login-confirm');
+            const mustChangePassword = Number(currentUser?.must_change_password) === 1;
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('first-login-form-step').style.display = 'block';
+            document.getElementById('first-login-recovery-step').style.display = 'none';
+            document.getElementById('first-login-error').style.display = 'none';
+            document.getElementById('first-login-welcome').textContent = `مرحباً ${currentUser?.full_name || currentUser?.username || ''}`;
+            passwordFields.forEach(field => {
+                field.closest('.first-login-field').style.display = mustChangePassword ? 'flex' : 'none';
+                field.required = mustChangePassword;
+            });
+            overlay.style.display = 'flex';
+            setTimeout(() => (mustChangePassword ? document.getElementById('first-login-password') : document.getElementById('first-login-pin'))?.focus(), 50);
+        }
+
+        function enterAuthenticatedApp() {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('first-login-overlay').style.display = 'none';
+            sessionStorage.setItem('police_academy_user', JSON.stringify(currentUser));
+            updateUserUI();
+            loadDashboardStats();
+            loadBackupsList();
+            loadEmployeesList();
+            switchView(currentUser?.role === 'employee' ? 'upload' : 'dashboard');
+        }
+
+        async function submitFirstLoginSetup() {
+            const password = document.getElementById('first-login-password').value;
+            const confirmPassword = document.getElementById('first-login-confirm').value;
+            const pin = document.getElementById('first-login-pin').value.trim();
+            const errorBox = document.getElementById('first-login-error');
+            const submitBtn = document.getElementById('first-login-submit');
+
+            errorBox.style.display = 'none';
+            if (Number(currentUser?.must_change_password) === 1 && password !== confirmPassword) {
+                errorBox.textContent = 'كلمتا المرور الجديدتان غير متطابقتين.';
+                errorBox.style.display = 'block';
+                return;
+            }
+            if (!/^\d{6,10}$/.test(pin)) {
+                errorBox.textContent = 'رمز PIN يجب أن يتكون من 6 إلى 10 أرقام.';
+                errorBox.style.display = 'block';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'جاري تأمين الحساب...';
+            try {
+                const res = await fetch('/api/auth/complete_first_login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        new_password: password,
+                        confirm_password: confirmPassword,
+                        recovery_pin: pin
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success || !data.recovery_card) {
+                    throw new Error(data.error || 'تعذر إكمال إعداد الحساب');
+                }
+
+                currentUser = data.user || currentUser;
+                sessionStorage.setItem('police_academy_user', JSON.stringify(currentUser));
+                const card = data.recovery_card;
+                const qr = document.getElementById('first-login-qr');
+                qr.src = card.qr_image_data_url;
+                document.getElementById('first-login-manual-code').textContent = card.manual_recovery_code;
+                const download = document.getElementById('first-login-download');
+                download.href = card.qr_image_data_url;
+                download.download = `${currentUser.username}-recovery-qr.png`;
+                document.getElementById('first-login-form-step').style.display = 'none';
+                document.getElementById('first-login-recovery-step').style.display = 'block';
+            } catch (error) {
+                errorBox.textContent = error.message || 'تعذر إكمال إعداد الحساب';
+                errorBox.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'اعتماد كلمة المرور وإنشاء بطاقة QR';
+            }
+        }
+
+        async function finishFirstLoginSetup() {
+            try {
+                const res = await fetch('/api/auth/acknowledge_recovery_card', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ acknowledged: true })
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) {
+                    showToast(data.error || 'تعذر تأكيد حفظ بطاقة الاسترداد', 'error');
+                    return;
+                }
+                currentUser = data.user || currentUser;
+                enterAuthenticatedApp();
+                showToast('تم تأمين حسابك وتفعيل الدخول بنجاح', 'success');
+            } catch (error) {
+                showToast('فشل الاتصال بالخادم لتأكيد بطاقة الاسترداد', 'error');
+            }
+        }
+
         async function checkAuthSession() {
             // فحص هل المنظومة بحاجة إلى تهيئة أولى لتعيين حساب المدير
             try {
@@ -5528,19 +6234,30 @@
             } catch (e) {}
 
             try {
-                const saved = sessionStorage.getItem('police_academy_user');
-                if (saved) {
-                    currentUser = JSON.parse(saved);
-                    document.getElementById('login-screen').style.display = 'none';
-                    updateUserUI();
-                    loadDashboardStats();
-                    loadBackupsList();
-                    loadEmployeesList();
+                // The Flask session is authoritative. sessionStorage can
+                // survive a local-server restart and must not be treated as a
+                // valid authenticated session by itself.
+                const meRes = await fetch('/api/auth/me');
+                const meData = await meRes.json();
+                if (meRes.ok && meData.authenticated && meData.user) {
+                    currentUser = meData.user;
+                    csrfToken = meData.csrf_token || '';
+                    sessionStorage.setItem('police_academy_user', JSON.stringify(currentUser));
+                    if (requiresFirstLoginSetup(currentUser)) {
+                        openFirstLoginSetup();
+                        return true;
+                    }
+                    enterAuthenticatedApp();
                     return true;
                 }
-            } catch (e) {}
+            } catch (e) {
+                // Fall through to the login gate when the local server is not
+                // reachable or the session response is malformed.
+            }
 
             // No active session -> show login gate
+            sessionStorage.removeItem('police_academy_user');
+            csrfToken = '';
             currentUser = null;
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('form-login-standard').style.display = 'block';
@@ -5627,21 +6344,15 @@
                 const data = await res.json();
                 if (data.success && data.user) {
                     currentUser = data.user;
+                    csrfToken = data.csrf_token || '';
                     sessionStorage.setItem('police_academy_user', JSON.stringify(currentUser));
-                    
-                    // Hide login gate
-                    document.getElementById('login-screen').style.display = 'none';
-                    
-                    updateUserUI();
-                    loadDashboardStats();
-                    loadBackupsList();
-                    loadEmployeesList();
-                    
-                    showToast(`مرحباً بك يا ${currentUser.full_name}`, 'success');
-                    if (currentUser.role === 'employee') {
-                        switchView('upload');
+
+                    if (requiresFirstLoginSetup(currentUser)) {
+                        openFirstLoginSetup();
+                        showToast('يرجى تأمين حسابك لإكمال أول تسجيل دخول', 'info');
                     } else {
-                        switchView('dashboard');
+                        enterAuthenticatedApp();
+                        showToast(`مرحباً بك يا ${currentUser.full_name}`, 'success');
                     }
                 } else {
                     errAlert.style.display = 'flex';
@@ -5656,8 +6367,18 @@
             }
         }
 
-        function logoutUser() {
+        async function logoutUser() {
+            try {
+                await fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: currentUser?.username || '' })
+                });
+            } catch (e) {
+                // Always clear the local UI even if the local server stopped.
+            }
             sessionStorage.removeItem('police_academy_user');
+            csrfToken = '';
             currentUser = null;
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
@@ -5669,18 +6390,25 @@
         function updateUserUI() {
             const nameEl = document.getElementById('current-user-name');
             const badgeEl = document.getElementById('current-user-role-badge');
-            const isAdmin = (currentUser.role === 'admin');
+            const isAdmin = isSystemAdmin(currentUser);
 
             if (nameEl && badgeEl) {
                 nameEl.innerText = currentUser.full_name.split(' ')[0] || currentUser.username;
-                badgeEl.innerText = isAdmin ? 'مدير النظام' : 'موظف فحص';
+                badgeEl.innerText = currentUser.role_label_ar || (isAdmin ? 'مدير النظام التقني' : 'موظف فحص');
                 badgeEl.style.background = isAdmin ? '#e0f2fe' : '#ecfdf5';
                 badgeEl.style.color = isAdmin ? '#0369a1' : '#047857';
             }
 
             // التحكم في ظهور عناصر القائمة الجانبية بناءً على الصلاحيات
             document.querySelectorAll('.admin-only').forEach(el => {
-                el.style.display = isAdmin ? 'flex' : 'none';
+                // Never force a layout mode here. Some admin-only nodes are
+                // navigation links (flex), while others are whole view sections
+                // that must remain hidden until switchView activates them.
+                if (isAdmin) {
+                    el.style.removeProperty('display');
+                } else {
+                    el.style.display = 'none';
+                }
             });
 
             // التحكم في أزرار اتخاذ القرار في شاشة التقرير
@@ -5709,7 +6437,7 @@
 
                 if (sidebarBadge) {
                     sidebarBadge.innerText = count;
-                    if (count > 0 && currentUser.role === 'admin') {
+                    if (count > 0 && isSystemAdmin(currentUser)) {
                         sidebarBadge.classList.remove('zero');
                     } else {
                         sidebarBadge.classList.add('zero');
@@ -5915,13 +6643,13 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    showToast(`تمت إضافة الموظف (${full_name}) بنجاح`, 'success');
+                    showToast(`تمت إضافة الموظف (${full_name}). سلّمه كلمة المرور المؤقتة لأول دخول.`, 'success');
                     fullnameInput.value = '';
                     usernameInput.value = '';
                     passwordInput.value = '';
                     loadEmployeesList();
                 } else {
-                    showToast(data.error || 'فشل إضافة الموظف', 'error');
+                    showToast(getErrorMessage(data, 'فشل إضافة الموظف'), 'error');
                 }
             } catch (e) {
                 showToast('فشل الاتصال بالخادم لإضافة الموظف', 'error');
@@ -6428,7 +7156,7 @@
                     ? '<span style="background: #ecfdf5; color: #059669; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width: 12px; height: 12px; stroke: #059669;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>ناجح</span>'
                     : `<span style="background: #fef2f2; color: #dc2626; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;"><svg class="nav-icon-svg" style="width: 12px; height: 12px; stroke: #dc2626;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>${ev.failure_reason_code || 'فشل'}</span>`;
 
-                const roleBadge = ev.role === 'admin'
+                const roleBadge = isSystemAdmin({ role: ev.role })
                     ? '<span style="background: #e0f2fe; color: #0369a1; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700;">مدير</span>'
                     : (ev.role === 'employee' ? '<span style="background: #f1f5f9; color: #475569; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 700;">موظف</span>' : '<span style="color: var(--text-muted); font-size: 11px;">نظام</span>');
 
@@ -6837,8 +7565,15 @@
 
         // Initialize App with Login Gate First
         document.addEventListener('DOMContentLoaded', () => {
+            initializeResponsiveTables();
             checkAuthSession();
             setInterval(updateInitialReviewsCount, 10000);
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) closeMobileSidebar();
+        });
+        document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') closeMobileSidebar();
         });
         window.addEventListener('load', () => {
             if (!currentUser) checkAuthSession();
@@ -6847,10 +7582,8 @@
         async function deleteCustomPhrase(idx) {
             if (!confirm('هل تريد حذف هذه الجملة؟')) return;
             try {
-                const csrfToken = document.cookie.match(/csrf_token=([^;]+)/)?.[1] || '';
                 const res = await fetch(`/api/common-phrases/${idx}`, {
-                    method: 'DELETE',
-                    headers: { 'X-CSRF-Token': csrfToken }
+                    method: 'DELETE'
                 });
                 const data = await res.json();
                 if (data.success) {
@@ -6912,7 +7645,6 @@
             from { opacity:0; transform:translateY(30px); }
             to   { opacity:1; transform:translateY(0); }
         }
-        .toast-container { position:fixed;bottom:24px;left:24px;z-index:9999; }
         </style>
 </body>
 </html>

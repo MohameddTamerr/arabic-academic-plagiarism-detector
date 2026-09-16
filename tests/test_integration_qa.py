@@ -79,3 +79,77 @@ def test_bibliography_exclusion_from_problematic():
     report = analyze_academic_document(bib_text)
     assert report['problematic_pct'] == 0.0
     assert report['bibliography_segments_count'] > 0
+
+
+def test_identical_document_with_bibliography_is_100_percent():
+    """قائمة المراجع المستبعدة لا تبقى في مقام نسبة تشابه متن مطابق حرفياً."""
+    import uuid
+
+    marker = uuid.uuid4().hex[:10]
+    body = (
+        f"يعالج هذا المتن الأكاديمي الفريد {marker} قواعد الملكية العامة "
+        "وضمانات الأفراد في إطار سيادة القانون والرقابة القضائية المتخصصة."
+    )
+    full_text = (
+        body
+        + "\n\nالمراجع والمصادر:\n"
+        + "1. سالم، محمود، (2024)، مبادئ القانون الإداري، دار المعرفة، القاهرة."
+    )
+    res = paper_service.import_reference_paper(
+        title=f"مرجع مطابق كامل {marker}",
+        author="باحث الاختبار",
+        raw_text=full_text,
+        category="قانون"
+    )
+    assert res['success'] is True
+    invalidate_pipeline_index()
+
+    report = analyze_academic_document(full_text)
+
+    assert report['bibliography_segments_count'] > 0
+    assert report['overall_pct'] == 100.0
+
+
+def test_identical_submitted_reference_is_reported_as_exact_file_match():
+    """A byte-identical active reference is authoritative 100%, not excluded."""
+    import uuid
+
+    marker = uuid.uuid4().hex[:10]
+    body = (
+        f"يفحص هذا النص الفريد {marker} استبعاد التطابق الذاتي عند إعادة رفع "
+        "المستند المرجعي نفسه إلى منظومة الفحص الأكاديمي المحلية."
+    )
+    res = paper_service.import_reference_paper(
+        title=f"مرجع اختبار الاستبعاد الذاتي {marker}",
+        author="باحث الاختبار",
+        raw_text=body,
+        category="اختبار",
+    )
+    assert res['success'] is True
+    invalidate_pipeline_index()
+
+    report = analyze_academic_document(
+        body,
+        pages_data=[{'page_number': 1, 'text': body}],
+        exact_reference_match={
+            'id': res['id'],
+            'reference_id': f'test-ref-{marker}',
+            'title': f'مرجع اختبار التطابق الكامل {marker}',
+            'author': 'باحث الاختبار',
+            'file_hash': 'a' * 64,
+            'segments': [{
+                'segment_number': 1,
+                'page_number': 1,
+                'raw_text': body,
+                'word_count': len(body.split()),
+            }],
+        },
+    )
+
+    assert report['overall_pct'] == 100.0
+    assert report['problematic_pct'] == 100.0
+    assert report['copied_pct'] == 100.0
+    assert report['exact_file_match']['detected'] is True
+    assert report['exact_file_match']['method'] == 'sha256'
+    assert report['sources'][0]['source_id'] == res['id']
+    assert all(seg.get('source_id') == res['id'] for seg in report['segments'])

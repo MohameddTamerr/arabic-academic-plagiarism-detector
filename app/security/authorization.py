@@ -38,7 +38,8 @@ def get_authenticated_user() -> Optional[dict]:
             'id': getattr(u, 'id', None),
             'username': getattr(u, 'username', ''),
             'full_name': getattr(u, 'full_name', ''),
-            'role': getattr(u, 'role', '')
+            'role': getattr(u, 'role', ''),
+            'department': getattr(u, 'department', '')
         }
 
     # 2. فحص جلسة العمل الموقعة في Flask
@@ -69,6 +70,15 @@ def get_authenticated_user() -> Optional[dict]:
             with get_session() as session:
                 db_user = session.query(User).filter(User.id == user_id).first()
                 if not db_user:
+                    # في بيئة الاختبارات، إذا حُدد الدور صراحة في الجلسة، يُعتمد كجلسة اختبار اصطناعية
+                    if current_app and current_app.config.get('TESTING') and flask_session.get('role'):
+                        return {
+                            'id': user_id,
+                            'username': flask_session.get('username', 'test_user'),
+                            'full_name': flask_session.get('full_name', flask_session.get('username', 'test_user')),
+                            'role': flask_session.get('role'),
+                            'department': flask_session.get('department', '')
+                        }
                     # المستخدم تم حذفه
                     flask_session.clear()
                     return None
@@ -92,7 +102,10 @@ def get_authenticated_user() -> Optional[dict]:
                     'id': db_user.id,
                     'username': db_user.username,
                     'full_name': db_user.full_name,
-                    'role': db_user.role
+                    'role': db_user.role,
+                    'department': getattr(db_user, 'department', ''),
+                    'must_change_password': int(getattr(db_user, 'must_change_password', 0) or 0),
+                    'must_enroll_recovery': int(getattr(db_user, 'must_enroll_recovery', 0) or 0)
                 }
 
         # فحص role مباشر في الجلسة (للجلسات الاصطناعية المؤقتة)
@@ -101,8 +114,9 @@ def get_authenticated_user() -> Optional[dict]:
             return {
                 'id': flask_session.get('user_id', 1),
                 'username': flask_session.get('username', 'test_user'),
-                'full_name': flask_session.get('username', 'test_user'),
-                'role': session_role
+                'full_name': flask_session.get('full_name', flask_session.get('username', 'test_user')),
+                'role': session_role,
+                'department': flask_session.get('department', '')
             }
     except Exception:
         pass
@@ -112,19 +126,22 @@ def get_authenticated_user() -> Optional[dict]:
         if not current_app.config.get('STRICT_AUTH'):
             test_role = request.headers.get('X-User-Role')
             test_name = request.headers.get('X-User-Name') or 'test_user'
+            test_dept = request.headers.get('X-User-Department') or ''
             if test_role:
                 return {
-                    'id': 1,
+                    'id': int(request.headers.get('X-User-Id') or 1),
                     'username': test_name,
                     'full_name': test_name,
-                    'role': test_role
+                    'role': test_role,
+                    'department': test_dept
                 }
             # للمسارات التشغيلية في الاختبارات السابقة الموروثة التي لم تنشئ جلسة صريحة
             return {
                 'id': 1,
                 'username': 'legacy_test_admin',
                 'full_name': 'مدير اختبار قديم',
-                'role': Role.LEGACY_ADMIN
+                'role': Role.LEGACY_ADMIN,
+                'department': ''
             }
 
     return None
@@ -149,6 +166,34 @@ def has_permission(user_or_role: Any, permission_name: str) -> bool:
     return permission_name in perms
 
 
+def check_unit_access(user: Optional[dict], target_department: Optional[str]) -> bool:
+    """
+    التحقق الصارم من نطاق الوحدة / القسم المؤسسي (Organizational Unit Scope Check):
+    - SYSTEM_ADMIN / LEGACY_ADMIN: صلاحية كاملة على كافة الوحدات.
+    - إذا كان المرجع أو البحث عاماً أو بدون قسم (عام / general / فارغ): متاح لكافة المحكمين والوحدات.
+    - إذا كان المستخدم غير مقيد بقسم محدد (فارغ): متاح له الوصول لكافة الأقسام.
+    - إذا كان المستخدم مقيداً بقسم محدد والهدف مقيد بقسم مختلف: يُمنع الوصول لحماية الخصوصية وعزل الوحدات (IDOR).
+    """
+    if not user:
+        return False
+    role = normalize_role(user.get('role', ''))
+    if role in (Role.SYSTEM_ADMIN, Role.LEGACY_ADMIN):
+        return True
+
+    user_dept = (user.get('department') or '').strip().lower()
+    target_dept = (target_department or '').strip().lower()
+
+    # إذا كان القسم المستهدف عاماً أو غير محدد، فهو متاح للجميع
+    if not target_dept or target_dept in ('عام', 'general', 'all', 'default'):
+        return True
+
+    # إذا كان المستخدم عاماً بدون تقييد لوحدة معينة
+    if not user_dept or user_dept in ('عام', 'general', 'all'):
+        return True
+
+    return user_dept == target_dept
+
+
 def can_view_research(user: Any, research: Optional[dict] = None) -> bool:
     """
     التحقق من صلاحية استعراض البحث وفق سياسة نطاق البيانات المؤسسية (Data Scoping).
@@ -159,16 +204,58 @@ def can_view_research(user: Any, research: Optional[dict] = None) -> bool:
         return False
 
     if research and isinstance(user, dict):
-        role = user.get('role', '')
+        role = normalize_role(user.get('role', ''))
         username = user.get('username', '')
-        # الأدوار الإشرافية والتحكيمية تملك صلاحية الاطلاع العام
-        if role in (Role.SYSTEM_ADMIN, Role.UNIT_MANAGER, Role.SENIOR_REVIEWER, Role.REVIEWER, Role.LEGACY_ADMIN, Role.LEGACY_EMPLOYEE):
+
+        # الأدوار الإدارية العليا تملك صلاحية الاطلاع العام
+        if role in (Role.SYSTEM_ADMIN, Role.LEGACY_ADMIN):
             return True
-        # مدخل البيانات (data_entry) يقتصر نطاقه على الأبحاث التي قام برفعها بنفسه
-        created_by = research.get('created_by', '')
-        if created_by and created_by != username:
+
+        # فحص نطاق الوحدة/القسم
+        res_dept = research.get('department') or research.get('category', '')
+        if not check_unit_access(user, res_dept):
             return False
 
+        # مدخل البيانات (data_entry) يقتصر نطاقه على الأبحاث التي قام برفعها بنفسه
+        if role == Role.DATA_ENTRY:
+            created_by = research.get('created_by', '')
+            if created_by and created_by != username:
+                return False
+
+    return True
+
+
+def can_view_thesis(user: Any, thesis: Optional[dict] = None) -> bool:
+    """التحقق من صلاحية استعراض الرسالة العلمية وفق سياسة نطاق الوحدة."""
+    if not user:
+        return False
+    if not has_permission(user, Permission.THESIS_VIEW):
+        return False
+    if not thesis:
+        return True
+    if isinstance(user, dict):
+        role = normalize_role(user.get('role', ''))
+        if role in (Role.SYSTEM_ADMIN, Role.LEGACY_ADMIN):
+            return True
+        dept = thesis.get('department', '')
+        return check_unit_access(user, dept)
+    return True
+
+
+def can_view_report(user: Any, report: Optional[dict] = None) -> bool:
+    """التحقق من صلاحية استعراض التقرير وفق نطاق الوحدة وفصل المهام."""
+    if not user:
+        return False
+    if not has_permission(user, Permission.REPORT_VIEW):
+        return False
+    if not report:
+        return True
+    if isinstance(user, dict):
+        role = normalize_role(user.get('role', ''))
+        if role in (Role.SYSTEM_ADMIN, Role.LEGACY_ADMIN):
+            return True
+        dept = report.get('department', '') or report.get('category', '')
+        return check_unit_access(user, dept)
     return True
 
 
@@ -204,6 +291,12 @@ def require_authenticated():
             user = get_authenticated_user()
             if not user:
                 return make_error_response('يجب تسجيل الدخول أولاً للوصول إلى هذه الخدمة.', code=ErrorCode.AUTH_REQUIRED, status_code=401)
+            if user.get('must_change_password') or user.get('must_enroll_recovery'):
+                return make_error_response(
+                    'يجب إكمال إعداد كلمة المرور وبطاقة الاسترداد أولاً.',
+                    code='ACCOUNT_SETUP_REQUIRED',
+                    status_code=428
+                )
             return fn(*args, **kwargs)
         return wrapper
     return decorator
@@ -225,6 +318,13 @@ def require_permission(permission_name: str):
                 # إذا لم يكن هناك مستخدم مسجل دخول
                 record_access_denied_audit(None, permission_name, "طلب من مستخدم غير مسجل دخول")
                 return make_error_response('غير مصرح: يجب تسجيل الدخول للوصول إلى هذه الخدمة.', code=ErrorCode.AUTH_REQUIRED, status_code=401)
+
+            if user.get('must_change_password') or user.get('must_enroll_recovery'):
+                return make_error_response(
+                    'يجب إكمال إعداد كلمة المرور وبطاقة الاسترداد أولاً.',
+                    code='ACCOUNT_SETUP_REQUIRED',
+                    status_code=428
+                )
 
             if not has_permission(user, permission_name):
                 record_access_denied_audit(user, permission_name, f"المستخدم {user.get('username')} لا يملك صلاحية {permission_name}")
@@ -253,6 +353,13 @@ def require_any_permission(*permission_names: str):
             if not user:
                 record_access_denied_audit(None, ', '.join(permission_names), "طلب من مستخدم غير مسجل دخول")
                 return make_error_response('غير مصرح: يجب تسجيل الدخول للوصول إلى هذه الخدمة.', code=ErrorCode.AUTH_REQUIRED, status_code=401)
+
+            if user.get('must_change_password') or user.get('must_enroll_recovery'):
+                return make_error_response(
+                    'يجب إكمال إعداد كلمة المرور وبطاقة الاسترداد أولاً.',
+                    code='ACCOUNT_SETUP_REQUIRED',
+                    status_code=428
+                )
 
             has_any = any(has_permission(user, p) for p in permission_names)
             if not has_any:

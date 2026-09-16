@@ -21,6 +21,16 @@ if sys.stdout.encoding and sys.stdout.encoding.lower() not in ('utf-8', 'utf8'):
     except Exception:
         pass
 
+import os
+from pathlib import Path
+
+# إضافة مسارات vendor المحمولة تلقائياً إلى مسار البحث sys.path
+_HERE = Path(__file__).resolve().parent
+_ROOT = _HERE.parent if _HERE.name.lower() == "app" else _HERE
+for _v in [_HERE / "vendor", _ROOT / "vendor"]:
+    if _v.exists() and str(_v) not in sys.path:
+        sys.path.insert(0, str(_v))
+
 import config
 from app import create_app
 
@@ -35,10 +45,19 @@ if __name__ == '__main__':
     print(f"   الخادم يعمل محلياً على: http://{config.HOST}:{config.PORT}")
     print("=" * 70)
 
-    try:
-        from waitress import serve
-        logger.info(f"بدء تشغيل خادم الإنتاج Waitress على المنفذ {config.PORT}...")
-        serve(app, host=config.HOST, port=config.PORT, threads=8)
-    except Exception as e:
-        logger.warning(f"تعذر تشغيل Waitress ({e})، جاري استخدام خادم Flask الافتراضي...")
-        app.run(host=config.HOST, port=config.PORT, threaded=True, debug=config.DEBUG)
+    is_prod = getattr(config, 'PRODUCTION_MODE', False) or getattr(config, 'PORTABLE_MODE', False) or getattr(config, 'SINGLE_EXE_MODE', False) or os.environ.get('PORTABLE_MODE') == '1' or (_HERE.name.lower() == 'app')
+    log_file = config.LOGS_DIR / "server.log"
+
+    if is_prod:
+        from app.wsgi_server import run_production_server
+        run_production_server(app, host=config.HOST, port=config.PORT, threads=8, log_file=log_file)
+    else:
+        # Development / Source repository mode
+        is_explicit_dev = os.environ.get('FLASK_ENV') == 'development' or os.environ.get('APP_ENV') == 'development' or '--dev' in sys.argv
+        if is_explicit_dev:
+            logger.info(f"بدء تشغيل خادم Flask المحلي (نمط التطوير الصريح) على المنفذ {config.PORT}...")
+            app.run(host=config.HOST, port=config.PORT, threaded=True, debug=config.DEBUG)
+        else:
+            from app.wsgi_server import run_production_server
+            run_production_server(app, host=config.HOST, port=config.PORT, threads=8, log_file=log_file)
+

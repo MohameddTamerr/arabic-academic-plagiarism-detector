@@ -13,6 +13,7 @@ import uuid
 import shutil
 import logging
 import threading
+from functools import lru_cache
 from pathlib import Path
 from datetime import datetime
 from typing import Optional
@@ -47,7 +48,7 @@ def get_ocr_lock_path() -> Path:
 class CrossProcessOcrLock:
     """
     قفل تنفيذ OCR الحاكم عبر العمليات المتعددة (Cross-Process Authoritative OCR Execution Slot):
-    - يضمن تشغيل عملية Tesseract واحدة فقط في نفس اللحظة عبر كافة عمليات نظام التشغيل (MAX_CONCURRENT_OCR_JOBS = 1).
+    - يضمن عدم تجاوز عدد فتحات Tesseract المضبوط عبر كافة عمليات نظام التشغيل.
     - يعتمد على ملف قفل ذري (.ocr.lock) مدعوم برقم العملية (PID) وطابع زمني وهوية فريدة.
     - يدعم كشف واسترداد الأقفال الميتة (Stale Locks) إذا توقفت العملية السابقة دون تحرير القفل.
     - يضمن التحرير الحتمي للقفل في كتلة finally أو عند خروج مدير السياق.
@@ -55,7 +56,14 @@ class CrossProcessOcrLock:
     def __init__(self, owner: str = 'system', timeout_seconds: int = 60, lock_file_path: Optional[Path] = None):
         self.owner = owner
         self.timeout_seconds = timeout_seconds
-        self.lock_file = lock_file_path or get_ocr_lock_path()
+        base_lock_file = lock_file_path or get_ocr_lock_path()
+        slot_count = 1 if lock_file_path else max(1, int(getattr(config, 'MAX_CONCURRENT_OCR_JOBS', 1)))
+        self._lock_candidates = [base_lock_file]
+        self._lock_candidates.extend(
+            base_lock_file.with_name(f'{base_lock_file.name}.{slot_no}')
+            for slot_no in range(2, slot_count + 1)
+        )
+        self.lock_file = base_lock_file
         self.token = str(uuid.uuid4())
         self._fd = None
         self._acquired = False
@@ -64,37 +72,31 @@ class CrossProcessOcrLock:
         max_timeout = timeout_seconds if timeout_seconds is not None else self.timeout_seconds
         start_time = time.time()
         while True:
-            # 1. فحص القفل الحالي إذا كان موجوداً
-            if self.lock_file.exists():
-                is_stale = self._check_and_clean_stale_lock()
-                if not is_stale:
-                    if not blocking:
-                        return False
-                    if time.time() - start_time > max_timeout:
-                        return False
-                    time.sleep(poll_interval)
+            for candidate in self._lock_candidates:
+                self.lock_file = candidate
+                if self.lock_file.exists() and not self._check_and_clean_stale_lock():
                     continue
 
-            # 2. محاولة إنشاء ملف القفل ذرياً على مستوى نظام التشغيل
-            try:
-                flags = os.O_CREAT | os.O_EXCL | os.O_RDWR
-                self._fd = os.open(str(self.lock_file), flags, 0o600)
-                payload = {
-                    'token': self.token,
-                    'owner': self.owner,
-                    'pid': os.getpid(),
-                    'acquired_at': datetime.utcnow().isoformat(),
-                    'expires_at': time.time() + self.timeout_seconds
-                }
-                os.write(self._fd, json.dumps(payload).encode('utf-8'))
-                self._acquired = True
-                return True
-            except (FileExistsError, OSError):
-                if not blocking:
-                    return False
-                if time.time() - start_time > max_timeout:
-                    return False
-                time.sleep(poll_interval)
+                # محاولة إنشاء فتحة القفل ذرياً على مستوى نظام التشغيل.
+                try:
+                    flags = os.O_CREAT | os.O_EXCL | os.O_RDWR
+                    self._fd = os.open(str(self.lock_file), flags, 0o600)
+                    payload = {
+                        'token': self.token,
+                        'owner': self.owner,
+                        'pid': os.getpid(),
+                        'acquired_at': datetime.utcnow().isoformat(),
+                        'expires_at': time.time() + self.timeout_seconds
+                    }
+                    os.write(self._fd, json.dumps(payload).encode('utf-8'))
+                    self._acquired = True
+                    return True
+                except (FileExistsError, OSError):
+                    continue
+
+            if not blocking or time.time() - start_time > max_timeout:
+                return False
+            time.sleep(poll_interval)
 
     def _check_and_clean_stale_lock(self) -> bool:
         try:
@@ -110,15 +112,18 @@ class CrossProcessOcrLock:
             expires_at = data.get('expires_at', 0)
             pid = data.get('pid')
 
-            # فحص انتهاء مدة التأجير
-            if time.time() > expires_at:
-                logger.warning(f"تم اكتشاف قفل OCR منتهي الصلاحية (Stale Lock) لمالكه {data.get('owner')} (PID {pid}). جاري الاسترداد...")
+            # العملية الحية تظل مالكة للفتحة حتى إن تجاوزت صفحة صعبة مدة
+            # التأجير الاسمية؛ وإلا قد يبدأ Tesseract آخر فوقها ويستهلك الذاكرة.
+            if pid and self._is_process_alive(pid):
+                return False
+
+            if pid and not self._is_process_alive(pid):
+                logger.warning(f"تم اكتشاف قفل OCR لعملية غير موجودة (Dead PID {pid}). جاري الاسترداد...")
                 self._force_remove_lock_file()
                 return True
 
-            # فحص ما إذا كانت العملية ميتة
-            if pid and not self._is_process_alive(pid):
-                logger.warning(f"تم اكتشاف قفل OCR لعملية غير موجودة (Dead PID {pid}). جاري الاسترداد...")
+            if time.time() > expires_at:
+                logger.warning(f"تم اكتشاف قفل OCR منتهي الصلاحية (Stale Lock) لمالكه {data.get('owner')} (PID {pid}). جاري الاسترداد...")
                 self._force_remove_lock_file()
                 return True
 
@@ -202,6 +207,18 @@ _COMMON_TESSERACT_PATHS = [
 ]
 
 
+def find_tessdata_dir() -> Path | None:
+    """Locate the bundled Arabic/English OCR models in source and frozen builds."""
+    candidates = [
+        Path(getattr(config, 'BUNDLE_DIR', config.BASE_DIR)) / 'tessdata',
+        Path(config.BASE_DIR) / 'assets' / 'tessdata',
+    ]
+    for candidate in candidates:
+        if (candidate / 'ara.traineddata').is_file() and (candidate / 'eng.traineddata').is_file():
+            return candidate.resolve()
+    return None
+
+
 def find_tesseract_cmd() -> str | None:
     """البحث التلقائي عن مسار tesseract.exe على نظام ويندوز."""
     # 1. فحص المتغير البيئي PATH
@@ -217,6 +234,7 @@ def find_tesseract_cmd() -> str | None:
     return None
 
 
+@lru_cache(maxsize=1)
 def check_ocr_availability() -> dict:
     """
     التحقق من جاهزية محرك OCR المحلي وحزم اللغة العربية.
@@ -229,16 +247,32 @@ def check_ocr_availability() -> dict:
             'has_arabic': False
         }
 
+    tessdata_dir = find_tessdata_dir()
+    if not tessdata_dir:
+        return {
+            'available': True,
+            'cmd_path': cmd,
+            'has_arabic': False,
+            'languages': [],
+            'reason': 'محرك Tesseract متاح لكن حزمة OCR العربية المضمنة غير موجودة.'
+        }
+
     try:
         import pytesseract
         pytesseract.pytesseract.tesseract_cmd = cmd
-        langs = pytesseract.get_languages(config='')
+        tessdata_arg = str(tessdata_dir)
+        # pytesseract's --list-langs wrapper mis-parses custom tessdata paths on
+        # some Windows builds. The packaged model files are authoritative here;
+        # the engine itself is exercised separately by get_tesseract_version.
+        pytesseract.get_tesseract_version()
+        langs = sorted(path.stem for path in tessdata_dir.glob('*.traineddata'))
         has_arabic = ('ara' in langs) or ('Arabic' in langs)
         return {
             'available': True,
             'cmd_path': cmd,
             'has_arabic': has_arabic,
             'languages': langs,
+            'tessdata_path': tessdata_arg,
             'reason': 'محرك Tesseract جاهز ومتاح أوفلاين.' if has_arabic else 'Tesseract متاح لكن ينقصه ملف اللغة العربية (ara.traineddata).'
         }
     except Exception as e:
@@ -249,7 +283,7 @@ def check_ocr_availability() -> dict:
         }
 
 
-def ocr_page_pixmap(pixmap_or_image) -> str:
+def ocr_page_pixmap(pixmap_or_image, languages: str = 'ara+eng') -> str:
     """
     تنفيذ OCR على صورة صفحة واحدة فقط، مع معالجة الأخطاء بأمان.
     """
@@ -260,7 +294,7 @@ def ocr_page_pixmap(pixmap_or_image) -> str:
 
     try:
         import pytesseract
-        from PIL import Image
+        from PIL import Image, ImageOps
         import io
 
         pytesseract.pytesseract.tesseract_cmd = status['cmd_path']
@@ -274,6 +308,10 @@ def ocr_page_pixmap(pixmap_or_image) -> str:
         else:
             return ''
 
+        # Grayscale improves old, textured Arabic periodicals while keeping the
+        # operation light enough for very large PDFs.
+        image = ImageOps.grayscale(image)
+
         with _OCR_SEMAPHORE:
             timeout = getattr(config, 'OCR_LOCK_TIMEOUT_SECONDS', 60)
             ocr_lock = CrossProcessOcrLock(owner=f"ocr_proc_{os.getpid()}", timeout_seconds=timeout)
@@ -281,7 +319,13 @@ def ocr_page_pixmap(pixmap_or_image) -> str:
                 logger.warning("تعذر حجز فتحة تشغيل OCR عبر العمليات ضمن المهلة المحددة (Cross-Process OCR Slot Timeout).")
                 return ''
             try:
-                text = pytesseract.image_to_string(image, lang='ara+eng', config='--psm 6')
+                tessdata_path = status.get('tessdata_path')
+                tessdata_config = f'--tessdata-dir {tessdata_path} ' if tessdata_path else ''
+                text = pytesseract.image_to_string(
+                    image,
+                    lang=languages,
+                    config=f'{tessdata_config}--oem 1 --psm 3'
+                )
                 return text.strip()
             finally:
                 ocr_lock.release()

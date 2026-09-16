@@ -221,3 +221,52 @@ def test_error_response_contains_reference_id(app_client):
     assert len(data['reference_id']) >= 8
 
 
+def test_production_server_fails_closed_when_waitress_missing(tmp_path, monkeypatch):
+    """التحقق من أن الخادم في نمط الإنتاج المحمول يغلق فوراً ويرفض الاستخدام الافتراضي لـ Flask إذا غاب خادم Waitress."""
+    import subprocess
+    test_script = tmp_path / "test_srv.py"
+    root_str = str(ROOT_DIR).replace('\\', '/')
+    test_main_code = f"""
+import sys, os
+sys.path.insert(0, '{root_str}')
+os.environ["PORTABLE_MODE"] = "1"
+sys.modules['waitress'] = None
+
+# محاكاة تشغيل server.py مباشرة
+with open(r'{root_str}/server.py', 'r', encoding='utf-8') as f:
+    code = f.read()
+
+# تنفيذ الكود في سياق __main__
+exec(compile(code, 'server.py', 'exec'), {{'__name__': '__main__', '__file__': r'{root_str}/server.py'}})
+"""
+    test_script.write_text(test_main_code, encoding='utf-8')
+    res = subprocess.run([sys.executable, str(test_script)], capture_output=True, text=True, encoding='utf-8', errors='replace', cwd=str(ROOT_DIR))
+    assert res.returncode == 1
+    assert "PRODUCTION WSGI SERVER NOT AVAILABLE" in res.stderr
+    assert "Logs/server.log" in res.stderr
+
+
+def test_packaged_mode_fails_closed_when_runtime_missing(tmp_path, monkeypatch):
+    """التحقق من أن الحزمة الإنتاجية ترفض الإطلاق بدون مجلد Runtime."""
+    app_dir = tmp_path / "App"
+    app_dir.mkdir(exist_ok=True)
+    monkeypatch.setattr(portable_cli, "ROOT_DIR", tmp_path)
+    monkeypatch.setattr(portable_cli, "APP_DIR", app_dir)
+    monkeypatch.setattr(portable_cli, "is_port_in_use", lambda *args, **kwargs: False)
+
+    with pytest.raises(SystemExit) as exc:
+        portable_cli.cmd_start()
+    assert exc.value.code == 1
+
+
+def test_bundled_waitress_version_and_availability():
+    """التحقق من توفر خادم Waitress بالإصدار المعتمد 3.0.2 داخل vendor."""
+    vendor_dir = ROOT_DIR / "vendor"
+    if str(vendor_dir) not in sys.path:
+        sys.path.insert(0, str(vendor_dir))
+    import waitress
+    from waitress import serve
+    assert serve is not None
+
+
+

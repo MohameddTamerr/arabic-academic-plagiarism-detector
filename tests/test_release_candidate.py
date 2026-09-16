@@ -42,7 +42,8 @@ def test_release_manifest_integrity_and_hashes():
         "v1.2.0-ministry-storage-retrieval-alpha",
         "v1.3.0-ministry-distributed-processing-alpha",
         "v1.4.0-ministry-final-validation-rc",
-        "v1.4.1-sqlite-portable-rc"
+        "v1.4.1-sqlite-portable-rc",
+        "v1.4.2-single-exe-user-test-rc"
     ]
     assert "readiness_verdict" in manifest
     assert manifest["application_version"] in [versioning.APPLICATION_VERSION, "2.5.0", "2.6.0", "2.7.0"]

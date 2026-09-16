@@ -213,7 +213,8 @@ def get_current_corpus_info() -> Dict[str, Any]:
             # خط الأساس الأولي
             fp, _ = compute_deterministic_corpus_fingerprint(session=session)
             year = datetime.now().year
-            ver_id = f"REF-{year}-000001"
+            seq_val = reference_service.get_next_sequence_value('reference_corpus', year)
+            ver_id = f"REF-{year}-{seq_val:06d}"
             base_rec = ReferenceCorpusVersion(
                 version_identifier=ver_id,
                 fingerprint=fp,

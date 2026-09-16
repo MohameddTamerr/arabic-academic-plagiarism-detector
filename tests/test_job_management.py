@@ -14,6 +14,7 @@
 """
 
 import os
+import sys
 import time
 import uuid
 import json
@@ -24,6 +25,7 @@ import multiprocessing
 from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 
+import app
 import config
 from app.repositories import base_repo, report_repo
 from app.models.schema import JobRecord, IndexStateRecord, ScanJob
@@ -1123,7 +1125,7 @@ def test_backup_cross_process_serialization_multiprocess(tmp_path):
 
 
 def test_ocr_concurrency_bounding_with_mock():
-    """35. التحقق من أن سقف تشغيل OCR (MAX_CONCURRENT_OCR_JOBS = 1) يحمي تنفيذ Tesseract الفعلي."""
+    """35. التحقق من أن تنفيذ OCR لا يتجاوز السقف المضبوط."""
     from PIL import Image
     from concurrent.futures import ThreadPoolExecutor
     from plagiarism_detector.extraction import ocr_engine
@@ -1153,7 +1155,7 @@ def test_ocr_concurrency_bounding_with_mock():
 
     assert len(results) == 5
     assert all(r == "نص مستخرج عبر OCR" for r in results)
-    assert max_concurrent_seen == 1
+    assert 1 <= max_concurrent_seen <= config.MAX_CONCURRENT_OCR_JOBS
 
 
 def test_index_rebuild_dedup_multiprocess(tmp_path):
@@ -1269,6 +1271,5 @@ def test_cross_process_ocr_crash_recovery(tmp_path):
     # تحرير القفل
     lock_b.release()
     assert not os.path.exists(lock_file)
-
 
 

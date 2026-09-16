@@ -5,6 +5,7 @@
 """
 
 import os
+import sys
 import io
 import time
 import uuid
@@ -16,6 +17,7 @@ import multiprocessing
 from datetime import datetime
 from pathlib import Path
 
+import app
 import config
 from app import create_app
 from app.repositories import base_repo, report_repo, batch_repo, user_repo
@@ -33,6 +35,8 @@ from plagiarism_detector.reporting.html_exporter import export_report_to_html
 def _mp_worker_finalize_report(db_path: str, report_id: str, username: str, queue: multiprocessing.Queue):
     """عامل مستقل في عملية OS منفصلة لمحاولة اعتماد التقرير بالتزامن."""
     try:
+        import sys
+        import app
         import config
         from app.repositories import base_repo
         from app.services import report_integrity_service

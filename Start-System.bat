@@ -8,7 +8,8 @@ if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
 set "PYTHON="
 if exist "%ROOT%\Runtime\python.exe" (
     set "PYTHON=%ROOT%\Runtime\python.exe"
-) else (
+) else if not exist "%ROOT%\App" (
+    rem Fallback to system Python ONLY in developer/source repository mode
     where python >nul 2>nul
     if not errorlevel 1 (
         set "PYTHON=python"
@@ -21,8 +22,9 @@ if "%PYTHON%"=="" (
     echo ======================================================================
     echo Python executable was not found in:
     echo   %ROOT%\Runtime\python.exe
-    echo nor in the system PATH.
-    echo Please install Python 3.11+ or provide the Runtime directory.
+    echo.
+    echo This portable package requires the bundled Runtime.
+    echo System Python fallback is disabled in production portable mode.
     echo ======================================================================
     pause
     exit /b 1

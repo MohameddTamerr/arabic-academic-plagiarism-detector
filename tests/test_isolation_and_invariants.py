@@ -14,6 +14,7 @@
 """
 
 import os
+import sys
 import io
 import uuid
 import time
@@ -23,6 +24,7 @@ import multiprocessing
 from pathlib import Path
 import pytest
 
+import app
 import config
 from app.models.research_schema import Research, ResearchFile, STORAGE_STATUS_FINALIZED, STORAGE_STATUS_REGISTRY_ONLY
 from app.repositories import batch_repo, base_repo
@@ -32,13 +34,17 @@ from app.services import storage_service, backup_service, integrity_service
 def _mp_probe_worker(db_path: str, result_queue: multiprocessing.Queue):
     """عامل فرعي يتأكد من استخدام المسار المعزول تحت TESTING=1."""
     import os
+    import sys
     os.environ['TESTING'] = '1'
+    os.environ['DATABASE_URL'] = f"sqlite:///{db_path}"
+    import app
     import config
     from app.repositories import base_repo
     
     config.DATABASE_URL = f"sqlite:///{db_path}"
     config.DEFAULT_SQLITE_PATH = Path(db_path)
     base_repo.rebind_engine(config.DATABASE_URL)
+
     
     with base_repo.get_session() as session:
         conn = session.connection()

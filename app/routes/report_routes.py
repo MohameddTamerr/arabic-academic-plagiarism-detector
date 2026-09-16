@@ -10,14 +10,15 @@ from flask import Blueprint, request, jsonify, Response
 from werkzeug.utils import secure_filename
 
 import config
-from app.repositories import report_repo, document_repo, batch_repo
+from app.repositories import report_repo, document_repo, batch_repo, base_repo
 from app.services import audit_service
 from app.services.paper_service import import_reference_paper
 from plagiarism_detector.extraction.page_extractor import extract_text
 from plagiarism_detector.preprocessing.cheating_detector import clean_cheating_text
 from plagiarism_detector.reporting.html_exporter import export_report_to_html
 from app.security.permissions import Permission
-from app.security.authorization import require_permission
+from app.security.authorization import require_permission, get_authenticated_user, can_view_report
+from app.errors.error_codes import ErrorCode
 
 report_bp = Blueprint('report_bp', __name__)
 
@@ -29,6 +30,13 @@ def get_report_route(report_id):
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
 
     # تسجيل حدث فتح التقرير إذا كان الطلب من مستخدم وليس استعلاماً خلفياً متكرراً
     if request.headers.get('X-Track-Open', '').lower() == 'true' or request.args.get('track', '').lower() == '1':
@@ -82,6 +90,7 @@ def delete_report_route(report_id):
 
 
 @report_bp.route('/api/reports/<report_id>/submit_to_admin', methods=['POST'])
+@require_permission(Permission.RESEARCH_UPLOAD)
 def submit_to_admin(report_id):
     """إرسال بحث من موظف لمدير النظام للاعتماد والفحص الأولي."""
     data = request.get_json(silent=True) or request.form or {}
@@ -115,7 +124,7 @@ def submit_to_admin(report_id):
 
 
 @report_bp.route('/api/initial_reviews', methods=['GET'])
-@require_permission(Permission.REVIEW_PRELIMINARY)
+@require_permission(Permission.REVIEW_VIEW)
 def get_initial_reviews():
     """استرجاع قائمة الأبحاث المنتظرة في طابور الفحص الأولي مع دعم التقسيم والبحث وفلترة التواريخ."""
     from app.utils.pagination import get_pagination_params, format_paginated_response
@@ -147,6 +156,7 @@ def get_initial_reviews():
 
 
 @report_bp.route('/api/initial_reviews/count', methods=['GET'])
+@require_permission(Permission.REVIEW_VIEW)
 def get_initial_reviews_count():
     """عدد الأبحاث المعلقة لتحديث شارة الإشعارات."""
     return jsonify({'count': report_repo.get_pending_initial_reviews_count()})
@@ -192,21 +202,72 @@ def list_reports_paginated():
 @report_bp.route('/api/reports/<report_id>/initial_accept', methods=['POST'])
 @require_permission(Permission.REVIEW_PRELIMINARY)
 def initial_accept(report_id):
-    """قبول مبدئي للبحث مع التحقق من صحة الانتقال (صلاحية review.preliminary)."""
+    """قبول مبدئي للبحث مع التحقق من صحة الانتقال وفصل المهام (صلاحية review.preliminary)."""
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
 
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    # فحص الحماية ضد المراجعة الذاتية (Self-Review Protection)
+    submitted_by_uid = report.get('submitted_by_user_id')
+    submitted_by_name = report.get('submitted_by')
+    if actor:
+        if (submitted_by_uid and actor.get('id') == submitted_by_uid) or \
+           (submitted_by_name and actor.get('username') and actor.get('username').lower() == submitted_by_name.lower()):
+            audit_service.record_event(
+                action="REVIEW_DECISION_ATTEMPT_DENIED",
+                category="review",
+                user=actor,
+                object_type="report",
+                object_id=report_id,
+                success=False,
+                failure_reason_code="SELF_REVIEW_FORBIDDEN",
+                metadata={'report_id': report_id, 'attempted_action': 'initial_accept'}
+            )
+            return jsonify({
+                'error': 'غير مصرح: لا يمكن للمستخدم مراجعة أو تحكيم بحث قام برفعه بنفسه (مبدأ فصل المهام المؤسسي)',
+                'code': ErrorCode.AUTH_FORBIDDEN
+            }), 403
+
     prev_review_status = report.get('review_status', 'pending_review')
     prev_status = report.get('status', 'مفحوص')
+
+    data = request.get_json(silent=True) or request.form or {}
+    comment = data.get('comment', '')
 
     success, err_msg = report_repo.update_report_review_status(report_id, 'preliminary_accepted')
     if not success:
         return jsonify({'error': err_msg or 'انتقال تحكيمي غير قانوني'}), 400
 
+    # تسجيل سجل قرار التحكيم في DB
+    from app.models.schema import ReviewDecisionRecord
+    with base_repo.get_session() as session:
+        dec_rec = ReviewDecisionRecord(
+            report_id=report_id,
+            research_id=report.get('research_id'),
+            thesis_id=report.get('thesis_id'),
+            report_revision=report.get('revision_number', 1),
+            previous_review_status=prev_review_status,
+            new_review_status='preliminary_accepted',
+            decision='preliminary_accepted',
+            reviewer=actor.get('username', 'مراجع') if actor else 'مراجع',
+            reviewer_user_id=actor.get('id') if actor else None,
+            reviewer_role_snapshot=actor.get('role', '') if actor else '',
+            comment=comment,
+            request_id=request.headers.get('X-Request-ID', '')
+        )
+        session.add(dec_rec)
+
     audit_service.record_event(
         action="review.preliminary_accepted",
         category="review",
+        user=actor,
         object_type="report",
         object_id=report_id,
         report_id=report_id,
@@ -217,7 +278,8 @@ def initial_accept(report_id):
             'previous_review_status': prev_review_status,
             'new_review_status': 'preliminary_accepted',
             'previous_status': prev_status,
-            'new_status': 'قبول مبدئي'
+            'new_status': 'قبول مبدئي',
+            'comment': comment
         }
     )
 
@@ -233,21 +295,73 @@ def initial_accept(report_id):
 @report_bp.route('/api/reports/<report_id>/reject', methods=['POST'])
 @require_permission(Permission.REVIEW_REJECT)
 def reject_report(report_id):
-    """رفض البحث أكاديمياً مع التحقق من صحة الانتقال (صلاحية review.reject)."""
+    """رفض البحث أكاديمياً مع التحقق من صحة الانتقال وحفظ سبب الرفض (صلاحية review.reject)."""
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
 
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    # فحص الحماية ضد المراجعة الذاتية (Self-Review Protection)
+    submitted_by_uid = report.get('submitted_by_user_id')
+    submitted_by_name = report.get('submitted_by')
+    if actor:
+        if (submitted_by_uid and actor.get('id') == submitted_by_uid) or \
+           (submitted_by_name and actor.get('username') and actor.get('username').lower() == submitted_by_name.lower()):
+            audit_service.record_event(
+                action="REVIEW_DECISION_ATTEMPT_DENIED",
+                category="review",
+                user=actor,
+                object_type="report",
+                object_id=report_id,
+                success=False,
+                failure_reason_code="SELF_REVIEW_FORBIDDEN",
+                metadata={'report_id': report_id, 'attempted_action': 'reject'}
+            )
+            return jsonify({
+                'error': 'غير مصرح: لا يمكن للمستخدم مراجعة أو تحكيم بحث قام برفعه بنفسه (مبدأ فصل المهام المؤسسي)',
+                'code': ErrorCode.AUTH_FORBIDDEN
+            }), 403
+
     prev_review_status = report.get('review_status', 'pending_review')
     prev_status = report.get('status', 'مفحوص')
+
+    data = request.get_json(silent=True) or request.form or {}
+    rejection_reason = (data.get('reason') or data.get('comment') or '').strip()
 
     success, err_msg = report_repo.update_report_review_status(report_id, 'rejected')
     if not success:
         return jsonify({'error': err_msg or 'انتقال تحكيمي غير قانوني'}), 400
 
+    # تسجيل سجل قرار التحكيم في DB
+    from app.models.schema import ReviewDecisionRecord
+    with base_repo.get_session() as session:
+        dec_rec = ReviewDecisionRecord(
+            report_id=report_id,
+            research_id=report.get('research_id'),
+            thesis_id=report.get('thesis_id'),
+            report_revision=report.get('revision_number', 1),
+            previous_review_status=prev_review_status,
+            new_review_status='rejected',
+            decision='rejected',
+            reviewer=actor.get('username', 'مراجع') if actor else 'مراجع',
+            reviewer_user_id=actor.get('id') if actor else None,
+            reviewer_role_snapshot=actor.get('role', '') if actor else '',
+            rejection_reason=rejection_reason,
+            comment=rejection_reason,
+            request_id=request.headers.get('X-Request-ID', '')
+        )
+        session.add(dec_rec)
+
     audit_service.record_event(
         action="review.rejected",
         category="review",
+        user=actor,
         object_type="report",
         object_id=report_id,
         report_id=report_id,
@@ -258,7 +372,8 @@ def reject_report(report_id):
             'previous_review_status': prev_review_status,
             'new_review_status': 'rejected',
             'previous_status': prev_status,
-            'new_status': 'مرفوض'
+            'new_status': 'مرفوض',
+            'rejection_reason': rejection_reason
         }
     )
 
@@ -272,7 +387,7 @@ def reject_report(report_id):
 
 
 @report_bp.route('/api/preliminary_papers', methods=['GET'])
-@require_permission(Permission.REPORT_VIEW)
+@require_permission(Permission.REVIEW_VIEW)
 def get_preliminary():
     """استرجاع الأبحاث المقبولة مبدئياً مع دعم التقسيم والبحث والفلترة."""
     from app.utils.pagination import get_pagination_params, format_paginated_response
@@ -303,7 +418,7 @@ def get_preliminary():
 
 
 @report_bp.route('/api/rejected_papers', methods=['GET'])
-@require_permission(Permission.REPORT_VIEW)
+@require_permission(Permission.REVIEW_VIEW)
 def get_rejected():
     """استرجاع الأبحاث المرفوضة مع دعم التقسيم والبحث والفلترة."""
     from app.utils.pagination import get_pagination_params, format_paginated_response
@@ -390,6 +505,41 @@ def final_accept(report_id):
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
 
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    # فحص الحماية ضد المراجعة الذاتية (Self-Review Protection)
+    submitted_by_uid = report.get('submitted_by_user_id')
+    submitted_by_name = report.get('submitted_by')
+    if actor:
+        if (submitted_by_uid and actor.get('id') == submitted_by_uid) or \
+           (submitted_by_name and actor.get('username') and actor.get('username').lower() == submitted_by_name.lower()):
+            audit_service.record_event(
+                action="REVIEW_DECISION_ATTEMPT_DENIED",
+                category="review",
+                user=actor,
+                object_type="report",
+                object_id=report_id,
+                success=False,
+                failure_reason_code="SELF_REVIEW_FORBIDDEN",
+                metadata={'report_id': report_id, 'attempted_action': 'final_accept'}
+            )
+            return jsonify({
+                'error': 'غير مصرح: لا يمكن للمستخدم مراجعة أو تحكيم بحث قام برفعه بنفسه (مبدأ فصل المهام المؤسسي)',
+                'code': ErrorCode.AUTH_FORBIDDEN
+            }), 403
+
+    # التحقق من أن البحث/الرسالة مكتملة الفحص وليست معلقة أو فاشلة
+    if report.get('scan_status') not in ('completed', 'مفحوص'):
+        return jsonify({
+            'error': 'لا يمكن الاعتماد النهائي لبحث أو رسالة لم يكتمل فحصها التقني بنجاح',
+            'code': ErrorCode.VALIDATION_ERROR
+        }), 400
+
     prev_review_status = report.get('review_status', 'pending_review')
     prev_status = report.get('status', 'مفحوص')
 
@@ -414,9 +564,28 @@ def final_accept(report_id):
         raw_text=final_text
     )
 
+    # تسجيل سجل قرار التحكيم في DB
+    from app.models.schema import ReviewDecisionRecord
+    with base_repo.get_session() as session:
+        dec_rec = ReviewDecisionRecord(
+            report_id=report_id,
+            research_id=report.get('research_id'),
+            thesis_id=report.get('thesis_id'),
+            report_revision=report.get('revision_number', 1),
+            previous_review_status=prev_review_status,
+            new_review_status='final_accepted',
+            decision='final_accepted',
+            reviewer=actor.get('username', 'مراجع نهائي') if actor else 'مراجع نهائي',
+            reviewer_user_id=actor.get('id') if actor else None,
+            reviewer_role_snapshot=actor.get('role', '') if actor else '',
+            request_id=request.headers.get('X-Request-ID', '')
+        )
+        session.add(dec_rec)
+
     audit_service.record_event(
         action="review.final_accepted",
         category="review",
+        user=actor,
         object_type="report",
         object_id=report_id,
         report_id=report_id,
@@ -453,6 +622,13 @@ def export_html(report_id):
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
 
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
     audit_service.record_event(
         action="report.exported",
         category="report",
@@ -477,9 +653,20 @@ def export_html(report_id):
 @require_permission(Permission.REPORT_FINALIZE)
 def finalize_report_route(report_id):
     """اعتماد التقرير رسمياً وتجميد محتواه وبصمته الرقمية (صلاحية report.finalize)."""
+    report = report_repo.get_report(report_id)
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
     from flask import session as flask_session
     from app.services import report_integrity_service
-    user_name = flask_session.get('user', {}).get('username') or 'senior_reviewer'
+    user_name = actor.get('username') if actor else (flask_session.get('user', {}).get('username') or 'senior_reviewer')
 
     ok, rep_data, msg, err_code = report_integrity_service.finalize_report(report_id, finalized_by=user_name)
     if not ok:
@@ -499,6 +686,17 @@ def finalize_report_route(report_id):
 @require_permission(Permission.REPORT_VIEW)
 def get_report_integrity_route(report_id):
     """التحقق من سلامة ونزاهة وبصمة التقرير (صلاحية report.view)."""
+    report = report_repo.get_report(report_id)
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
     from app.services import report_integrity_service
     res = report_integrity_service.verify_report_integrity(report_id)
     if res.get('error'):
@@ -510,9 +708,20 @@ def get_report_integrity_route(report_id):
 @require_permission(Permission.REPORT_VOID)
 def void_report_route(report_id):
     """إبطال تقرير معتمد مع توثيق السبب والفاعل (صلاحية report.void)."""
+    report = report_repo.get_report(report_id)
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
     from flask import session as flask_session
     from app.services import report_integrity_service
-    user_name = flask_session.get('user', {}).get('username') or 'system_admin'
+    user_name = actor.get('username') if actor else (flask_session.get('user', {}).get('username') or 'system_admin')
     data = request.get_json(silent=True) or request.form or {}
     reason = data.get('reason', '').strip()
 
@@ -530,10 +739,18 @@ def void_report_route(report_id):
 @require_permission(Permission.REPORT_VIEW)
 def get_report_revisions_route(report_id):
     """استرجاع خط النسب الزمني وتاريخ مراجعات البحث للتقرير (صلاحية report.view)."""
-    from app.services import report_integrity_service
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    from app.services import report_integrity_service
 
     research_id = report.get('research_id')
     if not research_id:
@@ -545,4 +762,3 @@ def get_report_revisions_route(report_id):
         'research_reference_number': report.get('reference_number', ''),
         'revisions': revisions
     })
-

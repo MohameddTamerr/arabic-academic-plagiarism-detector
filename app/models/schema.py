@@ -143,6 +143,9 @@ class LegacyReport(Base):
 
     # Phase 15: الهوية المستقرة وإدارة المراجعات وسلسلة النزاهة (Revision Model & Tamper-Evidence)
     research_id = Column(Integer, nullable=True, index=True)
+    thesis_id = Column(Integer, nullable=True, index=True)
+    is_combined_thesis = Column(Integer, default=0, index=True)
+    submitted_by_user_id = Column(Integer, nullable=True, index=True)
     scan_execution_id = Column(String(64), nullable=True, index=True)
     revision_number = Column(Integer, default=1, nullable=False)
     supersedes_report_id = Column(String(64), nullable=True, index=True)
@@ -164,6 +167,7 @@ class LegacyReport(Base):
 
     __table_args__ = (
         Index('idx_rep_research_rev', 'research_id', 'revision_number'),
+        Index('idx_rep_thesis_rev', 'thesis_id', 'revision_number'),
         Index('idx_rep_artifact_status', 'artifact_status'),
     )
 
@@ -177,14 +181,23 @@ class ReviewDecisionRecord(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     report_id = Column(String(64), nullable=False, index=True)
     research_id = Column(Integer, nullable=True, index=True)
+    thesis_id = Column(Integer, nullable=True, index=True)
+    report_revision = Column(Integer, default=1)
+    previous_review_status = Column(String(50), default='')
+    new_review_status = Column(String(50), default='')
     decision = Column(String(50), nullable=False) # pending_review, preliminary_accepted, rejected, final_accepted
     reviewer = Column(String(255), nullable=False)
+    reviewer_user_id = Column(Integer, nullable=True, index=True)
+    reviewer_role_snapshot = Column(String(50), default='')
+    rejection_reason = Column(Text, default='')
     comment = Column(Text, default='')
+    request_id = Column(String(64), default='')
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
         Index('idx_rev_hist_report', 'report_id'),
         Index('idx_rev_hist_research', 'research_id'),
+        Index('idx_rev_hist_thesis', 'thesis_id'),
     )
 
 
@@ -196,10 +209,14 @@ class User(Base):
     username = Column(String(100), unique=True, nullable=False, index=True)
     password_hash = Column(String(255), nullable=False)
     full_name = Column(String(255), nullable=False)
-    role = Column(String(50), default='employee')  # admin, employee, etc.
+    role = Column(String(50), default='employee')  # system_admin, reviewer, employee, etc.
+    department = Column(String(255), default='')   # الإدارة / الوحدة
+    phone_number = Column(String(50), default='')  # رقم الهاتف (اختياري)
     reset_allowed = Column(Integer, default=0)
-    is_active = Column(Integer, default=1)  # 1 = نشط، 0 = معطل
-    session_version = Column(Integer, default=1)  # ختم أمان الجلسة لإلغاء الجلسات النشطة
+    is_active = Column(Integer, default=1)         # 1 = نشط، 0 = معطل
+    must_change_password = Column(Integer, default=0) # 1 = إجبار تغيير كلمة المرور عند أول تسجيل دخول
+    must_enroll_recovery = Column(Integer, default=0) # 1 = إجبار إعداد استرداد الحساب
+    session_version = Column(Integer, default=1)   # ختم أمان الجلسة لإلغاء الجلسات النشطة
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -237,6 +254,48 @@ class SystemSecurityState(Base):
     key = Column(String(100), primary_key=True)
     value = Column(Text, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AccountRecoveryCredential(Base):
+    """
+    جدول اعتمادات استرداد الحسابات بدون اتصال (Offline QR/Code Account Recovery Credentials):
+    - يخزن فقط مدققات التجزئة القوية (Argon2id Verifiers) للسر ولرمز PIN.
+    - لا يخزن السر الخام أو رمز الاسترداد أو رقم PIN نهائياً.
+    """
+    __tablename__ = 'account_recovery_credentials'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    credential_public_id = Column(String(64), unique=True, nullable=False, index=True)
+    secret_verifier = Column(String(255), nullable=False)
+    pin_verifier = Column(String(255), nullable=False)
+    version = Column(Integer, default=1)
+    status = Column(String(20), default='active', index=True)  # active, revoked, superseded
+    created_at = Column(DateTime, default=datetime.utcnow)
+    revoked_at = Column(DateTime, nullable=True)
+    last_used_at = Column(DateTime, nullable=True)
+    failure_count = Column(Integer, default=0)
+    locked_until = Column(DateTime, nullable=True)
+
+
+class RecoveryTransaction(Base):
+    """
+    جدول معاملات الاسترداد المؤقتة ذات الاستخدام لمرة واحدة (Short-Lived Reset Authorization Tokens):
+    - صلاحية محدودة (5-10 دقائق).
+    - غير صالحة للاستخدام المزدوج، وتبطل فور إعادة تعيين كلمة المرور أو انتهاء الوقت.
+    """
+    __tablename__ = 'recovery_transactions'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), nullable=False, index=True)
+    credential_id = Column(Integer, ForeignKey('account_recovery_credentials.id', ondelete='CASCADE'), nullable=False)
+    token_hash = Column(String(255), unique=True, nullable=False, index=True)
+    state = Column(String(20), default='pending', index=True)  # pending, completed, expired, revoked
+    expires_at = Column(DateTime, nullable=False)
+    used_at = Column(DateTime, nullable=True)
+    request_id = Column(String(64), default='')
+    client_ip = Column(String(64), default='')
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 
 class ReferenceMetadataHistory(Base):
@@ -362,6 +421,4 @@ class JobRecord(Base):
         Index('idx_job_research', 'research_id'),
         Index('idx_job_batch', 'batch_id'),
     )
-
-
 

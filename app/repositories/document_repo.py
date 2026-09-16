@@ -32,6 +32,76 @@ def get_document_by_hash(file_hash: str) -> Optional[dict]:
     return None
 
 
+def get_active_document_by_hash(file_hash: str, include_content: bool = False) -> Optional[dict]:
+    """Return an active reference whose binary SHA-256 matches exactly.
+
+    When ``include_content`` is enabled, the already-indexed pages and segments are
+    returned as well.  This lets an exact-file scan reuse trusted corpus content
+    instead of running PDF extraction/OCR on the same bytes again.
+    """
+    if not file_hash:
+        return None
+
+    with get_session() as session:
+        doc = (
+            session.query(Document)
+            .filter(
+                Document.file_hash == file_hash,
+                Document.current_status == 'active',
+            )
+            .first()
+        )
+        if not doc:
+            return None
+
+        result = {
+            'id': doc.id,
+            'reference_id': doc.reference_id or '',
+            'title': doc.title,
+            'author': doc.author or '',
+            'category': doc.category or 'عام',
+            'file_path': doc.file_path or '',
+            'file_hash': doc.file_hash or '',
+            'size_bytes': doc.size_bytes or 0,
+            'current_status': doc.current_status or 'active',
+            'created_at': doc.created_at.isoformat() if doc.created_at else '',
+        }
+
+        if include_content:
+            pages = (
+                session.query(DocumentPage)
+                .filter(DocumentPage.document_id == doc.id)
+                .order_by(DocumentPage.page_number.asc(), DocumentPage.id.asc())
+                .all()
+            )
+            segments = (
+                session.query(DocumentSegment)
+                .filter(DocumentSegment.document_id == doc.id)
+                .order_by(DocumentSegment.segment_number.asc(), DocumentSegment.id.asc())
+                .all()
+            )
+            result['pages'] = [
+                {
+                    'page_number': page.page_number,
+                    'text': page.raw_text or '',
+                    'is_ocr': False,
+                    'extraction_engine': 'reference_cache',
+                }
+                for page in pages
+            ]
+            result['segments'] = [
+                {
+                    'segment_number': segment.segment_number,
+                    'page_number': segment.page_number,
+                    'raw_text': segment.raw_text or '',
+                    'word_count': segment.word_count or len((segment.raw_text or '').split()),
+                }
+                for segment in segments
+            ]
+
+        return result
+
+
 def get_document_by_title(title: str) -> Optional[dict]:
     """فحص وجود بحث بنفس العنوان."""
     with get_session() as session:

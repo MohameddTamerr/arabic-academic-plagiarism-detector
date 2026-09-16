@@ -32,6 +32,13 @@ def client():
         yield client
 
 
+def _login_as(client, role):
+    with client.session_transaction() as session:
+        session['user_id'] = 987654
+        session['username'] = f'test_{role}'
+        session['role'] = role
+
+
 def test_new_research_initial_statuses():
     """البحث الجديد يبدأ بحالة فحص queued وحالة تحكيم pending_review."""
     res_id = batch_repo.create_research(
@@ -124,11 +131,13 @@ def test_academic_review_workflow_progression(client):
     )
 
     # 1. قبول مبدئي
+    _login_as(client, 'reviewer')
     res_init = client.post(f'/api/reports/{rep_id}/initial_accept')
     assert res_init.status_code == 200
     assert res_init.get_json()['review_status'] == ReviewStatus.PRELIMINARY_ACCEPTED.value
 
     # 2. اعتماد نهائي
+    _login_as(client, 'senior_reviewer')
     res_final = client.post(f'/api/reports/{rep_id}/final_accept')
     assert res_final.status_code == 200
     assert res_final.get_json()['review_status'] == ReviewStatus.FINAL_ACCEPTED.value
@@ -149,6 +158,7 @@ def test_invalid_review_transition_rejected_by_backend(client):
     )
 
     # محاولة نقله لقبول مبدئي بعد الاعتماد النهائي
+    _login_as(client, 'reviewer')
     res_invalid = client.post(f'/api/reports/{rep_id}/initial_accept')
     assert res_invalid.status_code == 400
     assert 'غير مسموح' in str(res_invalid.get_json().get('error', ''))
@@ -201,6 +211,7 @@ def test_audit_event_contains_previous_and_new_review_status(client):
         review_status=ReviewStatus.PENDING_REVIEW.value
     )
 
+    _login_as(client, 'reviewer')
     client.post(f'/api/reports/{rep_id}/reject')
 
     with get_session() as session:

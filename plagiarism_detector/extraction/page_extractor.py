@@ -4,7 +4,7 @@
 - استخراج صفحة-بصفحة من ملفات PDF مع حفظ رقم الصفحة الأصلي بدقة.
 - استخراج فقرات مستندات Word (.docx) و (.txt) مع وسم رقم الصفحة بـ None (غير متاح).
 - دعم معالجة الحروف المعكوسة (Bidi) وتنظيف شوائب خطوط PDF العربية.
-- تفعيل التعرف الضوئي (OCR) المشروط فقط على الصفحات المصمتة التي يقل نصها عن 20 كلمة.
+- تفعيل OCR للصفحات المصمتة ولطبقات النص العربية ذات الترميز التالف.
 """
 
 import os
@@ -12,7 +12,10 @@ import re
 import logging
 import unicodedata
 from pathlib import Path
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
+from typing import Callable, Optional
 
+import config
 from .ocr_engine import check_ocr_availability, ocr_page_pixmap
 
 logger = logging.getLogger(__name__)
@@ -21,6 +24,29 @@ logger = logging.getLogger(__name__)
 _REVERSED_ARABIC = re.compile(r'\b(ة[ا-ي]{2,}|[ا-ي]{2,}لا|[ا-ي]{2,}ةي|هيلع|ءاكذ|ميلعت)\b')
 _ARABIC_CHAR_RE = re.compile(r'[\u0600-\u06FF\uFB50-\uFDFF\uFE70-\uFEFF]')
 _LATIN_CHAR_RE = re.compile(r'[a-zA-Z]')
+_LEGACY_PDF_GLYPH_RE = re.compile(r'[\u0080-\u009F\u00E5\u00C5]')
+
+
+def pdf_text_needs_ocr(text: str, min_words: int = 20) -> tuple[bool, str]:
+    """Detect empty/scanned pages and corrupt legacy Arabic PDF text layers."""
+    if not text or not text.strip():
+        return True, 'empty'
+
+    arabic_chars = len(_ARABIC_CHAR_RE.findall(text))
+    replacement_chars = text.count('\uFFFD')
+    control_chars = sum(
+        1 for char in text
+        if unicodedata.category(char) == 'Cc' and char not in '\n\r\t'
+    )
+    legacy_glyphs = len(_LEGACY_PDF_GLYPH_RE.findall(text))
+    if arabic_chars >= 20 and (replacement_chars or control_chars or legacy_glyphs):
+        return True, 'corrupt_text_layer'
+
+    words = text.split()
+    if len(words) < min_words:
+        return True, 'sparse'
+
+    return False, ''
 
 
 def clean_arabic_pdf_glyphs(text: str) -> str:
@@ -36,6 +62,7 @@ def clean_arabic_pdf_glyphs(text: str) -> str:
     text = unicodedata.normalize('NFKC', text)
     # إزالة الرموز والمحارف التحكمية غير المقروءة
     text = re.sub(r'[\uFFFD\u0000-\u0008\u000B\u000C\u000E-\u001F\u25C6\u25C7\u25A0\u25A1]', ' ', text)
+    text = re.sub(r'[\u200E\u200F\u202A-\u202E\u2066-\u2069]', '', text)
     text = text.replace('\u0640', '')  # إزالة الكشيدة
 
     # تصحيح تراكيب ال التعريف الشائعة في الخطوط المعطوبة
@@ -86,7 +113,11 @@ def unreverse_arabic_text(text: str) -> str:
     return '\n'.join(out_lines)
 
 
-def extract_document_pages(file_path: str, enable_ocr: bool = True) -> list[dict]:
+def extract_document_pages(
+    file_path: str,
+    enable_ocr: bool = True,
+    progress_callback: Optional[Callable[[int, int, int], None]] = None,
+) -> list[dict]:
     """
     استخراج محتوى المستند صفحة-بصفحة.
     يرجع قائمة بالقواميس:
@@ -100,7 +131,11 @@ def extract_document_pages(file_path: str, enable_ocr: bool = True) -> list[dict
     pages: list[dict] = []
 
     if ext == '.pdf':
-        pages = _extract_pages_from_pdf(file_path, enable_ocr=enable_ocr)
+        pages = _extract_pages_from_pdf(
+            file_path,
+            enable_ocr=enable_ocr,
+            progress_callback=progress_callback,
+        )
     elif ext in ('.docx', '.doc'):
         pages = _extract_pages_from_docx(file_path)
     elif ext == '.txt':
@@ -111,51 +146,178 @@ def extract_document_pages(file_path: str, enable_ocr: bool = True) -> list[dict
     return pages
 
 
-def _extract_pages_from_pdf(path: str, enable_ocr: bool = True) -> list[dict]:
-    """استخراج صفحات PDF مع الحفاظ على ترقيم الصفحات ومحاولة OCR المشروط."""
-    pages = []
+def _notify_pdf_progress(callback, completed: int, total: int, page_number: int) -> None:
+    if not callback:
+        return
+    try:
+        callback(completed, total, page_number)
+    except Exception as exc:
+        logger.debug("تعذر إرسال تقدم استخراج PDF: %s", exc)
+
+
+def _clean_pdf_page_result(text: str, logical_direction: bool) -> str:
+    if not text:
+        return ''
+    text = unicodedata.normalize('NFKC', text)
+    if not logical_direction:
+        text = unreverse_arabic_text(text)
+    return clean_arabic_pdf_glyphs(text).strip()
+
+
+def alternative_pdf_text_is_usable(primary_text: str, alternative_text: str) -> bool:
+    """Accept a clean alternate text layer only when it preserves enough Arabic."""
+    if not alternative_text or len(alternative_text.split()) < 20:
+        return False
+    alternative_needs_ocr, _ = pdf_text_needs_ocr(alternative_text)
+    if alternative_needs_ocr:
+        return False
+
+    primary_arabic = len(_ARABIC_CHAR_RE.findall(primary_text or ''))
+    alternative_arabic = len(_ARABIC_CHAR_RE.findall(alternative_text))
+    if primary_arabic < 40:
+        return alternative_arabic >= 20
+    return (alternative_arabic / primary_arabic) >= 0.70
+
+
+def _ocr_pdf_pixmap(pixmap, original_text: str, original_word_count: int, languages: str) -> tuple[str, bool]:
+    """OCR worker for one already-rendered page, returning safe fallback text."""
+    try:
+        ocr_text = ocr_page_pixmap(pixmap, languages=languages)
+        minimum_words = 4 if original_word_count < 20 else max(8, int(original_word_count * 0.25))
+        if ocr_text and len(ocr_text.split()) >= minimum_words:
+            return _clean_pdf_page_result(ocr_text, True), True
+    except Exception as exc:
+        logger.debug("فشل OCR لإحدى صفحات PDF: %s", exc)
+    return _clean_pdf_page_result(original_text, False), False
+
+
+def _extract_pages_from_pdf(
+    path: str,
+    enable_ocr: bool = True,
+    progress_callback: Optional[Callable[[int, int, int], None]] = None,
+) -> list[dict]:
+    """استخراج PDF بصفحات OCR متوازية ومحدودة الذاكرة مع حفظ الترتيب."""
     ocr_status = check_ocr_availability() if enable_ocr else {'available': False}
 
     # المحاولة الأولى: PyMuPDF (fitz)
     try:
         import fitz
-        doc = fitz.open(path)
-        for idx, page in enumerate(doc):
-            page_num = idx + 1
-            text = page.get_text('text')
-            is_ocr = False
+        with fitz.open(path) as doc:
+            total_pages = len(doc)
+            pages: list[Optional[dict]] = [None] * total_pages
+            completed = 0
+            worker_count = min(
+                max(1, int(getattr(config, 'PDF_OCR_WORKERS', 2))),
+                max(1, int(getattr(config, 'MAX_CONCURRENT_OCR_JOBS', 2))),
+            )
+            dpi = int(getattr(config, 'PDF_OCR_DPI', 220))
+            max_pending = max(2, worker_count * 2)
+            pending = {}
+            alternate_reader = None
+            alternate_reader_failed = False
 
-            # فحص إذا كانت الصفحة مصمتة أو مسحوبة عبر سكانر (أقل من 20 كلمة)
-            words = text.split() if text else []
-            if len(words) < 20 and enable_ocr and ocr_status['available']:
-                logger.info(f"الصفحة {page_num} نصها قليل جداً ({len(words)} كلمة)، جاري تجربة OCR مشروط...")
-                try:
-                    pix = page.get_pixmap(dpi=200)
-                    ocr_text = ocr_page_pixmap(pix)
-                    if ocr_text and len(ocr_text.split()) > len(words):
-                        text = ocr_text
-                        is_ocr = True
-                except Exception as oe:
-                    logger.debug(f"فشل OCR للصفحة {page_num}: {oe}")
+            def collect(done_futures) -> None:
+                nonlocal completed
+                for future in done_futures:
+                    page_idx, page_num = pending.pop(future)
+                    try:
+                        page_text, is_ocr = future.result()
+                    except Exception as exc:
+                        logger.warning("فشل عامل OCR للصفحة %s: %s", page_num, exc)
+                        page_text, is_ocr = '', False
+                    pages[page_idx] = {
+                        'page_number': page_num,
+                        'text': page_text,
+                        'is_ocr': is_ocr,
+                        'extraction_engine': 'tesseract' if is_ocr else 'pymupdf',
+                    }
+                    completed += 1
+                    _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
 
-            if text:
-                text = unicodedata.normalize('NFKC', text)
-                text = unreverse_arabic_text(text)
-                text = clean_arabic_pdf_glyphs(text)
+            with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix='pdf-ocr') as executor:
+                for idx, page in enumerate(doc):
+                    page_num = idx + 1
+                    text = page.get_text('text') or ''
+                    words = text.split()
+                    needs_ocr, ocr_reason = pdf_text_needs_ocr(text)
 
-            pages.append({
-                'page_number': page_num,
-                'text': text.strip() if text else '',
-                'is_ocr': is_ocr
-            })
-        return pages
+                    # A second PDF parser can often recover a clean logical Arabic
+                    # text layer even when PyMuPDF exposes legacy control glyphs.
+                    # This avoids expensive OCR on most born-digital pages.
+                    if needs_ocr and not alternate_reader_failed:
+                        if alternate_reader is None:
+                            try:
+                                from pypdf import PdfReader
+                                alternate_reader = PdfReader(path)
+                            except Exception as exc:
+                                logger.warning("تعذر فتح طبقة النص البديلة: %s", exc)
+                                alternate_reader_failed = True
+                        try:
+                            if alternate_reader is None:
+                                raise RuntimeError('alternate PDF reader is unavailable')
+                            alternate_text = alternate_reader.pages[idx].extract_text() or ''
+                            if alternative_pdf_text_is_usable(text, alternate_text):
+                                pages[idx] = {
+                                    'page_number': page_num,
+                                    'text': _clean_pdf_page_result(alternate_text, True),
+                                    'is_ocr': False,
+                                    'extraction_engine': 'pypdf',
+                                }
+                                completed += 1
+                                _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
+                                continue
+                        except Exception as exc:
+                            logger.debug("تعذر استخراج طبقة النص البديلة للصفحة %s: %s", page_num, exc)
+
+                    can_ocr = (
+                        needs_ocr
+                        and enable_ocr
+                        and ocr_status.get('available')
+                        and ocr_status.get('has_arabic')
+                    )
+
+                    if can_ocr:
+                        logger.info(
+                            "الصفحة %s تحتاج OCR (%s، %s كلمة) بدقة %s DPI...",
+                            page_num, ocr_reason, len(words), dpi,
+                        )
+                        pix = page.get_pixmap(dpi=dpi, colorspace=fitz.csGRAY, alpha=False)
+                        arabic_count = len(_ARABIC_CHAR_RE.findall(text))
+                        latin_count = len(_LATIN_CHAR_RE.findall(text))
+                        has_substantial_latin = latin_count >= 40 or latin_count >= (arabic_count * 0.20)
+                        languages = 'ara+eng' if has_substantial_latin else 'ara'
+                        future = executor.submit(
+                            _ocr_pdf_pixmap, pix, text, len(words), languages
+                        )
+                        pending[future] = (idx, page_num)
+
+                        if len(pending) >= max_pending:
+                            done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
+                            collect(done)
+                    else:
+                        pages[idx] = {
+                            'page_number': page_num,
+                            'text': _clean_pdf_page_result(text, False),
+                            'is_ocr': False,
+                            'extraction_engine': 'pymupdf',
+                        }
+                        completed += 1
+                        _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
+
+                while pending:
+                    done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
+                    collect(done)
+
+            return [page for page in pages if page is not None]
     except Exception as e:
         logger.warning(f"تعذر استخراج PDF بـ PyMuPDF: {e}. جاري استخدام pdfplumber...")
 
     # المحاولة البديلة: pdfplumber
+    pages = []
     try:
         import pdfplumber
         with pdfplumber.open(path) as pdf:
+            total_pages = len(pdf.pages)
             for idx, p in enumerate(pdf.pages):
                 page_num = idx + 1
                 t = p.extract_text() or ''
@@ -168,6 +330,7 @@ def _extract_pages_from_pdf(path: str, enable_ocr: bool = True) -> list[dict]:
                     'text': t.strip(),
                     'is_ocr': False
                 })
+                _notify_pdf_progress(progress_callback, idx + 1, total_pages, page_num)
         return pages
     except Exception as e2:
         logger.error(f"فشل استخراج ملف PDF بالكامل: {e2}")

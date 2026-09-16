@@ -42,6 +42,16 @@ if __name__ == '__main__':
     print("   http://localhost:5000")
     print("=" * 60)
 
-    threading.Thread(target=open_browser, daemon=True).start()
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    import config
+    is_prod = getattr(config, 'PRODUCTION_MODE', False) or getattr(config, 'PORTABLE_MODE', False) or getattr(config, 'SINGLE_EXE_MODE', False)
+    is_explicit_dev = (os.environ.get('FLASK_ENV') == 'development' or os.environ.get('APP_ENV') == 'development' or '--dev' in sys.argv) and not is_prod
+
+    if is_explicit_dev:
+        print("   تشغيل خادم Flask المحلي (نمط التطوير الصريح)...")
+        app.run(host='127.0.0.1', port=5000, debug=False)
+    else:
+        from app.wsgi_server import run_production_server
+        log_file = config.LOGS_DIR / "server.log"
+        run_production_server(app, host='127.0.0.1', port=5000, threads=8, log_file=log_file)
+
 

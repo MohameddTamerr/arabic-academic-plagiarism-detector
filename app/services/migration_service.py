@@ -322,6 +322,138 @@ def _migration_007_phase17_job_queue():
         conn.commit()
 
 
+def _migration_008_phase18_storage_status():
+    """الهجرة 008: دعم حالة التخزين الصريحة في جدول research_files وفهارس التحقق."""
+    with base_repo.engine.connect() as conn:
+        cols = {row[1] for row in conn.execute(text("PRAGMA table_info(research_files);")).fetchall()}
+        if 'storage_status' not in cols:
+            conn.execute(text("ALTER TABLE research_files ADD COLUMN storage_status VARCHAR(50) DEFAULT 'finalized' NOT NULL;"))
+            conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rf_storage_status ON research_files (storage_status);"))
+            conn.commit()
+
+
+def _migration_009_phase19_user_mgmt_and_theses():
+    """الهجرة 009: إدارة المستخدمين المؤسسية، هيكل الرسائل متعددة الأجزاء، والتقارير المجمعة."""
+    with base_repo.engine.connect() as conn:
+        # 1. ترقية جدول users
+        user_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(users);")).fetchall()}
+        user_cols_to_add = [
+            ('department', "VARCHAR(255) DEFAULT ''"),
+            ('phone_number', "VARCHAR(50) DEFAULT ''"),
+            ('must_change_password', "INTEGER DEFAULT 0"),
+            ('must_enroll_recovery', "INTEGER DEFAULT 0"),
+        ]
+        for col_name, col_def in user_cols_to_add:
+            if col_name not in user_cols:
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {col_name} {col_def};"))
+
+        # 2. ترقية جدول review_decision_history
+        rev_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(review_decision_history);")).fetchall()}
+        rev_cols_to_add = [
+            ('thesis_id', "INTEGER"),
+            ('report_revision', "INTEGER DEFAULT 1"),
+            ('previous_review_status', "VARCHAR(50) DEFAULT ''"),
+            ('new_review_status', "VARCHAR(50) DEFAULT ''"),
+            ('reviewer_user_id', "INTEGER"),
+            ('reviewer_role_snapshot', "VARCHAR(50) DEFAULT ''"),
+            ('rejection_reason', "TEXT DEFAULT ''"),
+            ('request_id', "VARCHAR(64) DEFAULT ''"),
+        ]
+        for col_name, col_def in rev_cols_to_add:
+            if col_name not in rev_cols:
+                conn.execute(text(f"ALTER TABLE review_decision_history ADD COLUMN {col_name} {col_def};"))
+
+        # 3. ترقية جدول reports
+        report_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(reports);")).fetchall()}
+        report_cols_to_add = [
+            ('thesis_id', "INTEGER"),
+            ('is_combined_thesis', "INTEGER DEFAULT 0"),
+            ('submitted_by_user_id', "INTEGER"),
+        ]
+        for col_name, col_def in report_cols_to_add:
+            if col_name not in report_cols:
+                conn.execute(text(f"ALTER TABLE reports ADD COLUMN {col_name} {col_def};"))
+
+        # 4. جدول reference_sequences
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS reference_sequences (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                namespace VARCHAR(50) NOT NULL DEFAULT 'research',
+                year INTEGER NOT NULL,
+                last_value INTEGER NOT NULL DEFAULT 0,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        """))
+        conn.execute(text("CREATE UNIQUE INDEX IF NOT EXISTS idx_ref_seq_ns_year ON reference_sequences (namespace, year);"))
+
+        # 5. جدول theses
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS theses (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                reference_number VARCHAR(50) NOT NULL UNIQUE,
+                title VARCHAR(500) NOT NULL,
+                author VARCHAR(255) DEFAULT '',
+                degree_type VARCHAR(100) DEFAULT 'ماجستير',
+                department VARCHAR(255) DEFAULT '',
+                academic_year VARCHAR(50) DEFAULT '',
+                notes TEXT DEFAULT '',
+                status VARCHAR(50) DEFAULT 'draft',
+                review_status VARCHAR(50) DEFAULT 'pending_review',
+                combined_report_id VARCHAR(64),
+                is_stale INTEGER DEFAULT 0,
+                created_by VARCHAR(255) DEFAULT '',
+                created_by_user_id INTEGER,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            );
+        """))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_thesis_ref_num ON theses (reference_number);"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_thesis_status ON theses (status);"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_thesis_review_status ON theses (review_status);"))
+
+        # 6. جدول thesis_parts
+        conn.execute(text("""
+            CREATE TABLE IF NOT EXISTS thesis_parts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                thesis_id INTEGER NOT NULL,
+                part_title VARCHAR(500) NOT NULL,
+                sort_order INTEGER NOT NULL DEFAULT 0,
+                original_filename VARCHAR(500) NOT NULL,
+                stored_filename VARCHAR(500) NOT NULL,
+                file_path TEXT DEFAULT '',
+                file_type VARCHAR(10) DEFAULT 'pdf',
+                file_size_bytes BIGINT DEFAULT 0,
+                file_hash VARCHAR(64) DEFAULT '',
+                scan_status VARCHAR(50) DEFAULT 'queued',
+                scan_job_id VARCHAR(64),
+                report_id VARCHAR(64),
+                similarity_pct FLOAT,
+                problematic_pct FLOAT,
+                copied_pct FLOAT,
+                para_pct FLOAT,
+                cited_pct FLOAT,
+                total_words INTEGER DEFAULT 0,
+                problematic_words INTEGER DEFAULT 0,
+                copied_words INTEGER DEFAULT 0,
+                para_words INTEGER DEFAULT 0,
+                cited_words INTEGER DEFAULT 0,
+                error_message TEXT DEFAULT '',
+                is_detached INTEGER DEFAULT 0,
+                detached_by VARCHAR(255) DEFAULT '',
+                detached_at DATETIME,
+                detach_reason TEXT DEFAULT '',
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (thesis_id) REFERENCES theses (id) ON DELETE CASCADE
+            );
+        """))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_tp_thesis_order ON thesis_parts (thesis_id, sort_order);"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_tp_thesis_hash ON thesis_parts (thesis_id, file_hash);"))
+        conn.execute(text("CREATE INDEX IF NOT EXISTS idx_tp_scan_status ON thesis_parts (scan_status);"))
+
+        conn.commit()
+
+
 MIGRATIONS_REGISTRY: List[Dict[str, Any]] = [
     {
         'version': '001_initial_schema',
@@ -357,6 +489,16 @@ MIGRATIONS_REGISTRY: List[Dict[str, Any]] = [
         'version': '007_phase17_job_queue',
         'description': 'إدارة طابور المهام الخلفية، التزامن المحصن، الفهارس وسجل التنفيذ',
         'func': _migration_007_phase17_job_queue
+    },
+    {
+        'version': '008_phase18_storage_status',
+        'description': 'دعم حالة التخزين الصريحة في جدول research_files وفهارس التحقق',
+        'func': _migration_008_phase18_storage_status
+    },
+    {
+        'version': '009_phase19_user_mgmt_and_theses',
+        'description': 'إدارة المستخدمين المؤسسية، هيكل الرسائل متعددة الأجزاء، والتقارير المجمعة',
+        'func': _migration_009_phase19_user_mgmt_and_theses
     }
 ]
 

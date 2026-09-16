@@ -10,6 +10,7 @@
 """
 
 import os
+import sys
 import time
 import json
 import uuid
@@ -21,6 +22,7 @@ import threading
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, Tuple, Dict, Any, List
+
 
 import config
 from app import versioning
@@ -844,6 +846,15 @@ def restore_institutional_backup(
         finally:
             post_conn.close()
 
+        # إعادة تطبيق سمة الإخفاء في نظام ويندوز بعد الاستعادة
+        if sys.platform == "win32":
+            try:
+                from app.utils.windows_security import apply_windows_hidden_attribute
+                apply_windows_hidden_attribute(live_db)
+                apply_windows_hidden_attribute(live_db.parent)
+            except Exception:
+                pass
+
         base_repo.engine.dispose()
 
         # 9. توثيق النجاح في سجل الفهرس والتدقيق
@@ -949,6 +960,13 @@ def _rollback_to_safety_backup(safety_backup_id: str) -> None:
             finally:
                 src_conn.close()
                 dst_conn.close()
+            if sys.platform == "win32":
+                try:
+                    from app.utils.windows_security import apply_windows_hidden_attribute
+                    apply_windows_hidden_attribute(live_db)
+                    apply_windows_hidden_attribute(live_db.parent)
+                except Exception:
+                    pass
             base_repo.engine.dispose()
     finally:
         if temp_rb.exists():

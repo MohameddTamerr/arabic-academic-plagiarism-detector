@@ -1,6 +1,6 @@
 {
   "evaluation_metadata": {
-    "timestamp": "2026-09-05 21:39:02 UTC",
+    "timestamp": "2026-09-10 14:06:18 UTC",
     "engine_version": "1.0-phase18-baseline",
     "dataset_samples": 323,
     "runtime_configuration": {
@@ -204,9 +204,9 @@
   "performance_benchmarks": {
     "scope": "Segment-level comparison microbenchmark (Normalization + Shingle Jaccard + TF-IDF Lexical + Citation Regex)",
     "excludes": "End-to-end multi-page PDF OCR extraction, candidate BM25 disk retrieval, SQLite DB transaction writes, report rendering",
-    "mean_latency_ms": 4.882,
-    "p50_latency_ms": 4.483,
-    "p95_latency_ms": 6.495
+    "mean_latency_ms": 18.869,
+    "p50_latency_ms": 17.243,
+    "p95_latency_ms": 31.312
   },
   "detailed_records": [
     {
@@ -226,7 +226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.922,
+      "elapsed_ms": 13.591,
       "notes": "نسخ حرفي تام ومتطابق 100%"
     },
     {
@@ -246,7 +246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.369,
+      "elapsed_ms": 12.385,
       "notes": "نسخ حرفي - مصطلحات تقنية"
     },
     {
@@ -266,7 +266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.145,
+      "elapsed_ms": 12.817,
       "notes": "نسخ حرفي - علوم سياسية"
     },
     {
@@ -286,7 +286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.047,
+      "elapsed_ms": 13.163,
       "notes": "نسخ حرفي - علوم البيئة"
     },
     {
@@ -306,7 +306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.949,
+      "elapsed_ms": 15.043,
       "notes": "نسخ حرفي - منهجية البحث العلمي"
     },
     {
@@ -326,7 +326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.976,
+      "elapsed_ms": 12.528,
       "notes": "نسخ حرفي - أمن المعلومات"
     },
     {
@@ -346,7 +346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.975,
+      "elapsed_ms": 12.152,
       "notes": "نسخ حرفي - علم المكتبات والمعلومات"
     },
     {
@@ -366,7 +366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.942,
+      "elapsed_ms": 12.126,
       "notes": "نسخ حرفي - تعريفات قانونية معيارية"
     },
     {
@@ -386,7 +386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.979,
+      "elapsed_ms": 11.862,
       "notes": "نسخ حرفي - اقتصاد ومالية عامة"
     },
     {
@@ -406,7 +406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.973,
+      "elapsed_ms": 14.27,
       "notes": "نسخ حرفي - إدارة الأعمال"
     },
     {
@@ -426,7 +426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.975,
+      "elapsed_ms": 13.34,
       "notes": "نسخ حرفي - أدلة جنائية رقمية"
     },
     {
@@ -446,7 +446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.994,
+      "elapsed_ms": 14.647,
       "notes": "نسخ حرفي - علوم إدارية"
     },
     {
@@ -466,7 +466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.933,
+      "elapsed_ms": 12.449,
       "notes": "نسخ حرفي - إدارة عامة"
     },
     {
@@ -486,7 +486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.124,
+      "elapsed_ms": 15.595,
       "notes": "نسخ حرفي - علم الاجتماع"
     },
     {
@@ -506,7 +506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.018,
+      "elapsed_ms": 12.459,
       "notes": "نسخ حرفي - قانون دستوري"
     },
     {
@@ -526,7 +526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.988,
+      "elapsed_ms": 12.965,
       "notes": "نسخ حرفي - اتصالات وشبكات"
     },
     {
@@ -546,7 +546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.082,
+      "elapsed_ms": 13.562,
       "notes": "نسخ حرفي - أمن سيبراني"
     },
     {
@@ -566,7 +566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.228,
+      "elapsed_ms": 12.457,
       "notes": "نسخ حرفي - إحصاء ومنهجية"
     },
     {
@@ -586,7 +586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.022,
+      "elapsed_ms": 12.52,
       "notes": "نسخ حرفي - سياسة نقدية"
     },
     {
@@ -606,7 +606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.976,
+      "elapsed_ms": 11.672,
       "notes": "نسخ حرفي - سلاسل الكتل"
     },
     {
@@ -626,7 +626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.843,
+      "elapsed_ms": 12.335,
       "notes": "نسخ متطابق مع إزالة كامل التشكيل والتنوين"
     },
     {
@@ -646,7 +646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.751,
+      "elapsed_ms": 12.946,
       "notes": "نسخ متطابق مع تغيرات رسم الألف والتاء المربوطة"
     },
     {
@@ -666,7 +666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.12,
+      "elapsed_ms": 13.372,
       "notes": "نسخ متطابق مع إزالة كافة علامات الترقيم"
     },
     {
@@ -686,7 +686,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.692,
+      "elapsed_ms": 14.975,
       "notes": "نسخ متطابق مع فروق المسافات البيضاء والمسافات المتعددة"
     },
     {
@@ -706,7 +706,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.606,
+      "elapsed_ms": 11.111,
       "notes": "نسخ متطابق مع كشيدة وتطويل الحروف"
     },
     {
@@ -726,7 +726,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.365,
+      "elapsed_ms": 13.364,
       "notes": "نسخ حرفي كامل للأطروحة في مجال environment"
     },
     {
@@ -746,7 +746,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.34,
+      "elapsed_ms": 13.358,
       "notes": "نسخ حرفي كامل للأطروحة في مجال management"
     },
     {
@@ -766,7 +766,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.346,
+      "elapsed_ms": 13.81,
       "notes": "نسخ حرفي كامل للأطروحة في مجال forensics"
     },
     {
@@ -786,7 +786,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.336,
+      "elapsed_ms": 12.488,
       "notes": "نسخ حرفي كامل للأطروحة في مجال public_admin"
     },
     {
@@ -806,7 +806,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 7.627,
+      "elapsed_ms": 23.019,
       "notes": "نسخ حرفي كامل للأطروحة في مجال law"
     },
     {
@@ -826,7 +826,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.315,
+      "elapsed_ms": 12.62,
       "notes": "نسخ حرفي كامل للأطروحة في مجال computer_science"
     },
     {
@@ -846,7 +846,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.246,
+      "elapsed_ms": 12.812,
       "notes": "نسخ حرفي كامل للأطروحة في مجال environment"
     },
     {
@@ -866,7 +866,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.249,
+      "elapsed_ms": 21.101,
       "notes": "نسخ حرفي كامل للأطروحة في مجال management"
     },
     {
@@ -886,7 +886,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.273,
+      "elapsed_ms": 14.925,
       "notes": "نسخ حرفي كامل للأطروحة في مجال forensics"
     },
     {
@@ -906,7 +906,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.368,
+      "elapsed_ms": 18.331,
       "notes": "نسخ حرفي كامل للأطروحة في مجال public_admin"
     },
     {
@@ -926,7 +926,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.308,
+      "elapsed_ms": 17.699,
       "notes": "نسخ حرفي كامل للأطروحة في مجال law"
     },
     {
@@ -946,7 +946,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.37,
+      "elapsed_ms": 13.4,
       "notes": "نسخ حرفي كامل للأطروحة في مجال computer_science"
     },
     {
@@ -966,7 +966,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.415,
+      "elapsed_ms": 14.55,
       "notes": "نسخ حرفي كامل للأطروحة في مجال environment"
     },
     {
@@ -986,7 +986,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.451,
+      "elapsed_ms": 13.462,
       "notes": "نسخ حرفي كامل للأطروحة في مجال management"
     },
     {
@@ -1006,7 +1006,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.317,
+      "elapsed_ms": 12.64,
       "notes": "نسخ حرفي كامل للأطروحة في مجال forensics"
     },
     {
@@ -1026,7 +1026,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.394,
+      "elapsed_ms": 12.318,
       "notes": "نسخ حرفي كامل للأطروحة في مجال public_admin"
     },
     {
@@ -1046,7 +1046,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.365,
+      "elapsed_ms": 12.33,
       "notes": "نسخ حرفي كامل للأطروحة في مجال law"
     },
     {
@@ -1066,7 +1066,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.431,
+      "elapsed_ms": 16.604,
       "notes": "نسخ حرفي كامل للأطروحة في مجال computer_science"
     },
     {
@@ -1086,7 +1086,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.431,
+      "elapsed_ms": 19.889,
       "notes": "نسخ حرفي كامل للأطروحة في مجال environment"
     },
     {
@@ -1106,7 +1106,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.331,
+      "elapsed_ms": 31.691,
       "notes": "نسخ حرفي كامل للأطروحة في مجال management"
     },
     {
@@ -1126,7 +1126,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.295,
+      "elapsed_ms": 12.919,
       "notes": "نسخ حرفي كامل للأطروحة في مجال forensics"
     },
     {
@@ -1146,7 +1146,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.413,
+      "elapsed_ms": 14.964,
       "notes": "نسخ حرفي كامل للأطروحة في مجال public_admin"
     },
     {
@@ -1166,7 +1166,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.446,
+      "elapsed_ms": 15.235,
       "notes": "نسخ حرفي كامل للأطروحة في مجال law"
     },
     {
@@ -1186,7 +1186,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.446,
+      "elapsed_ms": 26.386,
       "notes": "نسخ حرفي كامل للأطروحة في مجال computer_science"
     },
     {
@@ -1206,7 +1206,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.381,
+      "elapsed_ms": 23.203,
       "notes": "نسخ حرفي كامل للأطروحة في مجال environment"
     },
     {
@@ -1226,7 +1226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.441,
+      "elapsed_ms": 24.617,
       "notes": "نسخ حرفي كامل للأطروحة في مجال management"
     },
     {
@@ -1246,7 +1246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.588,
+      "elapsed_ms": 15.588,
       "notes": "نسخ حرفي كامل للأطروحة في مجال forensics"
     },
     {
@@ -1266,7 +1266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.375,
+      "elapsed_ms": 13.579,
       "notes": "نسخ حرفي كامل للأطروحة في مجال public_admin"
     },
     {
@@ -1286,7 +1286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.392,
+      "elapsed_ms": 12.603,
       "notes": "نسخ حرفي كامل للأطروحة في مجال law"
     },
     {
@@ -1306,7 +1306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.49,
+      "elapsed_ms": 13.19,
       "notes": "نسخ حرفي كامل للأطروحة في مجال computer_science"
     },
     {
@@ -1326,7 +1326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.74,
+      "elapsed_ms": 14.014,
       "notes": "استبدال كلمات مترادفة وحذف وتغيير ترتيب طفيف"
     },
     {
@@ -1346,7 +1346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.795,
+      "elapsed_ms": 13.181,
       "notes": "إدراج مفردات وتغيير ترتيب"
     },
     {
@@ -1366,7 +1366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.637,
+      "elapsed_ms": 13.604,
       "notes": "استبدال مترادفات قانونية مباشرة مع بقاء الهيكل النحوي"
     },
     {
@@ -1386,7 +1386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.607,
+      "elapsed_ms": 14.019,
       "notes": "استبدال كلمات وإضافة أسماء عطف"
     },
     {
@@ -1406,7 +1406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.534,
+      "elapsed_ms": 20.888,
       "notes": "تعديل مصطلحات إحصائية مع الحفاظ على البنية"
     },
     {
@@ -1426,7 +1426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.532,
+      "elapsed_ms": 20.827,
       "notes": "استبدال كلمات وحذف مفردة"
     },
     {
@@ -1446,7 +1446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.79,
+      "elapsed_ms": 24.356,
       "notes": "إدراج واستبدال مفردات أمنية"
     },
     {
@@ -1466,7 +1466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.555,
+      "elapsed_ms": 20.146,
       "notes": "تعديل صياغي مع الاحتفاظ بالمفردات الجوهرية"
     },
     {
@@ -1486,7 +1486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.711,
+      "elapsed_ms": 13.807,
       "notes": "تعديل تقني مع الحفاظ على متواليات الكلمات الأساسية"
     },
     {
@@ -1506,7 +1506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.722,
+      "elapsed_ms": 15.587,
       "notes": "تعديل بالمرادفات مع الحفاظ على المعنى والهيكل"
     },
     {
@@ -1526,7 +1526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.871,
+      "elapsed_ms": 27.511,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1546,7 +1546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.506,
+      "elapsed_ms": 16.552,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1566,7 +1566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.554,
+      "elapsed_ms": 16.957,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -1586,7 +1586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.998,
+      "elapsed_ms": 20.927,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -1606,7 +1606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.45,
+      "elapsed_ms": 24.976,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -1626,7 +1626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.72,
+      "elapsed_ms": 17.138,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1646,7 +1646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.522,
+      "elapsed_ms": 21.084,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1666,7 +1666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.543,
+      "elapsed_ms": 21.586,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -1686,7 +1686,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.045,
+      "elapsed_ms": 23.984,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -1706,7 +1706,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.692,
+      "elapsed_ms": 28.719,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -1726,7 +1726,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.922,
+      "elapsed_ms": 34.974,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1746,7 +1746,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.465,
+      "elapsed_ms": 31.827,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1766,7 +1766,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.756,
+      "elapsed_ms": 34.386,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -1786,7 +1786,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.183,
+      "elapsed_ms": 37.167,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -1806,7 +1806,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.505,
+      "elapsed_ms": 37.88,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -1826,7 +1826,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.869,
+      "elapsed_ms": 35.014,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1846,7 +1846,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.549,
+      "elapsed_ms": 28.117,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1866,7 +1866,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.705,
+      "elapsed_ms": 29.855,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -1886,7 +1886,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.209,
+      "elapsed_ms": 34.823,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -1906,7 +1906,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.626,
+      "elapsed_ms": 26.848,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -1926,7 +1926,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.903,
+      "elapsed_ms": 20.652,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1946,7 +1946,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.518,
+      "elapsed_ms": 32.674,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -1966,7 +1966,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.689,
+      "elapsed_ms": 28.515,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -1986,7 +1986,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.011,
+      "elapsed_ms": 31.669,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -2006,7 +2006,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.51,
+      "elapsed_ms": 30.648,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -2026,7 +2026,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.834,
+      "elapsed_ms": 28.441,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2046,7 +2046,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.503,
+      "elapsed_ms": 29.4,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2066,7 +2066,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.519,
+      "elapsed_ms": 27.139,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -2086,7 +2086,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.894,
+      "elapsed_ms": 30.947,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -2106,7 +2106,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.449,
+      "elapsed_ms": 25.685,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -2126,7 +2126,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.74,
+      "elapsed_ms": 31.312,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2146,7 +2146,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.411,
+      "elapsed_ms": 21.492,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2166,7 +2166,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.5,
+      "elapsed_ms": 30.171,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -2186,7 +2186,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.899,
+      "elapsed_ms": 33.329,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -2206,7 +2206,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.997,
+      "elapsed_ms": 28.794,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -2226,7 +2226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.748,
+      "elapsed_ms": 27.0,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2246,7 +2246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.293,
+      "elapsed_ms": 29.149,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2266,7 +2266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.49,
+      "elapsed_ms": 23.594,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -2286,7 +2286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.03,
+      "elapsed_ms": 22.663,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -2306,7 +2306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.351,
+      "elapsed_ms": 23.903,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -2326,7 +2326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.966,
+      "elapsed_ms": 38.543,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2346,7 +2346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.506,
+      "elapsed_ms": 30.497,
       "notes": "نسخ معدل مع استبدال مترادفات في economics"
     },
     {
@@ -2366,7 +2366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.436,
+      "elapsed_ms": 19.917,
       "notes": "نسخ معدل مع استبدال مترادفات في law"
     },
     {
@@ -2386,7 +2386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.103,
+      "elapsed_ms": 17.576,
       "notes": "نسخ معدل مع استبدال مترادفات في public_admin"
     },
     {
@@ -2406,7 +2406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.239,
+      "elapsed_ms": 30.685,
       "notes": "نسخ معدل مع استبدال مترادفات في cybersecurity"
     },
     {
@@ -2426,7 +2426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.573,
+      "elapsed_ms": 38.663,
       "notes": "إعادة صياغة استبدالية كاملة للمفردات الفنية مع الحفاظ على الفكرة"
     },
     {
@@ -2446,7 +2446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.092,
+      "elapsed_ms": 15.007,
       "notes": "إعادة هيكلة الجملة وتقديم العبارات المتناقضة"
     },
     {
@@ -2466,7 +2466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.867,
+      "elapsed_ms": 13.955,
       "notes": "إعادة صياغة مفاهيمية مع تغيير ترتيب المبتدأ والخبر"
     },
     {
@@ -2486,7 +2486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.713,
+      "elapsed_ms": 17.305,
       "notes": "تحويل من مبني للمجهول إلى صيغة فاعلية مع مرادفات كاملة"
     },
     {
@@ -2506,7 +2506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.199,
+      "elapsed_ms": 16.525,
       "notes": "إعادة صياغة أمنية جذرية مع استبدال المفردات"
     },
     {
@@ -2526,7 +2526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.939,
+      "elapsed_ms": 20.897,
       "notes": "إعادة صياغة مجازية ووصفية"
     },
     {
@@ -2546,7 +2546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.932,
+      "elapsed_ms": 15.613,
       "notes": "إعادة صياغة قاعدة قانونية شهيرة بمفردات فلسفية بديلة"
     },
     {
@@ -2566,7 +2566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.907,
+      "elapsed_ms": 15.463,
       "notes": "إعادة صياغة إدارية كاملة"
     },
     {
@@ -2586,7 +2586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.832,
+      "elapsed_ms": 15.709,
       "notes": "إعادة صياغة سياسية بمفردات مختلفة تماماً"
     },
     {
@@ -2606,7 +2606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.88,
+      "elapsed_ms": 15.254,
       "notes": "إعادة صياغة نظرية اقتصادية دون تكرار أي كلمة محورية"
     },
     {
@@ -2626,7 +2626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.495,
+      "elapsed_ms": 20.021,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -2646,7 +2646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.428,
+      "elapsed_ms": 19.207,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2666,7 +2666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.029,
+      "elapsed_ms": 18.158,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -2686,7 +2686,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.452,
+      "elapsed_ms": 20.651,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -2706,7 +2706,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.357,
+      "elapsed_ms": 27.577,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2726,7 +2726,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.295,
+      "elapsed_ms": 20.053,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -2746,7 +2746,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.457,
+      "elapsed_ms": 19.521,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2766,7 +2766,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.922,
+      "elapsed_ms": 18.547,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -2786,7 +2786,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.444,
+      "elapsed_ms": 19.104,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -2806,7 +2806,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.466,
+      "elapsed_ms": 19.832,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2826,7 +2826,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.371,
+      "elapsed_ms": 19.776,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -2846,7 +2846,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.417,
+      "elapsed_ms": 19.827,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2866,7 +2866,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.915,
+      "elapsed_ms": 18.233,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -2886,7 +2886,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.352,
+      "elapsed_ms": 20.672,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -2906,7 +2906,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.35,
+      "elapsed_ms": 19.466,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2926,7 +2926,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.522,
+      "elapsed_ms": 20.136,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -2946,7 +2946,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.882,
+      "elapsed_ms": 25.128,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -2966,7 +2966,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.232,
+      "elapsed_ms": 26.472,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -2986,7 +2986,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.621,
+      "elapsed_ms": 21.259,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3006,7 +3006,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.402,
+      "elapsed_ms": 29.832,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3026,7 +3026,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.587,
+      "elapsed_ms": 21.26,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -3046,7 +3046,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.872,
+      "elapsed_ms": 22.894,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3066,7 +3066,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.455,
+      "elapsed_ms": 32.186,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -3086,7 +3086,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.919,
+      "elapsed_ms": 20.549,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3106,7 +3106,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 7.029,
+      "elapsed_ms": 20.112,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3126,7 +3126,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.943,
+      "elapsed_ms": 21.909,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -3146,7 +3146,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.885,
+      "elapsed_ms": 20.306,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3166,7 +3166,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.565,
+      "elapsed_ms": 18.194,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -3186,7 +3186,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.933,
+      "elapsed_ms": 24.301,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3206,7 +3206,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.993,
+      "elapsed_ms": 29.095,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3226,7 +3226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.769,
+      "elapsed_ms": 25.81,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -3246,7 +3246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.283,
+      "elapsed_ms": 32.861,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3266,7 +3266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.817,
+      "elapsed_ms": 31.888,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -3286,7 +3286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.101,
+      "elapsed_ms": 25.654,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3306,7 +3306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.216,
+      "elapsed_ms": 20.109,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3326,7 +3326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.044,
+      "elapsed_ms": 28.93,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -3346,7 +3346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.219,
+      "elapsed_ms": 24.172,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3366,7 +3366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.911,
+      "elapsed_ms": 27.823,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -3386,7 +3386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.104,
+      "elapsed_ms": 28.14,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3406,7 +3406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.15,
+      "elapsed_ms": 25.628,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3426,7 +3426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.144,
+      "elapsed_ms": 20.866,
       "notes": "إعادة صياغة متقدمة في مجال security"
     },
     {
@@ -3446,7 +3446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.378,
+      "elapsed_ms": 23.322,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3466,7 +3466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.002,
+      "elapsed_ms": 18.993,
       "notes": "إعادة صياغة متقدمة في مجال economics"
     },
     {
@@ -3486,7 +3486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.159,
+      "elapsed_ms": 19.93,
       "notes": "إعادة صياغة متقدمة في مجال methodology"
     },
     {
@@ -3506,7 +3506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.14,
+      "elapsed_ms": 27.966,
       "notes": "إعادة صياغة متقدمة في مجال law"
     },
     {
@@ -3526,7 +3526,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.922,
+      "elapsed_ms": 17.082,
       "notes": "اقتباس نصي منسوخ حرفياً لكنه موثق بقوس ورقم صفحة (APA)"
     },
     {
@@ -3546,7 +3546,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.234,
+      "elapsed_ms": 22.02,
       "notes": "استشهاد سردي مباشر مع أقواس اقتباس"
     },
     {
@@ -3566,7 +3566,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.87,
+      "elapsed_ms": 17.243,
       "notes": "توثيق بنمط IEEE برقم مرجعي معقوف"
     },
     {
@@ -3586,7 +3586,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.337,
+      "elapsed_ms": 20.564,
       "notes": "إعادة صياغة مع استشهاد صريح بأسماء الباحثين"
     },
     {
@@ -3606,7 +3606,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.907,
+      "elapsed_ms": 14.485,
       "notes": "اقتباس مع توثيق عربي بصيغة (المؤلف، السنة: الصفحة)"
     },
     {
@@ -3626,7 +3626,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.043,
+      "elapsed_ms": 22.195,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -3646,7 +3646,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.04,
+      "elapsed_ms": 14.659,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -3666,7 +3666,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.042,
+      "elapsed_ms": 13.534,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -3686,7 +3686,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.055,
+      "elapsed_ms": 13.743,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -3706,7 +3706,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.933,
+      "elapsed_ms": 14.366,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -3726,7 +3726,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.153,
+      "elapsed_ms": 14.537,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -3746,7 +3746,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.085,
+      "elapsed_ms": 15.379,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -3766,7 +3766,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.12,
+      "elapsed_ms": 15.193,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -3786,7 +3786,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.044,
+      "elapsed_ms": 14.777,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -3806,7 +3806,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.924,
+      "elapsed_ms": 20.909,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -3826,7 +3826,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.128,
+      "elapsed_ms": 14.127,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -3846,7 +3846,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.045,
+      "elapsed_ms": 13.857,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -3866,7 +3866,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.089,
+      "elapsed_ms": 13.304,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -3886,7 +3886,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.182,
+      "elapsed_ms": 13.258,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -3906,7 +3906,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.991,
+      "elapsed_ms": 12.844,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -3926,7 +3926,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.019,
+      "elapsed_ms": 13.454,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -3946,7 +3946,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.057,
+      "elapsed_ms": 12.777,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -3966,7 +3966,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.079,
+      "elapsed_ms": 14.09,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -3986,7 +3986,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.048,
+      "elapsed_ms": 13.081,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4006,7 +4006,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.998,
+      "elapsed_ms": 12.884,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4026,7 +4026,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.041,
+      "elapsed_ms": 13.376,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -4046,7 +4046,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.065,
+      "elapsed_ms": 13.402,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -4066,7 +4066,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.088,
+      "elapsed_ms": 12.837,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -4086,7 +4086,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.082,
+      "elapsed_ms": 13.534,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4106,7 +4106,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.948,
+      "elapsed_ms": 13.039,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4126,7 +4126,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.059,
+      "elapsed_ms": 13.649,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -4146,7 +4146,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.282,
+      "elapsed_ms": 15.311,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -4166,7 +4166,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.196,
+      "elapsed_ms": 14.272,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -4186,7 +4186,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.035,
+      "elapsed_ms": 12.326,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4206,7 +4206,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.919,
+      "elapsed_ms": 13.639,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4226,7 +4226,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.026,
+      "elapsed_ms": 13.112,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -4246,7 +4246,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.011,
+      "elapsed_ms": 15.674,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -4266,7 +4266,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.105,
+      "elapsed_ms": 20.723,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -4286,7 +4286,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.183,
+      "elapsed_ms": 21.861,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4306,7 +4306,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.95,
+      "elapsed_ms": 21.969,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4326,7 +4326,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.069,
+      "elapsed_ms": 12.314,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -4346,7 +4346,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.026,
+      "elapsed_ms": 12.23,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -4366,7 +4366,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.065,
+      "elapsed_ms": 13.3,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -4386,7 +4386,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.026,
+      "elapsed_ms": 14.412,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4406,7 +4406,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.934,
+      "elapsed_ms": 13.05,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4426,7 +4426,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.148,
+      "elapsed_ms": 13.59,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في cybersecurity"
     },
     {
@@ -4446,7 +4446,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.155,
+      "elapsed_ms": 13.336,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في economics"
     },
     {
@@ -4466,7 +4466,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.114,
+      "elapsed_ms": 15.356,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في methodology"
     },
     {
@@ -4486,7 +4486,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 4.038,
+      "elapsed_ms": 16.59,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في public_admin"
     },
     {
@@ -4506,7 +4506,7 @@
       "semantic_score": null,
       "citation_detected": true,
       "common_detected": false,
-      "elapsed_ms": 3.972,
+      "elapsed_ms": 16.954,
       "notes": "اقتباس موثق بنمط أكاديمي سليم في law"
     },
     {
@@ -4526,7 +4526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": true,
-      "elapsed_ms": 4.211,
+      "elapsed_ms": 19.178,
       "notes": "كليشيهات أكاديمية ولوازم كتابة شائعة"
     },
     {
@@ -4546,7 +4546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.269,
+      "elapsed_ms": 19.455,
       "notes": "ديباجة مراسيم وقرارات حكومية معيارية"
     },
     {
@@ -4566,7 +4566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.377,
+      "elapsed_ms": 16.529,
       "notes": "صيغة إدارية قياسية لصفحة مناقشة الرسائل الجامعية"
     },
     {
@@ -4586,7 +4586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": true,
-      "elapsed_ms": 4.481,
+      "elapsed_ms": 15.314,
       "notes": "عبارات منهجية شائعة جداً في مئات الأبحاث"
     },
     {
@@ -4606,7 +4606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": true,
-      "elapsed_ms": 4.883,
+      "elapsed_ms": 20.796,
       "notes": "عبارات الإهداء والشكر التقليدية في الأطروحات"
     },
     {
@@ -4626,7 +4626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.276,
+      "elapsed_ms": 21.837,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4646,7 +4646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.277,
+      "elapsed_ms": 15.376,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -4666,7 +4666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.426,
+      "elapsed_ms": 22.597,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -4686,7 +4686,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.478,
+      "elapsed_ms": 13.714,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4706,7 +4706,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.447,
+      "elapsed_ms": 15.442,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -4726,7 +4726,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.363,
+      "elapsed_ms": 17.345,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4746,7 +4746,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.364,
+      "elapsed_ms": 16.825,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -4766,7 +4766,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.31,
+      "elapsed_ms": 14.025,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -4786,7 +4786,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.46,
+      "elapsed_ms": 16.02,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4806,7 +4806,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.349,
+      "elapsed_ms": 18.063,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -4826,7 +4826,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.393,
+      "elapsed_ms": 17.526,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4846,7 +4846,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.375,
+      "elapsed_ms": 19.08,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -4866,7 +4866,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.309,
+      "elapsed_ms": 22.249,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -4886,7 +4886,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.551,
+      "elapsed_ms": 19.523,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4906,7 +4906,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.433,
+      "elapsed_ms": 17.598,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -4926,7 +4926,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.426,
+      "elapsed_ms": 16.623,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -4946,7 +4946,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.333,
+      "elapsed_ms": 17.206,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -4966,7 +4966,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.256,
+      "elapsed_ms": 16.045,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -4986,7 +4986,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.358,
+      "elapsed_ms": 13.772,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5006,7 +5006,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.471,
+      "elapsed_ms": 20.068,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5026,7 +5026,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.425,
+      "elapsed_ms": 14.301,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5046,7 +5046,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.308,
+      "elapsed_ms": 14.441,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -5066,7 +5066,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.285,
+      "elapsed_ms": 14.142,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -5086,7 +5086,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.326,
+      "elapsed_ms": 14.762,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5106,7 +5106,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.401,
+      "elapsed_ms": 16.777,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5126,7 +5126,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.343,
+      "elapsed_ms": 16.08,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5146,7 +5146,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 8.472,
+      "elapsed_ms": 23.112,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -5166,7 +5166,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.204,
+      "elapsed_ms": 12.527,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -5186,7 +5186,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.317,
+      "elapsed_ms": 13.474,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5206,7 +5206,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.358,
+      "elapsed_ms": 13.048,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5226,7 +5226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.52,
+      "elapsed_ms": 14.693,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5246,7 +5246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.32,
+      "elapsed_ms": 14.023,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -5266,7 +5266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.429,
+      "elapsed_ms": 13.508,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -5286,7 +5286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.459,
+      "elapsed_ms": 13.89,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5306,7 +5306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.477,
+      "elapsed_ms": 18.175,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5326,7 +5326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.442,
+      "elapsed_ms": 17.392,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5346,7 +5346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.519,
+      "elapsed_ms": 17.293,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -5366,7 +5366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.474,
+      "elapsed_ms": 17.216,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -5386,7 +5386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.536,
+      "elapsed_ms": 22.485,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5406,7 +5406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.519,
+      "elapsed_ms": 17.022,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5426,7 +5426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.404,
+      "elapsed_ms": 20.724,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5446,7 +5446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.466,
+      "elapsed_ms": 23.931,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate"
     },
     {
@@ -5466,7 +5466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.348,
+      "elapsed_ms": 19.106,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations"
     },
     {
@@ -5486,7 +5486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.414,
+      "elapsed_ms": 17.296,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في methodology"
     },
     {
@@ -5506,7 +5506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.593,
+      "elapsed_ms": 16.576,
       "notes": "تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate"
     },
     {
@@ -5526,7 +5526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.872,
+      "elapsed_ms": 18.985,
       "notes": "نصان مستقلان تماماً في الزراعة والقانون"
     },
     {
@@ -5546,7 +5546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.878,
+      "elapsed_ms": 17.222,
       "notes": "نصان مختلفان كلياً (فيزياء اتصالات مقابل علم العقاب والإصلاح)"
     },
     {
@@ -5566,7 +5566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.837,
+      "elapsed_ms": 17.386,
       "notes": "هيكل أكاديمي متشابه ولكن في موضوعين منفصلين تماماً"
     },
     {
@@ -5586,7 +5586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.562,
+      "elapsed_ms": 18.928,
       "notes": "جيولوجيا مقابل إجراءات جنائية"
     },
     {
@@ -5606,7 +5606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.374,
+      "elapsed_ms": 15.494,
       "notes": "تربية مقابل هندسة برمجيات"
     },
     {
@@ -5626,7 +5626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.112,
+      "elapsed_ms": 14.625,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -5646,7 +5646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.305,
+      "elapsed_ms": 19.346,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -5666,7 +5666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.381,
+      "elapsed_ms": 20.527,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -5686,7 +5686,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.386,
+      "elapsed_ms": 27.394,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -5706,7 +5706,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.241,
+      "elapsed_ms": 20.831,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -5726,7 +5726,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.4,
+      "elapsed_ms": 16.705,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -5746,7 +5746,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.468,
+      "elapsed_ms": 17.026,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -5766,7 +5766,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.544,
+      "elapsed_ms": 17.305,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -5786,7 +5786,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.74,
+      "elapsed_ms": 16.119,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -5806,7 +5806,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.447,
+      "elapsed_ms": 15.709,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -5826,7 +5826,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.552,
+      "elapsed_ms": 14.544,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -5846,7 +5846,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.591,
+      "elapsed_ms": 15.059,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -5866,7 +5866,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.678,
+      "elapsed_ms": 14.323,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -5886,7 +5886,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.678,
+      "elapsed_ms": 15.547,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -5906,7 +5906,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.483,
+      "elapsed_ms": 14.685,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -5926,7 +5926,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.526,
+      "elapsed_ms": 16.474,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -5946,7 +5946,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.589,
+      "elapsed_ms": 16.708,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -5966,7 +5966,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.792,
+      "elapsed_ms": 18.442,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -5986,7 +5986,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.085,
+      "elapsed_ms": 17.549,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6006,7 +6006,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.73,
+      "elapsed_ms": 19.913,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6026,7 +6026,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.817,
+      "elapsed_ms": 14.977,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -6046,7 +6046,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.876,
+      "elapsed_ms": 17.648,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -6066,7 +6066,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.124,
+      "elapsed_ms": 14.88,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -6086,7 +6086,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.936,
+      "elapsed_ms": 14.509,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6106,7 +6106,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.7,
+      "elapsed_ms": 14.905,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6126,7 +6126,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.872,
+      "elapsed_ms": 17.538,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -6146,7 +6146,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.952,
+      "elapsed_ms": 18.54,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -6166,7 +6166,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.201,
+      "elapsed_ms": 16.152,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -6186,7 +6186,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.856,
+      "elapsed_ms": 13.792,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6206,7 +6206,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.867,
+      "elapsed_ms": 15.411,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6226,7 +6226,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.983,
+      "elapsed_ms": 19.101,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -6246,7 +6246,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.106,
+      "elapsed_ms": 17.757,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -6266,7 +6266,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.088,
+      "elapsed_ms": 20.286,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -6286,7 +6286,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 6.053,
+      "elapsed_ms": 16.516,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6306,7 +6306,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.698,
+      "elapsed_ms": 22.064,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6326,7 +6326,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.552,
+      "elapsed_ms": 23.868,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -6346,7 +6346,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.718,
+      "elapsed_ms": 25.481,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -6366,7 +6366,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 5.005,
+      "elapsed_ms": 24.341,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -6386,7 +6386,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.839,
+      "elapsed_ms": 20.29,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6406,7 +6406,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.561,
+      "elapsed_ms": 17.833,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6426,7 +6426,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.993,
+      "elapsed_ms": 15.649,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar"
     },
     {
@@ -6446,7 +6446,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.812,
+      "elapsed_ms": 15.219,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law"
     },
     {
@@ -6466,7 +6466,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.81,
+      "elapsed_ms": 15.213,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology"
     },
     {
@@ -6486,7 +6486,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.678,
+      "elapsed_ms": 18.599,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing"
     },
     {
@@ -6506,7 +6506,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.451,
+      "elapsed_ms": 19.691,
       "notes": "نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law"
     },
     {
@@ -6526,7 +6526,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.104,
+      "elapsed_ms": 21.047,
       "notes": "تشويه OCR: إسقاط نقاط الياء، استبدال التاء المربوطة، تشويش الباء/القاف"
     },
     {
@@ -6546,7 +6546,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.056,
+      "elapsed_ms": 20.414,
       "notes": "تشويه OCR: تطويل عشوائي ودمج حروف وإسقاط نقاط"
     },
     {
@@ -6566,7 +6566,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.141,
+      "elapsed_ms": 18.883,
       "notes": "تشويه OCR: تبديل التاء بنون والباء بياء وهبوط الدقة"
     },
     {
@@ -6586,7 +6586,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.107,
+      "elapsed_ms": 15.666,
       "notes": "تشويه OCR: أخطاء قراءة بصرية شائعة في الماسحات الضوئية"
     },
     {
@@ -6606,7 +6606,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.104,
+      "elapsed_ms": 15.495,
       "notes": "تشويه OCR شديد مع فقدان بعض الأحرف"
     },
     {
@@ -6626,7 +6626,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.423,
+      "elapsed_ms": 20.519,
       "notes": "قائمة مراجع أكاديمية تتطلب الاستبعاد التلقائي من حساب الاستلال"
     },
     {
@@ -6646,7 +6646,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 4.106,
+      "elapsed_ms": 13.404,
       "notes": "قائمة مراجع إنجليزية مختلطة مع مراجع محلية"
     },
     {
@@ -6666,7 +6666,7 @@
       "semantic_score": null,
       "citation_detected": false,
       "common_detected": false,
-      "elapsed_ms": 3.821,
+      "elapsed_ms": 14.682,
       "notes": "عنوان قسم مراجع يجب تجنب اعتباره استلالاً في متن البحث"
     }
   ]

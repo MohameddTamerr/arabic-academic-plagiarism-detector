@@ -1,324 +1,324 @@
 sample_id,expected_class,predicted_overlap_class,production_pipeline_action,is_correct_evaluation,generation_origin,domain,word_count,length_category,jaccard_score,shingle_score,tfidf_score,char_ngram_score,semantic_score,citation_detected,common_detected,elapsed_ms,notes
-exact_01,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,20,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.922,نسخ حرفي تام ومتطابق 100%
-exact_02,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,22,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.369,نسخ حرفي - مصطلحات تقنية
-exact_03,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,political_science,20,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.145,نسخ حرفي - علوم سياسية
-exact_04,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,22,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.047,نسخ حرفي - علوم البيئة
-exact_05,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.949,نسخ حرفي - منهجية البحث العلمي
-exact_06,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.976,نسخ حرفي - أمن المعلومات
-exact_07,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,information_science,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.975,نسخ حرفي - علم المكتبات والمعلومات
-exact_08,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,16,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.942,نسخ حرفي - تعريفات قانونية معيارية
-exact_09,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,18,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.979,نسخ حرفي - اقتصاد ومالية عامة
-exact_10,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.973,نسخ حرفي - إدارة الأعمال
-exact_11,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.975,نسخ حرفي - أدلة جنائية رقمية
-exact_12,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.994,نسخ حرفي - علوم إدارية
-exact_13,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,16,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.933,نسخ حرفي - إدارة عامة
-exact_14,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,sociology,15,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.124,نسخ حرفي - علم الاجتماع
-exact_15,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.018,نسخ حرفي - قانون دستوري
-exact_16,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,telecom,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.988,نسخ حرفي - اتصالات وشبكات
-exact_17,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.082,نسخ حرفي - أمن سيبراني
-exact_18,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,statistics,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.228,نسخ حرفي - إحصاء ومنهجية
-exact_19,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,15,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.022,نسخ حرفي - سياسة نقدية
-exact_20,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,18,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.976,نسخ حرفي - سلاسل الكتل
-exact_21_diacritics,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,12,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.843,نسخ متطابق مع إزالة كامل التشكيل والتنوين
-exact_22_alef_variants,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,13,MEDIUM,1.0,1.0,0.4732,0.7509,,False,False,3.751,نسخ متطابق مع تغيرات رسم الألف والتاء المربوطة
-exact_23_punctuation,EXACT_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,14,MEDIUM,0.0,0.9746,1.0,0.8458,,False,False,4.12,نسخ متطابق مع إزالة كافة علامات الترقيم
-exact_24_spacing,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,9,SHORT,1.0,1.0,1.0,1.0,,False,False,3.692,نسخ متطابق مع فروق المسافات البيضاء والمسافات المتعددة
-exact_25_tatweel,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,8,SHORT,1.0,1.0,1.0,1.0,,False,False,3.606,نسخ متطابق مع كشيدة وتطويل الحروف
-exact_26,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.365,نسخ حرفي كامل للأطروحة في مجال environment
-exact_27,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.34,نسخ حرفي كامل للأطروحة في مجال management
-exact_28,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.346,نسخ حرفي كامل للأطروحة في مجال forensics
-exact_29,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.336,نسخ حرفي كامل للأطروحة في مجال public_admin
-exact_30,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,7.627,نسخ حرفي كامل للأطروحة في مجال law
-exact_31,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,4.315,نسخ حرفي كامل للأطروحة في مجال computer_science
-exact_32,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.246,نسخ حرفي كامل للأطروحة في مجال environment
-exact_33,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.249,نسخ حرفي كامل للأطروحة في مجال management
-exact_34,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.273,نسخ حرفي كامل للأطروحة في مجال forensics
-exact_35,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.368,نسخ حرفي كامل للأطروحة في مجال public_admin
-exact_36,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,4.308,نسخ حرفي كامل للأطروحة في مجال law
-exact_37,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,4.37,نسخ حرفي كامل للأطروحة في مجال computer_science
-exact_38,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.415,نسخ حرفي كامل للأطروحة في مجال environment
-exact_39,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.451,نسخ حرفي كامل للأطروحة في مجال management
-exact_40,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.317,نسخ حرفي كامل للأطروحة في مجال forensics
-exact_41,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.394,نسخ حرفي كامل للأطروحة في مجال public_admin
-exact_42,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,4.365,نسخ حرفي كامل للأطروحة في مجال law
-exact_43,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,4.431,نسخ حرفي كامل للأطروحة في مجال computer_science
-exact_44,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.431,نسخ حرفي كامل للأطروحة في مجال environment
-exact_45,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.331,نسخ حرفي كامل للأطروحة في مجال management
-exact_46,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.295,نسخ حرفي كامل للأطروحة في مجال forensics
-exact_47,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.413,نسخ حرفي كامل للأطروحة في مجال public_admin
-exact_48,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,4.446,نسخ حرفي كامل للأطروحة في مجال law
-exact_49,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,4.446,نسخ حرفي كامل للأطروحة في مجال computer_science
-exact_50,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.381,نسخ حرفي كامل للأطروحة في مجال environment
-exact_51,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.441,نسخ حرفي كامل للأطروحة في مجال management
-exact_52,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,4.588,نسخ حرفي كامل للأطروحة في مجال forensics
-exact_53,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,4.375,نسخ حرفي كامل للأطروحة في مجال public_admin
-exact_54,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,4.392,نسخ حرفي كامل للأطروحة في مجال law
-exact_55,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,4.49,نسخ حرفي كامل للأطروحة في مجال computer_science
-mod_01,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,16,MEDIUM,0.0,0.7467,0.0,0.6007,,False,False,4.74,استبدال كلمات مترادفة وحذف وتغيير ترتيب طفيف
-mod_02,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,17,MEDIUM,0.0,0.7217,0.0,0.5164,,False,False,4.795,إدراج مفردات وتغيير ترتيب
-mod_03,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,0.0,0.7069,0.0,0.6988,,False,False,4.637,استبدال مترادفات قانونية مباشرة مع بقاء الهيكل النحوي
-mod_04,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,education,16,MEDIUM,0.0,0.7479,0.0,0.5865,,False,False,4.607,استبدال كلمات وإضافة أسماء عطف
-mod_05,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,18,MEDIUM,0.0,0.7773,0.4517,0.6914,,False,False,4.534,تعديل مصطلحات إحصائية مع الحفاظ على البنية
-mod_06,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.0,0.7511,0.0,0.5457,,False,False,4.532,استبدال كلمات وحذف مفردة
-mod_07,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,17,MEDIUM,0.0,0.7863,0.434,0.6617,,False,False,4.79,إدراج واستبدال مفردات أمنية
-mod_08,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,19,MEDIUM,0.0,0.7315,0.0,0.5391,,False,False,4.555,تعديل صياغي مع الاحتفاظ بالمفردات الجوهرية
-mod_09,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,16,MEDIUM,0.0,0.6696,0.0,0.5615,,False,False,4.711,تعديل تقني مع الحفاظ على متواليات الكلمات الأساسية
-mod_10,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,sociology,18,MEDIUM,0.0,0.6667,0.0,0.5337,,False,False,4.722,تعديل بالمرادفات مع الحفاظ على المعنى والهيكل
-mod_11,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.871,نسخ معدل مع استبدال مترادفات في economics
-mod_12,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.506,نسخ معدل مع استبدال مترادفات في economics
-mod_13,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.554,نسخ معدل مع استبدال مترادفات في law
-mod_14,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,5.998,نسخ معدل مع استبدال مترادفات في public_admin
-mod_15,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.45,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_16,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,6.72,نسخ معدل مع استبدال مترادفات في economics
-mod_17,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.522,نسخ معدل مع استبدال مترادفات في economics
-mod_18,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.543,نسخ معدل مع استبدال مترادفات في law
-mod_19,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.045,نسخ معدل مع استبدال مترادفات في public_admin
-mod_20,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.692,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_21,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.922,نسخ معدل مع استبدال مترادفات في economics
-mod_22,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.465,نسخ معدل مع استبدال مترادفات في economics
-mod_23,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.756,نسخ معدل مع استبدال مترادفات في law
-mod_24,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.183,نسخ معدل مع استبدال مترادفات في public_admin
-mod_25,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.505,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_26,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.869,نسخ معدل مع استبدال مترادفات في economics
-mod_27,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.549,نسخ معدل مع استبدال مترادفات في economics
-mod_28,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.705,نسخ معدل مع استبدال مترادفات في law
-mod_29,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.209,نسخ معدل مع استبدال مترادفات في public_admin
-mod_30,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.626,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_31,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.903,نسخ معدل مع استبدال مترادفات في economics
-mod_32,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.518,نسخ معدل مع استبدال مترادفات في economics
-mod_33,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.689,نسخ معدل مع استبدال مترادفات في law
-mod_34,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.011,نسخ معدل مع استبدال مترادفات في public_admin
-mod_35,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.51,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_36,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.834,نسخ معدل مع استبدال مترادفات في economics
-mod_37,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.503,نسخ معدل مع استبدال مترادفات في economics
-mod_38,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.519,نسخ معدل مع استبدال مترادفات في law
-mod_39,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,5.894,نسخ معدل مع استبدال مترادفات في public_admin
-mod_40,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.449,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_41,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.74,نسخ معدل مع استبدال مترادفات في economics
-mod_42,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.411,نسخ معدل مع استبدال مترادفات في economics
-mod_43,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.5,نسخ معدل مع استبدال مترادفات في law
-mod_44,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,5.899,نسخ معدل مع استبدال مترادفات في public_admin
-mod_45,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.997,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_46,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.748,نسخ معدل مع استبدال مترادفات في economics
-mod_47,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.293,نسخ معدل مع استبدال مترادفات في economics
-mod_48,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.49,نسخ معدل مع استبدال مترادفات في law
-mod_49,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.03,نسخ معدل مع استبدال مترادفات في public_admin
-mod_50,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.351,نسخ معدل مع استبدال مترادفات في cybersecurity
-mod_51,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,5.966,نسخ معدل مع استبدال مترادفات في economics
-mod_52,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,5.506,نسخ معدل مع استبدال مترادفات في economics
-mod_53,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,5.436,نسخ معدل مع استبدال مترادفات في law
-mod_54,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,6.103,نسخ معدل مع استبدال مترادفات في public_admin
-mod_55,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,5.239,نسخ معدل مع استبدال مترادفات في cybersecurity
-para_01,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,17,MEDIUM,0.0,0.0,0.0,0.2159,,False,False,4.573,إعادة صياغة استبدالية كاملة للمفردات الفنية مع الحفاظ على الفكرة
-para_02,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,sociology,20,MEDIUM,0.0,0.0,0.0,0.3091,,False,False,5.092,إعادة هيكلة الجملة وتقديم العبارات المتناقضة
-para_03,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,18,MEDIUM,0.0,0.0,0.0,0.2969,,False,False,4.867,إعادة صياغة مفاهيمية مع تغيير ترتيب المبتدأ والخبر
-para_04,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,17,MEDIUM,0.0,0.0,0.0,0.3651,,False,False,4.713,تحويل من مبني للمجهول إلى صيغة فاعلية مع مرادفات كاملة
-para_05,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,forensics,23,MEDIUM,0.0,0.0,0.0,0.248,,False,False,5.199,إعادة صياغة أمنية جذرية مع استبدال المفردات
-para_06,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,cybersecurity,19,MEDIUM,0.0,0.0,0.0,0.2371,,False,False,4.939,إعادة صياغة مجازية ووصفية
-para_07,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,20,MEDIUM,0.0,0.0,0.0,0.1935,,False,False,4.932,إعادة صياغة قاعدة قانونية شهيرة بمفردات فلسفية بديلة
-para_08,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,management,19,MEDIUM,0.0,0.0,0.0,0.2657,,False,False,4.907,إعادة صياغة إدارية كاملة
-para_09,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,political_science,19,MEDIUM,0.0,0.0,0.0,0.2213,,False,False,4.832,إعادة صياغة سياسية بمفردات مختلفة تماماً
-para_10,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,18,MEDIUM,0.0,0.0,0.0,0.3665,,False,False,4.88,إعادة صياغة نظرية اقتصادية دون تكرار أي كلمة محورية
-para_11,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.495,إعادة صياغة متقدمة في مجال security
-para_12,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.428,إعادة صياغة متقدمة في مجال law
-para_13,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,6.029,إعادة صياغة متقدمة في مجال economics
-para_14,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.452,إعادة صياغة متقدمة في مجال methodology
-para_15,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.357,إعادة صياغة متقدمة في مجال law
-para_16,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.295,إعادة صياغة متقدمة في مجال security
-para_17,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.457,إعادة صياغة متقدمة في مجال law
-para_18,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,5.922,إعادة صياغة متقدمة في مجال economics
-para_19,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.444,إعادة صياغة متقدمة في مجال methodology
-para_20,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.466,إعادة صياغة متقدمة في مجال law
-para_21,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.371,إعادة صياغة متقدمة في مجال security
-para_22,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.417,إعادة صياغة متقدمة في مجال law
-para_23,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,5.915,إعادة صياغة متقدمة في مجال economics
-para_24,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.352,إعادة صياغة متقدمة في مجال methodology
-para_25,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.35,إعادة صياغة متقدمة في مجال law
-para_26,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.522,إعادة صياغة متقدمة في مجال security
-para_27,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.882,إعادة صياغة متقدمة في مجال law
-para_28,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,6.232,إعادة صياغة متقدمة في مجال economics
-para_29,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.621,إعادة صياغة متقدمة في مجال methodology
-para_30,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.402,إعادة صياغة متقدمة في مجال law
-para_31,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.587,إعادة صياغة متقدمة في مجال security
-para_32,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.872,إعادة صياغة متقدمة في مجال law
-para_33,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,6.455,إعادة صياغة متقدمة في مجال economics
-para_34,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.919,إعادة صياغة متقدمة في مجال methodology
-para_35,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,7.029,إعادة صياغة متقدمة في مجال law
-para_36,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.943,إعادة صياغة متقدمة في مجال security
-para_37,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.885,إعادة صياغة متقدمة في مجال law
-para_38,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,6.565,إعادة صياغة متقدمة في مجال economics
-para_39,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.933,إعادة صياغة متقدمة في مجال methodology
-para_40,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.993,إعادة صياغة متقدمة في مجال law
-para_41,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.769,إعادة صياغة متقدمة في مجال security
-para_42,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.283,إعادة صياغة متقدمة في مجال law
-para_43,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,5.817,إعادة صياغة متقدمة في مجال economics
-para_44,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.101,إعادة صياغة متقدمة في مجال methodology
-para_45,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.216,إعادة صياغة متقدمة في مجال law
-para_46,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.044,إعادة صياغة متقدمة في مجال security
-para_47,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.219,إعادة صياغة متقدمة في مجال law
-para_48,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,5.911,إعادة صياغة متقدمة في مجال economics
-para_49,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.104,إعادة صياغة متقدمة في مجال methodology
-para_50,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.15,إعادة صياغة متقدمة في مجال law
-para_51,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,6.144,إعادة صياغة متقدمة في مجال security
-para_52,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,6.378,إعادة صياغة متقدمة في مجال law
-para_53,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,6.002,إعادة صياغة متقدمة في مجال economics
-para_54,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,6.159,إعادة صياغة متقدمة في مجال methodology
-para_55,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,6.14,إعادة صياغة متقدمة في مجال law
-cite_01,PROPERLY_CITED,EXACT_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,21,MEDIUM,0.7647,0.7647,0.874,0.9118,,True,False,3.922,اقتباس نصي منسوخ حرفياً لكنه موثق بقوس ورقم صفحة (APA)
-cite_02,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,0.087,0.758,0.4582,0.7061,,True,False,4.234,استشهاد سردي مباشر مع أقواس اقتباس
-cite_03,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,14,MEDIUM,0.6923,0.6923,0.7944,0.862,,True,False,3.87,توثيق بنمط IEEE برقم مرجعي معقوف
-cite_04,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,17,MEDIUM,0.0435,0.6919,0.0,0.573,,True,False,4.337,إعادة صياغة مع استشهاد صريح بأسماء الباحثين
-cite_05,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,18,MEDIUM,0.6111,0.6111,0.6988,0.7478,,True,False,3.907,اقتباس مع توثيق عربي بصيغة (المؤلف، السنة: الصفحة)
-cite_06,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.043,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_07,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.04,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_08,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.042,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_09,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.055,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_10,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.933,اقتباس موثق بنمط أكاديمي سليم في law
-cite_11,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.153,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_12,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.085,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_13,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.12,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_14,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.044,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_15,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.924,اقتباس موثق بنمط أكاديمي سليم في law
-cite_16,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.128,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_17,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.045,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_18,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.089,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_19,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.182,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_20,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.991,اقتباس موثق بنمط أكاديمي سليم في law
-cite_21,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.019,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_22,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.057,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_23,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.079,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_24,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.048,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_25,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.998,اقتباس موثق بنمط أكاديمي سليم في law
-cite_26,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.041,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_27,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.065,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_28,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.088,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_29,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.082,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_30,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.948,اقتباس موثق بنمط أكاديمي سليم في law
-cite_31,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.059,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_32,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.282,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_33,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.196,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_34,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.035,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_35,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.919,اقتباس موثق بنمط أكاديمي سليم في law
-cite_36,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.026,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_37,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.011,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_38,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.105,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_39,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.183,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_40,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.95,اقتباس موثق بنمط أكاديمي سليم في law
-cite_41,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.069,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_42,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.026,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_43,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.065,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_44,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.026,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_45,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.934,اقتباس موثق بنمط أكاديمي سليم في law
-cite_46,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,4.148,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
-cite_47,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,4.155,اقتباس موثق بنمط أكاديمي سليم في economics
-cite_48,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,4.114,اقتباس موثق بنمط أكاديمي سليم في methodology
-cite_49,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,4.038,اقتباس موثق بنمط أكاديمي سليم في public_admin
-cite_50,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,3.972,اقتباس موثق بنمط أكاديمي سليم في law
-common_01,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,academic_cliche,23,MEDIUM,0.1875,0.8612,0.6438,0.716,,False,True,4.211,كليشيهات أكاديمية ولوازم كتابة شائعة
-common_02,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,20,MEDIUM,0.1,0.7783,0.5357,0.7666,,False,False,4.269,ديباجة مراسيم وقرارات حكومية معيارية
-common_03,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,thesis_admin,16,MEDIUM,0.0,0.6667,0.0,0.6304,,False,False,4.377,صيغة إدارية قياسية لصفحة مناقشة الرسائل الجامعية
-common_04,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,SUPPRESSED_COMMON_TEXT,True,DEVELOPER_SYNTHETIC,methodology,18,MEDIUM,0.0,0.6518,0.0,0.4843,,False,True,4.481,عبارات منهجية شائعة جداً في مئات الأبحاث
-common_05,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,SUPPRESSED_COMMON_TEXT,True,DEVELOPER_SYNTHETIC,thesis_acknowledgements,19,MEDIUM,0.0,0.0,0.0,0.3257,,False,True,4.883,عبارات الإهداء والشكر التقليدية في الأطروحات
-common_06,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.276,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_07,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.277,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_08,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.426,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_09,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.478,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_10,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.447,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_11,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.363,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_12,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.364,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_13,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.31,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_14,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.46,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_15,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.349,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_16,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.393,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_17,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.375,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_18,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.309,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_19,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.551,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_20,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.433,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_21,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.426,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_22,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.333,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_23,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.256,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_24,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.358,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_25,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.471,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_26,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.425,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_27,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.308,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_28,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.285,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_29,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.326,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_30,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.401,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_31,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.343,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_32,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,8.472,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_33,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.204,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_34,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.317,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_35,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.358,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_36,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.52,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_37,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.32,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_38,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.429,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_39,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.459,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_40,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.477,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_41,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.442,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_42,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.519,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_43,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.474,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_44,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.536,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_45,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.519,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-common_46,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,4.404,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_47,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,4.466,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
-common_48,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,4.348,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
-common_49,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,4.414,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
-common_50,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,4.593,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
-orig_01,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,18,MEDIUM,0.0,0.0,0.0,0.2047,,False,False,4.872,نصان مستقلان تماماً في الزراعة والقانون
-orig_02,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,17,MEDIUM,0.0,0.0,0.0,0.1425,,False,False,4.878,نصان مختلفان كلياً (فيزياء اتصالات مقابل علم العقاب والإصلاح)
-orig_03,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,same_structure_diff_content,19,MEDIUM,0.0,0.0,0.0,0.1856,,False,False,4.837,هيكل أكاديمي متشابه ولكن في موضوعين منفصلين تماماً
-orig_04,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,21,MEDIUM,0.0,0.0,0.0,0.1175,,False,False,5.562,جيولوجيا مقابل إجراءات جنائية
-orig_05,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,17,MEDIUM,0.0,0.0,0.0,0.1299,,False,False,4.374,تربية مقابل هندسة برمجيات
-orig_06,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.112,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_07,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.305,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_08,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,4.381,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_09,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.386,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_10,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.241,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_11,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.4,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_12,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.468,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_13,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,4.544,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_14,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.74,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_15,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.447,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_16,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.552,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_17,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.591,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_18,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,4.678,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_19,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.678,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_20,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.483,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_21,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,5.526,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_22,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,5.589,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_23,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,4.792,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_24,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,5.085,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_25,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.73,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_26,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.817,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_27,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.876,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_28,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,5.124,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_29,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.936,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_30,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,5.7,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_31,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.872,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_32,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.952,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_33,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,5.201,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_34,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.856,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_35,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.867,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_36,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.983,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_37,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,5.106,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_38,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,5.088,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_39,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,6.053,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_40,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.698,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_41,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.552,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_42,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.718,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_43,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,5.005,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_44,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.839,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_45,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.561,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-orig_46,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,4.993,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
-orig_47,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,4.812,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
-orig_48,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,4.81,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
-orig_49,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,4.678,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
-orig_50,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,4.451,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
-ocr_01,OCR_NOISY_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,13,MEDIUM,0.8,0.8,0.7397,0.9037,,False,False,4.104,تشويه OCR: إسقاط نقاط الياء، استبدال التاء المربوطة، تشويش الباء/القاف
-ocr_02,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,14,MEDIUM,0.6667,0.6667,0.8449,0.9449,,False,False,4.056,تشويه OCR: تطويل عشوائي ودمج حروف وإسقاط نقاط
-ocr_03,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0,0.9487,0.0,0.587,,False,False,4.141,تشويه OCR: تبديل التاء بنون والباء بياء وهبوط الدقة
-ocr_04,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,11,MEDIUM,0.0,0.939,0.0,0.5516,,False,False,4.107,تشويه OCR: أخطاء قراءة بصرية شائعة في الماسحات الضوئية
-ocr_05,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,12,MEDIUM,0.0,0.9441,0.0,0.5938,,False,False,4.104,تشويه OCR شديد مع فقدان بعض الأحرف
-bib_01,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography,22,MEDIUM,0.8095,0.8095,0.8946,0.9494,,False,False,4.423,قائمة مراجع أكاديمية تتطلب الاستبعاد التلقائي من حساب الاستلال
-bib_02,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,4.106,قائمة مراجع إنجليزية مختلطة مع مراجع محلية
-bib_03,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography_header,10,MEDIUM,1.0,1.0,1.0,1.0,,False,False,3.821,عنوان قسم مراجع يجب تجنب اعتباره استلالاً في متن البحث
+exact_01,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,20,MEDIUM,1.0,1.0,1.0,1.0,,False,False,13.591,نسخ حرفي تام ومتطابق 100%
+exact_02,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,22,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.385,نسخ حرفي - مصطلحات تقنية
+exact_03,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,political_science,20,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.817,نسخ حرفي - علوم سياسية
+exact_04,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,22,MEDIUM,1.0,1.0,1.0,1.0,,False,False,13.163,نسخ حرفي - علوم البيئة
+exact_05,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,15.043,نسخ حرفي - منهجية البحث العلمي
+exact_06,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.528,نسخ حرفي - أمن المعلومات
+exact_07,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,information_science,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.152,نسخ حرفي - علم المكتبات والمعلومات
+exact_08,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,16,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.126,نسخ حرفي - تعريفات قانونية معيارية
+exact_09,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,18,MEDIUM,1.0,1.0,1.0,1.0,,False,False,11.862,نسخ حرفي - اقتصاد ومالية عامة
+exact_10,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,14.27,نسخ حرفي - إدارة الأعمال
+exact_11,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,13.34,نسخ حرفي - أدلة جنائية رقمية
+exact_12,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,14.647,نسخ حرفي - علوم إدارية
+exact_13,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,16,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.449,نسخ حرفي - إدارة عامة
+exact_14,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,sociology,15,MEDIUM,1.0,1.0,1.0,1.0,,False,False,15.595,نسخ حرفي - علم الاجتماع
+exact_15,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.459,نسخ حرفي - قانون دستوري
+exact_16,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,telecom,19,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.965,نسخ حرفي - اتصالات وشبكات
+exact_17,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,13.562,نسخ حرفي - أمن سيبراني
+exact_18,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,statistics,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.457,نسخ حرفي - إحصاء ومنهجية
+exact_19,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,15,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.52,نسخ حرفي - سياسة نقدية
+exact_20,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,18,MEDIUM,1.0,1.0,1.0,1.0,,False,False,11.672,نسخ حرفي - سلاسل الكتل
+exact_21_diacritics,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,12,MEDIUM,1.0,1.0,1.0,1.0,,False,False,12.335,نسخ متطابق مع إزالة كامل التشكيل والتنوين
+exact_22_alef_variants,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,13,MEDIUM,1.0,1.0,0.4732,0.7509,,False,False,12.946,نسخ متطابق مع تغيرات رسم الألف والتاء المربوطة
+exact_23_punctuation,EXACT_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,14,MEDIUM,0.0,0.9746,1.0,0.8458,,False,False,13.372,نسخ متطابق مع إزالة كافة علامات الترقيم
+exact_24_spacing,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,9,SHORT,1.0,1.0,1.0,1.0,,False,False,14.975,نسخ متطابق مع فروق المسافات البيضاء والمسافات المتعددة
+exact_25_tatweel,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,8,SHORT,1.0,1.0,1.0,1.0,,False,False,11.111,نسخ متطابق مع كشيدة وتطويل الحروف
+exact_26,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,13.364,نسخ حرفي كامل للأطروحة في مجال environment
+exact_27,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,13.358,نسخ حرفي كامل للأطروحة في مجال management
+exact_28,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,13.81,نسخ حرفي كامل للأطروحة في مجال forensics
+exact_29,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,12.488,نسخ حرفي كامل للأطروحة في مجال public_admin
+exact_30,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,23.019,نسخ حرفي كامل للأطروحة في مجال law
+exact_31,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,12.62,نسخ حرفي كامل للأطروحة في مجال computer_science
+exact_32,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,12.812,نسخ حرفي كامل للأطروحة في مجال environment
+exact_33,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,21.101,نسخ حرفي كامل للأطروحة في مجال management
+exact_34,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,14.925,نسخ حرفي كامل للأطروحة في مجال forensics
+exact_35,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,18.331,نسخ حرفي كامل للأطروحة في مجال public_admin
+exact_36,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,17.699,نسخ حرفي كامل للأطروحة في مجال law
+exact_37,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,13.4,نسخ حرفي كامل للأطروحة في مجال computer_science
+exact_38,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,14.55,نسخ حرفي كامل للأطروحة في مجال environment
+exact_39,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,13.462,نسخ حرفي كامل للأطروحة في مجال management
+exact_40,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,12.64,نسخ حرفي كامل للأطروحة في مجال forensics
+exact_41,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,12.318,نسخ حرفي كامل للأطروحة في مجال public_admin
+exact_42,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,12.33,نسخ حرفي كامل للأطروحة في مجال law
+exact_43,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,16.604,نسخ حرفي كامل للأطروحة في مجال computer_science
+exact_44,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,19.889,نسخ حرفي كامل للأطروحة في مجال environment
+exact_45,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,31.691,نسخ حرفي كامل للأطروحة في مجال management
+exact_46,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,12.919,نسخ حرفي كامل للأطروحة في مجال forensics
+exact_47,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,14.964,نسخ حرفي كامل للأطروحة في مجال public_admin
+exact_48,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,15.235,نسخ حرفي كامل للأطروحة في مجال law
+exact_49,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,26.386,نسخ حرفي كامل للأطروحة في مجال computer_science
+exact_50,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,environment,26,LONG,1.0,1.0,1.0,1.0,,False,False,23.203,نسخ حرفي كامل للأطروحة في مجال environment
+exact_51,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,management,27,LONG,1.0,1.0,1.0,1.0,,False,False,24.617,نسخ حرفي كامل للأطروحة في مجال management
+exact_52,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,27,LONG,1.0,1.0,1.0,1.0,,False,False,15.588,نسخ حرفي كامل للأطروحة في مجال forensics
+exact_53,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,26,LONG,1.0,1.0,1.0,1.0,,False,False,13.579,نسخ حرفي كامل للأطروحة في مجال public_admin
+exact_54,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,29,LONG,1.0,1.0,1.0,1.0,,False,False,12.603,نسخ حرفي كامل للأطروحة في مجال law
+exact_55,EXACT_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,28,LONG,1.0,1.0,1.0,1.0,,False,False,13.19,نسخ حرفي كامل للأطروحة في مجال computer_science
+mod_01,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,forensics,16,MEDIUM,0.0,0.7467,0.0,0.6007,,False,False,14.014,استبدال كلمات مترادفة وحذف وتغيير ترتيب طفيف
+mod_02,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,17,MEDIUM,0.0,0.7217,0.0,0.5164,,False,False,13.181,إدراج مفردات وتغيير ترتيب
+mod_03,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,0.0,0.7069,0.0,0.6988,,False,False,13.604,استبدال مترادفات قانونية مباشرة مع بقاء الهيكل النحوي
+mod_04,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,education,16,MEDIUM,0.0,0.7479,0.0,0.5865,,False,False,14.019,استبدال كلمات وإضافة أسماء عطف
+mod_05,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,18,MEDIUM,0.0,0.7773,0.4517,0.6914,,False,False,20.888,تعديل مصطلحات إحصائية مع الحفاظ على البنية
+mod_06,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.0,0.7511,0.0,0.5457,,False,False,20.827,استبدال كلمات وحذف مفردة
+mod_07,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,17,MEDIUM,0.0,0.7863,0.434,0.6617,,False,False,24.356,إدراج واستبدال مفردات أمنية
+mod_08,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,19,MEDIUM,0.0,0.7315,0.0,0.5391,,False,False,20.146,تعديل صياغي مع الاحتفاظ بالمفردات الجوهرية
+mod_09,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,16,MEDIUM,0.0,0.6696,0.0,0.5615,,False,False,13.807,تعديل تقني مع الحفاظ على متواليات الكلمات الأساسية
+mod_10,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,sociology,18,MEDIUM,0.0,0.6667,0.0,0.5337,,False,False,15.587,تعديل بالمرادفات مع الحفاظ على المعنى والهيكل
+mod_11,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,27.511,نسخ معدل مع استبدال مترادفات في economics
+mod_12,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,16.552,نسخ معدل مع استبدال مترادفات في economics
+mod_13,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,16.957,نسخ معدل مع استبدال مترادفات في law
+mod_14,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,20.927,نسخ معدل مع استبدال مترادفات في public_admin
+mod_15,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,24.976,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_16,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,17.138,نسخ معدل مع استبدال مترادفات في economics
+mod_17,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,21.084,نسخ معدل مع استبدال مترادفات في economics
+mod_18,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,21.586,نسخ معدل مع استبدال مترادفات في law
+mod_19,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,23.984,نسخ معدل مع استبدال مترادفات في public_admin
+mod_20,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,28.719,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_21,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,34.974,نسخ معدل مع استبدال مترادفات في economics
+mod_22,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,31.827,نسخ معدل مع استبدال مترادفات في economics
+mod_23,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,34.386,نسخ معدل مع استبدال مترادفات في law
+mod_24,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,37.167,نسخ معدل مع استبدال مترادفات في public_admin
+mod_25,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,37.88,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_26,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,35.014,نسخ معدل مع استبدال مترادفات في economics
+mod_27,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,28.117,نسخ معدل مع استبدال مترادفات في economics
+mod_28,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,29.855,نسخ معدل مع استبدال مترادفات في law
+mod_29,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,34.823,نسخ معدل مع استبدال مترادفات في public_admin
+mod_30,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,26.848,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_31,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,20.652,نسخ معدل مع استبدال مترادفات في economics
+mod_32,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,32.674,نسخ معدل مع استبدال مترادفات في economics
+mod_33,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,28.515,نسخ معدل مع استبدال مترادفات في law
+mod_34,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,31.669,نسخ معدل مع استبدال مترادفات في public_admin
+mod_35,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,30.648,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_36,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,28.441,نسخ معدل مع استبدال مترادفات في economics
+mod_37,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,29.4,نسخ معدل مع استبدال مترادفات في economics
+mod_38,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,27.139,نسخ معدل مع استبدال مترادفات في law
+mod_39,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,30.947,نسخ معدل مع استبدال مترادفات في public_admin
+mod_40,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,25.685,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_41,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,31.312,نسخ معدل مع استبدال مترادفات في economics
+mod_42,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,21.492,نسخ معدل مع استبدال مترادفات في economics
+mod_43,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,30.171,نسخ معدل مع استبدال مترادفات في law
+mod_44,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,33.329,نسخ معدل مع استبدال مترادفات في public_admin
+mod_45,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,28.794,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_46,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,27.0,نسخ معدل مع استبدال مترادفات في economics
+mod_47,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,29.149,نسخ معدل مع استبدال مترادفات في economics
+mod_48,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,23.594,نسخ معدل مع استبدال مترادفات في law
+mod_49,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,22.663,نسخ معدل مع استبدال مترادفات في public_admin
+mod_50,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,23.903,نسخ معدل مع استبدال مترادفات في cybersecurity
+mod_51,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,28,LONG,0.0,0.7389,0.0,0.5718,,False,False,38.543,نسخ معدل مع استبدال مترادفات في economics
+mod_52,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,24,MEDIUM,0.0,0.0,0.0,0.5087,,False,False,30.497,نسخ معدل مع استبدال مترادفات في economics
+mod_53,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,25,MEDIUM,0.0,0.7229,0.0,0.516,,False,False,19.917,نسخ معدل مع استبدال مترادفات في law
+mod_54,MODIFIED_COPY,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,public_admin,27,LONG,0.0,0.0,0.0,0.5551,,False,False,17.576,نسخ معدل مع استبدال مترادفات في public_admin
+mod_55,MODIFIED_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,25,MEDIUM,0.0,0.7214,0.0,0.5348,,False,False,30.685,نسخ معدل مع استبدال مترادفات في cybersecurity
+para_01,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,17,MEDIUM,0.0,0.0,0.0,0.2159,,False,False,38.663,إعادة صياغة استبدالية كاملة للمفردات الفنية مع الحفاظ على الفكرة
+para_02,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,sociology,20,MEDIUM,0.0,0.0,0.0,0.3091,,False,False,15.007,إعادة هيكلة الجملة وتقديم العبارات المتناقضة
+para_03,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,18,MEDIUM,0.0,0.0,0.0,0.2969,,False,False,13.955,إعادة صياغة مفاهيمية مع تغيير ترتيب المبتدأ والخبر
+para_04,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,17,MEDIUM,0.0,0.0,0.0,0.3651,,False,False,17.305,تحويل من مبني للمجهول إلى صيغة فاعلية مع مرادفات كاملة
+para_05,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,forensics,23,MEDIUM,0.0,0.0,0.0,0.248,,False,False,16.525,إعادة صياغة أمنية جذرية مع استبدال المفردات
+para_06,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,cybersecurity,19,MEDIUM,0.0,0.0,0.0,0.2371,,False,False,20.897,إعادة صياغة مجازية ووصفية
+para_07,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,20,MEDIUM,0.0,0.0,0.0,0.1935,,False,False,15.613,إعادة صياغة قاعدة قانونية شهيرة بمفردات فلسفية بديلة
+para_08,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,management,19,MEDIUM,0.0,0.0,0.0,0.2657,,False,False,15.463,إعادة صياغة إدارية كاملة
+para_09,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,political_science,19,MEDIUM,0.0,0.0,0.0,0.2213,,False,False,15.709,إعادة صياغة سياسية بمفردات مختلفة تماماً
+para_10,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,18,MEDIUM,0.0,0.0,0.0,0.3665,,False,False,15.254,إعادة صياغة نظرية اقتصادية دون تكرار أي كلمة محورية
+para_11,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,20.021,إعادة صياغة متقدمة في مجال security
+para_12,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,19.207,إعادة صياغة متقدمة في مجال law
+para_13,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,18.158,إعادة صياغة متقدمة في مجال economics
+para_14,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,20.651,إعادة صياغة متقدمة في مجال methodology
+para_15,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,27.577,إعادة صياغة متقدمة في مجال law
+para_16,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,20.053,إعادة صياغة متقدمة في مجال security
+para_17,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,19.521,إعادة صياغة متقدمة في مجال law
+para_18,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,18.547,إعادة صياغة متقدمة في مجال economics
+para_19,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,19.104,إعادة صياغة متقدمة في مجال methodology
+para_20,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,19.832,إعادة صياغة متقدمة في مجال law
+para_21,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,19.776,إعادة صياغة متقدمة في مجال security
+para_22,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,19.827,إعادة صياغة متقدمة في مجال law
+para_23,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,18.233,إعادة صياغة متقدمة في مجال economics
+para_24,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,20.672,إعادة صياغة متقدمة في مجال methodology
+para_25,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,19.466,إعادة صياغة متقدمة في مجال law
+para_26,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,20.136,إعادة صياغة متقدمة في مجال security
+para_27,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,25.128,إعادة صياغة متقدمة في مجال law
+para_28,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,26.472,إعادة صياغة متقدمة في مجال economics
+para_29,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,21.259,إعادة صياغة متقدمة في مجال methodology
+para_30,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,29.832,إعادة صياغة متقدمة في مجال law
+para_31,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,21.26,إعادة صياغة متقدمة في مجال security
+para_32,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,22.894,إعادة صياغة متقدمة في مجال law
+para_33,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,32.186,إعادة صياغة متقدمة في مجال economics
+para_34,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,20.549,إعادة صياغة متقدمة في مجال methodology
+para_35,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,20.112,إعادة صياغة متقدمة في مجال law
+para_36,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,21.909,إعادة صياغة متقدمة في مجال security
+para_37,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,20.306,إعادة صياغة متقدمة في مجال law
+para_38,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,18.194,إعادة صياغة متقدمة في مجال economics
+para_39,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,24.301,إعادة صياغة متقدمة في مجال methodology
+para_40,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,29.095,إعادة صياغة متقدمة في مجال law
+para_41,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,25.81,إعادة صياغة متقدمة في مجال security
+para_42,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,32.861,إعادة صياغة متقدمة في مجال law
+para_43,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,31.888,إعادة صياغة متقدمة في مجال economics
+para_44,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,25.654,إعادة صياغة متقدمة في مجال methodology
+para_45,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,20.109,إعادة صياغة متقدمة في مجال law
+para_46,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,28.93,إعادة صياغة متقدمة في مجال security
+para_47,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,24.172,إعادة صياغة متقدمة في مجال law
+para_48,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,27.823,إعادة صياغة متقدمة في مجال economics
+para_49,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,28.14,إعادة صياغة متقدمة في مجال methodology
+para_50,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,25.628,إعادة صياغة متقدمة في مجال law
+para_51,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,security,30,LONG,0.0,0.0,0.0,0.2648,,False,False,20.866,إعادة صياغة متقدمة في مجال security
+para_52,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,32,LONG,0.0,0.0,0.0,0.3309,,False,False,23.322,إعادة صياغة متقدمة في مجال law
+para_53,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,economics,30,LONG,0.0,0.0,0.0,0.3796,,False,False,18.993,إعادة صياغة متقدمة في مجال economics
+para_54,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,methodology,31,LONG,0.0,0.0,0.0,0.365,,False,False,19.93,إعادة صياغة متقدمة في مجال methodology
+para_55,PARAPHRASE,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,False,DEVELOPER_SYNTHETIC,law,30,LONG,0.0,0.0,0.0,0.3717,,False,False,27.966,إعادة صياغة متقدمة في مجال law
+cite_01,PROPERLY_CITED,EXACT_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,21,MEDIUM,0.7647,0.7647,0.874,0.9118,,True,False,17.082,اقتباس نصي منسوخ حرفياً لكنه موثق بقوس ورقم صفحة (APA)
+cite_02,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,17,MEDIUM,0.087,0.758,0.4582,0.7061,,True,False,22.02,استشهاد سردي مباشر مع أقواس اقتباس
+cite_03,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,computer_science,14,MEDIUM,0.6923,0.6923,0.7944,0.862,,True,False,17.243,توثيق بنمط IEEE برقم مرجعي معقوف
+cite_04,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,17,MEDIUM,0.0435,0.6919,0.0,0.573,,True,False,20.564,إعادة صياغة مع استشهاد صريح بأسماء الباحثين
+cite_05,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,18,MEDIUM,0.6111,0.6111,0.6988,0.7478,,True,False,14.485,اقتباس مع توثيق عربي بصيغة (المؤلف، السنة: الصفحة)
+cite_06,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,22.195,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_07,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,14.659,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_08,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,13.534,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_09,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,13.743,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_10,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,14.366,اقتباس موثق بنمط أكاديمي سليم في law
+cite_11,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,14.537,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_12,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,15.379,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_13,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,15.193,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_14,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,14.777,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_15,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,20.909,اقتباس موثق بنمط أكاديمي سليم في law
+cite_16,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,14.127,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_17,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,13.857,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_18,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,13.304,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_19,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,13.258,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_20,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,12.844,اقتباس موثق بنمط أكاديمي سليم في law
+cite_21,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,13.454,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_22,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,12.777,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_23,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,14.09,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_24,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,13.081,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_25,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,12.884,اقتباس موثق بنمط أكاديمي سليم في law
+cite_26,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,13.376,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_27,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,13.402,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_28,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,12.837,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_29,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,13.534,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_30,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,13.039,اقتباس موثق بنمط أكاديمي سليم في law
+cite_31,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,13.649,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_32,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,15.311,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_33,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,14.272,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_34,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,12.326,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_35,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,13.639,اقتباس موثق بنمط أكاديمي سليم في law
+cite_36,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,13.112,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_37,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,15.674,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_38,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,20.723,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_39,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,21.861,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_40,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,21.969,اقتباس موثق بنمط أكاديمي سليم في law
+cite_41,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,12.314,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_42,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,12.23,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_43,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,13.3,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_44,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,14.412,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_45,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,13.05,اقتباس موثق بنمط أكاديمي سليم في law
+cite_46,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0476,0.7667,0.4887,0.6355,,True,False,13.59,اقتباس موثق بنمط أكاديمي سليم في cybersecurity
+cite_47,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,economics,16,MEDIUM,0.3889,0.71,0.5521,0.6925,,True,False,13.336,اقتباس موثق بنمط أكاديمي سليم في economics
+cite_48,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,13,MEDIUM,0.1579,0.6633,0.0,0.6298,,True,False,15.356,اقتباس موثق بنمط أكاديمي سليم في methodology
+cite_49,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,15,MEDIUM,0.375,0.6667,0.5516,0.6315,,True,False,16.59,اقتباس موثق بنمط أكاديمي سليم في public_admin
+cite_50,PROPERLY_CITED,MODIFIED_COPY,CITED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,21,MEDIUM,0.6471,0.6471,0.8065,0.8888,,True,False,16.954,اقتباس موثق بنمط أكاديمي سليم في law
+common_01,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,academic_cliche,23,MEDIUM,0.1875,0.8612,0.6438,0.716,,False,True,19.178,كليشيهات أكاديمية ولوازم كتابة شائعة
+common_02,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,20,MEDIUM,0.1,0.7783,0.5357,0.7666,,False,False,19.455,ديباجة مراسيم وقرارات حكومية معيارية
+common_03,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,thesis_admin,16,MEDIUM,0.0,0.6667,0.0,0.6304,,False,False,16.529,صيغة إدارية قياسية لصفحة مناقشة الرسائل الجامعية
+common_04,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,SUPPRESSED_COMMON_TEXT,True,DEVELOPER_SYNTHETIC,methodology,18,MEDIUM,0.0,0.6518,0.0,0.4843,,False,True,15.314,عبارات منهجية شائعة جداً في مئات الأبحاث
+common_05,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,SUPPRESSED_COMMON_TEXT,True,DEVELOPER_SYNTHETIC,thesis_acknowledgements,19,MEDIUM,0.0,0.0,0.0,0.3257,,False,True,20.796,عبارات الإهداء والشكر التقليدية في الأطروحات
+common_06,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,21.837,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_07,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,15.376,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_08,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,22.597,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_09,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,13.714,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_10,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,15.442,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_11,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,17.345,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_12,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,16.825,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_13,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,14.025,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_14,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,16.02,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_15,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,18.063,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_16,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,17.526,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_17,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,19.08,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_18,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,22.249,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_19,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,19.523,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_20,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,17.598,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_21,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,16.623,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_22,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,17.206,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_23,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,16.045,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_24,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,13.772,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_25,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,20.068,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_26,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,14.301,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_27,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,14.441,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_28,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,14.142,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_29,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,14.762,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_30,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,16.777,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_31,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,16.08,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_32,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,23.112,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_33,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,12.527,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_34,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,13.474,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_35,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,13.048,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_36,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,14.693,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_37,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,14.023,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_38,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,13.508,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_39,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,13.89,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_40,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,18.175,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_41,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,17.392,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_42,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,17.293,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_43,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,17.216,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_44,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,22.485,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_45,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,17.022,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+common_46,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0,0.0,0.0,0.2672,,False,False,20.724,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_47,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,security_boilerplate,17,MEDIUM,0.0,0.0,0.0,0.3643,,False,False,23.931,تركيب لغوي اصطلاحي شائع ومتكرر في security_boilerplate
+common_48,COMMON_INSTITUTIONAL_TEXT,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,academic_recommendations,16,MEDIUM,0.0,0.0,0.0,0.3027,,False,False,19.106,تركيب لغوي اصطلاحي شائع ومتكرر في academic_recommendations
+common_49,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,methodology,15,MEDIUM,0.0952,0.8193,0.4084,0.6444,,False,False,17.296,تركيب لغوي اصطلاحي شائع ومتكرر في methodology
+common_50,COMMON_INSTITUTIONAL_TEXT,MODIFIED_COPY,MODIFIED_SEGMENT,False,DEVELOPER_SYNTHETIC,legal_boilerplate,15,MEDIUM,0.0,0.8789,0.4764,0.6963,,False,False,16.576,تركيب لغوي اصطلاحي شائع ومتكرر في legal_boilerplate
+orig_01,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,18,MEDIUM,0.0,0.0,0.0,0.2047,,False,False,18.985,نصان مستقلان تماماً في الزراعة والقانون
+orig_02,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,17,MEDIUM,0.0,0.0,0.0,0.1425,,False,False,17.222,نصان مختلفان كلياً (فيزياء اتصالات مقابل علم العقاب والإصلاح)
+orig_03,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,same_structure_diff_content,19,MEDIUM,0.0,0.0,0.0,0.1856,,False,False,17.386,هيكل أكاديمي متشابه ولكن في موضوعين منفصلين تماماً
+orig_04,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,21,MEDIUM,0.0,0.0,0.0,0.1175,,False,False,18.928,جيولوجيا مقابل إجراءات جنائية
+orig_05,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,cross_domain,17,MEDIUM,0.0,0.0,0.0,0.1299,,False,False,15.494,تربية مقابل هندسة برمجيات
+orig_06,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,14.625,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_07,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,19.346,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_08,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,20.527,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_09,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,27.394,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_10,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,20.831,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_11,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,16.705,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_12,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,17.026,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_13,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,17.305,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_14,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,16.119,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_15,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,15.709,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_16,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,14.544,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_17,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,15.059,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_18,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,14.323,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_19,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,15.547,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_20,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,14.685,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_21,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,16.474,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_22,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,16.708,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_23,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,18.442,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_24,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,17.549,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_25,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,19.913,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_26,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,14.977,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_27,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,17.648,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_28,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,14.88,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_29,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,14.509,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_30,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,14.905,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_31,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,17.538,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_32,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,18.54,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_33,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,16.152,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_34,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,13.792,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_35,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,15.411,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_36,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,19.101,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_37,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,17.757,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_38,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,20.286,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_39,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,16.516,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_40,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,22.064,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_41,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,23.868,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_42,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,25.481,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_43,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,24.341,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_44,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,20.29,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_45,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,17.833,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+orig_46,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,medicine_vs_radar,14,MEDIUM,0.0,0.0,0.0,0.1743,,False,False,15.649,نص أصلي مستقل غير مرتبط إطلاقاً في medicine_vs_radar
+orig_47,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_law,15,MEDIUM,0.0,0.0,0.0,0.2154,,False,False,15.219,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_law
+orig_48,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,comp_sci_vs_psychology,16,MEDIUM,0.0,0.0,0.0,0.1182,,False,False,15.213,نص أصلي مستقل غير مرتبط إطلاقاً في comp_sci_vs_psychology
+orig_49,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,chemistry_vs_marketing,15,MEDIUM,0.0,0.0,0.0,0.2058,,False,False,18.599,نص أصلي مستقل غير مرتبط إطلاقاً في chemistry_vs_marketing
+orig_50,ORIGINAL_UNRELATED,ORIGINAL_UNRELATED,CLEAN_ORIGINAL,True,DEVELOPER_SYNTHETIC,physics_vs_law,14,MEDIUM,0.0,0.0,0.0,0.2306,,False,False,19.691,نص أصلي مستقل غير مرتبط إطلاقاً في physics_vs_law
+ocr_01,OCR_NOISY_COPY,EXACT_COPY,COPIED_SEGMENT,True,DEVELOPER_SYNTHETIC,security,13,MEDIUM,0.8,0.8,0.7397,0.9037,,False,False,21.047,تشويه OCR: إسقاط نقاط الياء، استبدال التاء المربوطة، تشويش الباء/القاف
+ocr_02,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,law,14,MEDIUM,0.6667,0.6667,0.8449,0.9449,,False,False,20.414,تشويه OCR: تطويل عشوائي ودمج حروف وإسقاط نقاط
+ocr_03,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,cybersecurity,13,MEDIUM,0.0,0.9487,0.0,0.587,,False,False,18.883,تشويه OCR: تبديل التاء بنون والباء بياء وهبوط الدقة
+ocr_04,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,public_admin,11,MEDIUM,0.0,0.939,0.0,0.5516,,False,False,15.666,تشويه OCR: أخطاء قراءة بصرية شائعة في الماسحات الضوئية
+ocr_05,OCR_NOISY_COPY,MODIFIED_COPY,MODIFIED_SEGMENT,True,DEVELOPER_SYNTHETIC,methodology,12,MEDIUM,0.0,0.9441,0.0,0.5938,,False,False,15.495,تشويه OCR شديد مع فقدان بعض الأحرف
+bib_01,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography,22,MEDIUM,0.8095,0.8095,0.8946,0.9494,,False,False,20.519,قائمة مراجع أكاديمية تتطلب الاستبعاد التلقائي من حساب الاستلال
+bib_02,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography,21,MEDIUM,1.0,1.0,1.0,1.0,,False,False,13.404,قائمة مراجع إنجليزية مختلطة مع مراجع محلية
+bib_03,BIBLIOGRAPHY_ONLY,EXACT_COPY,COPIED_SEGMENT,False,DEVELOPER_SYNTHETIC,bibliography_header,10,MEDIUM,1.0,1.0,1.0,1.0,,False,False,14.682,عنوان قسم مراجع يجب تجنب اعتباره استلالاً في متن البحث

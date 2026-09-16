@@ -34,8 +34,10 @@ from app.security.permissions import Permission, Role
 def app_instance():
     app = create_app()
     app.config['TESTING'] = True
+    app.config['STRICT_AUTH'] = True
     app.config['SECRET_KEY'] = 'test-dup-secret-key-2026'
     return app
+
 
 
 @pytest.fixture
@@ -279,6 +281,7 @@ def test_authorized_rescan_proceeds_with_new_scan(client, app_instance):
 
 def test_batch_internal_duplicate_detected(client, app_instance):
     """كشف التكرار الداخلي بين ملفات نفس الدفعة دون إلغاء باقي ملفات الدفعة."""
+    from unittest.mock import patch
     uid, uname, urole = _setup_test_user('batch_dup_tester', Role.REVIEWER)
     with client.session_transaction() as sess:
         sess['user_id'] = uid
@@ -299,7 +302,8 @@ def test_batch_internal_duplicate_detected(client, app_instance):
         'authors[]': ['باحث 1', 'باحث 2', 'باحث 1']
     }
 
-    res = client.post('/api/batch/independent', data=data, content_type='multipart/form-data')
+    with patch('app.routes.batch_routes.start_batch_scan', return_value='mock-batch-123') as mock_scan:
+        res = client.post('/api/batch/independent', data=data, content_type='multipart/form-data')
     assert res.status_code == 202
     resp_data = res.get_json()
     assert 'duplicates_warning' in resp_data
@@ -308,6 +312,7 @@ def test_batch_internal_duplicate_detected(client, app_instance):
 
 def test_thesis_duplicate_chapter_excluded_from_scan(client, app_instance):
     """استبعاد الفصل المكرر داخل نفس الرسالة من الدمج والتحليل المزدوج."""
+    from unittest.mock import patch
     uid, uname, urole = _setup_test_user('thesis_dup_tester', Role.REVIEWER)
     with client.session_transaction() as sess:
         sess['user_id'] = uid
@@ -329,7 +334,8 @@ def test_thesis_duplicate_chapter_excluded_from_scan(client, app_instance):
         'author': 'الباحث الأكاديمي'
     }
 
-    res = client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
+    with patch('app.routes.batch_routes.start_thesis_scan', return_value='mock-thesis-123') as mock_scan:
+        res = client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
     assert res.status_code == 202
     resp_data = res.get_json()
     assert resp_data['file_count'] == 2 # تم إدخال فصلين فقط واستبعاد الثالث المكرر
@@ -579,20 +585,22 @@ def test_authorized_user_receives_previous_report_details(client, app_instance):
 
 
 def test_unauthorized_rescan_fails_without_scan_permission(client, app_instance):
-    """محاولة طلب الفحص من قبل مستخدم غير ممتلك لصلاحية scan.start (مثل مدير النظام التقني) تُرفض برمز 403."""
-    uid, uname, _ = _setup_test_user('sysadmin_no_scan', Role.SYSTEM_ADMIN)
+    """محاولة طلب الفحص من قبل مستخدم غير ممتلك لصلاحية scan.start تُرفض برمز 403."""
+    uid, uname, _ = _setup_test_user('guest_no_scan', 'guest')
     with client.session_transaction() as sess:
         sess['user_id'] = uid
         sess['username'] = uname
-        sess['role'] = Role.SYSTEM_ADMIN
+        sess['role'] = 'guest'
 
-    content = b"TEST_DATA_FOR_PERMISSION_CHECK"
+    content = _make_valid_test_pdf("TEST_DATA_FOR_PERMISSION_CHECK")
     res = client.post(
         '/api/analyze_async',
         data={'file': (io.BytesIO(content), 'doc.pdf'), 'title': 'محاولة فحص', 'allow_rescan': 'true'},
         content_type='multipart/form-data'
     )
+
     assert res.status_code == 403
+
 
 
 def test_sha256_stability_across_file_renames(tmp_path):

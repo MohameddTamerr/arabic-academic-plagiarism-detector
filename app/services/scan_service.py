@@ -37,6 +37,43 @@ from app.services.job_queue_service import JobType, JobStatus
 from app.errors.error_codes import ErrorCode
 
 
+def _find_exact_reference_match(file_path: str) -> dict | None:
+    """Return an active, byte-identical reference and its cached text content."""
+    from app.repositories import document_repo
+    from app.services.integrity_service import compute_stream_sha256
+
+    if not file_path or not os.path.exists(file_path):
+        return None
+    try:
+        file_hash, _ = compute_stream_sha256(file_path)
+        return document_repo.get_active_document_by_hash(file_hash, include_content=True)
+    except Exception as exc:
+        logger.warning("تعذر التحقق من بصمة التطابق الكامل للملف %s: %s", file_path, exc)
+        return None
+
+
+def _pdf_progress_callback(task_id: str, start_pct: int, end_pct: int, label: str = 'جاري قراءة الصفحات'):
+    """Map page-level extraction progress to a throttled persisted job range."""
+    state = {'progress': -1, 'completed': 0}
+
+    def callback(completed: int, total: int, _page_number: int) -> None:
+        if total <= 0:
+            return
+        progress = start_pct + int((completed / total) * max(0, end_pct - start_pct))
+        should_persist = (
+            progress != state['progress']
+            or completed == total
+            or completed - state['completed'] >= 20
+        )
+        if not should_persist:
+            return
+        state['progress'] = progress
+        state['completed'] = completed
+        _update_progress(task_id, progress, f'{label}: {completed} من {total} صفحة')
+
+    return callback
+
+
 # ─── فحص بحث واحد (API الحالي — بدون تغيير) ─────────────────────────────────
 
 def start_async_scan(
@@ -159,6 +196,10 @@ def _execute_thesis_pipeline(
         settings = get_current_settings()
         all_pages_data = []    # قائمة موحدة بجميع الصفحات من جميع الملفات
         total_files = len(file_entries)
+        exact_reference_match = (
+            _find_exact_reference_match(file_entries[0].get('path', ''))
+            if total_files == 1 else None
+        )
 
         for f_idx, entry in enumerate(file_entries):
             if job_queue_service.is_cancellation_requested(task_id):
@@ -178,7 +219,26 @@ def _execute_thesis_pipeline(
                 logger.warning(f"ملف الرسالة غير موجود: {file_path}")
                 continue
 
-            pages = extract_document_pages(file_path, enable_ocr=settings.get('enable_ocr', True))
+            file_start = 10 + int((f_idx / total_files) * 40)
+            file_end = 10 + int(((f_idx + 1) / total_files) * 40)
+            if exact_reference_match:
+                _update_progress(
+                    task_id,
+                    file_end,
+                    'تم اكتشاف ملف مطابق تماماً لمرجع نشط — تم تجاوز OCR',
+                )
+                pages = [dict(page) for page in exact_reference_match.get('pages', [])]
+            else:
+                pages = extract_document_pages(
+                    file_path,
+                    enable_ocr=settings.get('enable_ocr', True),
+                    progress_callback=_pdf_progress_callback(
+                        task_id,
+                        file_start,
+                        file_end,
+                        f'قراءة الملف {f_idx + 1} من {total_files}',
+                    ),
+                )
 
             # إضافة معرف الملف الأصلي لكل صفحة (للعزو في التقرير)
             for pg in pages:
@@ -205,7 +265,8 @@ def _execute_thesis_pipeline(
         report = analyze_academic_document(
             raw_text=raw_text,
             pages_data=all_pages_data,
-            settings_override=settings
+            settings_override=settings,
+            exact_reference_match=exact_reference_match,
         )
 
         if job_queue_service.is_cancellation_requested(task_id):
@@ -419,6 +480,11 @@ def _execute_batch_item(
             scan_execution_id=task_id
         )
 
+        # اربط مهمة الفحص بسجل البحث الذي أنشأه مسار الدفعة قبل بدء خط
+        # الأنابيب. بدون هذا الربط لم يكن الخط يجد السجل، فكان ينشئ Research
+        # ثانياً لنفس الملف ويترك التقرير من دون research_id صحيح.
+        batch_repo.update_research_scan(research_id, task_id)
+
         # تنفيذ الفحص الفعلي مع Semaphore
         with _BATCH_SEMAPHORE:
             _execute_scan_pipeline(task_id, file_path, title, author, raw_text, file_name)
@@ -475,10 +541,23 @@ def _execute_scan_pipeline(
         # المرحلة 1: استخراج الصفحات والنصوص
         _update_progress(task_id, 20, 'جاري استخراج وقراءة النصوص والصفحات من المستند...')
         pages_data = []
+        exact_reference_match = _find_exact_reference_match(file_path)
 
         if file_path and os.path.exists(file_path):
             settings = get_current_settings()
-            pages_data = extract_document_pages(file_path, enable_ocr=settings.get('enable_ocr', True))
+            if exact_reference_match:
+                _update_progress(
+                    task_id,
+                    44,
+                    'تم اكتشاف ملف مطابق تماماً لمرجع نشط — تم تجاوز OCR',
+                )
+                pages_data = [dict(page) for page in exact_reference_match.get('pages', [])]
+            else:
+                pages_data = extract_document_pages(
+                    file_path,
+                    enable_ocr=settings.get('enable_ocr', True),
+                    progress_callback=_pdf_progress_callback(task_id, 20, 44),
+                )
             if not raw_text:
                 raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])
 
@@ -503,7 +582,8 @@ def _execute_scan_pipeline(
         report = analyze_academic_document(
             raw_text=raw_text,
             pages_data=pages_data if pages_data else None,
-            settings_override=settings
+            settings_override=settings,
+            exact_reference_match=exact_reference_match,
         )
 
         if job_queue_service.is_cancellation_requested(task_id):
@@ -531,6 +611,7 @@ def _execute_scan_pipeline(
         from app.repositories.base_repo import get_session
 
         research_ref_no = ''
+        r_target_id = None
         with get_session() as session:
             existing_res = session.query(Research).filter(
                 (Research.scan_job_id == task_id) | (Research.report_id == report_id)
@@ -538,12 +619,14 @@ def _execute_scan_pipeline(
             if existing_res:
                 existing_res.report_id = report_id
                 research_ref_no = existing_res.reference_number or ''
+                r_target_id = existing_res.id
             else:
                 r_id = batch_repo.create_research(
                     title=report['title'],
                     author=report['author'],
                     created_by=''
                 )
+                r_target_id = r_id
                 batch_repo.update_research_scan(r_id, task_id, report_id)
                 if file_path and os.path.exists(file_path):
                     from app.services.integrity_service import compute_stream_sha256
@@ -565,7 +648,6 @@ def _execute_scan_pipeline(
         report['reference_number'] = research_ref_no
         report['research_reference_number'] = research_ref_no
 
-        r_target_id = r_id if 'r_id' in locals() else None
         rev_num, prev_rep_id = 1, None
         if r_target_id:
             from app.services import report_integrity_service
@@ -600,7 +682,7 @@ def _execute_scan_pipeline(
         from app.services import snapshot_service
         snapshot_service.create_report_snapshot(
             report_id=report_id,
-            research_id=r_id if 'r_id' in locals() else None,
+            research_id=r_target_id,
             research_reference_number=research_ref_no,
             settings_used=settings
         )

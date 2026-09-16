@@ -1,58 +1,16 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules, collect_data_files, collect_binaries, collect_all
+from PyInstaller.utils.hooks import collect_submodules
 
-# ─── numpy: يجب تضمين الـ .pyd binaries صراحةً وإلا تفشل الـ C-extensions ────
-numpy_datas,    numpy_binaries,    numpy_hidden    = collect_all('numpy')
-scipy_datas,    scipy_binaries,    scipy_hidden    = collect_all('scipy')
-sklearn_datas,  sklearn_binaries,  sklearn_hidden  = collect_all('sklearn')
-
-hiddenimports = [
-    'waitress', 'waitress.server', 'waitress.compat', 'waitress.adjustments',
-    'waitress.buffers', 'waitress.channel', 'waitress.receiver', 'waitress.rfc7230',
-    'waitress.task', 'waitress.utilities', 'waitress.wasyncore',
-    'sqlalchemy.dialects.sqlite', 'sqlalchemy.dialects.sqlite.pysqlite',
-    'bcrypt', '_bcrypt', 'jwt', 'tkinter', 'tkinter.ttk',
-    'tkinter.messagebox', 'tkinter.scrolledtext',
-    'numpy', 'numpy.core', 'numpy.core._multiarray_umath',
-    'numpy.core._multiarray_tests', 'numpy.core.multiarray',
-    'numpy.core.umath', 'numpy.lib', 'numpy.fft', 'numpy.linalg',
-    'numpy.random', 'numpy.random._common', 'numpy.random.bit_generator',
-    'sklearn', 'sklearn.feature_extraction', 'sklearn.feature_extraction.text',
-    'scipy', 'scipy.sparse', 'scipy.special._cdflib',
-    'docx', 'pdfplumber', 'pypdf', 'reportlab', 'reportlab.lib',
-    'reportlab.pdfgen', 'reportlab.platypus',
-    'psutil', 'cffi', '_cffi_backend',
-    'app', 'app.wsgi_server', 'app.single_exe', 'app.single_exe.entrypoint',
-    'app.single_exe.app_controller', 'app.single_exe.worker_runner',
-    'app.single_exe.gui_controller', 'app.single_exe.tray_controller',
-    'win32gui', 'win32con', 'win32api',
-    'argon2', 'argon2.low_level', 'argon2_cffi_bindings', '_argon2_cffi_bindings',
-    'qrcode', 'qrcode.image', 'qrcode.image.pil',
-    'cv2', 'PIL', 'PIL.Image',
-    'app.services.recovery_service', 'app.routes.recovery_routes',
-    'app.routes.common_phrases_routes',
-    'app.utils', 'app.utils.windows_security',
-    'config', 'plagiarism_detector',
-]
-hiddenimports += numpy_hidden
-hiddenimports += scipy_hidden
-hiddenimports += sklearn_hidden
-hiddenimports += collect_submodules('numpy')
-hiddenimports += collect_submodules('scipy')
-hiddenimports += collect_submodules('sklearn')
+hiddenimports = ['waitress', 'waitress.server', 'waitress.compat', 'waitress.adjustments', 'waitress.buffers', 'waitress.channel', 'waitress.receiver', 'waitress.rfc7230', 'waitress.task', 'waitress.utilities', 'waitress.wasyncore', 'sqlalchemy.dialects.sqlite', 'sqlalchemy.dialects.sqlite.pysqlite', 'bcrypt', '_bcrypt', 'jwt', 'tkinter', 'tkinter.ttk', 'tkinter.messagebox', 'tkinter.scrolledtext', 'sklearn', 'sklearn._cyutility', 'sklearn._isotonic', 'sklearn.feature_extraction', 'sklearn.feature_extraction.text', 'scipy', 'scipy._cyutility', 'scipy.sparse', 'scipy.special._cdflib', 'scipy._external.array_api_compat.numpy', 'scipy._external.array_api_compat.numpy.fft', 'scipy._external.array_api_compat.numpy.linalg', 'scipy._external.array_api_compat.numpy._aliases', 'scipy._external.array_api_compat.numpy._info', 'scipy._external.array_api_compat.numpy._typing', 'scipy._external.array_api_compat.common', 'scipy._external.array_api_compat.common._aliases', 'scipy._external.array_api_compat.common._fft', 'scipy._external.array_api_compat.common._helpers', 'scipy._external.array_api_compat.common._linalg', 'scipy._external.array_api_compat.common._typing', 'numpy', 'docx', 'pdfplumber', 'pypdf', 'reportlab', 'reportlab.lib', 'reportlab.pdfgen', 'reportlab.platypus', 'psutil', 'cffi', '_cffi_backend', 'app', 'app.wsgi_server', 'app.single_exe', 'app.single_exe.entrypoint', 'app.single_exe.app_controller', 'app.single_exe.worker_runner', 'app.single_exe.gui_controller', 'app.single_exe.tray_controller', 'win32gui', 'win32con', 'win32api', 'argon2', 'argon2.low_level', 'argon2_cffi_bindings', '_argon2_cffi_bindings', 'qrcode', 'qrcode.image', 'qrcode.image.pil', 'cv2', 'PIL', 'PIL.Image', 'app.services.recovery_service', 'app.routes.recovery_routes', 'app.utils', 'app.utils.windows_security', 'config', 'plagiarism_detector']
+hiddenimports += collect_submodules('scipy._external.array_api_compat.numpy')
+hiddenimports += collect_submodules('scipy._external.array_api_compat.common')
 
 
 a = Analysis(
     ['C:\\Users\\user\\Downloads\\Baba\\app\\single_exe\\entrypoint.py'],
     pathex=['C:\\Users\\user\\Downloads\\Baba', 'C:\\Users\\user\\Downloads\\Baba\\vendor'],
-    binaries=[] + numpy_binaries + scipy_binaries + sklearn_binaries,
-    datas=[
-        ('C:\\Users\\user\\Downloads\\Baba\\templates', 'templates'),
-        ('C:\\Users\\user\\Downloads\\Baba\\static', 'static'),
-        ('C:\\Users\\user\\Downloads\\Baba\\assets\\tessdata', 'tessdata'),
-        ('C:\\Users\\user\\Downloads\\Baba\\Police-Academy-College-of-Graduate-Studies.png', '.'),
-        ('C:\\Users\\user\\Downloads\\Baba\\release_manifest.json', '.'),
-    ] + numpy_datas + scipy_datas + sklearn_datas,
+    binaries=[('C:\\Users\\user\\Downloads\\Baba\\vendor\\numpy.libs\\libscipy_openblas64_-327b2e0bcffce2882e0dc04cdeb4eaa6.dll', 'numpy.libs'), ('C:\\Users\\user\\Downloads\\Baba\\vendor\\numpy.libs\\msvcp140-a4c2229bdc2a2a630acdc095b4d86008.dll', 'numpy.libs'), ('C:\\Users\\user\\Downloads\\Baba\\vendor\\scipy.libs\\libscipy_openblas-197ee2fc9b4d071f7e048078cac74115.dll', 'scipy.libs'), ('C:\\Users\\user\\Downloads\\Baba\\vendor\\sklearn\\.libs\\msvcp140.dll', 'sklearn\\.libs'), ('C:\\Users\\user\\Downloads\\Baba\\vendor\\sklearn\\.libs\\vcomp140.dll', 'sklearn\\.libs')],
+    datas=[('C:\\Users\\user\\Downloads\\Baba\\templates', 'templates'), ('C:\\Users\\user\\Downloads\\Baba\\static', 'static'), ('C:\\Users\\user\\Downloads\\Baba\\assets\\tessdata', 'tessdata'), ('C:\\Users\\user\\Downloads\\Baba\\Police-Academy-College-of-Graduate-Studies.png', '.'), ('C:\\Users\\user\\Downloads\\Baba\\release_manifest.json', '.'), ('C:\\Users\\user\\Downloads\\Baba\\vendor\\sklearn\\utils\\_repr_html', 'sklearn/utils/_repr_html')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},

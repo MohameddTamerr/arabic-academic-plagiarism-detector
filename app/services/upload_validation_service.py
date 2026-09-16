@@ -18,6 +18,9 @@ import time
 import zipfile
 import logging
 import unicodedata
+import subprocess
+import shutil
+import glob
 from pathlib import Path
 from typing import Optional, Dict, Any, Union, BinaryIO, Set
 
@@ -28,6 +31,20 @@ from app.services import integrity_service, storage_service
 from app.logging_config import log_operational_event
 
 logger = logging.getLogger(__name__)
+
+
+def _hidden_subprocess_options() -> dict:
+    """منع وميض نوافذ أدوات الفحص الخارجية في نسخة Windows ذات الواجهة."""
+    if os.name != 'nt':
+        return {}
+
+    startupinfo = subprocess.STARTUPINFO()
+    startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+    startupinfo.wShowWindow = subprocess.SW_HIDE
+    return {
+        'startupinfo': startupinfo,
+        'creationflags': subprocess.CREATE_NO_WINDOW,
+    }
 
 # الأسماء المحجوزة في أنظمة Windows
 _WINDOWS_RESERVED_NAMES = {
@@ -157,7 +174,10 @@ def validate_and_stage_upload(
 
         file_hash = hasher.hexdigest()
 
-        # 3. التحقق الهيكلي من توقيع وبنية الملف (File Signature & Structure Inspection)
+        # 3. الفحص الأمني المتقدم ضد الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Ingestion Scan)
+        _scan_for_malware(staging_path, ext)
+
+        # 4. التحقق الهيكلي من توقيع وبنية الملف (File Signature & Structure Inspection)
         detected_type = _inspect_file_structure(staging_path, ext)
 
         return {
@@ -184,6 +204,142 @@ def validate_and_stage_upload(
         )
 
 
+_CACHED_AV_ENGINE = None
+_AV_ENGINE_INITIALIZED = False
+
+
+def _find_antivirus_engine() -> Optional[str]:
+    """البحث عن محرك فحص الفيروسات المتاح في النظام (Windows Defender أو ClamAV)."""
+    global _CACHED_AV_ENGINE, _AV_ENGINE_INITIALIZED
+    if _AV_ENGINE_INITIALIZED:
+        return _CACHED_AV_ENGINE
+
+    _AV_ENGINE_INITIALIZED = True
+    if os.environ.get('DISABLE_EXTERNAL_AV_SCAN', '').lower() in ('1', 'true', 'yes'):
+        _CACHED_AV_ENGINE = None
+        return None
+
+    # 1. فحص Windows Defender MpCmdRun.exe
+    if sys.platform == 'win32':
+        candidates = [
+            r"C:\Program Files\Windows Defender\MpCmdRun.exe",
+            r"C:\Program Files (x86)\Windows Defender\MpCmdRun.exe",
+        ]
+        # فحص المسارات المتغيرة للمنصة
+        platform_dirs = glob.glob(r"C:\ProgramData\Microsoft\Windows Defender\Platform\*\MpCmdRun.exe")
+        candidates.extend(platform_dirs)
+
+        for cand in candidates:
+            if os.path.exists(cand):
+                _CACHED_AV_ENGINE = cand
+                return cand
+
+        which_mp = shutil.which("MpCmdRun.exe")
+        if which_mp:
+            _CACHED_AV_ENGINE = which_mp
+            return which_mp
+
+    # 2. فحص ClamAV
+    which_clam = shutil.which("clamdscan") or shutil.which("clamscan")
+    if which_clam:
+        _CACHED_AV_ENGINE = which_clam
+        return which_clam
+
+    _CACHED_AV_ENGINE = None
+    return None
+
+
+def _scan_for_malware(staging_path: Path, ext: str) -> None:
+    """
+    فحص أمني متقدم ضد الفيروسات والبرمجيات الخبيثة:
+    1. فحص البصمات الثنائية التنفيذية (منع الملفات التنفيذية المتنكرة).
+    2. استدعاء محرك الحماية الفوري (Windows Defender / ClamAV) إن وُجد.
+    """
+    # 1. فحص البصمات الثنائية التنفيذية (منع الملفات التنفيذية المتنكرة)
+    try:
+        with open(staging_path, 'rb') as f:
+            header = f.read(16)
+            if header.startswith(b'MZ') and ext != '.exe':
+                log_operational_event(
+                    level=logging.ERROR,
+                    message=f"رصد محاولة رفع ملف تنفيذي متنكر بامتداد أبحاث: {staging_path.name}",
+                    component="upload_security",
+                    error_code=ErrorCode.FILE_MALICIOUS
+                )
+                raise ValidationError(
+                    "تم رصد ترويسة ملف تنفيذي (PE/EXE) متنكر داخل مستند البحث. تم حظر الرفع فوراً.",
+                    code=ErrorCode.FILE_MALICIOUS,
+                    status_code=400
+                )
+            if header.startswith(b'\x7fELF') or header.startswith(b'\xfe\xed\xfa\xce') or header.startswith(b'\xcf\xfa\xed\xfe'):
+                raise ValidationError(
+                    "تم رصد ملف تنفيذي غير مصرح به داخل مستند البحث. تم حظر الرفع فوراً.",
+                    code=ErrorCode.FILE_MALICIOUS,
+                    status_code=400
+                )
+    except ValidationError:
+        raise
+    except Exception as e:
+        logger.warning(f"تعذر قراءة ترويسة الفحص الأمني للملف {staging_path.name}: {e}")
+
+    # 2. فحص بمحرك مكافحة الفيروسات المتاح
+    av_engine = _find_antivirus_engine()
+    if av_engine:
+        try:
+            if "MpCmdRun" in av_engine:
+                cmd = [av_engine, "-Scan", "-ScanType", "3", "-File", str(staging_path), "-DisableRemediation"]
+                proc = subprocess.run(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    timeout=15,
+                    check=False,
+                    **_hidden_subprocess_options()
+                )
+                # MpCmdRun Exit Code 2 means malware / threat found
+                if proc.returncode == 2:
+                    log_operational_event(
+                        level=logging.ERROR,
+                        message=f"Windows Defender رصد تهديداً أمنياً في الملف المرفوع: {staging_path.name}",
+                        component="antivirus_scanner",
+                        error_code=ErrorCode.FILE_MALICIOUS
+                    )
+                    raise ValidationError(
+                        "تم اكتشاف تهديد أمني أو برمجية خبيثة في الملف المرفوع عبر نظام حماية Windows Defender وتم حظر الملف.",
+                        code=ErrorCode.FILE_MALICIOUS,
+                        status_code=400
+                    )
+            elif "clam" in av_engine:
+                cmd = [av_engine, "--no-summary", str(staging_path)]
+                proc = subprocess.run(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    timeout=15,
+                    check=False,
+                    **_hidden_subprocess_options()
+                )
+                # ClamAV Exit Code 1 means virus found
+                if proc.returncode == 1:
+                    log_operational_event(
+                        level=logging.ERROR,
+                        message=f"ClamAV رصد فيروساً في الملف المرفوع: {staging_path.name}",
+                        component="antivirus_scanner",
+                        error_code=ErrorCode.FILE_MALICIOUS
+                    )
+                    raise ValidationError(
+                        "تم اكتشاف برمجية خبيثة أو فيروس في الملف المرفوع عبر نظام الحماية وتم رفضه.",
+                        code=ErrorCode.FILE_MALICIOUS,
+                        status_code=400
+                    )
+        except ValidationError:
+            raise
+        except subprocess.TimeoutExpired:
+            logger.warning(f"تجاوز فحص مكافحة الفيروسات المهلة المحددة للملف {staging_path.name}؛ الاستمرار مع الفحص البنيوي.")
+        except Exception as e:
+            logger.warning(f"تعذر إتمام فحص الفيروسات الخارجي للملف {staging_path.name}: {e}")
+
+
 def _inspect_file_structure(staging_path: Path, ext: str) -> str:
     """
     فحص توقيع وبنية الملف بحسب نوعه للتأكد من أمانه ومطابقته للمواصفات الأكاديمية.
@@ -200,13 +356,19 @@ def _inspect_file_structure(staging_path: Path, ext: str) -> str:
 
 def _inspect_pdf(path: Path) -> str:
     """فحص سلامة وتوقيع ملف PDF وتوافق عدد الصفحات والتشفير."""
-    # 1. فحص البايتات السحرية (%PDF-)
+    # 1. فحص البايتات السحرية (%PDF-) وفحص أوامر الإطلاق التلقائي (/Launch)
     with open(path, 'rb') as f:
-        header = f.read(1024)
-        if b'%PDF-' not in header:
+        sample = f.read(524288) # أول 512KB
+        if b'%PDF-' not in sample[:2048]:
             raise ValidationError(
                 "الملف المرفوع لا يطابق البنية الرقمية لملفات PDF (توقيع غير صالح).",
                 code=ErrorCode.FILE_SIGNATURE_MISMATCH,
+                status_code=400
+            )
+        if b'/Launch' in sample and b'/Action' in sample:
+            raise ValidationError(
+                "تم حظر الملف: مستند PDF يحتوي على أوامر تشغيل تلقائية غير آمنة (/Launch).",
+                code=ErrorCode.FILE_MALICIOUS,
                 status_code=400
             )
 
@@ -289,10 +451,26 @@ def _inspect_docx(path: Path) -> str:
             total_compressed = 0
             names = set()
 
+            dangerous_extensions = ('.exe', '.bat', '.cmd', '.scr', '.vbs', '.js', '.ps1', '.dll', '.com', '.pif', '.jar', '.hta', '.wsf')
             for member in members:
                 # أمان المسارات: منع Zip-Slip والمسارات المطلقة
                 m_name = member.filename
                 names.add(m_name)
+                m_lower = m_name.lower()
+
+                # فحص الماكرو التنفيذي والملفات المدمجة الخطيرة
+                if 'vbaproject.bin' in m_lower or (m_lower.endswith('.bin') and 'vba' in m_lower):
+                    raise ValidationError(
+                        "تم حظر الملف: يحتوي مستند Word على أكواد ماكرو برمجية (VBA Macros) غير مصرح بها.",
+                        code=ErrorCode.FILE_MALICIOUS,
+                        status_code=400
+                    )
+                if any(m_lower.endswith(ext_bad) for ext_bad in dangerous_extensions):
+                    raise ValidationError(
+                        "تم حظر الملف: تحتوي حزمة المستند على ملفات تنفيذية مدمجة غير آمنة.",
+                        code=ErrorCode.FILE_MALICIOUS,
+                        status_code=400
+                    )
 
                 if m_name.startswith('/') or m_name.startswith('\\') or '..' in m_name or re.match(r'^[a-zA-Z]:', m_name):
                     raise ValidationError(

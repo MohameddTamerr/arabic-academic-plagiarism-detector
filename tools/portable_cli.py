@@ -222,7 +222,21 @@ def cmd_start():
         cmd_setup(quiet=True)
 
     # 3. Process spawning configuration
-    py_exec = sys.executable
+    runtime_py = ROOT_DIR / "Runtime" / "python.exe"
+    if runtime_py.exists():
+        py_exec = str(runtime_py)
+    elif (ROOT_DIR / "App").exists():
+        print("=" * 70)
+        print("RUNTIME NOT FOUND")
+        print("=" * 70)
+        print("Bundled Python runtime was not found at:")
+        print(f"  {runtime_py}")
+        print("System Python fallback is disabled in production portable mode.")
+        print("=" * 70)
+        sys.exit(1)
+    else:
+        py_exec = sys.executable
+
     env = os.environ.copy()
     env["PORTABLE_MODE"] = "1"
     env["PORTABLE_ROOT"] = str(ROOT_DIR)
@@ -233,6 +247,14 @@ def cmd_start():
     env["STORAGE_ROOT"] = str(STORAGE_DIR)
     env["CONFIG_DIR"] = str(CONFIG_DIR)
     env["BACKUP_DIR"] = str(BACKUPS_DIR)
+
+    app_vendor = APP_DIR / "vendor"
+    root_vendor = ROOT_DIR / "vendor"
+    paths_to_add = [str(APP_DIR), str(ROOT_DIR)]
+    for v in [app_vendor, root_vendor]:
+        if v.exists() and str(v) not in paths_to_add:
+            paths_to_add.insert(0, str(v))
+    env["PYTHONPATH"] = os.pathsep.join(paths_to_add) + (os.pathsep + env.get("PYTHONPATH", "") if env.get("PYTHONPATH") else "")
 
     creationflags = 0
     if sys.platform == "win32":

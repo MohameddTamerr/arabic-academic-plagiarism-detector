@@ -33,6 +33,7 @@ class Permission:
     REPORT_VOID = "report.void"
 
     # 5. المسار والتحكيم الأكاديمي (Academic Review)
+    REVIEW_VIEW = "review.view"
     REVIEW_PRELIMINARY = "review.preliminary"
     REVIEW_REJECT = "review.reject"
     REVIEW_FINAL = "review.final"
@@ -48,9 +49,12 @@ class Permission:
     REFERENCE_CORPUS_MANAGE = "reference.corpus.manage"
     REFERENCE_MANAGE = "reference.manage"
 
-    # 7. إدارة المستخدمين (Users)
+    # 7. إدارة المستخدمين واسترداد الحسابات (Users & Account Recovery)
     USERS_VIEW = "users.view"
     USERS_MANAGE = "users.manage"
+    USER_RECOVERY_VIEW_STATUS = "users.recovery.view_status"
+    USER_RECOVERY_REVOKE = "users.recovery.revoke"
+    USER_PASSWORD_ADMIN_RESET = "users.password.admin_reset"
 
     # 8. إعدادات المنظومة (Settings)
     SETTINGS_VIEW = "settings.view"
@@ -74,10 +78,21 @@ class Permission:
     JOB_RETRY = "job.retry"
     JOB_MANAGE = "job.manage"
 
+    # 13. إدارة الرسائل متعددة الأجزاء (Thesis & Multi-Part Management)
+    THESIS_VIEW = "thesis.view"
+    THESIS_CREATE = "thesis.create"
+    THESIS_EDIT = "thesis.edit"
+    THESIS_ADD_PART = "thesis.add_part"
+    THESIS_REMOVE_PART = "thesis.remove_part"
+    THESIS_SCAN = "thesis.scan"
+    THESIS_REPORT_VIEW = "thesis.report.view"
+    THESIS_REPORT_FINALIZE = "thesis.report.finalize"
+
 
 class Role:
+    EMPLOYEE = "employee"               # موظف فحص وتشغيل (عمليات فقط)
     DATA_ENTRY = "data_entry"           # مدخل بيانات
-    REVIEWER = "reviewer"               # مراجع
+    REVIEWER = "reviewer"               # مراجع أكاديمي
     SENIOR_REVIEWER = "senior_reviewer" # مراجع أول / مراجع نهائي
     UNIT_MANAGER = "unit_manager"       # مسؤول وحدة
     SYSTEM_ADMIN = "system_admin"       # مدير النظام
@@ -89,18 +104,39 @@ class Role:
 
 # التسميات المؤسسية باللغة العربية
 ROLE_LABELS_AR: Dict[str, str] = {
+    Role.EMPLOYEE: "موظف فحص",
     Role.DATA_ENTRY: "مدخل بيانات",
     Role.REVIEWER: "مراجع أكاديمي",
     Role.SENIOR_REVIEWER: "مراجع أول / مراجع نهائي",
     Role.UNIT_MANAGER: "مسؤول وحدة الفحص",
     Role.SYSTEM_ADMIN: "مدير النظام التقني",
     Role.LEGACY_ADMIN: "مدير النظام (حساب عام)",
-    Role.LEGACY_EMPLOYEE: "موظف فحص (حساب عام)"
 }
 
 
 # خريطة مصفوفة الصلاحيات الافتراضية لكل دور (Default Role-Permission Matrix)
 ROLE_PERMISSIONS: Dict[str, Set[str]] = {
+    Role.EMPLOYEE: {
+        Permission.RESEARCH_UPLOAD,
+        Permission.RESEARCH_VIEW,
+        Permission.RESEARCH_EDIT_METADATA,
+        Permission.SCAN_START,
+        Permission.SCAN_RETRY,
+        Permission.BATCH_CREATE,
+        Permission.BATCH_VIEW,
+        Permission.BATCH_RETRY,
+        Permission.REPORT_VIEW,
+        Permission.REPORT_EXPORT,
+        Permission.REFERENCE_VIEW,
+        Permission.JOB_VIEW,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
+    },
     Role.DATA_ENTRY: {
         Permission.RESEARCH_UPLOAD,
         Permission.RESEARCH_VIEW,
@@ -114,6 +150,13 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.REPORT_EXPORT,
         Permission.REFERENCE_VIEW,
         Permission.JOB_VIEW,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
     },
     Role.REVIEWER: {
         Permission.RESEARCH_UPLOAD,
@@ -127,9 +170,17 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.REPORT_VIEW,
         Permission.REPORT_EXPORT,
         Permission.REFERENCE_VIEW,
+        Permission.REVIEW_VIEW,
         Permission.REVIEW_PRELIMINARY,
         Permission.REVIEW_REJECT,
         Permission.JOB_VIEW,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
     },
     Role.SENIOR_REVIEWER: {
         Permission.RESEARCH_UPLOAD,
@@ -144,10 +195,19 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.REPORT_EXPORT,
         Permission.REPORT_FINALIZE,
         Permission.REFERENCE_VIEW,
+        Permission.REVIEW_VIEW,
         Permission.REVIEW_PRELIMINARY,
         Permission.REVIEW_REJECT,
         Permission.REVIEW_FINAL,
         Permission.JOB_VIEW,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
+        Permission.THESIS_REPORT_FINALIZE,
     },
     Role.UNIT_MANAGER: {
         Permission.RESEARCH_UPLOAD,
@@ -160,8 +220,6 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.BATCH_RETRY,
         Permission.REPORT_VIEW,
         Permission.REPORT_EXPORT,
-        Permission.REPORT_FINALIZE,
-        Permission.REPORT_VOID,
         Permission.REFERENCE_VIEW,
         Permission.REFERENCE_ADD,
         Permission.REFERENCE_METADATA_EDIT,
@@ -171,23 +229,31 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.REFERENCE_INTEGRITY_VERIFY,
         Permission.REFERENCE_CORPUS_MANAGE,
         Permission.REFERENCE_MANAGE,
-        Permission.REVIEW_PRELIMINARY,
-        Permission.REVIEW_REJECT,
-        Permission.REVIEW_FINAL,
         Permission.SYSTEM_HEALTH_VIEW,
         Permission.JOB_VIEW,
         Permission.JOB_VIEW_ALL,
         Permission.JOB_CANCEL,
         Permission.JOB_RETRY,
         Permission.JOB_MANAGE,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
     },
     Role.SYSTEM_ADMIN: {
+        Permission.SCAN_START,
+        Permission.RESEARCH_UPLOAD,
         Permission.RESEARCH_VIEW,
+        Permission.BATCH_CREATE,
         Permission.BATCH_VIEW,
         Permission.REPORT_VIEW,
         Permission.REPORT_EXPORT,
         Permission.REPORT_FINALIZE,
         Permission.REPORT_VOID,
+        Permission.REVIEW_VIEW,
         Permission.REFERENCE_VIEW,
         Permission.REFERENCE_ADD,
         Permission.REFERENCE_METADATA_EDIT,
@@ -199,6 +265,9 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.REFERENCE_MANAGE,
         Permission.USERS_VIEW,
         Permission.USERS_MANAGE,
+        Permission.USER_RECOVERY_VIEW_STATUS,
+        Permission.USER_RECOVERY_REVOKE,
+        Permission.USER_PASSWORD_ADMIN_RESET,
         Permission.SETTINGS_VIEW,
         Permission.SETTINGS_MANAGE,
         Permission.AUDIT_VIEW,
@@ -211,57 +280,67 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.JOB_CANCEL,
         Permission.JOB_RETRY,
         Permission.JOB_MANAGE,
+        Permission.THESIS_VIEW,
+        Permission.THESIS_CREATE,
+        Permission.THESIS_EDIT,
+        Permission.THESIS_ADD_PART,
+        Permission.THESIS_REMOVE_PART,
+        Permission.THESIS_SCAN,
+        Permission.THESIS_REPORT_VIEW,
     },
 }
 
 # مواءمة الأدوار القديمة:
-# - admin القديم: يشمل كافة صلاحيات إدارة النظام + استعراض التقارير
-# - employee القديم: يطابق دور reviewer لضمان عدم تقليص أي صلاحية سابقة لموظفي الفحص
 ROLE_PERMISSIONS[Role.LEGACY_ADMIN] = set(ROLE_PERMISSIONS[Role.SYSTEM_ADMIN]) | {
     Permission.RESEARCH_UPLOAD,
     Permission.SCAN_START,
     Permission.BATCH_CREATE,
-    Permission.REPORT_EXPORT,
-    Permission.REVIEW_PRELIMINARY,
-    Permission.REVIEW_REJECT,
-    Permission.REVIEW_FINAL
+    Permission.REPORT_EXPORT
 }
-ROLE_PERMISSIONS[Role.LEGACY_EMPLOYEE] = set(ROLE_PERMISSIONS[Role.REVIEWER])
 
 
 def normalize_role(raw_role: Optional[str]) -> str:
     """
     تحويل وتوحيد مسمى الدور ليتطابق مع أدوار المنظومة المعتمدة.
-    - admin -> system_admin
-    - employee -> reviewer
     """
     if not raw_role:
-        return Role.DATA_ENTRY
+        return Role.EMPLOYEE
     clean = str(raw_role).strip().lower()
-    if clean in (Role.SYSTEM_ADMIN, 'system_admin', 'sysadmin', 'مدير النظام'):
+    if clean in (Role.SYSTEM_ADMIN, 'system_admin', 'sysadmin', 'مدير النظام', 'مدير النظام التقني'):
         return Role.SYSTEM_ADMIN
     if clean in (Role.LEGACY_ADMIN, 'admin', 'administrator', 'مدير'):
         return Role.LEGACY_ADMIN
     if clean in (Role.SENIOR_REVIEWER, 'senior_reviewer', 'senior', 'مراجع أول', 'مراجع نهائي'):
         return Role.SENIOR_REVIEWER
-    if clean in (Role.UNIT_MANAGER, 'unit_manager', 'manager', 'مسؤول وحدة'):
+    if clean in (Role.UNIT_MANAGER, 'unit_manager', 'manager', 'مسؤول وحدة', 'مسؤول وحدة الفحص'):
         return Role.UNIT_MANAGER
-    if clean in (Role.REVIEWER, 'reviewer', 'مراجع'):
+    if clean in (Role.REVIEWER, 'reviewer', 'مراجع', 'مراجع أكاديمي'):
         return Role.REVIEWER
-    if clean in (Role.LEGACY_EMPLOYEE, 'employee', 'موظف'):
-        return Role.LEGACY_EMPLOYEE
+    if clean in (Role.EMPLOYEE, 'employee', 'موظف', 'موظف فحص'):
+        return Role.EMPLOYEE
     if clean in (Role.DATA_ENTRY, 'data_entry', 'entry', 'مدخل بيانات'):
         return Role.DATA_ENTRY
     return clean
 
 
-def get_role_permissions(role: str) -> Set[str]:
-    """استرجاع مجموعة الصلاحيات الممنوحة لدور محدد."""
-    norm_role = normalize_role(role)
-    if norm_role in ROLE_PERMISSIONS:
-        return set(ROLE_PERMISSIONS[norm_role])
-    # افتراضي للأدوار غير المعرفة
-    return set(ROLE_PERMISSIONS.get(Role.DATA_ENTRY, set()))
+def get_role_permissions(role: Role) -> Set[Permission]:
+    """Return all permissions granted to a role."""
+    return ROLE_PERMISSIONS.get(role, set())
+
+
+def role_has_permission(role: Role, permission: Permission) -> bool:
+    """Check if a given Role enum has a specific Permission."""
+    return permission in get_role_permissions(role)
+
+
+def has_permission(role_str: str, permission_str: str) -> bool:
+    """Check if a string role has a given permission."""
+    try:
+        role = normalize_role(role_str)
+        perm = Permission(permission_str) if isinstance(permission_str, str) else permission_str
+        return role_has_permission(role, perm)
+    except Exception:
+        return False
 
 
 def get_user_permissions(user_dict_or_obj: Any) -> List[str]:

@@ -59,20 +59,16 @@ from app.security.password_policy import validate_password_strength
 def is_initial_admin_allowed() -> bool:
     """
     التحقق الصارم مما إذا كان إعداد المدير الأول مسموحاً به.
-    إذا تم إكمال التهيئة مسبقاً (bootstrap_completed = '1')، يُقفل المسار نهائياً
-    ولا يُعاد فتحه حتى لو عُطل أو حُذف كافة المديرين إلا عبر إجراءات الاستعادة الرسمية.
+    يُسمح به فقط إذا كانت قاعدة البيانات نظيفة تماماً ولا تحتوي على أي مستخدمين
+    ولم يتم إكمال التهيئة مسبقاً (bootstrap_completed != '1').
     """
     with get_session() as session:
         state = session.query(SystemSecurityState).filter(SystemSecurityState.key == 'bootstrap_completed').first()
         if state and state.value == '1':
             return False
 
-        admin_count = (
-            session.query(User)
-            .filter(User.role.in_(['admin', 'system_admin', 'superadmin', 'مدير', 'مدير النظام']))
-            .count()
-        )
-        return admin_count == 0
+        total_users = session.query(User).count()
+        return total_users == 0
 
 
 def is_first_time_setup() -> bool:
@@ -171,6 +167,9 @@ def authenticate_user(username: str, password: str) -> Optional[dict]:
                 'username': user.username,
                 'full_name': user.full_name,
                 'role': user.role,
+                'department': getattr(user, 'department', ''),
+                'must_change_password': int(getattr(user, 'must_change_password', 0) or 0),
+                'must_enroll_recovery': int(getattr(user, 'must_enroll_recovery', 0) or 0),
                 'session_version': getattr(user, 'session_version', 1)
             }
 
@@ -211,6 +210,9 @@ def authenticate_or_reset_user(username: str, password: str) -> tuple[Optional[d
                     'username': user.username,
                     'full_name': user.full_name,
                     'role': user.role,
+                    'department': getattr(user, 'department', ''),
+                    'must_change_password': int(getattr(user, 'must_change_password', 0) or 0),
+                    'must_enroll_recovery': int(getattr(user, 'must_enroll_recovery', 0) or 0),
                     'session_version': user.session_version
                 }, True
 
@@ -223,16 +225,29 @@ def authenticate_or_reset_user(username: str, password: str) -> tuple[Optional[d
                 'username': user.username,
                 'full_name': user.full_name,
                 'role': user.role,
+                'department': getattr(user, 'department', ''),
+                'must_change_password': int(getattr(user, 'must_change_password', 0) or 0),
+                'must_enroll_recovery': int(getattr(user, 'must_enroll_recovery', 0) or 0),
                 'session_version': getattr(user, 'session_version', 1)
             }, was_reset
 
     return None, False
 
 
-def add_user(username: str, password: str, full_name: str, role: str = 'employee', enforce_policy: Optional[bool] = None) -> tuple[bool, str]:
-    """إضافة موظف أو مستخدم جديد مع فحص سياسة أمان كلمات المرور."""
+def add_user(
+    username: str,
+    password: str,
+    full_name: str,
+    role: str = 'employee',
+    department: str = '',
+    phone_number: str = '',
+    must_change_password: int = 0,
+    must_enroll_recovery: int = 0,
+    enforce_policy: Optional[bool] = None
+) -> tuple[bool, str]:
+    """إضافة موظف أو مستخدم جديد مع فحص سياسة أمان كلمات المرور وحفظ البيانات المؤسسية."""
     if not username or not password or not full_name:
-        return False, "كافة الحقول مطلوبة"
+        return False, "كافة الحقول الأساسية مطلوبة"
 
     import os
     is_testing_env = os.environ.get('TESTING') == '1'
@@ -248,7 +263,7 @@ def add_user(username: str, password: str, full_name: str, role: str = 'employee
 
     from app.security.permissions import normalize_role, Role
     clean_user = username.strip()
-    norm_role = normalize_role(role) if role else Role.REVIEWER
+    norm_role = normalize_role(role) if role else Role.EMPLOYEE
 
     with get_session() as session:
         exists = session.query(User).filter(User.username.ilike(clean_user)).first()
@@ -260,31 +275,220 @@ def add_user(username: str, password: str, full_name: str, role: str = 'employee
             password_hash=hash_password(password),
             full_name=full_name.strip(),
             role=norm_role,
+            department=department.strip(),
+            phone_number=phone_number.strip(),
+            must_change_password=1 if must_change_password else 0,
+            must_enroll_recovery=1 if must_enroll_recovery else 0,
             is_active=1,
             session_version=1
         )
         session.add(user)
+        session.flush()
         return True, "تم إضافة المستخدم بنجاح"
 
 
-def get_users_list() -> list[dict]:
-    """استرجاع قائمة المستخدمين مع التسميات المؤسسية وحالة التفعيل."""
+def get_user_by_id(user_id: int) -> Optional[dict]:
+    """استرجاع بيانات مستخدم محدد بالحقول الآمنة المؤسسية."""
     from app.security.permissions import ROLE_LABELS_AR, get_user_permissions
+    from app.models.schema import AccountRecoveryCredential
     with get_session() as session:
-        users = session.query(User).order_by(User.id.asc()).all()
-        return [
-            {
+        u = session.query(User).filter(User.id == user_id).first()
+        if not u:
+            return None
+        cred = (
+            session.query(AccountRecoveryCredential)
+            .filter(AccountRecoveryCredential.user_id == u.id)
+            .order_by(AccountRecoveryCredential.id.desc())
+            .first()
+        )
+        rec_status = cred.status if cred else 'not_configured'
+        is_rec_active = bool(cred and cred.status == 'active')
+
+        res = {
+            'id': u.id,
+            'username': u.username,
+            'full_name': u.full_name,
+            'role': u.role,
+            'role_label_ar': ROLE_LABELS_AR.get(u.role, u.role),
+            'department': getattr(u, 'department', '') or '',
+            'phone_number': getattr(u, 'phone_number', '') or '',
+            'permissions': get_user_permissions(u),
+            'is_active': getattr(u, 'is_active', 1),
+            'must_change_password': getattr(u, 'must_change_password', 0),
+            'must_enroll_recovery': getattr(u, 'must_enroll_recovery', 0),
+            'recovery_configured': is_rec_active,
+            'has_recovery_key': is_rec_active,
+            'recovery_status': rec_status,
+            'recovery_status_label_ar': 'مُفعّل' if is_rec_active else ('ملغي / يحتاج إعادة إعداد' if rec_status == 'revoked' else 'غير مُفعّل'),
+            'created_at': u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at else ''
+        }
+        res['user'] = dict(res)
+        return res
+
+
+def get_user_by_username(username: str) -> Optional[dict]:
+    """استرجاع بيانات مستخدم محدد باسم المستخدم بالحقول الآمنة المؤسسية."""
+    if not username:
+        return None
+    with get_session() as session:
+        u = session.query(User).filter(User.username.ilike(username.strip())).first()
+        if not u:
+            return None
+        return get_user_by_id(u.id)
+
+
+def search_users_paginated(
+    query: Optional[str] = None,
+    role: Optional[str] = None,
+    department: Optional[str] = None,
+    is_active: Optional[int] = None,
+    recovery_status: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 25
+) -> tuple[list[dict], int]:
+    """بحث واسترجاع قائمة المستخدمين مع الترقيم والفلترة والحقول الآمنة ونطاق الوحدة."""
+    from app.security.permissions import ROLE_LABELS_AR, get_user_permissions, normalize_role
+    from app.models.schema import AccountRecoveryCredential
+    from sqlalchemy import or_
+
+    with get_session() as session:
+        q = session.query(User)
+
+        if query and query.strip():
+            clean_q = f"%{query.strip()}%"
+            q = q.filter(
+                or_(
+                    User.username.ilike(clean_q),
+                    User.full_name.ilike(clean_q),
+                    User.department.ilike(clean_q)
+                )
+            )
+
+        if role and role.strip():
+            norm_r = normalize_role(role)
+            q = q.filter(User.role == norm_r)
+
+        if department and department.strip():
+            q = q.filter(User.department.ilike(f"%{department.strip()}%"))
+
+        if is_active is not None:
+            q = q.filter(User.is_active == is_active)
+
+        total_count = q.count()
+        offset_val = max(0, (page - 1) * per_page)
+        users = q.order_by(User.id.asc()).offset(offset_val).limit(per_page).all()
+
+        user_ids = [u.id for u in users]
+        creds = (
+            session.query(AccountRecoveryCredential)
+            .filter(AccountRecoveryCredential.user_id.in_(user_ids))
+            .all()
+        ) if user_ids else []
+
+        cred_map: dict[int, str] = {}
+        for c in creds:
+            if c.user_id not in cred_map or (cred_map[c.user_id] != 'active' and c.status == 'active'):
+                cred_map[c.user_id] = c.status
+
+        items = []
+        for u in users:
+            c_status = cred_map.get(u.id, 'not_configured')
+            is_rec_active = (c_status == 'active')
+            
+            # فلترة حسب حالة الاسترداد إن طُلبت
+            if recovery_status:
+                rec_filter = recovery_status.strip().lower()
+                if rec_filter in ('active', 'configured', 'مفعل') and not is_rec_active:
+                    continue
+                if rec_filter in ('not_configured', 'none', 'غير مفعل') and c_status != 'not_configured':
+                    continue
+                if rec_filter in ('revoked', 'ملغي') and c_status != 'revoked':
+                    continue
+
+            items.append({
                 'id': u.id,
                 'username': u.username,
                 'full_name': u.full_name,
-                'role': u.role,
+                'role': normalize_role(u.role),
                 'role_label_ar': ROLE_LABELS_AR.get(u.role, u.role),
+                'department': getattr(u, 'department', '') or '',
+                'phone_number': getattr(u, 'phone_number', '') or '',
                 'permissions': get_user_permissions(u),
                 'is_active': getattr(u, 'is_active', 1),
-                'created_at': u.created_at.strftime('%Y-%m-%d') if u.created_at else ''
-            }
-            for u in users
-        ]
+                'must_change_password': getattr(u, 'must_change_password', 0),
+                'must_enroll_recovery': getattr(u, 'must_enroll_recovery', 0),
+                'recovery_configured': is_rec_active,
+                'recovery_status': c_status,
+                'recovery_status_label_ar': 'مُفعّل' if is_rec_active else ('ملغي / يحتاج إعادة إعداد' if c_status == 'revoked' else 'غير مُفعّل'),
+                'created_at': u.created_at.strftime('%Y-%m-%d %H:%M') if u.created_at else ''
+            })
+
+        return items, total_count
+
+
+def get_user_management_stats() -> dict:
+    """استرجاع إحصائيات إدارة المستخدمين المجمعة."""
+    from app.models.schema import AccountRecoveryCredential
+    with get_session() as session:
+        total_users = session.query(User).count()
+        active_users = session.query(User).filter(User.is_active == 1).count()
+        disabled_users = session.query(User).filter(User.is_active == 0).count()
+        active_rec_users = session.query(AccountRecoveryCredential.user_id).filter(AccountRecoveryCredential.status == 'active').distinct().count()
+        needs_recovery = max(0, total_users - active_rec_users)
+
+        return {
+            'total_users': total_users,
+            'active_users': active_users,
+            'disabled_users': disabled_users,
+            'admin_count': session.query(User).filter(User.role.in_(['system_admin', 'admin', 'sysadmin'])).count(),
+            'reviewer_count': session.query(User).filter(User.role == 'reviewer').count(),
+            'senior_reviewer_count': session.query(User).filter(User.role == 'senior_reviewer').count(),
+            'recovery_configured_count': active_rec_users,
+            'needs_recovery_setup_count': needs_recovery
+        }
+
+
+def get_users_list() -> list[dict]:
+    """استرجاع قائمة المستخدمين مع التسميات المؤسسية وحالة التفعيل وحالة بطاقة الاسترداد."""
+    items, _ = search_users_paginated(page=1, per_page=1000)
+    return items
+
+
+def update_user_profile_fields(
+    user_id: int,
+    full_name: Optional[str] = None,
+    role: Optional[str] = None,
+    department: Optional[str] = None,
+    phone_number: Optional[str] = None
+) -> tuple[bool, str, dict]:
+    """تحديث الحقول الآمنة لملف المستخدم مع ترقية الجلسة إذا تغير الدور."""
+    from app.security.permissions import normalize_role
+    with get_session() as session:
+        user = session.query(User).filter(User.id == user_id).first()
+        if not user:
+            return False, "المستخدم غير موجود", {}
+
+        changes = {}
+        if full_name and full_name.strip() and full_name.strip() != user.full_name:
+            changes['full_name'] = {'old': user.full_name, 'new': full_name.strip()}
+            user.full_name = full_name.strip()
+
+        if department is not None and department.strip() != getattr(user, 'department', ''):
+            changes['department'] = {'old': getattr(user, 'department', ''), 'new': department.strip()}
+            user.department = department.strip()
+
+        if phone_number is not None and phone_number.strip() != getattr(user, 'phone_number', ''):
+            changes['phone_number'] = {'old': getattr(user, 'phone_number', ''), 'new': phone_number.strip()}
+            user.phone_number = phone_number.strip()
+
+        if role and role.strip():
+            norm_r = normalize_role(role)
+            if norm_r != user.role:
+                changes['role'] = {'old': user.role, 'new': norm_r}
+                user.role = norm_r
+                user.session_version = getattr(user, 'session_version', 1) + 1
+
+        return True, "تم تحديث بيانات المستخدم بنجاح", changes
 
 
 def update_user_role(user_id: int, new_role: str) -> tuple[bool, str, Optional[str]]:
@@ -347,6 +551,52 @@ def change_password(username: str, old_pass: str, new_pass: str) -> tuple[bool, 
             lo.lockout_count = 0
 
         return True, "تم تغيير كلمة المرور بنجاح"
+
+
+def complete_first_login_password(user_id: int, new_pass: str, confirm_pass: str) -> tuple[bool, str, Optional[int]]:
+    """اعتماد كلمة المرور الدائمة في أول دخول وإبطال كلمة المرور المؤقتة والجلسات الأخرى."""
+    if new_pass != confirm_pass:
+        return False, "كلمتا المرور الجديدتان غير متطابقتين", None
+
+    with get_session() as session:
+        user = session.query(User).filter(User.id == user_id).first()
+        if not user or getattr(user, 'is_active', 1) == 0:
+            return False, "المستخدم غير موجود أو حسابه معطل", None
+        if not int(getattr(user, 'must_change_password', 0) or 0):
+            return True, "تم اعتماد كلمة المرور مسبقاً", getattr(user, 'session_version', 1)
+
+        is_valid, err_msg = validate_password_strength(
+            new_pass,
+            username=user.username,
+            full_name=user.full_name
+        )
+        if not is_valid:
+            return False, err_msg, None
+
+        user.password_hash = hash_password(new_pass)
+        user.must_change_password = 0
+        user.session_version = getattr(user, 'session_version', 1) + 1
+
+        user_ident = f"user_{user.username.lower()}"
+        lockouts = session.query(AuthLockout).filter(
+            AuthLockout.identifier.in_([user_ident, user.username.lower()])
+        ).all()
+        for lo in lockouts:
+            lo.failed_count = 0
+            lo.locked_until = None
+            lo.lockout_count = 0
+
+        return True, "تم اعتماد كلمة المرور الدائمة بنجاح", user.session_version
+
+
+def mark_recovery_enrollment_complete(user_id: int) -> tuple[bool, str]:
+    """تأكيد استلام المستخدم لبطاقة الاسترداد وإنهاء قيد أول دخول."""
+    with get_session() as session:
+        user = session.query(User).filter(User.id == user_id).first()
+        if not user or getattr(user, 'is_active', 1) == 0:
+            return False, "المستخدم غير موجود أو حسابه معطل"
+        user.must_enroll_recovery = 0
+        return True, "تم تأكيد حفظ بطاقة الاسترداد"
 
 
 def admin_reset_user_password(user_id: int, new_pass: str) -> tuple[bool, str]:

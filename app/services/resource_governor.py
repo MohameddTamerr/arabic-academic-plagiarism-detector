@@ -2,7 +2,7 @@
 """
 محرك حوكمة الموارد وضبط الضغط المؤسسي (System Resource Governor & Backpressure Controller):
 - مراقبة المساحة الحرة على القرص لمنع امتلاء وسائط التخزين.
-- فرض سقف تزامن عمليات OCR الشاقة (MAX_CONCURRENT_OCR = 1).
+- فرض سقف آمن وقابل للضبط لتزامن عمليات OCR الشاقة.
 - التحقق من جاهزية قاعدة البيانات ومحرك الاسترجاع قبل قبول أبحاث جديدة.
 """
 
@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 # الحدود الدنيا والقصوى الافتراضية
 MIN_FREE_DISK_BYTES = 5 * 1024 * 1024 * 1024 # 5 GB
 MAX_QUEUE_DEPTH = 10000
-MAX_OCR_CONCURRENCY = 1
+MAX_OCR_CONCURRENCY = config.MAX_CONCURRENT_OCR_JOBS
 
 
 def check_resource_limits(target_dir: Path = config.STORAGE_ROOT) -> Tuple[bool, str, Dict[str, Any]]:

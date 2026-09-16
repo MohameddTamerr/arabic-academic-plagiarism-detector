@@ -20,12 +20,15 @@ from app.errors.handlers import make_error_response
 
 logger = logging.getLogger(__name__)
 
-# المسارات المعفاة من فحص CSRF (مسارات تأسيس وتسجيل الدخول الأولي)
+# المسارات المعفاة من فحص CSRF (مسارات تأسيس وتسجيل الدخول الأولي والاسترداد بدون جلسة)
 CSRF_EXEMPT_ROUTES = {
     '/api/auth/login',
     '/api/auth/setup_first_admin',
     '/api/auth/setup_admin',
     '/api/auth/emergency_reset',
+    '/api/recovery/decode_qr',
+    '/api/recovery/verify_and_authorize',
+    '/api/recovery/complete_reset',
 }
 
 

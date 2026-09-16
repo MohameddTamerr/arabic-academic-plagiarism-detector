@@ -9,7 +9,11 @@ from flask import Blueprint, request, jsonify
 from werkzeug.utils import secure_filename
 
 import config
-from app.services.scan_service import start_async_scan, get_scan_status
+from app.services.scan_service import (
+    start_async_scan,
+    get_scan_status,
+    _find_exact_reference_match,
+)
 from app.repositories import report_repo
 from app.security.authorization import require_permission, get_authenticated_user
 from app.security.permissions import Permission
@@ -124,6 +128,7 @@ def analyze_sync_route():
     raw_text = request.form.get('text', '').strip()
     file_path = ''
     pages_data = []
+    exact_reference_match = None
 
     if 'file' in request.files and request.files['file'].filename:
         file = request.files['file']
@@ -144,7 +149,11 @@ def analyze_sync_route():
         if not title:
             title = os.path.splitext(file_name)[0]
 
-        pages_data = extract_document_pages(file_path, enable_ocr=True)
+        exact_reference_match = _find_exact_reference_match(file_path)
+        if exact_reference_match:
+            pages_data = [dict(page) for page in exact_reference_match.get('pages', [])]
+        else:
+            pages_data = extract_document_pages(file_path, enable_ocr=True)
         if not raw_text:
             raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])
 
@@ -155,7 +164,8 @@ def analyze_sync_route():
     report = analyze_academic_document(
         raw_text=raw_text,
         pages_data=pages_data if pages_data else None,
-        settings_override=settings
+        settings_override=settings,
+        exact_reference_match=exact_reference_match,
     )
 
     report_id = str(uuid.uuid4())[:8]

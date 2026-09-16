@@ -229,10 +229,13 @@ def test_thesis_provenance_and_attribution(app_client, temp_sample_files):
 
     from app.services.scan_service import _execute_thesis_pipeline
 
-    try:
-        with patch('app.services.scan_service.extract_document_pages') as mock_extract:
-            mock_extract.side_effect = [mock_pages_pdf, mock_pages_docx]
+    def _mock_extract_side_effect(file_path, *args, **kwargs):
+        if str(file_path).endswith('.docx'):
+            return mock_pages_docx
+        return mock_pages_pdf
 
+    try:
+        with patch('app.services.scan_service.extract_document_pages', side_effect=_mock_extract_side_effect):
             research_id = batch_repo.create_research(title='بحث العزو', author='باحث تجريبي')
             for idx, fe in enumerate(file_entries):
                 batch_repo.add_research_file(
@@ -395,6 +398,53 @@ def test_duplicate_file_detection(app_client, temp_sample_files):
     res2_data = res2.get_json()
     assert 'duplicates_warning' in res2_data
     assert 'بحث_أصيل.pdf' in res2_data['duplicates_warning']
+
+
+def test_batch_pipeline_reuses_precreated_research(monkeypatch):
+    """عنصر الدفعة لا ينشئ سجل Research ثانياً أثناء تشغيل خط الفحص."""
+    from app.services import scan_service
+
+    marker = uuid.uuid4().hex[:8]
+    batch_id = batch_repo.create_batch(created_by='مختبر', label=f'ربط {marker}')
+    research_id = batch_repo.create_research(
+        title=f'بحث وحيد {marker}',
+        author='باحث الاختبار',
+        batch_id=batch_id
+    )
+    batch_repo.add_batch_item(batch_id, research_id, 0)
+
+    with get_session() as session:
+        count_before = session.query(Research).count()
+
+    monkeypatch.setattr(report_repo, 'create_scan_job', lambda **kwargs: None)
+    monkeypatch.setattr(scan_service.job_queue_service, 'enqueue_job', lambda **kwargs: None)
+
+    def fake_pipeline(task_id, file_path, title, author, raw_text, file_name):
+        linked = batch_repo.get_research(research_id)
+        assert linked['scan_job_id'] == task_id
+        scan_service._ACTIVE_SCANS[task_id].update({
+            'status': 'completed',
+            'progress': 100,
+            'result': {'id': f'rep-{marker}', 'overall_pct': 100.0}
+        })
+
+    monkeypatch.setattr(scan_service, '_execute_scan_pipeline', fake_pipeline)
+
+    scan_service._execute_batch_item(
+        batch_id=batch_id,
+        research_id=research_id,
+        file_path='',
+        title=f'بحث وحيد {marker}',
+        author='باحث الاختبار',
+        raw_text='نص اختبار',
+        file_name='test.docx'
+    )
+
+    with get_session() as session:
+        assert session.query(Research).count() == count_before
+
+    linked = batch_repo.get_research(research_id)
+    assert linked['report_id'] == f'rep-{marker}'
 
 
 # ─── 10. Browser refresh does not lose batch state ────────────────────────────

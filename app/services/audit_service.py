@@ -22,7 +22,9 @@ logger = logging.getLogger(__name__)
 SENSITIVE_KEYS_BLACKLIST = {
     'password', 'old_password', 'new_password', 'password_hash', 'hash',
     'token', 'secret', 'secret_key', 'csrf_token', 'cookie', 'session',
-    'full_text', 'raw_text', 'text_content', 'segments', 'evidence_text'
+    'full_text', 'raw_text', 'text_content', 'segments', 'evidence_text',
+    'recovery_secret', 'recovery_code', 'recovery_pin', 'qr_payload',
+    'reset_token', 'pin', 'code'
 }
 
 

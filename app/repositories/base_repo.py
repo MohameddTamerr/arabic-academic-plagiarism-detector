@@ -42,12 +42,12 @@ def _check_fail_safe(target_url: str):
         b_type = get_backend_type(target_url)
         if b_type == "sqlite":
             db_path_str = target_url.replace("sqlite:///", "").replace("sqlite://", "")
-            db_path_str = db_path_str.split('?')[0]
             try:
                 resolved = Path(db_path_str).resolve()
-                if resolved == config.LIVE_DEFAULT_SQLITE_PATH:
+                live_single_exe = getattr(config, 'LIVE_SINGLE_EXE_SQLITE_PATH', None)
+                if resolved == config.LIVE_DEFAULT_SQLITE_PATH or (live_single_exe and resolved == live_single_exe):
                     raise RuntimeError(
-                        f"FAIL-SAFE GUARD ACTIVATED: Automated tests attempted to connect to the live production database! ({config.LIVE_DEFAULT_SQLITE_PATH})"
+                        f"FAIL-SAFE GUARD ACTIVATED: Automated tests attempted to connect to the live production database! ({resolved})"
                     )
             except Exception as e:
                 if isinstance(e, RuntimeError):
@@ -151,11 +151,30 @@ def init_database():
     # هجرة وفصل حالات الفحص والتحكيم (Phase 5 Status Migration)
     _migrate_workflow_statuses()
 
+    # التحقق من عمود storage_status في جدول research_files
+    _migrate_research_files_storage_status()
+
     # استعادة المهام المنقطعة: ScanBatchItems التي كانت running عند آخر إغلاق
     _recover_interrupted_batch_items()
 
 
 init_db = init_database
+
+
+def _migrate_research_files_storage_status():
+    """التحقق من وجود عمود storage_status في جدول research_files وإضافته تلقائياً عند غيابه."""
+    try:
+        inspector = inspect(engine)
+        if 'research_files' in inspector.get_table_names():
+            rf_cols = {c['name'] for c in inspector.get_columns('research_files')}
+            if 'storage_status' not in rf_cols:
+                with engine.connect() as conn:
+                    conn.execute(text("ALTER TABLE research_files ADD COLUMN storage_status VARCHAR(50) DEFAULT 'finalized' NOT NULL;"))
+                    conn.execute(text("CREATE INDEX IF NOT EXISTS idx_rf_storage_status ON research_files (storage_status);"))
+                    conn.commit()
+                logger.info("تم إضافة عمود storage_status إلى جدول research_files بنجاح.")
+    except Exception as e:
+        logger.warning(f"ملاحظة أثناء التحقق من عمود storage_status في research_files: {e}")
 
 
 def _migrate_workflow_statuses():

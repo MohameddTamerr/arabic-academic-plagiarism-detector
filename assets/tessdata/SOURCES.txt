@@ -1,0 +1,11 @@
+Bundled offline OCR language models
+===================================
+
+Source repository: https://github.com/tesseract-ocr/tessdata_best
+License: Apache License 2.0 (see LICENSE in this directory)
+
+ara.traineddata
+SHA-256: AB9D157D8E38CA00E7E39C7D5363A5239E053F5B0DBDB3167DDE9D8124335896
+
+eng.traineddata
+SHA-256: 8280AED0782FE27257A68EA10FE7EF324CA0F8D85BD2FD145D1C2B560BCB66BA

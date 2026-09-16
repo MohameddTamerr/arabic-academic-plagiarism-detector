@@ -80,6 +80,15 @@ def test_permission_matrix_integrity():
     assert Permission.SETTINGS_MANAGE in admin_perms
     assert Permission.AUDIT_VIEW in admin_perms
     assert Permission.BACKUP_CREATE in admin_perms
+    assert Permission.REVIEW_VIEW in admin_perms
+    assert Permission.REVIEW_PRELIMINARY not in admin_perms
+    assert Permission.REVIEW_REJECT not in admin_perms
+    assert Permission.REVIEW_FINAL not in admin_perms
+
+    unit_perms = get_role_permissions(Role.UNIT_MANAGER)
+    assert Permission.REVIEW_PRELIMINARY not in unit_perms
+    assert Permission.REVIEW_REJECT not in unit_perms
+    assert Permission.REVIEW_FINAL not in unit_perms
 
 
 def test_unauthenticated_user_cannot_access_protected_apis(client):
@@ -215,6 +224,11 @@ def test_system_admin_capabilities(client, app_instance):
     assert res_users.status_code == 200
     assert 'users' in res_users.get_json()
 
+    # إدارة النظام لا تمنح قراراً أكاديمياً ضمنياً.
+    assert client.get('/api/initial_reviews').status_code == 200
+    assert client.post('/api/reports/does-not-matter/initial_accept').status_code == 403
+    assert client.post('/api/reports/does-not-matter/reject').status_code == 403
+    assert client.post('/api/reports/does-not-matter/final_accept').status_code == 403
 
 def test_legacy_role_mappings_and_compatibility():
     """الأدوار القديمة admin و employee تحافظ على التوافق الكامل دون قفل الحسابات."""
@@ -227,7 +241,8 @@ def test_legacy_role_mappings_and_compatibility():
 
     emp_perms = get_role_permissions(Role.LEGACY_EMPLOYEE)
     assert Permission.RESEARCH_UPLOAD in emp_perms
-    assert Permission.REVIEW_PRELIMINARY in emp_perms
+    assert Permission.SCAN_START in emp_perms
+    assert Permission.REVIEW_PRELIMINARY not in emp_perms
 
 
 def test_audit_event_recorded_on_access_denied(client, app_instance):
@@ -434,4 +449,3 @@ def test_data_entry_can_view_reports_and_stats(client, app_instance):
     res_stats = client.get('/api/stats')
     assert res_stats.status_code == 200
     assert 'total_scans' in res_stats.get_json()
-

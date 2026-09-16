@@ -1,5 +1,5 @@
 # -*- mode: python ; coding: utf-8 -*-
-from PyInstaller.utils.hooks import collect_submodules, collect_data_files, collect_binaries, collect_all
+from PyInstaller.utils.hooks import collect_submodules, collect_all
 
 # numpy C-extensions fix
 numpy_datas,   numpy_binaries,   numpy_hidden   = collect_all('numpy')

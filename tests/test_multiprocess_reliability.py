@@ -9,6 +9,7 @@
 """
 
 import os
+import sys
 import time
 import json
 import uuid
@@ -20,6 +21,7 @@ import multiprocessing
 from pathlib import Path
 import pytest
 
+import app
 from app.services.backup_service import CrossProcessRestoreLock, create_institutional_backup, restore_institutional_backup, validate_backup
 from app.services import reference_service, audit_service, snapshot_service
 from app.repositories import backup_repo, base_repo, batch_repo
@@ -114,14 +116,22 @@ def _mp_worker_corpus_version(db_path: str, num_versions: int, result_queue: mul
     result_queue.put(allocated_versions)
 
 
-def _mp_worker_hold_restore_lock(lock_file: str, hold_duration: float, status_queue: multiprocessing.Queue):
+def _mp_worker_hold_restore_lock(lock_file: str, hold_duration: float, acquired_event, released_event):
     """عامل يحجز قفل الاستعادة لفترة زمنية محددة في عملية مستقلة."""
-    lock = CrossProcessRestoreLock(owner="process_holder", timeout_seconds=10, lock_file_path=Path(lock_file))
-    acquired = lock.acquire(blocking=False)
-    status_queue.put(acquired)
-    if acquired:
-        time.sleep(hold_duration)
-        lock.release()
+    import os
+    import time
+    from pathlib import Path
+    os.environ['TESTING'] = '1'
+    try:
+        from app.services.backup_service import CrossProcessRestoreLock
+        lock = CrossProcessRestoreLock(owner="process_holder", timeout_seconds=15, lock_file_path=Path(lock_file))
+        if lock.acquire(blocking=False):
+            acquired_event.set()
+            time.sleep(hold_duration)
+            lock.release()
+            released_event.set()
+    except Exception:
+        pass
 
 
 # ─── A. Cross-Process Restore Lock Tests ───────────────────────────────────────
@@ -134,22 +144,24 @@ def test_cross_process_restore_lock_blocks_second_process():
     temp_dir = tempfile.mkdtemp()
     lock_file = os.path.join(temp_dir, "test_restore.lock")
     try:
-        q = multiprocessing.Queue()
-        p1 = multiprocessing.Process(target=_mp_worker_hold_restore_lock, args=(lock_file, 1.5, q))
+        acquired_evt = multiprocessing.Event()
+        released_evt = multiprocessing.Event()
+        p1 = multiprocessing.Process(target=_mp_worker_hold_restore_lock, args=(lock_file, 1.5, acquired_evt, released_evt))
         p1.start()
 
         # انتظار تأكيد الاستحواذ من العملية الأولى
-        acquired_p1 = q.get(timeout=5)
-        assert acquired_p1 is True, "فشلت العملية الأولى في حجز القفل"
+        assert acquired_evt.wait(timeout=15) is True, "فشلت العملية الأولى في حجز القفل"
 
         # محاولة حجز القفل من العملية الحالية (يجب أن ترفض فوراً)
         lock2 = CrossProcessRestoreLock(owner="process_b", timeout_seconds=1, lock_file_path=Path(lock_file))
         assert lock2.acquire(blocking=False) is False, "تم السماح للعملية الثانية بحجز القفل وهو محجوز مسبقاً!"
 
+        # انتظار تحرير القفل وانتهاء العملية
+        assert released_evt.wait(timeout=15) is True, "فشلت العملية الأولى في تحرير القفل"
         p1.join(timeout=5)
 
         # بعد انتهاء العملية الأولى وتحرير القفل، يجب أن تنجح العملية الثانية
-        time.sleep(0.2)
+        time.sleep(0.1)
         assert lock2.acquire(blocking=False) is True, "فشلت العملية الثانية في حجز القفل بعد تحريره"
         lock2.release()
     finally:
@@ -157,6 +169,7 @@ def test_cross_process_restore_lock_blocks_second_process():
 
 
 def test_cross_process_restore_lock_recovers_stale_lock():
+
     """التحقق من استرداد القفل وتجاوز الأقفال الميتة (Stale Locks) منتهية الصلاحية."""
     temp_dir = tempfile.mkdtemp()
     lock_file = Path(temp_dir) / "stale_restore.lock"

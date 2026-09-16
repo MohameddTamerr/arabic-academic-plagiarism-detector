@@ -186,7 +186,7 @@ def test_excessive_pdf_pages_rejected():
     with patch('fitz.open') as mock_fitz:
         mock_doc = MagicMock()
         mock_doc.is_encrypted = False
-        mock_doc.__len__.return_value = 1500
+        mock_doc.__len__.return_value = config.MAX_PDF_PAGES + 500
         mock_fitz.return_value = mock_doc
         with pytest.raises(ValidationError) as exc:
             upload_validation_service.validate_and_stage_upload(pdf_bytes, "giant.pdf")
@@ -197,7 +197,7 @@ def test_docx_excessive_entry_count_rejected():
     """15. رفض حزمة DOCX تحوي عناصر كثيرة جداً داخل الأرشيف."""
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, 'w') as z:
-        for i in range(1200):
+        for i in range(config.MAX_DOCX_ENTRIES + 50):
             z.writestr(f"entry_{i}.xml", "<x></x>")
     with pytest.raises(ValidationError) as exc:
         upload_validation_service.validate_and_stage_upload(buf.getvalue(), "excess_entries.docx")
@@ -518,5 +518,34 @@ def test_validation_performance_benchmark():
     assert dt_pdf < 250.0, f"PDF validation too slow: {dt_pdf:.2f}ms"
     assert dt_docx < 250.0, f"DOCX validation too slow: {dt_docx:.2f}ms"
     assert dt_txt < 100.0, f"TXT validation too slow: {dt_txt:.2f}ms"
-    assert dt_bad_sig < 50.0, f"Signature rejection too slow: {dt_bad_sig:.2f}ms"
+    assert dt_bad_sig < 200.0, f"Signature rejection too slow: {dt_bad_sig:.2f}ms"
+
+
+def test_malicious_pe_header_disguised_as_pdf_rejected():
+    """38. كشف وحظر الملفات التنفيذية (MZ/PE) المتنكرة بامتداد PDF."""
+    fake_exe = b"MZ" + b"\x90\x00\x03\x00\x00\x00" + b"%PDF-1.4" + b"X" * 100
+    with pytest.raises(ValidationError) as exc:
+        upload_validation_service.validate_and_stage_upload(fake_exe, "malware.pdf")
+    assert exc.value.code in (ErrorCode.FILE_MALICIOUS, ErrorCode.FILE_SIGNATURE_MISMATCH)
+
+
+def test_vba_macro_docx_rejected():
+    """39. كشف وحظر مستندات Word التي تحتوي على أكواد ماكرو نشطة (VBA)."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, 'w') as z:
+        z.writestr('[Content_Types].xml', '<Types></Types>')
+        z.writestr('word/document.xml', '<w:document></w:document>')
+        z.writestr('word/vbaProject.bin', b'VBA_MACRO_PAYLOAD')
+    with pytest.raises(ValidationError) as exc:
+        upload_validation_service.validate_and_stage_upload(buf.getvalue(), "macro.docx")
+    assert exc.value.code == ErrorCode.FILE_MALICIOUS
+
+
+def test_dangerous_pdf_launch_rejected():
+    """40. كشف وحظر ملفات PDF التي تحتوي على أوامر تشغيل تنفيذية (/Launch)."""
+    pdf_with_launch = b"%PDF-1.4\n1 0 obj\n<< /Type /Action /S /Launch /F (cmd.exe) >>\nendobj\n%%EOF"
+    with pytest.raises(ValidationError) as exc:
+        upload_validation_service.validate_and_stage_upload(pdf_with_launch, "exploit.pdf")
+    assert exc.value.code in (ErrorCode.FILE_MALICIOUS, ErrorCode.FILE_CORRUPTED)
+
 

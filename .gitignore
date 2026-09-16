@@ -17,8 +17,12 @@ __pycache__/
 *.egg-info/
 .eggs/
 .pytest_cache/
+.pytest-*/
 .coverage
 htmlcov/
+build_log.txt
+tmp/
+*.pdf
 
 # Local databases & journal files (NEVER COMMIT)
 *.db

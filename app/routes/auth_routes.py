@@ -11,11 +11,39 @@ from app.errors.error_codes import ErrorCode
 auth_bp = Blueprint('auth_bp', __name__)
 
 
+def is_localhost_request(req=None) -> bool:
+    """
+    التحقق الصارم من أن الطلب وارد من الجهاز المحلي فقط (Direct Socket Peer).
+    يتجاهل أي ترويسات وكيل غير موثوقة (X-Forwarded-For, X-Real-IP, Forwarded) لمنع الانتحال.
+    """
+    if req is None:
+        req = request
+
+    # قراءة عنوان الاتصال المباشر من بيئة WSGI (Socket Peer IP)
+    remote_ip = req.environ.get('REMOTE_ADDR') or req.remote_addr or ''
+    remote_ip = remote_ip.strip()
+
+    # العناوين المحلية المسموح بها فقط
+    if remote_ip in ('127.0.0.1', '::1', 'localhost', '::ffff:127.0.0.1'):
+        return True
+    if remote_ip.startswith('127.'):
+        return True
+    return False
+
+
 @auth_bp.route('/api/auth/status', methods=['GET'])
+@auth_bp.route('/api/auth/setup_status', methods=['GET'])
 def get_auth_status():
-    """التحقق من حالة النظام وهل يحتاج لإعداد المدير الأول."""
+    """التحقق من حالة النظام وهل يحتاج لإعداد المدير الأول مع تقييد الوصول للشبكة المحلية."""
+    setup_required = user_repo.is_initial_admin_allowed()
+    is_local = is_localhost_request()
     return jsonify({
-        'needs_first_time_setup': user_repo.is_initial_admin_allowed()
+        'needs_first_time_setup': setup_required and is_local,
+        'setup_required': setup_required,
+        'setup_pending': setup_required and not is_local,
+        'is_localhost': is_local,
+        'bootstrap_allowed': setup_required and is_local,
+        'pending_message': 'لم يتم الانتهاء من إعداد النظام على جهاز الخادم بعد. يرجى التواصل مع مسؤول النظام.' if (setup_required and not is_local) else None
     })
 
 
@@ -43,28 +71,61 @@ def get_current_user_profile():
 @auth_bp.route('/api/auth/setup_first_admin', methods=['POST'])
 @auth_bp.route('/api/auth/setup_admin', methods=['POST'])
 def setup_first_admin():
-    """إنشاء حساب مدير النظام الأول في مرحلة الإعداد الأولى فقط مع قفل التزامن الدائم."""
+    """إنشاء حساب مدير النظام الأول في مرحلة الإعداد الأولى فقط من الخادم المحلي حصرياً."""
+    # 1. التحقق الصارم من أن الطلب محلي حصراً (Localhost-Only Enforcement)
+    if not is_localhost_request():
+        audit_service.record_event(
+            action="auth.setup_admin.rejected_remote",
+            category="security",
+            success=False,
+            failure_reason_code="REMOTE_BOOTSTRAP_FORBIDDEN",
+            metadata={"remote_addr": request.remote_addr, "client_ip": request.remote_addr}
+        )
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.FORBIDDEN_ORIGIN,
+            'status': 'SYSTEM_SETUP_PENDING',
+            'error': 'لم يتم الانتهاء من إعداد النظام على جهاز الخادم بعد. يرجى التواصل مع مسؤول النظام.'
+        }), 403
+
+    # 2. التحقق من صلاحية التهيئة الأولية
     if not user_repo.is_initial_admin_allowed():
-        return jsonify({'success': False, 'error_code': ErrorCode.FIRST_ADMIN_ALREADY_EXISTS, 'error': 'تم إعداد مدير النظام مسبقاً.'}), 400
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.FIRST_ADMIN_ALREADY_EXISTS,
+            'error': 'تم إعداد مدير النظام مسبقاً.'
+        }), 400
 
     data = request.get_json(silent=True) or request.form or {}
     username = data.get('username', '').strip()
     password = data.get('password', '').strip()
     full_name = data.get('full_name', '').strip()
+    pin = (data.get('recovery_pin') or data.get('pin') or '').strip()
+
+    if not username or not password or not full_name:
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.VALIDATION_ERROR,
+            'error': 'يرجى إدخال كافة البيانات المطلوبة لمدير النظام.'
+        }), 400
+
+    # 3. اشتراط رمز PIN للاسترداد الفوري
+    if not pin or not (pin.isdigit() and 6 <= len(pin) <= 10):
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.VALIDATION_ERROR,
+            'error': 'رمز PIN الخاص ببطاقة الاسترداد مطلوب ويجب أن يتكون من 6 إلى 10 أرقام.'
+        }), 400
 
     ok, msg = user_repo.create_initial_admin(username, password, full_name)
     if ok:
         user, _ = user_repo.authenticate_or_reset_user(username, password)
+        recovery_card = None
         if user:
-            # منع تثبيت الجلسة (Session Fixation Defense)
-            flask_session.clear()
-            flask_session['user_id'] = user.get('id')
-            flask_session['username'] = user.get('username')
-            flask_session['role'] = user.get('role')
-            flask_session['session_version'] = user.get('session_version', 1)
-            flask_session['auth_time'] = time.time()
-            flask_session['last_activity'] = time.time()
-            csrf_token = rotate_csrf_token()
+            from app.services import recovery_service
+            rec_ok, card_data, rec_err = recovery_service.enroll_recovery_credential(user.get('id'), pin, actor_context=user)
+            if rec_ok:
+                recovery_card = card_data
 
         audit_service.record_event(
             action="auth.setup_admin",
@@ -75,7 +136,12 @@ def setup_first_admin():
             success=True,
             metadata={"username": username, "full_name": full_name, "role": "system_admin"}
         )
-        return jsonify({'success': True, 'message': msg, 'user': user})
+        return jsonify({
+            'success': True,
+            'message': msg,
+            'user': user,
+            'recovery_card': recovery_card
+        })
 
     audit_service.record_event(
         action="auth.setup_admin.failed",
@@ -232,7 +298,99 @@ def change_password_route():
     return jsonify({'success': False, 'error': msg}), 400
 
 
-@auth_bp.route('/api/admin/users', methods=['GET', 'POST'])
+@auth_bp.route('/api/auth/complete_first_login', methods=['POST'])
+def complete_first_login_route():
+    """إتمام إعداد الموظف الإلزامي: كلمة مرور دائمة ثم بطاقة QR للاسترداد."""
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.AUTH_REQUIRED,
+            'error': 'انتهت جلسة أول دخول. يرجى تسجيل الدخول بكلمة المرور المؤقتة مرة أخرى.'
+        }), 401
+
+    data = request.get_json(silent=True) or request.form or {}
+    new_pass = (data.get('new_password') or '').strip()
+    confirm_pass = (data.get('confirm_password') or '').strip()
+    pin = (data.get('recovery_pin') or data.get('pin') or '').strip()
+
+    must_change = bool(user.get('must_change_password'))
+    must_enroll = bool(user.get('must_enroll_recovery'))
+    if not must_change and not must_enroll:
+        return jsonify({'success': False, 'error': 'تم إكمال إعداد هذا الحساب مسبقاً.'}), 409
+
+    if not pin or not pin.isdigit() or not 6 <= len(pin) <= 10:
+        return jsonify({
+            'success': False,
+            'error_code': ErrorCode.VALIDATION_ERROR,
+            'error': 'رمز PIN مطلوب ويجب أن يتكون من 6 إلى 10 أرقام.'
+        }), 400
+
+    if must_change:
+        if not new_pass or not confirm_pass:
+            return jsonify({
+                'success': False,
+                'error_code': ErrorCode.VALIDATION_ERROR,
+                'error': 'كلمة المرور الدائمة وتأكيدها مطلوبان.'
+            }), 400
+        ok, msg, new_session_version = user_repo.complete_first_login_password(
+            user.get('id'), new_pass, confirm_pass
+        )
+        if not ok:
+            return jsonify({'success': False, 'error_code': ErrorCode.VALIDATION_ERROR, 'error': msg}), 400
+        flask_session['session_version'] = new_session_version
+
+    from app.services import recovery_service
+    rec_ok, card_data, rec_msg = recovery_service.enroll_recovery_credential(
+        user_id=user.get('id'),
+        pin=pin,
+        actor_context=user,
+        clear_requirement=False
+    )
+    if not rec_ok:
+        return jsonify({'success': False, 'error_code': ErrorCode.VALIDATION_ERROR, 'error': rec_msg}), 400
+
+    updated_user = user_repo.get_user_by_id(user.get('id')) or dict(user)
+    updated_user['permissions'] = get_user_permissions(updated_user)
+    updated_user['role_label_ar'] = ROLE_LABELS_AR.get(updated_user.get('role'), updated_user.get('role'))
+
+    audit_service.record_event(
+        action='auth.first_login.completed',
+        category='auth',
+        user=updated_user,
+        object_type='user',
+        object_id=str(user.get('id')),
+        success=True,
+        metadata={'username': updated_user.get('username'), 'recovery_enrolled': True}
+    )
+    return jsonify({
+        'success': True,
+        'message': 'تم اعتماد كلمة المرور وإعداد بطاقة الاسترداد بنجاح.',
+        'user': updated_user,
+        'recovery_card': card_data
+    })
+
+
+@auth_bp.route('/api/auth/acknowledge_recovery_card', methods=['POST'])
+def acknowledge_recovery_card_route():
+    """تأكيد المستخدم أنه حفظ بطاقة QR ثم تحرير الجلسة للاستخدام الطبيعي."""
+    user = get_authenticated_user()
+    if not user:
+        return jsonify({'success': False, 'error': 'يجب تسجيل الدخول أولاً'}), 401
+    if user.get('must_change_password'):
+        return jsonify({'success': False, 'error': 'يجب اعتماد كلمة المرور الدائمة أولاً'}), 428
+
+    ok, msg = user_repo.mark_recovery_enrollment_complete(user.get('id'))
+    if not ok:
+        return jsonify({'success': False, 'error': msg}), 400
+
+    updated_user = user_repo.get_user_by_id(user.get('id')) or dict(user)
+    updated_user['permissions'] = get_user_permissions(updated_user)
+    updated_user['role_label_ar'] = ROLE_LABELS_AR.get(updated_user.get('role'), updated_user.get('role'))
+    return jsonify({'success': True, 'message': msg, 'user': updated_user})
+
+
+@auth_bp.route('/users', methods=['GET', 'POST'])
 def handle_users():
     """إدارة المستخدمين (عرض وإضافة)."""
     if request.method == 'GET':

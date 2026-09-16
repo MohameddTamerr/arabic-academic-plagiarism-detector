@@ -46,10 +46,20 @@ if __name__ == '__main__':
     threading.Thread(target=open_browser, daemon=True).start()
 
     # بدء خادم Waitress الإنتاجي (100% Offline)
-    try:
-        from waitress import serve
-        serve(app, host='0.0.0.0', port=5000, threads=16)
-    except Exception as e:
-        print(f"   تشغيل خادم Flask المحلي: {e}")
-        app.run(host='0.0.0.0', port=5000, threaded=True, debug=False)
+    import config
+    is_prod = getattr(config, 'PRODUCTION_MODE', False) or getattr(config, 'PORTABLE_MODE', False) or getattr(config, 'SINGLE_EXE_MODE', False) or os.environ.get('PORTABLE_MODE') == '1' or os.path.basename(_HERE).lower() == 'app'
+    log_file = config.LOGS_DIR / "server.log"
+
+    if is_prod:
+        from app.wsgi_server import run_production_server
+        run_production_server(app, host='0.0.0.0', port=5000, threads=16, log_file=log_file)
+    else:
+        is_explicit_dev = os.environ.get('FLASK_ENV') == 'development' or os.environ.get('APP_ENV') == 'development' or '--dev' in sys.argv
+        if is_explicit_dev:
+            print("   تشغيل خادم Flask المحلي (نمط التطوير الصريح)...")
+            app.run(host='0.0.0.0', port=5000, threaded=True, debug=False)
+        else:
+            from app.wsgi_server import run_production_server
+            run_production_server(app, host='0.0.0.0', port=5000, threads=16, log_file=log_file)
+
 

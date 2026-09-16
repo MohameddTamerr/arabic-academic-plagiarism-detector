@@ -25,6 +25,13 @@ def client():
         yield client
 
 
+def _login_as(client, role, username):
+    with client.session_transaction() as session:
+        session['user_id'] = 876543
+        session['username'] = username
+        session['role'] = role
+
+
 def test_successful_login_creates_audit_event(client):
     """تسجيل الدخول الناجح ينشئ حدث تدقيق auth.login.success."""
     user_repo.add_user('audit_test_user', 'secure_pass123', 'مدير الاختبار', 'admin')
@@ -164,8 +171,11 @@ def test_academic_review_workflow_events(client):
         report_dict={'title': 'بحث قيد التحكيم للتدقيق'},
         author='باحث تجريبي'
     )
+    _login_as(client, 'employee', 'employee_audit_1')
     client.post(f'/api/reports/{rep_id}/submit_to_admin', json={'employee_name': 'فاحص 1', 'notes': 'ملاحظات'})
+    _login_as(client, 'reviewer', 'reviewer_audit_1')
     client.post(f'/api/reports/{rep_id}/initial_accept')
+    _login_as(client, 'senior_reviewer', 'senior_audit_1')
     client.post(f'/api/reports/{rep_id}/final_accept')
 
     # مسار 2: إرسال -> رفض
@@ -179,7 +189,9 @@ def test_academic_review_workflow_events(client):
         report_dict={'title': 'بحث قيد التحكيم للرفض'},
         author='باحث تجريبي'
     )
+    _login_as(client, 'employee', 'employee_audit_2')
     client.post(f'/api/reports/{rep_id_rej}/submit_to_admin', json={'employee_name': 'فاحص 2', 'notes': 'ملاحظات الرفض'})
+    _login_as(client, 'reviewer', 'reviewer_audit_2')
     client.post(f'/api/reports/{rep_id_rej}/reject')
 
     with get_session() as session:
