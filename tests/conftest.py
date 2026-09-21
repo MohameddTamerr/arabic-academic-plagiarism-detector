@@ -8,6 +8,19 @@ import pytest
 import config
 from app.repositories import base_repo
 
+@pytest.fixture(autouse=True)
+def isolated_local_antivirus(monkeypatch):
+    """Use a clean local scanner double; security tests override its responses."""
+    from app.services import upload_validation_service as validation
+    from types import SimpleNamespace
+    original_run = validation.subprocess.run
+    monkeypatch.setattr(validation, '_find_antivirus_engine', lambda: 'clamscan')
+    def run(command, *args, **kwargs):
+        if isinstance(command, list) and command and command[0] == 'clamscan':
+            return SimpleNamespace(returncode=0, stdout=(str(command[-1]) + ': OK\n').encode(), stderr=b'')
+        return original_run(command, *args, **kwargs)
+    monkeypatch.setattr(validation.subprocess, 'run', run)
+
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_database(tmp_path_factory):
     """

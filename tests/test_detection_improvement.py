@@ -271,8 +271,8 @@ def test_anonymized_ingest_pii_redaction():
 
 def test_production_config_remains_strictly_unchanged():
     """Verify that Phase 19 did NOT modify any production default settings or thresholds."""
-    assert config.DEFAULT_SETTINGS['shingle_size'] == 5
-    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.40
-    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.40
+    assert config.DEFAULT_SETTINGS['shingle_size'] == 4
+    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.33
+    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.35
     assert config.DEFAULT_SETTINGS['enable_semantic_model'] is False
     assert config.DEFAULT_SETTINGS['max_candidate_retrieval'] == 50

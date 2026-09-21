@@ -49,6 +49,7 @@ def test_separation_of_duties_and_self_review(client, app_instance):
 
         # Create a report submitted by u_submitter
         rep_data = {
+            'segments': [{'text': 'محتوى أصلي محفوظ لاختبار فصل المهام ومنع مراجعة المستخدم لبحثه'}],
             'clean_words_count': 2000,
             'total_words': 2000,
             'copied_words': 100,

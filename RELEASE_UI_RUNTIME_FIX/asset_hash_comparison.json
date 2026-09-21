@@ -1,0 +1,59 @@
+{
+  "latest_mei_dir": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122",
+  "assets": {
+    "templates/index.html": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\templates/index.html",
+      "source_sha256": "103901c5d64bc2a02f796d7779d5d9cb6ffffb22ff042f9101f82d5ec76e91c4",
+      "source_size_bytes": 559700,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\templates/index.html",
+      "packaged_sha256": "103901c5d64bc2a02f796d7779d5d9cb6ffffb22ff042f9101f82d5ec76e91c4",
+      "packaged_size_bytes": 559700,
+      "hash_match": true
+    },
+    "static/js/report-list.js": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\static/js/report-list.js",
+      "source_sha256": "5c05adb2f9f900d19a47b12bc60e223353ae6cb7701be0c60805d3f7352601dd",
+      "source_size_bytes": 2549,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\static/js/report-list.js",
+      "packaged_sha256": "5c05adb2f9f900d19a47b12bc60e223353ae6cb7701be0c60805d3f7352601dd",
+      "packaged_size_bytes": 2549,
+      "hash_match": true
+    },
+    "static/js/pdf-viewer.js": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\static/js/pdf-viewer.js",
+      "source_sha256": "ab877cf2298008390e193af6178842b2f05881a7cc8bd8358122a2f4aeb9bac4",
+      "source_size_bytes": 4157,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\static/js/pdf-viewer.js",
+      "packaged_sha256": "ab877cf2298008390e193af6178842b2f05881a7cc8bd8358122a2f4aeb9bac4",
+      "packaged_size_bytes": 4157,
+      "hash_match": true
+    },
+    "server.py": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\server.py",
+      "source_sha256": "06261f1b2be22e10378cf850a88633d882f12a528daa3bfaf938a96f68261ccb",
+      "source_size_bytes": 3104,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\server.py",
+      "packaged_sha256": null,
+      "packaged_size_bytes": null,
+      "hash_match": false
+    },
+    "config.py": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\config.py",
+      "source_sha256": "626b460e4af92de526f4b7763ad00585ab2952df571bdf4909d5d7f4736cc804",
+      "source_size_bytes": 15819,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\config.py",
+      "packaged_sha256": null,
+      "packaged_size_bytes": null,
+      "hash_match": false
+    },
+    "main.py": {
+      "source_path": "c:\\Users\\user\\Downloads\\Baba\\main.py",
+      "source_sha256": "b43e7894ec85dbca6db4f48aae72954ad44583e2a86632da232ee422edcee491",
+      "source_size_bytes": 2212,
+      "packaged_path": "C:\\Users\\user\\AppData\\Local\\Temp\\_MEI339122\\main.py",
+      "packaged_sha256": null,
+      "packaged_size_bytes": null,
+      "hash_match": false
+    }
+  }
+}

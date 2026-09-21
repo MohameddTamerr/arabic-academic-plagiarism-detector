@@ -24,10 +24,17 @@ report_bp = Blueprint('report_bp', __name__)
 
 
 @report_bp.route('/api/reports/<report_id>', methods=['GET'])
+@report_bp.route('/api/reports/<report_id>/summary', methods=['GET'])
 @require_permission(Permission.REPORT_VIEW)
 def get_report_route(report_id):
-    """استرجاع تقرير فحص سابق وتوثيق استعراض التقرير (صلاحية report.view)."""
-    report = report_repo.get_report(report_id)
+    """استرجاع تقرير فحص سابق أو موجزه التنفيذي وتوثيق استعراض التقرير (صلاحية report.view)."""
+    is_summary_request = request.path.endswith('/summary') or request.args.get('view') == 'summary'
+    
+    if is_summary_request:
+        report = report_repo.get_report_summary(report_id)
+    else:
+        report = report_repo.get_report(report_id)
+
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
 
@@ -49,10 +56,116 @@ def get_report_route(report_id):
             research_id=report.get('research_id'),
             research_reference_number=report.get('reference_number', ''),
             success=True,
-            metadata={'title': report.get('title', '')}
+            metadata={'title': report.get('title', ''), 'view': 'summary' if is_summary_request else 'full'}
         )
 
+    # إرفاق صلاحيات المراجعة ودور المستخدم للواجهة
+    if actor:
+        r = (actor.get('role') or '').lower()
+        report['user_role'] = actor.get('role', '')
+        report['can_review'] = r in ('system_admin', 'senior_reviewer', 'reviewer', 'admin')
+
     return jsonify(report)
+
+
+@report_bp.route('/api/reports/<report_id>/evidence', methods=['GET'])
+@require_permission(Permission.REPORT_VIEW)
+def get_report_evidence_route(report_id):
+    """استرجاع شواهد التطابق المقسمة والمفلترة للتقرير (صلاحية report.view)."""
+    # التحقق من الصلاحية والوصول للتقرير
+    summary = report_repo.get_report_summary(report_id)
+    if not summary:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, summary):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 25, type=int)
+    match_type = request.args.get('match_type')
+    source_id = request.args.get('source_id', type=int)
+    source_title = request.args.get('source_title')
+    part_id = request.args.get('part_id', type=int)
+    page_number = request.args.get('page_number', type=int)
+    min_pct = request.args.get('min_pct', type=float)
+    query = request.args.get('q') or request.args.get('search')
+    group_by_source = request.args.get('group_by_source', '').lower() in ('1', 'true')
+
+    evidence_data = report_repo.get_report_evidence_paginated(
+        report_id=report_id,
+        page=page,
+        page_size=page_size,
+        match_type=match_type,
+        source_id=source_id,
+        source_title=source_title,
+        part_id=part_id,
+        page_number=page_number,
+        min_pct=min_pct,
+        query=query,
+        group_by_source=group_by_source
+    )
+    return jsonify(evidence_data)
+
+
+@report_bp.route('/api/reports/<report_id>/sources', methods=['GET'])
+@require_permission(Permission.REPORT_VIEW)
+def get_report_sources_route(report_id):
+    """استرجاع قائمة المصادر المرجعية المطابقة مع الترقيم والبحث (صلاحية report.view)."""
+    summary = report_repo.get_report_summary(report_id)
+    if not summary:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, summary):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    page = request.args.get('page', 1, type=int)
+    page_size = request.args.get('page_size', 25, type=int)
+    query = request.args.get('q') or request.args.get('search')
+
+    sources_data = report_repo.get_report_sources_paginated(
+        report_id=report_id,
+        page=page,
+        page_size=page_size,
+        query=query
+    )
+    return jsonify(sources_data)
+
+
+@report_bp.route('/api/reports/<report_id>/page_evidence', methods=['GET'])
+@require_permission(Permission.REPORT_VIEW)
+def get_report_page_evidence_route(report_id):
+    """استرجاع نصوص وشواهد صفحة محددة فقط لعارض المستند عند الطلب (صلاحية report.view)."""
+    summary = report_repo.get_report_summary(report_id)
+    if not summary:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, summary):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى تقارير هذا القسم أو الوحدة التنظيمية',
+            'code': ErrorCode.AUTH_FORBIDDEN
+        }), 403
+
+    page_number = request.args.get('page', type=int)
+    part_id = request.args.get('part_id', type=int)
+
+    if not page_number:
+        return jsonify({'error': 'رقم الصفحة مطلوب'}), 400
+
+    page_data = report_repo.get_report_page_evidence(
+        report_id=report_id,
+        page_number=page_number,
+        part_id=part_id
+    )
+    return jsonify(page_data)
 
 
 @report_bp.route('/api/reports/<report_id>', methods=['DELETE'])
@@ -543,44 +656,16 @@ def final_accept(report_id):
     prev_review_status = report.get('review_status', 'pending_review')
     prev_status = report.get('status', 'مفحوص')
 
-    success, err_msg = report_repo.update_report_review_status(report_id, 'final_accepted')
-    if not success:
-        return jsonify({'error': err_msg or 'انتقال تحكيمي غير قانوني'}), 400
-
-    title = report.get('title', 'بحث بدون عنوان')
-    author = report.get('author', 'غير محدد')
-    category = report.get('category', 'عام')
-    final_file = report.get('final_file_path') or report.get('file_path', '')
-    final_text = report.get('final_full_text', '')
-
-    if not final_text and 'segments' in report and report['segments']:
-        final_text = ' '.join(s.get('text', '') for s in report['segments'])
-
-    res = import_reference_paper(
-        title=f"{title} (معتمد نهائي)",
-        author=author,
-        category=category,
-        file_path=final_file,
-        raw_text=final_text
-    )
-
-    # تسجيل سجل قرار التحكيم في DB
-    from app.models.schema import ReviewDecisionRecord
-    with base_repo.get_session() as session:
-        dec_rec = ReviewDecisionRecord(
-            report_id=report_id,
-            research_id=report.get('research_id'),
-            thesis_id=report.get('thesis_id'),
-            report_revision=report.get('revision_number', 1),
-            previous_review_status=prev_review_status,
-            new_review_status='final_accepted',
-            decision='final_accepted',
-            reviewer=actor.get('username', 'مراجع نهائي') if actor else 'مراجع نهائي',
-            reviewer_user_id=actor.get('id') if actor else None,
-            reviewer_role_snapshot=actor.get('role', '') if actor else '',
-            request_id=request.headers.get('X-Request-ID', '')
-        )
-        session.add(dec_rec)
+    from app.services.final_acceptance_service import accept_report
+    try:
+        references = accept_report(report, actor or {})
+    except ValueError as error:
+        return jsonify(error=str(error), success=False), 400
+    except Exception:
+        return jsonify(error='تعذر اعتماد التقرير وإضافة مراجعه؛ لم يتم إكمال العملية', success=False), 500
+    res = references[0]
+    title = report.get('title', '')
+    author = report.get('author', '')
 
     audit_service.record_event(
         action="review.final_accepted",

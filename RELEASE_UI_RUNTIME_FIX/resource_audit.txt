@@ -1,0 +1,3 @@
+HTTP 404 GET http://127.0.0.1:5000/favicon.ico
+HTTP 401 GET http://127.0.0.1:5000/api/theses?page=1&page_size=20
+HTTP 401 GET http://127.0.0.1:5000/api/reports?page=1&page_size=20

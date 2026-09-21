@@ -22,14 +22,16 @@ logger = logging.getLogger(__name__)
 
 def get_staging_upload_dir() -> Path:
     """مجلد العزل المؤقت للرفع أثناء مرحلة الكتابة."""
-    staging_dir = getattr(config, 'TEMP_UPLOAD_DIR', config.STORAGE_ROOT / 'temp_uploads') / '.staging_uploads'
+    temp_up = getattr(config, 'TEMP_UPLOAD_DIR', None) or (Path(config.STORAGE_ROOT) / 'temp_uploads')
+    staging_dir = Path(temp_up) / '.staging_uploads'
     staging_dir.mkdir(parents=True, exist_ok=True)
     return staging_dir
 
 
 def get_finalized_upload_dir() -> Path:
     """مجلد التخزين النهائي للملفات المعتمدة."""
-    final_dir = getattr(config, 'TEMP_UPLOAD_DIR', config.STORAGE_ROOT / 'temp_uploads')
+    temp_up = getattr(config, 'TEMP_UPLOAD_DIR', None) or (Path(config.STORAGE_ROOT) / 'temp_uploads')
+    final_dir = Path(temp_up)
     final_dir.mkdir(parents=True, exist_ok=True)
     return final_dir
 

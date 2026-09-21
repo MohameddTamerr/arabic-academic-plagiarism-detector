@@ -15,6 +15,7 @@ import uuid
 import hashlib
 import logging
 from datetime import datetime
+from contextlib import nullcontext
 from typing import Optional, Tuple, List, Dict, Any
 from sqlalchemy import text, or_
 
@@ -128,7 +129,7 @@ def allocate_corpus_version(
     - يعلم فهرس الاسترجاع كـ stale.
     """
     year = datetime.now().year
-    next_seq = reference_service.get_next_sequence_value('reference_corpus', year)
+    next_seq = reference_service.get_next_sequence_value('reference_corpus', year, session=session)
     version_id = f"REF-{year}-{next_seq:06d}"
     event_id = f"evt-{uuid.uuid4().hex[:12]}"
 
@@ -256,7 +257,8 @@ def add_reference_document(
     original_filename: str = '',
     added_by: str = 'system',
     notes: str = '',
-    ownership_note: str = ''
+    ownership_note: str = '',
+    transaction_session=None
 ) -> dict:
     """
     إضافة مرجع جديد مع التحقق الصارم من عدم التكرار، وبناء الهوية المستقرة، وإصدار النسخة الذرية.
@@ -279,27 +281,28 @@ def add_reference_document(
 
     # 2. سياسة منع التكرار المعتمدة على الهاش التام للمراجع النشطة فقط
     if file_hash:
-        with get_session() as session:
+        with (nullcontext(transaction_session) if transaction_session is not None else get_session()) as session:
             existing = (
                 session.query(Document)
                 .filter(Document.file_hash == file_hash, Document.current_status == STATUS_ACTIVE)
                 .first()
             )
             if existing:
-                audit_service.record_event(
-                    action="reference.duplicate_rejected",
-                    category="reference",
-                    object_type="reference_document",
-                    object_id=str(existing.reference_id or existing.id),
-                    user={'username': added_by},
-                    success=False,
-                    metadata={
-                        "title": title,
-                        "existing_ref_id": existing.reference_id,
-                        "existing_title": existing.title,
-                        "hash_prefix": file_hash[:16]
-                    }
-                )
+                if transaction_session is None:
+                    audit_service.record_event(
+                        action="reference.duplicate_rejected",
+                        category="reference",
+                        object_type="reference_document",
+                        object_id=str(existing.reference_id or existing.id),
+                        user={'username': added_by},
+                        success=False,
+                        metadata={
+                            "title": title,
+                            "existing_ref_id": existing.reference_id,
+                            "existing_title": existing.title,
+                            "hash_prefix": file_hash[:16]
+                        }
+                    )
                 return {
                     'success': False,
                     'is_duplicate': True,
@@ -338,7 +341,7 @@ def add_reference_document(
 
     # 7. الحفظ وإصدار النسخة التراكمية في معاملة ذرية موحدة
     try:
-        with get_session() as session:
+        with (nullcontext(transaction_session) if transaction_session is not None else get_session()) as session:
             # حجز إصدار قاعدة المراجع
             corpus_ver = allocate_corpus_version(
                 change_type="add",
@@ -401,10 +404,13 @@ def add_reference_document(
 
             session.flush()
             doc_id = doc.id
+            version = session.query(ReferenceCorpusVersion).filter_by(version_identifier=corpus_ver).one()
+            version.fingerprint, version.document_count = compute_deterministic_corpus_fingerprint(session=session)
             doc_title = doc.title
             doc_author = doc.author
             doc_category = doc.category
-            session.commit()
+            if transaction_session is None:
+                session.commit()
     except Exception as exc:
         if "UNIQUE constraint failed" in str(exc) or "IntegrityError" in type(exc).__name__:
             if file_hash:
@@ -433,21 +439,22 @@ def add_reference_document(
         raise exc
 
     # توثيق في سجل التدقيق
-    audit_service.record_event(
-        action="reference.added",
-        category="reference",
-        object_type="reference_document",
-        object_id=reference_id,
-        user={'username': added_by},
-        success=True,
-        metadata={
-            "title": title,
-            "author": author,
-            "corpus_version": corpus_ver,
-            "pages_count": len(pages_data),
-            "segments_count": len(segments_data)
-        }
-    )
+    if transaction_session is None:
+        audit_service.record_event(
+            action="reference.added",
+            category="reference",
+            object_type="reference_document",
+            object_id=reference_id,
+            user={'username': added_by},
+            success=True,
+            metadata={
+                "title": title,
+                "author": author,
+                "corpus_version": corpus_ver,
+                "pages_count": len(pages_data),
+                "segments_count": len(segments_data)
+            }
+        )
 
     return {
         'success': True,

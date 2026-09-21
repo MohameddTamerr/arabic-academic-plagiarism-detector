@@ -21,6 +21,7 @@ from app.repositories import report_repo
 from app.services.settings_service import get_current_settings
 from plagiarism_detector.extraction.page_extractor import extract_document_pages
 from plagiarism_detector.reporting.report_builder import analyze_academic_document
+from app.services.self_match_service import reference_ids_for_work, reference_ids_for_scan
 from plagiarism_detector.core.categorizer import categorize_text
 
 logger = logging.getLogger(__name__)
@@ -267,6 +268,7 @@ def _execute_thesis_pipeline(
             pages_data=all_pages_data,
             settings_override=settings,
             exact_reference_match=exact_reference_match,
+            excluded_doc_ids=reference_ids_for_work(research_id=research_id),
         )
 
         if job_queue_service.is_cancellation_requested(task_id):
@@ -584,6 +586,7 @@ def _execute_scan_pipeline(
             pages_data=pages_data if pages_data else None,
             settings_override=settings,
             exact_reference_match=exact_reference_match,
+            excluded_doc_ids=reference_ids_for_scan(task_id),
         )
 
         if job_queue_service.is_cancellation_requested(task_id):

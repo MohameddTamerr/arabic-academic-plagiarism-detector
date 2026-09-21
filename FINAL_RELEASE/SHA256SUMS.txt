@@ -1,0 +1,5 @@
+# SHA-256 Checksums for Arabic Academic Plagiarism Detector Release Artifacts
+# Generated: 2026-09-17
+# Branch: release/v1-final-rc (fbfd6538b8137ba936fe26b528b1bb711e74bebb)
+
+8d000483de7c4104ece76143834caeb22853764343a502e524f26793ea8cb3bc  windows-modern/Arabic-Plagiarism-System.exe

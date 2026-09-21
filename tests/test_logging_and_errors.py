@@ -343,10 +343,12 @@ def test_extraction_failure_gets_stable_error_code():
 def test_ocr_failure_handled_safely():
     """25. معالجة خطأ OCR بأمان دون التسبب في انهيار التطبيق."""
     from plagiarism_detector.extraction.ocr_engine import check_ocr_availability
+    check_ocr_availability.cache_clear()
     with patch('plagiarism_detector.extraction.ocr_engine.find_tesseract_cmd', return_value=None):
         info = check_ocr_availability()
         assert info['available'] is False
         assert 'has_arabic' in info
+    check_ocr_availability.cache_clear()
 
 
 def test_backup_and_restore_failures_logged_safely():

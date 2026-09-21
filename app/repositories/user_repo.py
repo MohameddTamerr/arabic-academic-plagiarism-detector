@@ -440,6 +440,7 @@ def get_user_management_stats() -> dict:
             'total_users': total_users,
             'active_users': active_users,
             'disabled_users': disabled_users,
+            'employee_count': session.query(User).filter(User.role == 'employee').count(),
             'admin_count': session.query(User).filter(User.role.in_(['system_admin', 'admin', 'sysadmin'])).count(),
             'reviewer_count': session.query(User).filter(User.role == 'reviewer').count(),
             'senior_reviewer_count': session.query(User).filter(User.role == 'senior_reviewer').count(),

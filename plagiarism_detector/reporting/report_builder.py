@@ -138,6 +138,7 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
                 logger.debug(f"تخطي بناء مصفوفة TF-IDF الشاملة: {e}")
 
         index_data = {
+            'shingle_size': shingle_size,
             'retriever': retriever,
             'corpus_shingles': corpus_shingles,
             'corpus_light_texts': corpus_light_texts,
@@ -231,7 +232,7 @@ def trigger_async_index_rebuild(target_corpus_version: Optional[str] = None, req
     return job_id or ''
 
 
-def get_pipeline_index(auto_rebuild_if_stale: bool = True) -> dict:
+def get_pipeline_index(auto_rebuild_if_stale: bool = True, shingle_size: Optional[int] = None) -> dict:
     """استرجاع الفهرس المخزن في الذاكرة مع التحقق من عدم تقادمه (Staleness Protection)."""
     global _CACHED_INDEX
     from app.models.schema import IndexStateRecord
@@ -255,7 +256,22 @@ def get_pipeline_index(auto_rebuild_if_stale: bool = True) -> dict:
         else:
             raise RuntimeError("فهرس الاسترجاع غير متطابق مع قاعدة المراجع الحالية (CORPUS_INDEX_STALE)")
 
-    return _CACHED_INDEX
+    index = _CACHED_INDEX
+    if shingle_size is None or index.get('shingle_size') == shingle_size:
+        return index
+
+    # A scan-local view prevents different concurrent scan settings from
+    # modifying the shared corpus cache or another scan's retriever.
+    retriever = CandidateRetriever()
+    shingles = []
+    for idx, (light, aggressive) in enumerate(zip(
+        index['corpus_light_texts'], index['corpus_aggr_texts']
+    )):
+        value = get_shingles(aggressive, size=shingle_size)
+        shingles.append(value)
+        retriever.add_segment(idx, light.split(), value, norm_light=light)
+    return dict(index, retriever=retriever, corpus_shingles=shingles,
+                shingle_size=shingle_size)
 
 
 def invalidate_pipeline_index(mark_stale_in_db: bool = True):
@@ -280,7 +296,9 @@ def invalidate_pipeline_index(mark_stale_in_db: bool = True):
 def analyze_academic_document(
     raw_text: str,
     pages_data: Optional[list[dict]] = None,
-    settings_override: Optional[dict] = None
+    settings_override: Optional[dict] = None,
+    exact_reference_match: Optional[dict] = None,
+    excluded_doc_ids: Optional[set[int]] = None
 ) -> dict:
     """
     إجراء الفحص الأكاديمي الشامل للنص أو الصفحات المستخرجة.
@@ -314,7 +332,7 @@ def analyze_academic_document(
             for i, s in enumerate(sents)
         ]
 
-    index_data = get_pipeline_index()
+    index_data = get_pipeline_index(shingle_size=settings['shingle_size'])
     retriever: CandidateRetriever = index_data['retriever']
     corpus_shingles = index_data['corpus_shingles']
     corpus_light_texts = index_data['corpus_light_texts']
@@ -343,6 +361,8 @@ def analyze_academic_document(
         seg_dict = {
             'text': seg.raw_text,
             'page_number': seg.page_number,
+            'source_file': seg.source_file,
+            'file_index': seg.file_index,
             'status': 'original',
             'match_type': 'ORIGINAL',
             'score': 0,
@@ -398,6 +418,9 @@ def analyze_academic_document(
         # ── المرحلة A: كشف النسخ الحرفي عبر Shingles + Jaccard ───
         q_shingles = get_shingles(eval_aggr, size=settings['shingle_size'])
         shingle_candidates = retriever.retrieve_candidates_for_shingles(q_shingles)
+        if excluded_doc_ids:
+            shingle_candidates = [idx for idx in shingle_candidates
+                                  if corpus_metadata[idx]['doc_id'] not in excluded_doc_ids]
 
         match_found = False
 
@@ -604,4 +627,8 @@ def analyze_academic_document(
         'common_text_filter_mode': common_mode,
         'citation_filter_mode': citation_mode,
         'settings_snapshot': dict(settings)
+        , 'exact_file_match': {
+            'detected': bool(exact_reference_match),
+            'method': 'sha256' if exact_reference_match else None
+        }
     }

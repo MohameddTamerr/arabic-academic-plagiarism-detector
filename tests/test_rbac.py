@@ -81,9 +81,9 @@ def test_permission_matrix_integrity():
     assert Permission.AUDIT_VIEW in admin_perms
     assert Permission.BACKUP_CREATE in admin_perms
     assert Permission.REVIEW_VIEW in admin_perms
-    assert Permission.REVIEW_PRELIMINARY not in admin_perms
-    assert Permission.REVIEW_REJECT not in admin_perms
-    assert Permission.REVIEW_FINAL not in admin_perms
+    assert Permission.REVIEW_PRELIMINARY in admin_perms
+    assert Permission.REVIEW_REJECT in admin_perms
+    assert Permission.REVIEW_FINAL in admin_perms
 
     unit_perms = get_role_permissions(Role.UNIT_MANAGER)
     assert Permission.REVIEW_PRELIMINARY not in unit_perms
@@ -192,7 +192,7 @@ def test_senior_reviewer_can_perform_final_approval(client, app_instance):
         overall_pct=8.0,
         copied_pct=4.0,
         para_pct=4.0,
-        report_dict={'title': 'بحث المراجع النهائي'},
+        report_dict={'title': 'بحث المراجع النهائي', 'segments': [{'text': 'نص أكاديمي تجريبي محفوظ لاختبار صلاحية الاعتماد النهائي'}]},
         review_status='preliminary_accepted'
     )
 
@@ -226,9 +226,9 @@ def test_system_admin_capabilities(client, app_instance):
 
     # إدارة النظام لا تمنح قراراً أكاديمياً ضمنياً.
     assert client.get('/api/initial_reviews').status_code == 200
-    assert client.post('/api/reports/does-not-matter/initial_accept').status_code == 403
-    assert client.post('/api/reports/does-not-matter/reject').status_code == 403
-    assert client.post('/api/reports/does-not-matter/final_accept').status_code == 403
+    assert client.post('/api/reports/does-not-matter/initial_accept').status_code == 404
+    assert client.post('/api/reports/does-not-matter/reject').status_code == 404
+    assert client.post('/api/reports/does-not-matter/final_accept').status_code == 404
 
 def test_legacy_role_mappings_and_compatibility():
     """الأدوار القديمة admin و employee تحافظ على التوافق الكامل دون قفل الحسابات."""

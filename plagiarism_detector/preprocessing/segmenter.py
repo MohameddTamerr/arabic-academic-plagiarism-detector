@@ -20,6 +20,8 @@ class DocumentSegment:
     word_count: int
     is_cited: bool = False
     citation_text: str = ''
+    source_file: str = ''
+    file_index: Optional[int] = None
 
 
 def segment_pages(pages: list[dict], min_words: int = 4) -> list[DocumentSegment]:
@@ -50,7 +52,9 @@ def segment_pages(pages: list[dict], min_words: int = 4) -> list[DocumentSegment
                 raw_text=sent,
                 normalized_light=n_light,
                 normalized_aggressive=n_aggr,
-                word_count=w_count
+                word_count=w_count,
+                source_file=page.get('source_file', ''),
+                file_index=page.get('file_index')
             ))
             seg_counter += 1
 

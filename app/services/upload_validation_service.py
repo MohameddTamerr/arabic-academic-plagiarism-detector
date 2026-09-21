@@ -175,7 +175,7 @@ def validate_and_stage_upload(
         file_hash = hasher.hexdigest()
 
         # 3. الفحص الأمني المتقدم ضد الفيروسات والبرمجيات الخبيثة (Antivirus & Malware Ingestion Scan)
-        _scan_for_malware(staging_path, ext)
+        antivirus_status = _scan_for_malware(staging_path, ext)
 
         # 4. التحقق الهيكلي من توقيع وبنية الملف (File Signature & Structure Inspection)
         detected_type = _inspect_file_structure(staging_path, ext)
@@ -188,7 +188,8 @@ def validate_and_stage_upload(
             'size_bytes': total_bytes,
             'sha256': file_hash,
             'staging_path': str(staging_path),
-            'validation_status': 'validated'
+            'validation_status': 'validated',
+            'antivirus_status': antivirus_status or 'SCAN_CLEAN'
         }
 
     except Exception as e:
@@ -282,62 +283,78 @@ def _scan_for_malware(staging_path: Path, ext: str) -> None:
     except Exception as e:
         logger.warning(f"تعذر قراءة ترويسة الفحص الأمني للملف {staging_path.name}: {e}")
 
-    # 2. فحص بمحرك مكافحة الفيروسات المتاح
-    av_engine = _find_antivirus_engine()
-    if av_engine:
-        try:
-            if "MpCmdRun" in av_engine:
-                cmd = [av_engine, "-Scan", "-ScanType", "3", "-File", str(staging_path), "-DisableRemediation"]
-                proc = subprocess.run(
-                    cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    timeout=15,
-                    check=False,
-                    **_hidden_subprocess_options()
-                )
-                # MpCmdRun Exit Code 2 means malware / threat found
-                if proc.returncode == 2:
-                    log_operational_event(
-                        level=logging.ERROR,
-                        message=f"Windows Defender رصد تهديداً أمنياً في الملف المرفوع: {staging_path.name}",
-                        component="antivirus_scanner",
-                        error_code=ErrorCode.FILE_MALICIOUS
-                    )
-                    raise ValidationError(
-                        "تم اكتشاف تهديد أمني أو برمجية خبيثة في الملف المرفوع عبر نظام حماية Windows Defender وتم حظر الملف.",
-                        code=ErrorCode.FILE_MALICIOUS,
-                        status_code=400
-                    )
-            elif "clam" in av_engine:
-                cmd = [av_engine, "--no-summary", str(staging_path)]
-                proc = subprocess.run(
-                    cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                    timeout=15,
-                    check=False,
-                    **_hidden_subprocess_options()
-                )
-                # ClamAV Exit Code 1 means virus found
-                if proc.returncode == 1:
-                    log_operational_event(
-                        level=logging.ERROR,
-                        message=f"ClamAV رصد فيروساً في الملف المرفوع: {staging_path.name}",
-                        component="antivirus_scanner",
-                        error_code=ErrorCode.FILE_MALICIOUS
-                    )
-                    raise ValidationError(
-                        "تم اكتشاف برمجية خبيثة أو فيروس في الملف المرفوع عبر نظام الحماية وتم رفضه.",
-                        code=ErrorCode.FILE_MALICIOUS,
-                        status_code=400
-                    )
-        except ValidationError:
-            raise
-        except subprocess.TimeoutExpired:
-            logger.warning(f"تجاوز فحص مكافحة الفيروسات المهلة المحددة للملف {staging_path.name}؛ الاستمرار مع الفحص البنيوي.")
-        except Exception as e:
-            logger.warning(f"تعذر إتمام فحص الفيروسات الخارجي للملف {staging_path.name}: {e}")
+    # 2. فحص بمحرك مكافحة الفيروسات المحلي الصارم (Fail-Closed Antivirus Policy)
+    engine = _find_antivirus_engine()
+    if not engine:
+        raise ValidationError(
+            "محرك مكافحة الفيروسات المحلي غير متاح؛ تم رفض الملف دون تثبيته.",
+            code=ErrorCode.ANTIVIRUS_UNAVAILABLE,
+            status_code=503
+        )
+
+    name = Path(engine).name.lower()
+    if 'mpcmdrun' in name:
+        command = [engine, '-Scan', '-ScanType', '3', '-File', str(staging_path), '-DisableRemediation']
+        threat_code = 2
+    elif 'clam' in name:
+        command = [engine, '--no-summary', str(staging_path)]
+        threat_code = 1
+    else:
+        raise ValidationError(
+            "محرك الفحص الأمني غير معروف؛ تم رفض الملف.",
+            code=ErrorCode.ANTIVIRUS_SCAN_FAILED,
+            status_code=503
+        )
+
+    try:
+        proc = subprocess.run(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            timeout=60,
+            check=False,
+            **_hidden_subprocess_options()
+        )
+    except Exception:
+        logger.warning("فشل محرك مكافحة الفيروسات؛ تم رفض الملف دون تثبيته.")
+        raise ValidationError(
+            "تعذر إكمال الفحص الأمني المحلي؛ تم رفض الملف. حاول مجدداً بعد التحقق من محرك الحماية.",
+            code=ErrorCode.ANTIVIRUS_SCAN_FAILED,
+            status_code=503
+        )
+
+    if proc.returncode == threat_code:
+        log_operational_event(
+            level=logging.ERROR,
+            message=f"رفض ملف بواسطة محرك مكافحة الفيروسات المحلي: {staging_path.name}",
+            component="antivirus_scanner",
+            error_code=ErrorCode.FILE_MALICIOUS
+        )
+        from app.services import audit_service
+        audit_service.record_event(
+            action="upload.malware_rejected",
+            category="security",
+            success=False,
+            failure_reason_code=ErrorCode.FILE_MALICIOUS
+        )
+        raise ValidationError(
+            "رصد محرك الحماية تهديداً أو نتيجة غير آمنة؛ تم رفض الملف.",
+            code=ErrorCode.FILE_MALICIOUS,
+            status_code=400
+        )
+
+    output = proc.stdout.decode('utf-8', errors='replace') if isinstance(proc.stdout, bytes) else (proc.stdout or '')
+    clean = (('scan finished.' in output.lower() or 'no threats found' in output.lower())
+             if ('mpcmdrun' in name) else ((str(staging_path) + ': OK') in [line.strip() for line in output.splitlines()]))
+
+    if proc.returncode != 0 or not clean:
+        raise ValidationError(
+            "لم يؤكد محرك الحماية نتيجة فحص سليمة؛ تم رفض الملف دون تثبيته.",
+            code=ErrorCode.ANTIVIRUS_SCAN_FAILED,
+            status_code=503
+        )
+
+    return 'SCAN_CLEAN'
 
 
 def _inspect_file_structure(staging_path: Path, ext: str) -> str:
@@ -574,12 +591,12 @@ def _inspect_txt(path: Path) -> str:
 
 def finalize_validated_upload(
     validation_result: Dict[str, Any],
-    target_dir: Optional[Path] = None
+    target_dir: Optional[Any] = None
 ) -> Dict[str, Any]:
     """
     نقل الملف المدقق ذرياً من Staging إلى مجلد التخزين النهائي وتوليد السجل المعتمد.
     """
-    target_dir = target_dir or storage_service.get_finalized_upload_dir()
+    target_dir = Path(target_dir) if target_dir else storage_service.get_finalized_upload_dir()
     staging_path = Path(validation_result['staging_path'])
 
     if not staging_path.exists():

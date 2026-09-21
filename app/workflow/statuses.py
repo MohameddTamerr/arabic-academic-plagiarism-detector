@@ -74,6 +74,7 @@ VALID_SCAN_TRANSITIONS: dict[str, Set[str]] = {
 
 VALID_REVIEW_TRANSITIONS: dict[str, Set[str]] = {
     ReviewStatus.PENDING_REVIEW.value: {
+        ReviewStatus.FINAL_ACCEPTED.value,
         ReviewStatus.PRELIMINARY_ACCEPTED.value,
         ReviewStatus.REJECTED.value,
         ReviewStatus.PENDING_REVIEW.value  # إعادة إرسال بملاحظات

@@ -168,7 +168,7 @@ def test_academic_review_workflow_events(client):
         overall_pct=12.0,
         copied_pct=8.0,
         para_pct=4.0,
-        report_dict={'title': 'بحث قيد التحكيم للتدقيق'},
+        report_dict={'title': 'بحث قيد التحكيم للتدقيق', 'segments': [{'text': 'محتوى أكاديمي تجريبي محفوظ لاختبار سجل القبول النهائي'}]},
         author='باحث تجريبي'
     )
     _login_as(client, 'employee', 'employee_audit_1')

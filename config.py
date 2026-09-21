@@ -31,7 +31,12 @@ _RAW_LOCALAPPDATA = os.environ.get('LOCALAPPDATA', _RAW_APPDATA)
 LIVE_DEFAULT_SQLITE_PATH = (Path(_RAW_APPDATA) / 'ArabicPlagiarismDetector' / 'papers.db').resolve()
 LIVE_SINGLE_EXE_SQLITE_PATH = (Path(_RAW_LOCALAPPDATA) / 'ArabicAcademicPlagiarismSystem' / 'Data' / 'Database' / 'papers.db').resolve()
 
-if SINGLE_EXE_MODE:
+CURRENT_DEPLOYMENT_MODE = SINGLE_EXE_MODE or (
+    not PORTABLE_MODE and os.environ.get('TESTING') != '1'
+    and 'APPDATA_OVERRIDE' not in os.environ
+)
+
+if CURRENT_DEPLOYMENT_MODE:
     DATA_ROOT = Path(os.environ.get('ARABIC_APP_DATA_DIR', Path(_RAW_LOCALAPPDATA) / 'ArabicAcademicPlagiarismSystem' / 'Data')).resolve()
     APPDATA_DIR = DATA_ROOT
     DATABASE_DIR = Path(os.environ.get('DATABASE_DIR', DATA_ROOT / 'Database'))
@@ -176,8 +181,11 @@ DEFAULT_SETTINGS = {
     'citation_filter_mode': 'refined',          # كاشف الاستشهاد: 'refined' (RC2) أو 'baseline' (RC1)
 }
 
-# مسار ملف إعدادات المستخدم إن وُجد
-SETTINGS_FILE = APPDATA_DIR / 'academic_settings.json'
+# Keep an existing current-root settings file authoritative for compatibility.
+# Never import settings from another deployment's data root.
+_EXISTING_ROOT_SETTINGS = APPDATA_DIR / 'academic_settings.json'
+if _EXISTING_ROOT_SETTINGS.exists():
+    SETTINGS_FILE = _EXISTING_ROOT_SETTINGS
 
 # ─── إعدادات الأمان وتدقيق المدخلات (Phase 13: Upload & Ingestion Security Limits) ───
 ALLOWED_EXTENSIONS = {'.pdf', '.docx', '.txt'}
@@ -243,6 +251,5 @@ AUTH_COOKIE_SAMESITE = os.environ.get('AUTH_COOKIE_SAMESITE', 'Lax')
 AUTH_COOKIE_SECURE = os.environ.get('AUTH_COOKIE_SECURE', 'false').lower() in ('true', '1', 'yes')
 AUTH_CSRF_ENABLED = os.environ.get('AUTH_CSRF_ENABLED', 'true').lower() in ('true', '1', 'yes')
 APP_ENV = 'production' if PRODUCTION_MODE else os.environ.get('APP_ENV', 'development')
-
 
 

@@ -1,0 +1,475 @@
+{
+  "visibleCount": 1,
+  "viewDiagnostics": [
+    {
+      "id": "view-dashboard",
+      "exists": true,
+      "display": "block",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section active",
+      "boundingRectangle": {
+        "top": 86,
+        "left": 26,
+        "width": 1608,
+        "height": 832.03125
+      },
+      "isActiveClass": true,
+      "isVisible": true
+    },
+    {
+      "id": "view-upload",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-initial-review",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-preliminary",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-rejected",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-reports",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-database",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-users",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section admin-only",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-theses",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-thesis-detail",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-combined-report",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-settings",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-audit",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section admin-only",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-help",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": true,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-system-health",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": false,
+      "classes": "view-section",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-stats-dashboard",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": false,
+      "classes": "view-section admin-only",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    },
+    {
+      "id": "view-common-phrases",
+      "exists": true,
+      "display": "none",
+      "visibility": "visible",
+      "position": "static",
+      "insideMain": false,
+      "classes": "view-section admin-only",
+      "boundingRectangle": {
+        "top": 0,
+        "left": 0,
+        "width": 0,
+        "height": 0
+      },
+      "isActiveClass": false,
+      "isVisible": false
+    }
+  ],
+  "strayElements": [
+    {
+      "id": "hover-popover",
+      "display": "block",
+      "position": "static",
+      "rect": {
+        "top": 721,
+        "left": 0,
+        "width": 1920,
+        "height": 104
+      },
+      "insideMain": false,
+      "parentTag": "BODY"
+    },
+    {
+      "id": "arabic-datepicker-popover",
+      "display": "block",
+      "position": "static",
+      "rect": {
+        "top": 825,
+        "left": 0,
+        "width": 1920,
+        "height": 255
+      },
+      "insideMain": false,
+      "parentTag": "BODY"
+    }
+  ],
+  "bodyChildrenCount": 30,
+  "bodyChildren": [
+    {
+      "tag": "HEADER",
+      "id": "",
+      "className": "topbar"
+    },
+    {
+      "tag": "DIV",
+      "id": "",
+      "className": "app-container"
+    },
+    {
+      "tag": "SECTION",
+      "id": "view-system-health",
+      "className": "view-section"
+    },
+    {
+      "tag": "SECTION",
+      "id": "view-stats-dashboard",
+      "className": "view-section admin-only"
+    },
+    {
+      "tag": "SECTION",
+      "id": "view-common-phrases",
+      "className": "view-section admin-only"
+    },
+    {
+      "tag": "DIV",
+      "id": "hover-popover",
+      "className": "hover-popover"
+    },
+    {
+      "tag": "DIV",
+      "id": "submit-admin-modal",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "audit-detail-modal",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "add-modal",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "edit-paper-modal",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "toast-container",
+      "className": "toast-container"
+    },
+    {
+      "tag": "DIV",
+      "id": "custom-confirm-modal",
+      "className": "confirm-modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "login-screen",
+      "className": "login-screen-wrapper"
+    },
+    {
+      "tag": "DIV",
+      "id": "first-login-overlay",
+      "className": "first-login-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "forgot-password-modal",
+      "className": ""
+    },
+    {
+      "tag": "SCRIPT",
+      "id": "",
+      "className": ""
+    },
+    {
+      "tag": "DIV",
+      "id": "arabic-datepicker-popover",
+      "className": "arabic-datepicker-popover"
+    },
+    {
+      "tag": "DIV",
+      "id": "scan-notification-toast",
+      "className": ""
+    },
+    {
+      "tag": "STYLE",
+      "id": "",
+      "className": ""
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-create-user",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-edit-user",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-reset-password",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-recovery-mgmt",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-create-thesis",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-add-thesis-part",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "DIV",
+      "id": "modal-edit-thesis-part",
+      "className": "modal-overlay"
+    },
+    {
+      "tag": "SCRIPT",
+      "id": "",
+      "className": ""
+    },
+    {
+      "tag": "DIV",
+      "id": "internal-pdf-modal",
+      "className": ""
+    },
+    {
+      "tag": "SCRIPT",
+      "id": "",
+      "className": ""
+    },
+    {
+      "tag": "SCRIPT",
+      "id": "",
+      "className": ""
+    }
+  ]
+}

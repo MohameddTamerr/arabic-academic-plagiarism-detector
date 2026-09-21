@@ -125,7 +125,7 @@ def test_academic_review_workflow_progression(client):
         overall_pct=12.0,
         copied_pct=8.0,
         para_pct=4.0,
-        report_dict={'title': 'بحث مسار التحكيم الكامل'},
+        report_dict={'title': 'بحث مسار التحكيم الكامل', 'segments': [{'text': 'محتوى البحث الأكاديمي للتحكيم النهائي وحفظ المصدر المرجعي'}]},
         scan_status=ScanStatus.COMPLETED.value,
         review_status=ReviewStatus.PENDING_REVIEW.value
     )

@@ -107,4 +107,5 @@ class ErrorCode:
 
     # أخطاء الخادم العامة (General System Errors)
     INTERNAL_ERROR = "INTERNAL_ERROR"
-
+    ANTIVIRUS_UNAVAILABLE = "ANTIVIRUS_UNAVAILABLE"
+    ANTIVIRUS_SCAN_FAILED = "ANTIVIRUS_SCAN_FAILED"

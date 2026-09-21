@@ -1,0 +1,83 @@
+{
+  "1_DB_INTEGRITY_AND_SYSADMIN": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:55.545598+00:00",
+    "details": {
+      "summary": "Authoritative DB intact, quick_check & integrity_check OK, SYSADMIN Tamer Darwish active",
+      "db_path": "C:\\Users\\user\\AppData\\Local\\ArabicAcademicPlagiarismSystem\\Data\\Database\\papers.db",
+      "user_count": 4,
+      "sysadmin_count": 1,
+      "research_count": 11,
+      "reports_count": 7,
+      "reference_documents_count": 4,
+      "theses_count": 0,
+      "audit_count": 970
+    }
+  },
+  "2_PACKAGED_EXE_INSPECTION": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:55.860680+00:00",
+    "details": {
+      "summary": "Single EXE verified: x64 PE32+, Windows GUI subsystem (2), zero console popup",
+      "file_name": "Arabic-Plagiarism-System.exe",
+      "size_bytes": 292123420,
+      "size_mb": 278.59,
+      "sha256": "8d000483de7c4104ece76143834caeb22853764343a502e524f26793ea8cb3bc",
+      "pe_machine": "0x8664 (x64 AMD64)",
+      "pe_subsystem": "2 (IMAGE_SUBSYSTEM_WINDOWS_GUI)"
+    }
+  },
+  "3_ANTIVIRUS_CONTRACT": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:55.924186+00:00",
+    "details": {
+      "summary": "Fail-closed AV contract verified: Disguised binaries blocked, local engine scanned",
+      "engine_discovered": "C:\\Program Files\\Windows Defender\\MpCmdRun.exe",
+      "disguise_blocked": true,
+      "clean_scan_result": "CLEAN_PROMOTED"
+    }
+  },
+  "4_ARABIC_DIGITAL_AND_OCR": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:56.287581+00:00",
+    "details": {
+      "summary": "Digital Arabic extraction verified non-empty, Arabic (ara) and English (eng) tessdata bundled & detected",
+      "digital_extracted_chars": 86,
+      "ocr_available": true,
+      "ocr_has_arabic": true,
+      "ara_traineddata_bytes": 12603724,
+      "eng_traineddata_bytes": 15400601
+    }
+  },
+  "5_RBAC_AND_THESIS_WEIGHTED_MATH": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:56.472921+00:00",
+    "details": {
+      "summary": "Employee negative RBAC verified (all forbidden actions returned 403), weighted thesis calculation verified != arithmetic average",
+      "disposable_employee": "emp_rc_f6547d",
+      "part1_words": 280,
+      "part2_words": 450,
+      "part1_sim_pct": 10.0,
+      "part2_sim_pct": 20.0,
+      "weighted_result_pct": 16.16,
+      "arithmetic_avg_pct": 15.0,
+      "rbac_test_results": {
+        "final_accept_status": 403,
+        "reject_status": 403,
+        "users_manage_status": 403,
+        "audit_logs_status": 403
+      }
+    }
+  },
+  "6_DB_HEALTH_AND_WAL": {
+    "status": "PASS",
+    "timestamp": "2026-09-17T14:04:56.479493+00:00",
+    "details": {
+      "summary": "Database health metrics reported, WAL mode verified, table count and size verified",
+      "health_status": "healthy",
+      "journal_mode": "wal",
+      "db_size_mb": null,
+      "schema_version": "1.0.0"
+    }
+  }
+}

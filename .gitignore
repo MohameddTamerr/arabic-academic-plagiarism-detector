@@ -38,6 +38,8 @@ database/
 logs/
 Logs/
 *.log
+*_run_log.txt
+*run_log.txt
 Diagnostics/
 diagnostics/
 

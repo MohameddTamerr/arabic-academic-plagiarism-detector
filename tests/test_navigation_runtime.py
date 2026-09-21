@@ -41,7 +41,8 @@ const ctx = { currentUser:{role:'system_admin'}, sessionStorage:{setItem(){}},
  querySelectorAll:s=>s==='.view-section'?views:navs}};
 for(const name of ['loadReportList','loadInitialReviewsQueue','loadPreliminaryPapers','loadRejectedPapers',
  'loadDatabasePapers','loadDashboardStats','loadUsersList','loadUserStats','loadThesesList','loadAuditLogs',
- 'loadSystemHealth','startSystemHealthTimer','stopSystemHealthTimer']) ctx[name]=()=>{};
+ 'loadSystemHealth','startSystemHealthTimer','stopSystemHealthTimer','loadBackupsList',
+ 'loadSystemSettings','loadSystemDiagnostics']) ctx[name]=()=>{};
 vm.createContext(ctx); vm.runInContext(input.roles+input.controller,ctx);
 for (const name of names.slice(0,7)) {
  ctx.switchView(name);
@@ -62,7 +63,7 @@ console.log('navigation controller passed');
     result = subprocess.run([node, str(js), str(payload)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
     assert '.view-section:not(.active), .view-section[hidden]' in html
-    assert "querySelectorAll('.admin-only')" not in html
+    assert "el.hidden = !selected;" in controller
 
 
 @pytest.mark.parametrize('role', ['system_admin', 'employee'])

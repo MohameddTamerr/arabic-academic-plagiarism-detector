@@ -31,13 +31,23 @@ def format_reference_number(prefix: str, year: int, sequence_value: int) -> str:
     return f"{clean_prefix}-{year}-{sequence_value:06d}"
 
 
-def get_next_sequence_value(namespace: str, year: int) -> int:
+def get_next_sequence_value(namespace: str, year: int, session=None) -> int:
     """
     توليد وتحديث القيمة التسلسلية ذرياً عبر معاملات قاعدة البيانات (Cross-Process Atomic Sequence):
     - يعتمد على عبارة UPDATE ذرية مباشرة في SQL لمنع أي سباق بين العمليات المتزامنة (Zero Lost Increments).
     - يضمن الأمان التام عبر العمليات المتعددة (Multi-Process Safety) في SQLite و PostgreSQL.
     """
     from app.repositories.base_repo import get_session, get_backend_type
+    if session is not None:
+        result = session.execute(text("""
+            INSERT INTO reference_sequences (namespace, year, last_value, updated_at)
+            VALUES (:ns, :yr, 1, CURRENT_TIMESTAMP)
+            ON CONFLICT (namespace, year) DO UPDATE
+            SET last_value = reference_sequences.last_value + 1,
+                updated_at = CURRENT_TIMESTAMP
+            RETURNING last_value
+        """), {'ns': namespace, 'yr': year})
+        return int(result.scalar_one())
     with get_session() as session:
         # 1. ضمان وجود سجل التسلسل أولاً
         exists = session.query(ReferenceSequence).filter(
@@ -166,4 +176,3 @@ def get_next_backup_reference(year: Optional[int] = None, prefix: str = 'BKP') -
         ref_number = format_reference_number(prefix, year, next_val)
         logger.info(f"تم توليد وحجز رقم نسخة احتياطية جديد: {ref_number}")
         return ref_number
-

@@ -70,8 +70,8 @@ def test_rbac_permission_matrix_authoritative():
     assert role_has_permission(Role.SYSTEM_ADMIN, Permission.AUDIT_VIEW) is True
     assert role_has_permission(Role.SYSTEM_ADMIN, Permission.USER_PASSWORD_ADMIN_RESET) is True
     assert role_has_permission(Role.SYSTEM_ADMIN, Permission.REVIEW_VIEW) is True
-    assert role_has_permission(Role.SYSTEM_ADMIN, Permission.REVIEW_PRELIMINARY) is False
-    assert role_has_permission(Role.SYSTEM_ADMIN, Permission.REVIEW_FINAL) is False
+    assert role_has_permission(Role.SYSTEM_ADMIN, Permission.REVIEW_PRELIMINARY) is True
+    assert role_has_permission(Role.SYSTEM_ADMIN, Permission.REVIEW_FINAL) is True
 
 
 def test_sysadmin_user_management_lifecycle(client):
@@ -179,7 +179,7 @@ def test_employee_403_restrictions(client):
         overall_pct=15.0,
         copied_pct=10.0,
         para_pct=5.0,
-        report_dict={'segments': [], 'summary': 'test'},
+        report_dict={'segments': [{'text': 'محتوى أكاديمي محفوظ صالح للإضافة إلى قاعدة المراجع المؤسسية'}], 'summary': 'test'},
         category="قسم الحاسب",
         author="د. أحمد كمال",
         scan_status="completed",
@@ -257,7 +257,7 @@ def test_reviewer_vs_senior_reviewer_separation(client):
         overall_pct=8.0,
         copied_pct=5.0,
         para_pct=3.0,
-        report_dict={'segments': [], 'summary': 'test'},
+        report_dict={'segments': [{'text': 'محتوى أكاديمي محفوظ صالح للإضافة إلى قاعدة المراجع المؤسسية'}], 'summary': 'test'},
         category="قسم الرياضيات",
         author="د. خليل إبراهيم",
         scan_status="completed",
@@ -317,7 +317,7 @@ def test_self_review_forbidden_protection(client):
         overall_pct=12.0,
         copied_pct=8.0,
         para_pct=4.0,
-        report_dict={'segments': [], 'summary': 'test'},
+        report_dict={'segments': [{'text': 'محتوى أكاديمي محفوظ صالح للإضافة إلى قاعدة المراجع المؤسسية'}], 'summary': 'test'},
         category="قسم العلوم",
         author="د. حسام",
         submitted_by=sub_username,

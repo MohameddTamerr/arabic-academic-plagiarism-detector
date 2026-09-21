@@ -35,6 +35,7 @@ from app.routes.recovery_routes import recovery_bp
 from app.routes.user_routes import user_bp
 from app.routes.thesis_routes import thesis_bp
 from app.routes.common_phrases_routes import common_phrases_bp
+from app.routes.pdf_routes import pdf_bp
 
 
 def create_app() -> Flask:
@@ -95,6 +96,7 @@ def create_app() -> Flask:
     app.register_blueprint(user_bp)
     app.register_blueprint(thesis_bp)
     app.register_blueprint(common_phrases_bp)
+    app.register_blueprint(pdf_bp)
 
     @app.route('/')
     def index():

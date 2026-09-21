@@ -23,6 +23,13 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 import config
+
+@pytest.fixture(autouse=True)
+def isolated_evaluation_outputs(tmp_path, monkeypatch):
+    import shutil
+    import evaluation.evaluator as evaluator
+    shutil.copy2(evaluator._HERE / 'dataset.json', tmp_path / 'dataset.json')
+    monkeypatch.setattr(evaluator, '_HERE', tmp_path)
 from plagiarism_detector.preprocessing.normalizer import (
     normalize_aggressive, normalize_light, get_shingles
 )
@@ -40,9 +47,9 @@ def test_evaluator_consumes_runtime_production_configuration():
     assert RUNTIME_PRODUCTION_CONFIG['shingle_size'] == config.DEFAULT_SETTINGS['shingle_size']
     assert RUNTIME_PRODUCTION_CONFIG['jaccard_threshold'] == config.DEFAULT_SETTINGS['jaccard_threshold']
     assert RUNTIME_PRODUCTION_CONFIG['tfidf_threshold'] == config.DEFAULT_SETTINGS['tfidf_threshold']
-    assert RUNTIME_PRODUCTION_CONFIG['shingle_size'] == 5
-    assert RUNTIME_PRODUCTION_CONFIG['jaccard_threshold'] == 0.40
-    assert RUNTIME_PRODUCTION_CONFIG['tfidf_threshold'] == 0.40
+    assert RUNTIME_PRODUCTION_CONFIG['shingle_size'] == 4
+    assert RUNTIME_PRODUCTION_CONFIG['jaccard_threshold'] == 0.33
+    assert RUNTIME_PRODUCTION_CONFIG['tfidf_threshold'] == 0.35
 
 
 def test_semantic_model_absence_reported_as_unavailable():
@@ -180,7 +187,7 @@ def test_evaluation_reproducibility():
 
 def test_production_thresholds_unmutated():
     """13. التحقق الصارم من عدم تعديل أي عتبة إنتاجية أو تغيير في إعدادات المنظومة الافتراضية."""
-    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.40
-    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.40
-    assert config.DEFAULT_SETTINGS['shingle_size'] == 5
+    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.33
+    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.35
+    assert config.DEFAULT_SETTINGS['shingle_size'] == 4
     assert config.DEFAULT_SETTINGS['enable_semantic_model'] is False

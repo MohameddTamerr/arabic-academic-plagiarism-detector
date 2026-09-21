@@ -1,0 +1,291 @@
+[
+  {
+    "id": "view-dashboard",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-upload",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-initial-review",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-preliminary",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-rejected",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-reports",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-database",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-users",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section admin-only",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-theses",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-thesis-detail",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-combined-report",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-settings",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-audit",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section admin-only",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-help",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-system-health",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-stats-dashboard",
+    "exists": true,
+    "display": "none",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section admin-only",
+    "boundingRectangle": {
+      "top": 0,
+      "left": 0,
+      "width": 0,
+      "height": 0
+    },
+    "isActiveClass": false,
+    "isVisible": false
+  },
+  {
+    "id": "view-common-phrases",
+    "exists": true,
+    "display": "block",
+    "visibility": "visible",
+    "position": "static",
+    "insideMain": true,
+    "classes": "view-section admin-only active",
+    "boundingRectangle": {
+      "top": 80,
+      "left": 20,
+      "width": 1066,
+      "height": 372.140625
+    },
+    "isActiveClass": true,
+    "isVisible": true
+  }
+]

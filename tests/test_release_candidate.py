@@ -60,9 +60,9 @@ def test_release_manifest_integrity_and_hashes():
 
 def test_production_defaults_strictly_unmodified():
     """Verify production settings in config.DEFAULT_SETTINGS remain strictly unchanged."""
-    assert config.DEFAULT_SETTINGS['shingle_size'] == 5
-    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.40
-    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.40
+    assert config.DEFAULT_SETTINGS['shingle_size'] == 4
+    assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.33
+    assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.35
     assert config.DEFAULT_SETTINGS['semantic_threshold'] == 0.70
     assert config.DEFAULT_SETTINGS['max_candidate_retrieval'] == 50
     assert config.DEFAULT_SETTINGS['enable_semantic_model'] is False

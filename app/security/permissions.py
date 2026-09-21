@@ -244,6 +244,13 @@ ROLE_PERMISSIONS: Dict[str, Set[str]] = {
         Permission.THESIS_REPORT_VIEW,
     },
     Role.SYSTEM_ADMIN: {
+        Permission.REVIEW_PRELIMINARY,
+        Permission.REVIEW_REJECT,
+        Permission.REVIEW_FINAL,
+        Permission.RESEARCH_EDIT_METADATA,
+        Permission.SCAN_RETRY,
+        Permission.BATCH_RETRY,
+        Permission.THESIS_REPORT_FINALIZE,
         Permission.SCAN_START,
         Permission.RESEARCH_UPLOAD,
         Permission.RESEARCH_VIEW,
@@ -337,8 +344,7 @@ def has_permission(role_str: str, permission_str: str) -> bool:
     """Check if a string role has a given permission."""
     try:
         role = normalize_role(role_str)
-        perm = Permission(permission_str) if isinstance(permission_str, str) else permission_str
-        return role_has_permission(role, perm)
+        return role_has_permission(role, permission_str)
     except Exception:
         return False
 
@@ -352,4 +358,4 @@ def get_user_permissions(user_dict_or_obj: Any) -> List[str]:
         role = user_dict_or_obj.get('role', '')
     else:
         role = getattr(user_dict_or_obj, 'role', '')
-    return sorted(list(get_role_permissions(role)))
+    return sorted(list(get_role_permissions(normalize_role(role))))

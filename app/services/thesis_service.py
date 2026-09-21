@@ -21,6 +21,7 @@ from app.models.schema import LegacyReport, Document
 from app.services import audit_service, job_queue_service, report_integrity_service
 from app.services.job_queue_service import JobType
 from plagiarism_detector.reporting.report_builder import analyze_academic_document
+from app.services.self_match_service import reference_ids_for_work
 from plagiarism_detector.extraction.page_extractor import extract_document_pages
 from plagiarism_detector.reporting.page_allowance import compute_source_allowance
 from app.services.settings_service import get_current_settings
@@ -127,6 +128,7 @@ def _execute_part_scan(task_id: str, part_id: int):
             pages_data=pages_data,
             settings_override=settings,
             exact_reference_match=exact_reference_match,
+            excluded_doc_ids=reference_ids_for_work(thesis_id=part['thesis_id']),
         )
 
         report_repo.update_scan_job(task_id, status='running', progress=90, stage='جاري حفظ نتائج التقرير الفردي...')
@@ -284,7 +286,8 @@ def generate_combined_thesis_report(
             'cited_words': p_cited,
             'problematic_words': p_prob,
             'overall_pct': rep.get('overall_pct', 0.0),
-            'problematic_pct': rep.get('problematic_pct', 0.0)
+            'problematic_pct': rep.get('problematic_pct', 0.0),
+            'settings_used': rep.get('settings_snapshot', {})
         })
 
         input_manifest.append({
@@ -420,7 +423,9 @@ def generate_combined_thesis_report(
         'application_version': versioning.APPLICATION_VERSION,
         'engine_version': versioning.ENGINE_VERSION,
         'detector_version': versioning.DETECTOR_VERSION,
-        'settings_snapshot': dict(settings)
+        'settings_snapshot': dict(settings),
+        'part_settings_snapshots': [{'part_id': p['part_id'], 'report_id': p['report_id'], 'settings_used': p['settings_used']} for p in part_summaries],
+        'combined_settings_scope': 'page_allowance_aggregation_only'
     }
 
     # حفظ التقرير المجمع

@@ -226,6 +226,9 @@ def update_user(user_id):
     if not target_user:
         return jsonify({'error': 'المستخدم غير موجود', 'code': ErrorCode.USER_NOT_FOUND}), 404
 
+    if normalize_role(target_user.get('role')) == Role.SYSTEM_ADMIN:
+        return jsonify(error='حساب مدير النظام محفوظ؛ لا يمكن تغييره من إدارة الموظفين', code=ErrorCode.AUTH_FORBIDDEN), 403
+
     actor = get_authenticated_user()
     actor_role = actor.get('role') if actor else 'employee'
 
@@ -301,6 +304,9 @@ def toggle_user_status(user_id):
     if not target_user:
         return jsonify({'error': 'المستخدم غير موجود', 'code': ErrorCode.USER_NOT_FOUND}), 404
 
+    if normalize_role(target_user.get('role')) == Role.SYSTEM_ADMIN:
+        return jsonify(error='حساب مدير النظام محفوظ؛ لا يمكن تغييره من إدارة الموظفين', code=ErrorCode.AUTH_FORBIDDEN), 403
+
     data = request.get_json(silent=True) or request.form or {}
     if 'is_active' in data:
         new_active = 1 if data['is_active'] in (1, '1', True, 'true') else 0
@@ -340,6 +346,9 @@ def admin_reset_password(user_id):
     if not target_user:
         return jsonify({'error': 'المستخدم غير موجود', 'code': ErrorCode.USER_NOT_FOUND}), 404
 
+    if normalize_role(target_user.get('role')) == Role.SYSTEM_ADMIN:
+        return jsonify(error='حساب مدير النظام محفوظ؛ لا يمكن تغييره من إدارة الموظفين', code=ErrorCode.AUTH_FORBIDDEN), 403
+
     actor = get_authenticated_user()
     success, msg = user_repo.admin_reset_user_password(user_id, new_password)
     if not success:
@@ -367,6 +376,9 @@ def revoke_user_recovery(user_id):
     if not target_user:
         return jsonify({'error': 'المستخدم غير موجود', 'code': ErrorCode.USER_NOT_FOUND}), 404
 
+    if normalize_role(target_user.get('role')) == Role.SYSTEM_ADMIN:
+        return jsonify(error='حساب مدير النظام محفوظ؛ لا يمكن تغييره من إدارة الموظفين', code=ErrorCode.AUTH_FORBIDDEN), 403
+
     actor = get_authenticated_user()
     success, msg = recovery_service.revoke_recovery_credential(user_id, actor_user=actor)
     if not success:
@@ -392,6 +404,9 @@ def require_user_recovery_reenroll(user_id):
     target_user = user_repo.get_user_by_id(user_id)
     if not target_user:
         return jsonify({'error': 'المستخدم غير موجود', 'code': ErrorCode.USER_NOT_FOUND}), 404
+
+    if normalize_role(target_user.get('role')) == Role.SYSTEM_ADMIN:
+        return jsonify(error='حساب مدير النظام محفوظ؛ لا يمكن تغييره من إدارة الموظفين', code=ErrorCode.AUTH_FORBIDDEN), 403
 
     actor = get_authenticated_user()
     # إلغاء البطاقة إن وجدت

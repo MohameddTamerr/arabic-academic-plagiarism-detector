@@ -1,0 +1,73 @@
+{
+  "manifest_version": "1.0.0",
+  "release_candidate_id": "v1.0.0-rc",
+  "product_name": "Arabic Academic Plagiarism Detector (منظومة كشف الاستلال العلمي والأمانة الأكاديمية)",
+  "source_commit": "fbfd6538b8137ba936fe26b528b1bb711e74bebb",
+  "git_branch": "release/v1-final-rc",
+  "build_date": "2026-09-17T17:00:00Z",
+  "authoritative_data_root": "%LOCALAPPDATA%\\ArabicAcademicPlagiarismSystem\\Data",
+  "database_name": "papers.db",
+  "database_engine": "SQLite 3 (WAL mode)",
+  "wsgi_server": "Waitress v3.0.2 (Production Embedded)",
+  "max_concurrent_scans": 2,
+  "offline_architecture": "100% Local / Zero CDN / Zero Cloud Dependencies",
+  "artifacts": [
+    {
+      "name": "Arabic-Plagiarism-System.exe",
+      "target_platform": "Windows 10 / Windows 11 x64",
+      "platform_category": "windows-modern",
+      "relative_path": "windows-modern/Arabic-Plagiarism-System.exe",
+      "architecture": "x86_64 (AMD64 PE32+)",
+      "subsystem": "Windows GUI (No Console)",
+      "size_bytes": 292123420,
+      "size_mb": 278.59,
+      "sha256": "8d000483de7c4104ece76143834caeb22853764343a502e524f26793ea8cb3bc",
+      "python_runtime": "3.13.2 x64",
+      "packager": "PyInstaller 6.19.0",
+      "runtime_status": "VERIFIED (Passed full regression and live execution)",
+      "bundled_ocr_models": [
+        "ara.traineddata",
+        "eng.traineddata"
+      ],
+      "antivirus_adapter": "Windows Defender (MpCmdRun.exe) Fail-Closed",
+      "offline_pdf_viewer": "Bundled PDF.js (Local Canvas)"
+    },
+    {
+      "name": "Arabic-Plagiarism-System-Win7-SP1.exe",
+      "target_platform": "Windows 7 SP1 x64",
+      "platform_category": "windows-legacy",
+      "relative_path": "windows-legacy/win7-sp1-x64/",
+      "architecture": "x86_64",
+      "subsystem": "Windows GUI",
+      "runtime_status": "REQUIRES SEPARATE BUILD (Audited toolchain: Python 3.8.10 x64 + PyInstaller compatible)",
+      "antivirus_adapter": "ClamAV / Legacy Defender Fail-Closed"
+    },
+    {
+      "name": "Arabic-Plagiarism-System-Win8.exe",
+      "target_platform": "Windows 8 / 8.1 x64",
+      "platform_category": "windows-legacy",
+      "relative_path": "windows-legacy/win8-x64/",
+      "architecture": "x86_64",
+      "subsystem": "Windows GUI",
+      "runtime_status": "REQUIRES SEPARATE BUILD (Audited toolchain: Python 3.8.10 x64 + PyInstaller compatible)",
+      "antivirus_adapter": "Windows Defender / ClamAV Fail-Closed"
+    },
+    {
+      "name": "arabic-plagiarism-detector-linux-x64.tar.gz",
+      "target_platform": "Linux x64 (Ubuntu / Debian / RHEL / AlmaLinux)",
+      "platform_category": "linux-x64",
+      "relative_path": "linux-x64/",
+      "architecture": "x86_64 ELF",
+      "subsystem": "Systemd Service / CLI Daemon",
+      "runtime_status": "COMPATIBLE BY INSPECTION — NOT MEASURED (Requires Linux native execution environment)",
+      "antivirus_adapter": "ClamAV (clamscan / clamdscan) Fail-Closed"
+    }
+  ],
+  "authoritative_sysadmin": {
+    "user_id": 1,
+    "username": "Tamer Darwish",
+    "full_name": "Dr.Tamer Mohamed Darwish",
+    "role": "system_admin",
+    "status": "Active (Preserved)"
+  }
+}

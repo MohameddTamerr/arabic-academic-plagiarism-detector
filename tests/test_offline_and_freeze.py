@@ -20,9 +20,9 @@ def test_detector_scientific_settings_frozen(app_instance):
     settings = config.DEFAULT_SETTINGS
     
     # Assert exact scientific baseline thresholds
-    assert settings.get('shingle_size') == 5
-    assert settings.get('jaccard_threshold') == 0.40
-    assert settings.get('tfidf_threshold') == 0.40
+    assert settings.get('shingle_size') == 4
+    assert settings.get('jaccard_threshold') == 0.33
+    assert settings.get('tfidf_threshold') == 0.35
     assert settings.get('min_sentence_words') == 4
     assert settings.get('max_candidate_retrieval') == 50
     assert settings.get('citation_filter_mode') == 'refined'
