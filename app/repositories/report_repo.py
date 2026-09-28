@@ -10,7 +10,7 @@ import json
 import logging
 from datetime import datetime
 from typing import Optional, Tuple
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, or_
 
 from app.repositories.base_repo import get_session
 from app.models.schema import LegacyReport, ScanJob, Match
@@ -18,6 +18,7 @@ from app.workflow.statuses import (
     ScanStatus, ReviewStatus, SCAN_STATUS_LABELS_AR, REVIEW_STATUS_LABELS_AR,
     derive_legacy_status, map_legacy_status
 )
+from plagiarism_detector.preprocessing.normalizer import normalize_light
 
 logger = logging.getLogger(__name__)
 
@@ -160,12 +161,65 @@ def get_report(report_id: str) -> Optional[dict]:
             data['research_id'] = res.id
         elif not data.get('reference_number'):
             data['reference_number'] = data.get('research_reference_number', '')
+        if res:
+            data['batch_id'] = res.batch_id or data.get('batch_id')
 
         # جلب لقطة تشغيل ومعايير الفحص الأكاديمي (Snapshot)
         from app.services import snapshot_service
         data['snapshot'] = snapshot_service.get_report_snapshot(report_id)
 
         return data
+
+
+def get_review_history_segments(review_statuses: tuple[str, ...]) -> list[dict]:
+    """Return submitted passages from completed reviewed reports.
+
+    These reports are intentionally kept outside the authoritative reference
+    corpus.  Callers decide whether a status contributes to the official
+    similarity score (preliminary) or to a separate resubmission signal
+    (rejected).
+    """
+    statuses = tuple(status for status in review_statuses if status)
+    if not statuses:
+        return []
+
+    with get_session() as session:
+        reports = (
+            session.query(LegacyReport)
+            .filter(
+                LegacyReport.scan_status == 'completed',
+                LegacyReport.review_status.in_(statuses),
+                or_(LegacyReport.artifact_status.is_(None), LegacyReport.artifact_status != 'voided'),
+            )
+            .order_by(LegacyReport.created_at.desc(), LegacyReport.id.desc())
+            .all()
+        )
+
+        history_segments = []
+        for report in reports:
+            try:
+                payload = json.loads(report.report_json or '{}')
+            except Exception:
+                continue
+            segments = payload.get('segments') or payload.get('matches') or []
+            for position, segment in enumerate(segments, start=1):
+                if segment.get('is_bibliography'):
+                    continue
+                raw_text = str(segment.get('text') or segment.get('suspect_text') or '').strip()
+                if len(raw_text.split()) < 4:
+                    continue
+                history_segments.append({
+                    'report_id': report.id,
+                    'research_id': report.research_id,
+                    'review_status': report.review_status,
+                    'title': report.title,
+                    'author': report.author or '',
+                    'page_number': segment.get('page_number') or segment.get('suspect_page'),
+                    'segment_number': segment.get('segment_number', position),
+                    'raw_text': raw_text,
+                    'normalized_text': normalize_light(raw_text),
+                })
+        return history_segments
 
 
 def delete_report(report_id: str, allow_finalized: bool = False) -> bool:
@@ -711,7 +765,10 @@ def get_report_summary(report_id: str) -> Optional[dict]:
 
         # إحصائيات الشواهد والمصادر (دعم كل من segments و matches)
         all_segments = full_data.get('segments') or full_data.get('matches') or []
+
+        # Matched segments are those with explicit status OR source_id OR match_type
         matched_segs = [s for s in all_segments if s.get('status') in ('copied', 'paraphrased', 'cited') or s.get('source_id') is not None or s.get('match_type') in ('direct', 'paraphrase', 'exact', 'EXACT', 'PARAPHRASE')]
+
         sources_list = full_data.get('sources', [])
         top_sources = sources_list[:5] if sources_list else []
 
@@ -720,6 +777,13 @@ def get_report_summary(report_id: str) -> Optional[dict]:
         para_p = rep.para_pct if rep.para_pct is not None else full_data.get('para_pct', 0.0)
         prob_p = full_data.get('problematic_pct', (copied_p + para_p))
         cited_p = full_data.get('cited_pct', full_data.get('excluded_similarity', 0.0))
+
+        # If we have percentages but very few matched segments, ensure segments with status are included
+        if len(matched_segs) < 5 and (overall_p > 0):
+            # Recount: segments must have at least a status field to be considered evidence
+            status_segs = [s for s in all_segments if s.get('status') in ('copied', 'paraphrased', 'cited')]
+            if len(status_segs) > len(matched_segs):
+                matched_segs = status_segs
 
         technical_audit_data = full_data.get('technical_audit') or {
             'detector_version': full_data.get('detector_version', '3.5.0'),
@@ -761,6 +825,10 @@ def get_report_summary(report_id: str) -> Optional[dict]:
             'paraphrase_words': full_data.get('paraphrased_words', full_data.get('paraphrase_words', 0)),
             'cited_words': full_data.get('cited_words', 0),
             'problematic_words': full_data.get('problematic_words', 0),
+            'rejected_history_pct': full_data.get('rejected_history_pct', 0),
+            'rejected_history_words': full_data.get('rejected_history_words', 0),
+            'rejected_history_matches_count': full_data.get('rejected_history_matches_count', 0),
+            'rejected_history_sources': full_data.get('rejected_history_sources', []),
             'total_pages': full_data.get('total_pages', 0),
             'plagiarized_words': full_data.get('plagiarized_words', 0),
             'plagiarized_pages': full_data.get('plagiarized_pages', 0),
@@ -820,11 +888,69 @@ def get_report_summary(report_id: str) -> Optional[dict]:
             summary['research_id'] = res.id
         elif not summary.get('reference_number'):
             summary['reference_number'] = full_data.get('reference_number', full_data.get('research_reference_number', ''))
+        if res:
+            summary['batch_id'] = res.batch_id or full_data.get('batch_id')
 
         from app.services import snapshot_service
         summary['snapshot'] = snapshot_service.get_report_snapshot(report_id)
 
         return summary
+
+
+def _merge_adjacent_evidence(segments: list[dict]) -> list[dict]:
+    """Merge consecutive matches that belong to the same source passage.
+
+    Detection still scores atomic segments so percentages stay mathematically
+    stable.  The evidence layer presents adjacent atoms as one readable block.
+    """
+    merged: list[dict] = []
+    for original in segments:
+        current = dict(original)
+        current_text = current.get('text') or current.get('suspect_text') or ''
+        source_text = current.get('matched_text') or current.get('source_text') or ''
+        current['member_texts'] = list(current.get('member_texts') or [current_text])
+        current['source_member_texts'] = list(current.get('source_member_texts') or [source_text])
+        current['evidence_segment_count'] = int(current.get('evidence_segment_count') or 1)
+
+        previous = merged[-1] if merged else None
+        current_source_key = current.get('source_id') or current.get('source_title')
+        is_match = bool(current_source_key) and (
+            current.get('status') in ('copied', 'paraphrased', 'cited')
+            or current.get('source_id') is not None
+        )
+        same_block = is_match and bool(previous) and all((
+            str(previous.get('source_id') or previous.get('source_title')) == str(current_source_key),
+            previous.get('page_number') == current.get('page_number'),
+            previous.get('source_page') == current.get('source_page'),
+            previous.get('status') == current.get('status'),
+            previous.get('file_index') == current.get('file_index'),
+            previous.get('part_id') == current.get('part_id'),
+            previous.get('source_segment_number') is None
+            or current.get('source_segment_number') is None
+            or current.get('source_segment_number') == previous.get('source_segment_number') + 1,
+        ))
+        if not same_block:
+            merged.append(current)
+            continue
+
+        previous_words = max(1, len((previous.get('text') or '').split()))
+        current_words = max(1, len(current_text.split()))
+        total_words = previous_words + current_words
+        previous_score = float(previous.get('score') or (float(previous.get('pct') or 0) / 100))
+        current_score = float(current.get('score') or (float(current.get('pct') or 0) / 100))
+        previous['score'] = round(
+            ((previous_score * previous_words) + (current_score * current_words)) / total_words,
+            4,
+        )
+        previous['pct'] = min(100, round(previous['score'] * 100))
+        previous['text'] = ' '.join(filter(None, [previous.get('text', '').strip(), current_text.strip()]))
+        previous['matched_text'] = ' '.join(filter(None, [previous.get('matched_text', '').strip(), source_text.strip()]))
+        previous['member_texts'].extend(current['member_texts'])
+        previous['source_member_texts'].extend(current['source_member_texts'])
+        previous['evidence_segment_count'] += current['evidence_segment_count']
+        previous['source_segment_number'] = current.get('source_segment_number', previous.get('source_segment_number'))
+
+    return merged
 
 
 def get_report_evidence_paginated(
@@ -856,7 +982,8 @@ def get_report_evidence_paginated(
 
         all_segments = full_data.get('segments') or full_data.get('matches') or []
         # استخراج الشواهد المتطابقة فقط
-        matched_segs = [s for s in all_segments if s.get('status') in ('copied', 'paraphrased', 'cited') or s.get('source_id') is not None or s.get('match_type') in ('direct', 'paraphrase', 'exact', 'EXACT', 'PARAPHRASE', 'excluded_quote')]
+        evidence_blocks = _merge_adjacent_evidence(all_segments)
+        matched_segs = [s for s in evidence_blocks if s.get('status') in ('copied', 'paraphrased', 'cited') or s.get('source_id') is not None or s.get('match_type') in ('direct', 'paraphrase', 'exact', 'EXACT', 'PARAPHRASE', 'excluded_quote')]
 
         # تطبيق الفلاتر
         filtered = []
@@ -928,6 +1055,7 @@ def get_report_evidence_paginated(
                 first = grp_matches[0]
                 grouped_items.append({
                     'source_id': first.get('source_id'),
+                    'source_report_id': first.get('source_report_id'),
                     'source_title': first.get('source_title', 'مرجع غير محدد'),
                     'source_author': first.get('source_author', 'غير محدد'),
                     'match_count': len(grp_matches),
@@ -1034,6 +1162,7 @@ def get_report_page_evidence(
                     continue
                 page_segs.append(s)
 
+        page_segs = _merge_adjacent_evidence(page_segs)
         matched_count = sum(1 for s in page_segs if s.get('status') in ('copied', 'paraphrased', 'cited') or s.get('match_type') in ('direct', 'paraphrase', 'exact', 'EXACT', 'PARAPHRASE', 'excluded_quote'))
         return {
             'page_number': page_number,

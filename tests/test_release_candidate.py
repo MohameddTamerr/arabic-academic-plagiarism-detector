@@ -63,9 +63,9 @@ def test_production_defaults_strictly_unmodified():
     assert config.DEFAULT_SETTINGS['shingle_size'] == 4
     assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.33
     assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.35
-    assert config.DEFAULT_SETTINGS['semantic_threshold'] == 0.70
+    assert config.DEFAULT_SETTINGS['semantic_threshold'] == 0.80
     assert config.DEFAULT_SETTINGS['max_candidate_retrieval'] == 50
-    assert config.DEFAULT_SETTINGS['enable_semantic_model'] is False
+    assert config.DEFAULT_SETTINGS['enable_semantic_model'] is True
     assert config.DEFAULT_SETTINGS['enable_ocr'] is True
 
 
@@ -110,7 +110,7 @@ def test_air_gapped_offline_zero_network_invariants(monkeypatch):
     from plagiarism_detector.detection.semantic_matcher import check_semantic_model_availability
     avail = check_semantic_model_availability()
     assert isinstance(avail, dict)
-    assert avail["available"] is False
+    assert avail["available"] is True
 
 
 def test_database_integrity_check():

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شاهد المصدر - {{ source_title }}</title>
+    <style>
+        :root { --navy:#102f63; --blue:#1d4ed8; --surface:#f3f6fa; --muted:#64748b; }
+        * { box-sizing:border-box; }
+        body { margin:0; background:var(--surface); color:#0f172a; font-family:Cairo,"Segoe UI",Arial,sans-serif; }
+        .toolbar { position:sticky; top:0; z-index:20; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:12px 20px; color:#fff; background:var(--navy); box-shadow:0 2px 8px #0f172a33; }
+        .toolbar h1 { margin:0; font-size:16px; }
+        .toolbar-meta { display:flex; align-items:center; gap:10px; color:#dbeafe; font-size:13px; }
+        .source-summary { max-width:1100px; margin:16px auto 10px; padding:14px 18px; background:#fff; border:1px solid #dbe3ef; border-radius:10px; box-shadow:0 2px 8px #0f172a0d; }
+        .source-summary strong { color:var(--navy); }
+        .source-passage { margin-top:8px; padding:10px 12px; background:#eff6ff; border-inline-start:4px solid var(--blue); border-radius:6px; line-height:1.8; white-space:pre-wrap; }
+        .viewer-shell { max-width:1100px; margin:0 auto 28px; padding:12px; background:#475569; border-radius:10px; overflow:auto; }
+        .page-stage { position:relative; width:min(100%, 1000px); margin:auto; line-height:0; }
+        #source-page-image { display:block; width:100%; height:auto; background:#fff; }
+        #source-highlight-overlay { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+        .source-highlight { fill:#facc15; fill-opacity:.42; stroke:#dc2626; stroke-width:1.5; vector-effect:non-scaling-stroke; }
+        .status { max-width:1100px; margin:12px auto; color:var(--muted); font-size:13px; text-align:center; }
+        .error { color:#b91c1c; }
+        @media (max-width:640px) { .toolbar { align-items:flex-start; flex-direction:column; } .source-summary { margin:10px; } .viewer-shell { margin:0 10px 20px; } }
+    </style>
+</head>
+<body>
+    <header class="toolbar">
+        <h1>{{ source_title }}</h1>
+        <div class="toolbar-meta"><span>الرسالة/الجزء المصدر</span><strong>صفحة {{ source_page }}</strong></div>
+    </header>
+    <section class="source-summary">
+        <strong>المقطع الذي استند إليه التطابق:</strong>
+        <div class="source-passage" id="source-passage" dir="auto"></div>
+    </section>
+    <div class="status" id="viewer-status">جاري فتح المصدر وتحديد موضع الشاهد...</div>
+    <main class="viewer-shell">
+        <div class="page-stage">
+            <img id="source-page-image" alt="صفحة المصدر">
+            <svg id="source-highlight-overlay" aria-label="موضع الشاهد في المصدر"></svg>
+        </div>
+    </main>
+    <script>
+        const sourceId = {{ source_id | tojson }};
+        const sourceKind = {{ source_kind | default('reference') | tojson }};
+        const requestedPage = {{ source_page | tojson }};
+        const sourceText = {{ source_text | tojson }};
+        const passage = document.getElementById('source-passage');
+        const status = document.getElementById('viewer-status');
+        const image = document.getElementById('source-page-image');
+        const overlay = document.getElementById('source-highlight-overlay');
+        passage.textContent = sourceText || 'نص المقطع غير متاح، تم فتح صفحة المصدر المسجلة.';
+
+        async function loadSourceEvidence() {
+            try {
+                const infoResponse = await fetch(`/api/pdf/${encodeURIComponent(sourceKind)}/${encodeURIComponent(sourceId)}/info`);
+                const info = await infoResponse.json();
+                if (!infoResponse.ok) throw new Error(info.error || 'تعذر فتح المصدر');
+                const page = Math.max(1, Math.min(Number(requestedPage) || 1, info.page_count));
+                image.src = `/api/pdf/${encodeURIComponent(sourceKind)}/${encodeURIComponent(sourceId)}/page?page=${page}`;
+                await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; });
+
+                if (!sourceText) {
+                    status.textContent = `تم فتح صفحة المصدر ${page}.`;
+                    return;
+                }
+                const authResponse = await fetch('/api/auth/me');
+                const auth = await authResponse.json();
+                const locateResponse = await fetch(`/api/pdf/${encodeURIComponent(sourceKind)}/${encodeURIComponent(sourceId)}/locate?page=${page}`, {
+                    method: 'POST',
+                    headers: {'Content-Type':'application/json', 'X-CSRF-Token': auth.csrf_token || ''},
+                    body: JSON.stringify({text: sourceText})
+                });
+                const located = await locateResponse.json();
+                if (!locateResponse.ok) throw new Error(located.error || 'تعذر تحديد المقطع');
+                overlay.setAttribute('viewBox', `0 0 ${located.page_width || 1} ${located.page_height || 1}`);
+                overlay.replaceChildren();
+                (located.rects || []).forEach(rect => {
+                    const [x0, y0, x1, y1] = rect;
+                    const element = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    element.setAttribute('x', x0);
+                    element.setAttribute('y', y0);
+                    element.setAttribute('width', Math.max(1, x1 - x0));
+                    element.setAttribute('height', Math.max(1, y1 - y0));
+                    element.setAttribute('class', 'source-highlight');
+                    overlay.appendChild(element);
+                });
+                status.textContent = (located.rects || []).length
+                    ? `تم فتح صفحة ${page} وتحديد المقطع المصدر.`
+                    : `تم فتح صفحة ${page}، لكن تعذر تحديد إحداثيات المقطع آليًا.`;
+            } catch (error) {
+                status.textContent = error.message || 'تعذر فتح شاهد المصدر.';
+                status.classList.add('error');
+            }
+        }
+        loadSourceEvidence();
+    </script>
+</body>
+</html>

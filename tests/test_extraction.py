@@ -11,6 +11,7 @@ from plagiarism_detector.extraction.page_extractor import (
     unreverse_arabic_text,
     pdf_text_needs_ocr,
     alternative_pdf_text_is_usable,
+    merge_native_and_image_ocr_text,
 )
 from plagiarism_detector.extraction.ocr_engine import check_ocr_availability, find_tessdata_dir
 
@@ -67,6 +68,24 @@ def test_corrupt_legacy_arabic_text_layer_requires_ocr():
     assert reason == 'corrupt_text_layer'
 
 
+def test_corrupt_english_control_glyph_layer_requires_ocr():
+    corrupted = ("\x11\x18\x0e\x06 broken encoded English slide content " * 12)
+    needs_ocr, reason = pdf_text_needs_ocr(corrupted)
+    assert needs_ocr is True
+    assert reason == 'corrupt_text_layer'
+
+
+def test_image_ocr_text_is_merged_without_repeating_native_text():
+    native = "Executive Summary\nThis native sentence is already searchable."
+    ocr = "Executive Summary\nThis native sentence is already searchable.\nINSTANT Software\nنص داخل صورة"
+    merged, used_ocr = merge_native_and_image_ocr_text(native, ocr)
+
+    assert used_ocr is True
+    assert merged.count("Executive Summary") == 1
+    assert "INSTANT Software" in merged
+    assert "نص داخل صورة" in merged
+
+
 def test_clean_arabic_text_layer_does_not_require_ocr():
     clean = "هذا نص عربي سليم يحتوي على كلمات واضحة ومتتابعة ويصلح للاستخراج المباشر دون تشغيل التعرف الضوئي على الحروف في المستند"
     needs_ocr, reason = pdf_text_needs_ocr(clean)
@@ -113,3 +132,28 @@ def test_pdf_progress_callback_reports_all_pages(tmp_path):
 
     assert len(pages) == 3
     assert updates[-1][:2] == (3, 3)
+
+
+def test_docx_uses_rendered_pdf_pages_when_preview_is_available(tmp_path, monkeypatch):
+    import fitz
+    from plagiarism_detector.extraction import page_extractor
+
+    docx_path = tmp_path / 'page-aware.docx'
+    docx_path.write_bytes(b'PK\x03\x04-test')
+    preview_path = tmp_path / 'page-aware.pdf'
+    document = fitz.open()
+    document.new_page().insert_text((72, 72), 'First rendered Word page with searchable content')
+    document.new_page().insert_text((72, 72), 'Second rendered Word page with searchable content')
+    document.save(preview_path)
+    document.close()
+
+    monkeypatch.setattr(
+        'app.services.document_preview_service.ensure_pdf_preview',
+        lambda _path: preview_path,
+    )
+
+    pages = page_extractor.extract_document_pages(str(docx_path), enable_ocr=False)
+
+    assert [page['page_number'] for page in pages] == [1, 2]
+    assert 'First rendered Word page' in pages[0]['text']
+    assert 'Second rendered Word page' in pages[1]['text']

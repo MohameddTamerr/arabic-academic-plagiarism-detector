@@ -132,18 +132,119 @@ def test_logout_closes_server_session(template_content):
 def test_toast_stays_inside_viewport(template_content):
     """رسائل النجاح والخطأ لا تنزاح خارج الشاشة على أي عرض."""
     assert 'width: min(440px, calc(100vw - 24px));' in template_content
-    assert 'class="custom-toast-message"' in template_content
+    assert '.toast-container {' in template_content
+    assert 'position: fixed;' in template_content
+    assert '.custom-toast {' in template_content
+    assert "messageElement.className = 'custom-toast-message';" in template_content
     assert '.custom-toast-message {' in template_content
     assert '.toast-container { position:fixed;bottom:24px;left:24px' not in template_content
 
 
-def test_mobile_sidebar_is_off_canvas_and_accessible(template_content):
-    """القائمة الجانبية تتحول إلى قائمة منزلقة قابلة للفتح والإغلاق على الهاتف."""
-    assert 'id="mobile-menu-toggle"' in template_content
-    assert 'id="sidebar-mobile-overlay"' in template_content
-    assert '.sidebar.mobile-open {' in template_content
-    assert 'function toggleMobileSidebar(forceOpen)' in template_content
-    assert "toggle.setAttribute('aria-expanded', String(shouldOpen));" in template_content
+def test_sidebar_selection_and_report_polling_have_single_active_state(template_content):
+    """التنقل المخصص لا يحتفظ بتبويب نشط ثانٍ، وتحميل التقرير لا يتكرر أثناء polling."""
+    assert "document.querySelectorAll('.nav-item').forEach" in template_content
+    assert "document.querySelectorAll('.nav-item[data-view]').forEach" not in template_content
+    assert 'let _loadingBatchReportId = null;' in template_content
+    assert '_loadingBatchReportId !== activeItem.report_id' in template_content
+
+
+def test_topbar_brand_is_anchored_without_menu_toggle(template_content):
+    """الشعار يبدأ من يمين الهيدر مباشرة بلا زر قائمة يفصل بينهما."""
+    assert 'class="topbar-brand"' in template_content
+    assert '.topbar-brand {' in template_content
+    assert 'margin-inline-end: auto' in template_content
+    assert 'id="mobile-menu-toggle"' not in template_content
+    assert 'id="sidebar-mobile-overlay"' not in template_content
+
+
+def test_date_filter_is_compact_and_functional(template_content):
+    """فلتر التاريخ يستخدم مكوّناً مدمجاً ويرسل حدود الفترة للخادم."""
+    assert 'segmented-filter-bar' not in template_content
+    assert 'custom-date-picker-badge' not in template_content
+    assert 'arabic-datepicker-popover' not in template_content
+    assert '.date-range-filter {' in template_content
+    assert 'id="reports-date-from"' in template_content
+    assert 'id="reports-date-to"' in template_content
+    assert "function applyDateFilter(viewKey)" in template_content
+    assert "params.set('date_from', range.from)" in template_content
+    assert "params.set('date_to', range.to)" in template_content
+
+
+def test_all_sidebar_items_are_right_aligned_with_white_icons_and_red_review_badge(template_content):
+    """كل روابط القائمة تبدأ من اليمين وتستخدم أيقونات بيضاء، مع إبراز عداد المراجعات بالأحمر."""
+    assert '#badge-initial-review-count {' in template_content
+    nav_block = re.search(r'\.nav-item\s*\{([^}]+)\}', template_content)
+    assert nav_block is not None
+    assert 'justify-content: flex-start' in nav_block.group(1)
+    assert 'text-align: right' in nav_block.group(1)
+    assert 'direction: rtl' in nav_block.group(1)
+    assert '.nav-item .nav-icon-svg {' in template_content
+    assert 'stroke: #ffffff' in template_content
+    assert template_content.count('class="nav-icon-svg" aria-hidden="true"') >= 13
+    assert 'color: #fca5a5' in template_content
+
+
+def test_every_view_remains_inside_main_content(template_content):
+    """منع رجوع كسر الهيكل الذي كان يخرج صفحات الرسائل والتدقيق خارج main."""
+    main_match = re.search(r'<main class="main-content"[^>]*>(.*?)</main>', template_content, re.S)
+    assert main_match is not None
+    main_markup = main_match.group(1)
+    for view_id in ('view-dashboard', 'view-reports', 'view-database', 'view-theses', 'view-audit', 'view-help'):
+        assert f'id="{view_id}"' in main_markup
+
+    report_markup = main_markup.split('id="view-reports"', 1)[1].split('id="view-database"', 1)[0]
+    assert len(re.findall(r'<div\b', report_markup)) == len(re.findall(r'</div\s*>', report_markup))
+
+
+def test_review_workflow_tabs_are_visible_in_sidebar(template_content):
+    """حالات التحكيم الأساسية لها روابط واضحة بدلاً من بقائها صفحات مخفية."""
+    assert 'id="nav-initial-review"' in template_content
+    assert '<span class="nav-item-label">قيد المراجعة</span>' in template_content
+    assert 'id="nav-preliminary"' in template_content
+    assert '<span class="nav-item-label">القبول المبدئي</span>' in template_content
+    assert 'id="nav-final-accepted"' in template_content
+    assert '>القبول النهائي<' in template_content
+    assert 'id="nav-rejected"' in template_content
+    assert '>الرسائل المرفوضة<' in template_content
+
+
+def test_report_primary_accept_action_is_preliminary(template_content):
+    """زر التقرير يرسل للقبول المبدئي ولا يتجاوز مرحلة التحكيم إلى الاعتماد النهائي."""
+    assert 'id="btn-accept-preliminary" onclick="acceptInitialPaper()"' in template_content
+    assert '<span>قبول مبدئي</span>' in template_content
+    assert "const btnAccept = document.getElementById('btn-accept-preliminary');" in template_content
+    assert "showToast('تم القبول المبدئي للبحث بنجاح" in template_content
+    assert "switchView('preliminary');" in template_content
+    assert 'id="btn-accept-initial" onclick="acceptFinalPaper()"' not in template_content
+
+
+def test_rejected_history_score_is_visually_separate(template_content):
+    """تشابه المرفوضات يظهر كمؤشر إعادة تقديم ولا يختلط بنسبة الاستلال الرسمية."""
+    assert 'id="rejected-history-card"' in template_content
+    assert 'id="rejected-history-pct"' in template_content
+    assert 'id="rejected-history-details"' in template_content
+    assert 'id="rejected-history-sources"' in template_content
+    assert 'هذه النسبة منفصلة ولا تدخل في نسبة الاستلال الرسمية.' in template_content
+    assert "const rejectedHistoryPct = report.rejected_history_pct || 0;" in template_content
+
+
+def test_current_scan_opens_without_report_archive(template_content):
+    """نتيجة الرفع الحالية تستبدل أرشيف التقارير بدلاً من الظهور أسفله."""
+    assert 'id="report-archive-panel"' in template_content
+    assert 'if (archivePanel) archivePanel.hidden = showDetail;' in template_content
+    assert template_content.count("switchView('reports', true);") >= 4
+    assert "function openReportsArchive()" in template_content
+    assert "function openFinalAcceptedReports()" in template_content
+
+
+def test_new_scan_replaces_stale_report_workspace(template_content):
+    """قبول فحص جديد يخفي نتيجة البحث السابق حتى تكتمل النتيجة الجديدة."""
+    assert '#report-detail-panel.report-workspace-loading > :not(:first-child):not(#batch-switcher-bar)' in template_content
+    assert 'function prepareReportWorkspaceForNewScan(message)' in template_content
+    assert "detailPanel.classList.toggle('report-workspace-loading', visible)" in template_content
+    assert "prepareReportWorkspaceForNewScan('جاري فحص الرسالة وتجهيز نتيجتها...')" in template_content
+    assert "prepareReportWorkspaceForNewScan('تم استلام الملف — جاري بدء الفحص...')" in template_content
+    assert "prepareReportWorkspaceForNewScan('جاري إعادة فحص البحث — 0%')" in template_content
 
 
 def test_tables_and_forms_have_mobile_fallbacks(template_content):
@@ -153,3 +254,17 @@ def test_tables_and_forms_have_mobile_fallbacks(template_content):
     assert '.table-scroll .custom-table {' in template_content
     assert '.main-content [style*="grid-template-columns"] {' in template_content
     assert 'grid-template-columns: minmax(0, 1fr) !important;' in template_content
+
+
+def test_employee_first_login_is_a_locked_modal_not_inline_content(template_content):
+    """إعداد الموظف الأول يغطي التطبيق ويعزل واجهة الجلسة السابقة بالكامل."""
+    assert '.first-login-overlay {' in template_content
+    assert 'position: fixed;' in template_content
+    assert 'z-index: 200100;' in template_content
+    assert '.first-login-card {' in template_content
+    assert 'id="first-login-overlay" class="first-login-overlay" role="dialog" aria-modal="true" aria-hidden="true"' in template_content
+    assert 'function setFirstLoginLock(locked)' in template_content
+    assert "document.querySelectorAll('.topbar, .app-container')" in template_content
+    assert 'shell.inert = locked;' in template_content
+    assert "switchView(normalizeUserRole(currentUser?.role) === 'employee' ? 'upload' : 'dashboard');" in template_content
+    assert "overlay.setAttribute('aria-hidden', 'false');" in template_content

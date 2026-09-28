@@ -29,6 +29,33 @@ from app.models.snapshot_schema import ReportExecutionSnapshot
 from app.security.permissions import Role, Permission
 
 
+def test_adjacent_evidence_is_presented_as_one_readable_block():
+    segments = [
+        {
+            'status': 'paraphrased', 'source_id': 7, 'page_number': 2,
+            'source_page': 11, 'text': 'الجملة الأولى', 'matched_text': 'المقطع الأول',
+            'score': 0.82,
+        },
+        {
+            'status': 'paraphrased', 'source_id': 7, 'page_number': 2,
+            'source_page': 11, 'text': 'الجملة الثانية', 'matched_text': 'المقطع الثاني',
+            'score': 0.88,
+        },
+        {
+            'status': 'copied', 'source_id': 7, 'page_number': 2,
+            'source_page': 11, 'text': 'نوع مختلف', 'matched_text': 'لا يدمج',
+            'score': 1.0,
+        },
+    ]
+
+    grouped = report_repo._merge_adjacent_evidence(segments)
+
+    assert len(grouped) == 2
+    assert grouped[0]['text'] == 'الجملة الأولى الجملة الثانية'
+    assert grouped[0]['matched_text'] == 'المقطع الأول المقطع الثاني'
+    assert grouped[0]['evidence_segment_count'] == 2
+
+
 # ─── Helper Fixtures ─────────────────────────────────────────────────────────
 
 @pytest.fixture

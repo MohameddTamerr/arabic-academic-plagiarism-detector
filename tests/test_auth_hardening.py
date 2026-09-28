@@ -334,17 +334,22 @@ def test_lockout_expires_after_duration(clean_auth_db):
 def test_successful_login_resets_failed_counter(clean_auth_db):
     """13. تسجيل الدخول الناجح يُصفر عداد المحاولات الفاشلة."""
     username = 'test_reset_counter_user'
-    login_throttling_service.record_failed_attempt(username)
-    login_throttling_service.record_failed_attempt(username)
+    ip_address = '127.0.0.77'
+    login_throttling_service.record_failed_attempt(username, ip_address)
+    login_throttling_service.record_failed_attempt(username, ip_address)
 
-    login_throttling_service.record_successful_login(username)
+    login_throttling_service.record_successful_login(username, ip_address)
 
     with base_repo.get_session() as session:
-        lockout = session.query(AuthLockout).filter(
-            AuthLockout.identifier == login_throttling_service.normalize_identifier(username=username)
-        ).first()
-        assert lockout is not None
-        assert lockout.failed_count == 0
+        identifiers = {
+            login_throttling_service.normalize_identifier(username=username),
+            login_throttling_service.normalize_identifier(ip_address=ip_address),
+        }
+        lockouts = session.query(AuthLockout).filter(AuthLockout.identifier.in_(identifiers)).all()
+        assert {item.identifier for item in lockouts} == identifiers
+        assert all(item.failed_count == 0 for item in lockouts)
+        assert all(item.locked_until is None for item in lockouts)
+        assert all(item.lockout_count == 0 for item in lockouts)
 
 
 def test_password_never_stored_in_lockout_table(clean_auth_db):

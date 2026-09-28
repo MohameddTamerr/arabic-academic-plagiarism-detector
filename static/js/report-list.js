@@ -4,10 +4,14 @@ async function loadReportList(page = 1) {
     const pager = document.getElementById('report-list-pagination');
     if (!body) return;
     const params = new URLSearchParams({page, page_size: 20});
-    for (const key of ['q', 'date_from', 'date_to', 'review_status', 'scan_status']) {
-        const value = document.getElementById('report-filter-' + key).value;
+    for (const key of ['q', 'review_status', 'scan_status']) {
+        const value = document.getElementById('report-filter-' + key)?.value;
         if (value) params.set(key, value);
     }
+    const dateFrom = document.getElementById('reports-date-from')?.value;
+    const dateTo = document.getElementById('reports-date-to')?.value;
+    if (dateFrom) params.set('date_from', dateFrom);
+    if (dateTo) params.set('date_to', dateTo);
     try {
         const response = await fetch('/api/reports?' + params);
         const data = await response.json();
@@ -43,5 +47,10 @@ async function loadReportList(page = 1) {
 
 function closeReportDetail() {
     const panel = document.getElementById('report-detail-panel');
+    const archive = document.getElementById('report-archive-panel');
+    const switcher = document.getElementById('batch-switcher-bar');
     if (panel) panel.hidden = true;
+    if (archive) archive.hidden = false;
+    if (switcher) switcher.style.display = 'none';
+    if (typeof loadReportList === 'function') loadReportList(1);
 }

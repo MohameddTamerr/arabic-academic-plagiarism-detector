@@ -181,3 +181,14 @@ def test_report_version_snapshot_integrity():
     assert report['common_text_version'] == "common-phrases-span-1.3"
     assert report['candidate_retrieval_mode'] in ('dual_channel', 'baseline')
     assert isinstance(report['settings_snapshot'], dict)
+
+
+def test_empty_extraction_still_returns_a_valid_report_snapshot():
+    """Image-only/empty extraction must not fail while serialising settings."""
+    report = analyze_academic_document("")
+
+    assert report['segments'] == []
+    assert report['overall_pct'] == 0
+    assert report['candidate_retrieval_mode'] in ('dual_channel', 'baseline')
+    assert report['common_text_filter_mode'] in ('span_level', 'baseline')
+    assert report['citation_filter_mode'] in ('refined', 'baseline')

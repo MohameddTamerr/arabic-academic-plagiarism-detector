@@ -136,7 +136,16 @@ TEMP_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # مجلد النماذج المحلية أوفلاين
 MODELS_DIR = BUNDLE_DIR / 'models'
-SEMANTIC_MODEL_PATH = Path(os.environ.get('SEMANTIC_MODEL_PATH', MODELS_DIR / 'semantic_model'))
+SEMANTIC_MODEL_NAME = os.environ.get(
+    'SEMANTIC_MODEL_NAME',
+    'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+)
+SEMANTIC_MODEL_PATH = Path(os.environ.get(
+    'SEMANTIC_MODEL_PATH',
+    MODELS_DIR / 'models--qdrant--paraphrase-multilingual-MiniLM-L12-v2-onnx-Q',
+))
+SEMANTIC_CACHE_DIR = Path(os.environ.get('SEMANTIC_CACHE_DIR', STORAGE_ROOT / 'semantic_cache'))
+SEMANTIC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 # مفتاح الجلسة الآمن (Flask Secret Key)
 _SECRET_KEY_FILE = CONFIG_DIR / '.secret_key'
@@ -167,12 +176,12 @@ DEFAULT_SETTINGS = {
     'shingle_size': 4,                     # حجم متوالية الكلمات لكشف النسخ الحرفي (4 أنسب للعربي)
     'jaccard_threshold': 0.33,             # عتبة النسخ الحرفي (Jaccard >= 33%) — خُفِّضت لتناسب التصريف العربي
     'tfidf_threshold': 0.35,               # عتبة إعادة الصياغة اللفظية (Cosine >= 35%)
-    'semantic_threshold': 0.70,            # عتبة التشابه الدلالي (Semantic >= 70%)
+    'semantic_threshold': 0.80,            # عتبة دلالية محافظة؛ تلتقط إعادة الصياغة القوية وتحد من تشابه الموضوع فقط
     'min_sentence_words': 4,               # الحد الأدنى لكلمات الجملة المعتبرة
     'allowed_similarity_pct': 20.0,        # النسبة الكلية المسموح بها للاستلال
     'words_per_page': 250,                 # معدل الكلمات التقديري لكل صفحة
     'max_allowed_pages_per_source': 5.0,   # الحد الأقصى للصفحات المقتبسة من مرجع واحد
-    'enable_semantic_model': False,        # النموذج الدلالي (معطل افتراضياً لسرعة المعالج)
+    'enable_semantic_model': True,         # النموذج متعدد اللغات مضمّن محلياً؛ يفشل بأمان إلى الكشف المعجمي إن تعذر تشغيله
     'enable_ocr': True,                    # تفعيل OCR المشروط عند توفر Tesseract
     'detection_profile': 'BALANCED',       # أنماط الكشف: LIGHT, BALANCED, ADVANCED
     'max_candidate_retrieval': 50,         # أقصى عدد مرشحين للفقرة الواحدة لتفادي البطء

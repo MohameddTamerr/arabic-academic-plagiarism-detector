@@ -159,6 +159,8 @@ def record_successful_login(username: str = '', ip_address: str = '') -> None:
     candidates = []
     if username and username.strip():
         candidates.append(normalize_identifier(username=username))
+    if ip_address and ip_address.strip():
+        candidates.append(normalize_identifier(ip_address=ip_address))
 
     if not candidates:
         return
@@ -171,4 +173,3 @@ def record_successful_login(username: str = '', ip_address: str = '') -> None:
             lockout.locked_until = None
             lockout.lockout_count = 0
             lockout.last_failed_at = now
-

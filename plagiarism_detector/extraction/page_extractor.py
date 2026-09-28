@@ -11,6 +11,7 @@ import os
 import re
 import logging
 import unicodedata
+from difflib import SequenceMatcher
 from pathlib import Path
 from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from typing import Callable, Optional
@@ -39,7 +40,12 @@ def pdf_text_needs_ocr(text: str, min_words: int = 20) -> tuple[bool, str]:
         if unicodedata.category(char) == 'Cc' and char not in '\n\r\t'
     )
     legacy_glyphs = len(_LEGACY_PDF_GLYPH_RE.findall(text))
-    if arabic_chars >= 20 and (replacement_chars or control_chars or legacy_glyphs):
+    # Control/replacement characters are a broken text layer regardless of the
+    # document language.  The previous Arabic-only guard allowed English slide
+    # decks encoded as control glyphs to bypass OCR and become punctuation junk.
+    if replacement_chars or control_chars:
+        return True, 'corrupt_text_layer'
+    if arabic_chars >= 20 and legacy_glyphs:
         return True, 'corrupt_text_layer'
 
     words = text.split()
@@ -137,7 +143,26 @@ def extract_document_pages(
             progress_callback=progress_callback,
         )
     elif ext in ('.docx', '.doc'):
-        pages = _extract_pages_from_docx(file_path)
+        # DOCX has no stable page model of its own. When a local office engine
+        # can render it, extract from the same PDF preview used by the report
+        # viewer so new evidence keeps real page numbers and coordinates.
+        pages = []
+        if ext == '.docx':
+            try:
+                from app.services.document_preview_service import ensure_pdf_preview
+                preview_path = ensure_pdf_preview(file_path)
+                pages = _extract_pages_from_pdf(
+                    str(preview_path),
+                    enable_ocr=False,
+                    progress_callback=progress_callback,
+                )
+            except Exception as preview_error:
+                logger.warning(
+                    "تعذر إنشاء معاينة PDF لملف Word؛ سيتم الاستخراج النصي دون أرقام صفحات: %s",
+                    preview_error,
+                )
+        if not pages:
+            pages = _extract_pages_from_docx(file_path)
     elif ext == '.txt':
         pages = _extract_pages_from_txt(file_path)
     else:
@@ -164,6 +189,68 @@ def _clean_pdf_page_result(text: str, logical_direction: bool) -> str:
     return clean_arabic_pdf_glyphs(text).strip()
 
 
+def _normalized_ocr_line(text: str) -> str:
+    """Normalize a native/OCR line for conservative duplicate detection."""
+    return re.sub(r'[^0-9a-z\u0600-\u06ff]+', '', (text or '').casefold())
+
+
+def merge_native_and_image_ocr_text(native_text: str, ocr_text: str) -> tuple[str, bool]:
+    """Append only useful OCR lines that are not already in the PDF text layer."""
+    native_clean = _clean_pdf_page_result(native_text, False)
+    ocr_clean = _clean_pdf_page_result(ocr_text, True)
+    if not ocr_clean:
+        return native_clean, False
+    if not native_clean:
+        return ocr_clean, True
+
+    native_lines = [
+        _normalized_ocr_line(line)
+        for line in native_clean.splitlines()
+        if _normalized_ocr_line(line)
+    ]
+    native_compact = _normalized_ocr_line(native_clean)
+    additions = []
+    seen = set()
+    for raw_line in ocr_clean.splitlines():
+        line = re.sub(r'\s+', ' ', raw_line).strip()
+        normalized = _normalized_ocr_line(line)
+        # Ignore isolated OCR specks while retaining short names/logos such as
+        # "INSTANT Software" and their Arabic equivalents.
+        if len(normalized) < 5 or normalized in seen:
+            continue
+        seen.add(normalized)
+        if normalized in native_compact:
+            continue
+        if any(SequenceMatcher(None, normalized, existing).ratio() >= 0.90 for existing in native_lines):
+            continue
+        additions.append(line)
+
+    if not additions:
+        return native_clean, False
+    return f"{native_clean}\n\n" + '\n'.join(additions), True
+
+
+def pdf_page_has_large_image(page, min_area_ratio: float = 0.08) -> bool:
+    """Return True when a raster image occupies a meaningful part of a PDF page."""
+    try:
+        page_area = float(page.rect.get_area())
+        if page_area <= 0:
+            return False
+        seen_xrefs = set()
+        for image in page.get_images(full=True):
+            xref = int(image[0])
+            if xref in seen_xrefs:
+                continue
+            seen_xrefs.add(xref)
+            for rect in page.get_image_rects(xref):
+                visible = rect & page.rect
+                if not visible.is_empty and (float(visible.get_area()) / page_area) >= min_area_ratio:
+                    return True
+    except Exception as exc:
+        logger.debug("تعذر قياس الصور المضمنة في صفحة PDF: %s", exc)
+    return False
+
+
 def alternative_pdf_text_is_usable(primary_text: str, alternative_text: str) -> bool:
     """Accept a clean alternate text layer only when it preserves enough Arabic."""
     if not alternative_text or len(alternative_text.split()) < 20:
@@ -179,12 +266,22 @@ def alternative_pdf_text_is_usable(primary_text: str, alternative_text: str) -> 
     return (alternative_arabic / primary_arabic) >= 0.70
 
 
-def _ocr_pdf_pixmap(pixmap, original_text: str, original_word_count: int, languages: str) -> tuple[str, bool]:
+def _ocr_pdf_pixmap(
+    pixmap,
+    original_text: str,
+    original_word_count: int,
+    languages: str,
+    merge_with_original: bool = False,
+) -> tuple[str, bool]:
     """OCR worker for one already-rendered page, returning safe fallback text."""
     try:
         ocr_text = ocr_page_pixmap(pixmap, languages=languages)
-        minimum_words = 4 if original_word_count < 20 else max(8, int(original_word_count * 0.25))
+        minimum_words = 2 if merge_with_original else (
+            4 if original_word_count < 20 else max(8, int(original_word_count * 0.25))
+        )
         if ocr_text and len(ocr_text.split()) >= minimum_words:
+            if merge_with_original:
+                return merge_native_and_image_ocr_text(original_text, ocr_text)
             return _clean_pdf_page_result(ocr_text, True), True
     except Exception as exc:
         logger.debug("فشل OCR لإحدى صفحات PDF: %s", exc)
@@ -219,7 +316,7 @@ def _extract_pages_from_pdf(
             def collect(done_futures) -> None:
                 nonlocal completed
                 for future in done_futures:
-                    page_idx, page_num = pending.pop(future)
+                    page_idx, page_num, hybrid_ocr = pending.pop(future)
                     try:
                         page_text, is_ocr = future.result()
                     except Exception as exc:
@@ -229,7 +326,10 @@ def _extract_pages_from_pdf(
                         'page_number': page_num,
                         'text': page_text,
                         'is_ocr': is_ocr,
-                        'extraction_engine': 'tesseract' if is_ocr else 'pymupdf',
+                        'extraction_engine': (
+                            'pymupdf+tesseract' if is_ocr and hybrid_ocr
+                            else ('tesseract' if is_ocr else 'pymupdf')
+                        ),
                     }
                     completed += 1
                     _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
@@ -240,6 +340,7 @@ def _extract_pages_from_pdf(
                     text = page.get_text('text') or ''
                     words = text.split()
                     needs_ocr, ocr_reason = pdf_text_needs_ocr(text)
+                    has_large_image = pdf_page_has_large_image(page)
 
                     # A second PDF parser can often recover a clean logical Arabic
                     # text layer even when PyMuPDF exposes legacy control glyphs.
@@ -257,20 +358,24 @@ def _extract_pages_from_pdf(
                                 raise RuntimeError('alternate PDF reader is unavailable')
                             alternate_text = alternate_reader.pages[idx].extract_text() or ''
                             if alternative_pdf_text_is_usable(text, alternate_text):
-                                pages[idx] = {
-                                    'page_number': page_num,
-                                    'text': _clean_pdf_page_result(alternate_text, True),
-                                    'is_ocr': False,
-                                    'extraction_engine': 'pypdf',
-                                }
-                                completed += 1
-                                _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
-                                continue
+                                text = alternate_text
+                                words = text.split()
+                                needs_ocr = False
+                                if not has_large_image:
+                                    pages[idx] = {
+                                        'page_number': page_num,
+                                        'text': _clean_pdf_page_result(alternate_text, True),
+                                        'is_ocr': False,
+                                        'extraction_engine': 'pypdf',
+                                    }
+                                    completed += 1
+                                    _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
+                                    continue
                         except Exception as exc:
                             logger.debug("تعذر استخراج طبقة النص البديلة للصفحة %s: %s", page_num, exc)
 
                     can_ocr = (
-                        needs_ocr
+                        (needs_ocr or has_large_image)
                         and enable_ocr
                         and ocr_status.get('available')
                         and ocr_status.get('has_arabic')
@@ -279,17 +384,21 @@ def _extract_pages_from_pdf(
                     if can_ocr:
                         logger.info(
                             "الصفحة %s تحتاج OCR (%s، %s كلمة) بدقة %s DPI...",
-                            page_num, ocr_reason, len(words), dpi,
+                            page_num, ocr_reason or 'embedded_image', len(words), dpi,
                         )
                         pix = page.get_pixmap(dpi=dpi, colorspace=fitz.csGRAY, alpha=False)
-                        arabic_count = len(_ARABIC_CHAR_RE.findall(text))
-                        latin_count = len(_LATIN_CHAR_RE.findall(text))
-                        has_substantial_latin = latin_count >= 40 or latin_count >= (arabic_count * 0.20)
-                        languages = 'ara+eng' if has_substantial_latin else 'ara'
+                        # Always load both bundled models: text inside an image
+                        # can use a different language from the searchable layer.
+                        languages = 'ara+eng'
                         future = executor.submit(
-                            _ocr_pdf_pixmap, pix, text, len(words), languages
+                            _ocr_pdf_pixmap,
+                            pix,
+                            text,
+                            len(words),
+                            languages,
+                            not needs_ocr,
                         )
-                        pending[future] = (idx, page_num)
+                        pending[future] = (idx, page_num, not needs_ocr)
 
                         if len(pending) >= max_pending:
                             done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)

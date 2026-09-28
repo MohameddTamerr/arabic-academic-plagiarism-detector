@@ -67,12 +67,15 @@ def get_embedder():
         return None
 
     try:
+        os.environ.setdefault('HF_HUB_OFFLINE', '1')
+        os.environ.setdefault('TRANSFORMERS_OFFLINE', '1')
         from fastembed import TextEmbedding
-        # تحميل النموذج من المسار المحلي الحصري
+        # اسم النموذج يحدد إعداداته، بينما cache_dir يحتوي ملفاته المضمّنة محلياً.
         _EMBEDDER = TextEmbedding(
-            model_name=str(model_path),
+            model_name=config.SEMANTIC_MODEL_NAME,
             cache_dir=str(config.MODELS_DIR),
-            local_files_only=True
+            local_files_only=True,
+            threads=max(1, min(4, os.cpu_count() or 1)),
         )
         _IS_AVAILABLE = True
         return _EMBEDDER
@@ -90,7 +93,7 @@ def compute_embeddings(texts: list[str]) -> Optional[np.ndarray]:
 
     try:
         # FastEmbed يرجع مولداً لمصفوفات numpy
-        embeddings = list(embedder.embed(texts))
+        embeddings = list(embedder.embed(texts, batch_size=32))
         return np.array(embeddings)
     except Exception as e:
         logger.warning(f"فشل حساب التضمين الدلالي: {e}")
@@ -102,7 +105,8 @@ def match_semantic_similarity(
     candidate_indices: list[int],
     corpus_texts: list[str],
     corpus_embeddings: Optional[np.ndarray],
-    threshold: float = 0.70
+    threshold: float = 0.70,
+    query_embedding: Optional[np.ndarray] = None,
 ) -> Optional[tuple[int, float, str]]:
     """
     مقارنة دلالية بين جملة البحث والمرشحين.
@@ -111,12 +115,14 @@ def match_semantic_similarity(
     if corpus_embeddings is None or not candidate_indices:
         return None
 
-    q_embed = compute_embeddings([query_text])
-    if q_embed is None:
-        return None
+    if query_embedding is None:
+        q_embed = compute_embeddings([query_text])
+        if q_embed is None:
+            return None
+        query_embedding = q_embed[0]
 
     try:
-        q_vec = q_embed[0]
+        q_vec = query_embedding
         cand_vectors = corpus_embeddings[candidate_indices]
 
         # Cosine similarity للمتجهات الطبيعية

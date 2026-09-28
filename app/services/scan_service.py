@@ -322,6 +322,7 @@ def _execute_thesis_pipeline(
             category=category,
             status='مفحوص',
             author=report['author'],
+            file_path=file_path,
             research_id=research_id,
             scan_execution_id=task_id,
             revision_number=rev_num,

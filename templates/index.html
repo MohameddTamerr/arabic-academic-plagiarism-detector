@@ -355,6 +355,11 @@
             white-space: nowrap;
         }
 
+        .topbar-brand {
+            margin-inline-start: 0;
+            margin-inline-end: auto;
+        }
+
         .menu-toggle {
             cursor: pointer;
             background: none;
@@ -391,10 +396,6 @@
             border-left: 1px solid rgba(0, 0, 0, 0.15);
         }
 
-        .sidebar.mobile-open {
-            transform: translateX(0);
-        }
-
         .sidebar-nav {
             flex: 1;
             overflow-y: auto;
@@ -426,9 +427,12 @@
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 18px;
+            justify-content: flex-start;
+            gap: 11px;
+            padding: 10px 20px 10px 14px;
             color: #cbd5e1;
+            text-align: right;
+            direction: rtl;
             text-decoration: none;
             font-size: 13.5px;
             font-weight: 600;
@@ -446,6 +450,251 @@
             background-color: var(--active-item);
             color: #ffffff;
             border-right-color: #ffffff;
+        }
+
+        .nav-item .nav-icon-svg {
+            width: 18px;
+            height: 18px;
+            color: #ffffff;
+            stroke: #ffffff;
+            stroke-width: 1.9;
+            opacity: 0.92;
+        }
+
+        .nav-item:hover .nav-icon-svg,
+        .nav-item.active .nav-icon-svg {
+            opacity: 1;
+        }
+
+        .nav-item-label {
+            min-width: 0;
+            line-height: 1.4;
+        }
+
+        #badge-initial-review-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-inline-start: auto;
+            min-width: 24px;
+            height: 22px;
+            padding: 0 7px;
+            border-radius: 999px;
+            background: rgba(220, 38, 38, 0.18);
+            color: #fca5a5;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #badge-initial-review-count.zero {
+            display: none;
+        }
+
+        /* ─── Compact date range filter ─────────────────────────────── */
+        .filter-toolbar-wrap {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+            padding: 14px;
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #fbfdff 0%, #f5f9ff 100%);
+            box-shadow: 0 1px 3px rgba(15, 45, 92, 0.05);
+        }
+
+        .filter-controls {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            flex: 1 1 520px;
+            min-width: 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 185px;
+        }
+
+        .filter-field--search {
+            flex: 1 1 310px;
+            min-width: min(270px, 100%);
+        }
+
+        .filter-label {
+            color: #48627f;
+            font-size: 11.5px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .filter-control-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .filter-control-icon {
+            position: absolute;
+            right: 13px;
+            z-index: 1;
+            width: 17px;
+            height: 17px;
+            color: #66809f;
+            pointer-events: none;
+        }
+
+        .filter-control {
+            width: 100%;
+            min-height: 42px;
+            padding: 9px 38px 9px 13px;
+            border: 1px solid #cbd9e8;
+            border-radius: 9px;
+            outline: none;
+            background: #fff;
+            color: var(--primary-navy);
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 650;
+            line-height: 1.4;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+        }
+
+        .filter-control::placeholder {
+            color: #8a9bb0;
+            font-weight: 500;
+        }
+
+        .filter-control:hover {
+            border-color: #9fb6d0;
+        }
+
+        .filter-control:focus {
+            border-color: #1d4f91;
+            box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.12);
+            background: #fff;
+        }
+
+        select.filter-control {
+            cursor: pointer;
+            padding-left: 34px;
+            appearance: none;
+        }
+
+        .filter-select-wrap::after {
+            content: '';
+            position: absolute;
+            left: 13px;
+            width: 7px;
+            height: 7px;
+            border-left: 2px solid #66809f;
+            border-bottom: 2px solid #66809f;
+            transform: rotate(-45deg) translateY(-2px);
+            pointer-events: none;
+        }
+
+        .filter-toolbar-wrap .date-range-filter {
+            margin-inline-start: auto;
+        }
+
+        .date-range-filter {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 9px 10px;
+            border: 1px solid #dbe6f3;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);
+            box-shadow: 0 1px 2px rgba(15, 45, 92, 0.04);
+        }
+
+        .date-range-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary-navy);
+            font-size: 12.5px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .date-range-field {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 34px;
+            padding: 3px 9px;
+            border: 1px solid #cbd9e8;
+            border-radius: 8px;
+            background: #fff;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .date-range-field input[type="date"] {
+            width: 128px;
+            padding: 3px 0;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            color: var(--primary-navy);
+            font: inherit;
+            direction: ltr;
+            color-scheme: light;
+        }
+
+        .date-range-apply,
+        .date-range-clear {
+            min-height: 34px;
+            padding: 6px 13px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .date-range-apply {
+            border: 1px solid var(--primary-navy);
+            background: var(--primary-navy);
+            color: #fff;
+        }
+
+        .date-range-clear {
+            border: 1px solid #b9cbe0;
+            background: #fff;
+            color: var(--primary-navy);
+        }
+
+        @media (max-width: 720px) {
+            .filter-toolbar-wrap {
+                align-items: stretch;
+                padding: 12px;
+            }
+            .filter-controls,
+            .filter-field,
+            .filter-field--search {
+                width: 100%;
+                min-width: 100%;
+                flex-basis: 100%;
+            }
+            .filter-toolbar-wrap .date-range-filter {
+                width: 100%;
+                margin-inline-start: 0;
+            }
+            .date-range-filter { align-items: stretch; }
+            .date-range-title { width: 100%; }
+            .date-range-field { flex: 1 1 150px; }
+            .date-range-field input[type="date"] { width: 100%; }
         }
 
         .nav-icon-svg {
@@ -916,7 +1165,20 @@
         }
 
         /* ─── Toast Notifications ──────────────────────────────────── */
-        .custom-toast-message {
+        .toast-container {
+            position: fixed;
+            left: 20px;
+            bottom: 20px;
+            z-index: 20000;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+            max-width: calc(100vw - 40px);
+            pointer-events: none;
+        }
+
+        .custom-toast {
             width: min(440px, calc(100vw - 24px));
             border-radius: var(--radius-md);
             padding: 12px 16px;
@@ -929,9 +1191,172 @@
             margin-bottom: 8px;
             background: #ffffff;
             border: 1px solid var(--border-color);
+            pointer-events: auto;
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .custom-toast-message {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.5;
+        }
+
+        .custom-toast.toast-error { border-inline-start: 4px solid #ef4444; }
+        .custom-toast.toast-warning { border-inline-start: 4px solid #f59e0b; }
+        .custom-toast.toast-success { border-inline-start: 4px solid #10b981; }
+
+        @media (max-width: 600px) {
+            .toast-container {
+                left: 12px;
+                right: 12px;
+                bottom: 12px;
+                max-width: none;
+            }
+            .custom-toast { width: 100%; }
         }
 
         /* ─── Modal Dialogs ────────────────────────────────────────── */
+        body.first-login-locked {
+            overflow: hidden !important;
+        }
+
+        .first-login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow-y: auto;
+            overscroll-behavior: contain;
+            direction: rtl;
+            background:
+                radial-gradient(circle at 15% 12%, rgba(37, 99, 235, 0.2), transparent 34%),
+                rgba(7, 22, 48, 0.94);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .first-login-card {
+            width: min(100%, 620px);
+            max-height: calc(100dvh - 48px);
+            overflow-y: auto;
+            padding: 28px 30px;
+            border: 1px solid rgba(191, 219, 254, 0.85);
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: 0 28px 80px rgba(2, 12, 35, 0.48);
+            animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .first-login-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .first-login-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .first-login-field.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .first-login-field label {
+            color: var(--primary-navy);
+            font-size: 12.5px;
+            font-weight: 800;
+        }
+
+        .first-login-field input {
+            width: 100%;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #cbd9e8;
+            border-radius: 9px;
+            outline: none;
+            background: #f8fbff;
+            color: var(--primary-navy);
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+        }
+
+        .first-login-field input:focus {
+            border-color: #1d4f91;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(29, 79, 145, 0.13);
+        }
+
+        .first-login-help {
+            margin: 2px 0 0;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .first-login-error {
+            display: none;
+            margin-top: 12px;
+            padding: 10px 12px;
+            border: 1px solid #fecaca;
+            border-radius: 9px;
+            background: #fef2f2;
+            color: #b91c1c;
+            font-size: 12.5px;
+            font-weight: 700;
+        }
+
+        .recovery-card-result {
+            display: none;
+            text-align: center;
+        }
+
+        .recovery-card-result img {
+            display: block;
+            width: min(240px, 80vw);
+            height: auto;
+            margin: 0 auto 14px;
+            padding: 10px;
+            border: 1px solid #dbe6f3;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+
+        .recovery-manual-code {
+            margin: 0 auto 14px;
+            padding: 10px 12px;
+            border-radius: 9px;
+            background: #f1f5f9;
+            color: #0f2b5c;
+            font: 700 13px/1.5 monospace;
+            direction: ltr;
+            overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 640px) {
+            .first-login-overlay {
+                align-items: flex-start;
+                padding: 14px;
+            }
+            .first-login-card {
+                max-height: calc(100dvh - 28px);
+                padding: 22px 18px;
+                border-radius: 14px;
+            }
+            .first-login-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+            .first-login-field.full-width {
+                grid-column: auto;
+            }
+        }
+
         .modal-overlay,
         .confirm-modal-overlay {
             position: fixed;
@@ -987,127 +1412,6 @@
             color: #e2e8f0;
             max-height: 120px;
             overflow-y: auto;
-        }
-
-        /* ─── Arabic Date Range Picker Popover ─────────────────────────── */
-        .arabic-datepicker-popover {
-            display: none;
-            position: absolute;
-            z-index: 10500;
-            width: 320px;
-            background: #ffffff;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-modal);
-            padding: 14px;
-            direction: rtl;
-            font-family: inherit;
-        }
-        .adp-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .adp-title {
-            font-size: 13.5px;
-            font-weight: 800;
-            color: var(--primary-navy);
-        }
-        .adp-nav-btn {
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            color: var(--text-dark);
-        }
-        .adp-nav-btn:hover {
-            background: var(--surface-subtle);
-        }
-        .adp-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .adp-days-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-        }
-        .adp-day {
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 600;
-            border-radius: 4px;
-            cursor: pointer;
-            color: var(--text-dark);
-            user-select: none;
-        }
-        .adp-day:hover:not(.empty) {
-            background: #e2e8f0;
-        }
-        .adp-day.today {
-            border: 1px solid var(--primary-navy);
-        }
-        .adp-day.range-start,
-        .adp-day.range-end {
-            background: var(--primary-navy) !important;
-            color: #ffffff !important;
-            font-weight: 800;
-        }
-        .adp-day.in-range {
-            background: #e0f2fe !important;
-            color: var(--primary-navy);
-        }
-        .adp-day.empty {
-            cursor: default;
-        }
-        .adp-footer {
-            margin-top: 12px;
-            padding-top: 10px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .adp-summary {
-            font-size: 11px;
-            color: var(--text-muted);
-            font-weight: 600;
-        }
-        .adp-actions {
-            display: flex;
-            gap: 6px;
-        }
-        .adp-btn-clear {
-            padding: 4px 8px;
-            font-size: 11px;
-            background: none;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .adp-btn-apply {
-            padding: 4px 10px;
-            font-size: 11px;
-            font-weight: 700;
-            background: var(--primary-navy);
-            color: #ffffff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
 
         /* ─── Print Media Rules ────────────────────────────────────── */
@@ -1172,6 +1476,12 @@
             }
         }
 
+        /* A newly accepted scan owns the report workspace. Keep its progress
+           visible, but never leave the previous report underneath it. */
+        #report-detail-panel.report-workspace-loading > :not(:first-child):not(#batch-switcher-bar) {
+            display: none !important;
+        }
+
         @media (max-width: 768px) {
             .main-content [style*="grid-template-columns"] {
                 grid-template-columns: minmax(0, 1fr) !important;
@@ -1183,9 +1493,6 @@
 
     <!-- ─── Top Bar ────────────────────────────────────────────────────────── -->
     <header class="topbar">
-        <button type="button" class="mobile-menu-toggle" id="mobile-menu-toggle" onclick="toggleMobileSidebar()" aria-label="فتح القائمة الرئيسية" aria-expanded="false">
-            <svg class="nav-icon-svg" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
         <div class="topbar-brand" style="display: flex; align-items: center; gap: 14px;">
             <img src="/static/logo.png" alt="شعار أكاديمية الشرطة - كلية الدراسات العليا" style="height: 48px; width: auto; object-fit: contain; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.08));">
             <div style="display: flex; flex-direction: column;">
@@ -1208,21 +1515,63 @@
 
     <div class="app-container">
 
-        <div class="sidebar-mobile-overlay" id="sidebar-mobile-overlay" onclick="closeMobileSidebar()" aria-hidden="true"></div>
-
         <!-- ─── Sidebar Navigation (Right Side) ─────────────────────────────── -->
         <aside class="sidebar" id="app-sidebar">
-            <div class="sidebar-nav" id="sidebar-nav-container"><a class="nav-item" id="nav-dashboard" data-view="dashboard" onclick="switchView('dashboard')">الرئيسية</a>
-<a class="nav-item" id="nav-upload" data-view="upload" onclick="switchView('upload')">رفع بحث / رسالة</a>
-<a class="nav-item" id="nav-reports" data-view="reports" onclick="switchView('reports')">التقارير</a>
-<a class="nav-item" id="nav-theses" data-view="theses" onclick="switchView('theses')">إدارة الرسائل والأطروحات</a>
-<a class="nav-item admin-only" id="nav-initial-review" data-view="initial-review" onclick="switchView('initial-review')">المراجعات<span id="badge-initial-review-count">0</span></a>
-<a class="nav-item admin-only" id="nav-database" data-view="database" onclick="switchView('database')">قاعدة الأبحاث المرجعية</a>
-<a class="nav-item admin-only" id="nav-users" data-view="users" onclick="switchView('users')">إدارة المستخدمين</a>
-<a class="nav-item admin-only" id="nav-audit" data-view="audit" onclick="switchView('audit')">سجل التدقيق</a>
-<a class="nav-item admin-only" id="nav-settings" data-view="settings" onclick="switchView('settings')">الإعدادات</a>
-<a class="nav-item" id="nav-help" data-view="help" onclick="switchView('help')">المساعدة</a>
-</div>
+            <div class="sidebar-nav" id="sidebar-nav-container">
+                <a class="nav-item" id="nav-dashboard" data-view="dashboard" onclick="switchView('dashboard')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h13v-9.5"></path><path d="M9.5 20v-6h5v6"></path></svg>
+                    <span class="nav-item-label">الرئيسية</span>
+                </a>
+                <a class="nav-item" id="nav-upload" data-view="upload" onclick="switchView('upload')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><polyline points="9 15 12 12 15 15"></polyline></svg>
+                    <span class="nav-item-label">رفع بحث / رسالة</span>
+                </a>
+                <a class="nav-item" id="nav-reports" data-view="reports" onclick="openReportsArchive()">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M8 17v-2"></path><path d="M12 17v-5"></path><path d="M16 17v-7"></path></svg>
+                    <span class="nav-item-label">التقارير</span>
+                </a>
+                <a class="nav-item" id="nav-theses" data-view="theses" onclick="switchView('theses')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path><path d="M9 7h7"></path><path d="M9 11h7"></path></svg>
+                    <span class="nav-item-label">إدارة الرسائل والأطروحات</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-initial-review" data-view="initial-review" onclick="switchView('initial-review')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+                    <span class="nav-item-label">قيد المراجعة</span>
+                    <span id="badge-initial-review-count">0</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-preliminary" data-view="preliminary" onclick="switchView('preliminary')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-3"></path><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="m9 15 2 2 4-4"></path></svg>
+                    <span class="nav-item-label">القبول المبدئي</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-final-accepted" onclick="openFinalAcceptedReports()">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg>
+                    <span class="nav-item-label">القبول النهائي</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-rejected" data-view="rejected" onclick="switchView('rejected')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="m9 13 6 6"></path><path d="m15 13-6 6"></path></svg>
+                    <span class="nav-item-label">الرسائل المرفوضة</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-database" data-view="database" onclick="switchView('database')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5"></path><path d="M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"></path></svg>
+                    <span class="nav-item-label">قاعدة الأبحاث المرجعية</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-users" data-view="users" onclick="switchView('users')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <span class="nav-item-label">إدارة المستخدمين</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-audit" data-view="audit" onclick="switchView('audit')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="M9 9h6"></path><path d="M9 13h6"></path><path d="M9 17h3"></path></svg>
+                    <span class="nav-item-label">سجل التدقيق</span>
+                </a>
+                <a class="nav-item admin-only" id="nav-settings" data-view="settings" onclick="switchView('settings')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.83 2.83-.06-.06A1.7 1.7 0 0 0 15 19.4a1.7 1.7 0 0 0-1 .6 1.7 1.7 0 0 0-.4 1.1V21H9.6v-.09A1.7 1.7 0 0 0 8.5 19.4a1.7 1.7 0 0 0-1.88.34l-.06.06-2.83-2.83.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-.6-1 1.7 1.7 0 0 0-1.1-.4H3V9.6h.09A1.7 1.7 0 0 0 4.6 8.5a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.83-2.83.06.06A1.7 1.7 0 0 0 9 4.6a1.7 1.7 0 0 0 1-.6 1.7 1.7 0 0 0 .4-1.1V3h4v.09A1.7 1.7 0 0 0 15.5 4.6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2.83 2.83-.06.06A1.7 1.7 0 0 0 19.4 9c.1.4.3.75.6 1 .3.27.7.4 1.1.4h.9v4h-.09A1.7 1.7 0 0 0 19.4 15z"></path></svg>
+                    <span class="nav-item-label">الإعدادات</span>
+                </a>
+                <a class="nav-item" id="nav-help" data-view="help" onclick="switchView('help')">
+                    <svg class="nav-icon-svg" aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M9.6 9a2.5 2.5 0 1 1 4.83.9c-.43 1.16-1.43 1.42-2.03 2.1-.3.34-.4.75-.4 1.5"></path><path d="M12 17.5h.01"></path></svg>
+                    <span class="nav-item-label">المساعدة</span>
+                </a>
+            </div>
 
             <!-- Logout Button (Anchored at Bottom) -->
             <div class="sidebar-footer">
@@ -1357,38 +1706,12 @@
                         </button>
                     </div>
 
-                    <!-- Modern Segmented Date Filters -->
-                    <div class="filter-toolbar-wrap" style="margin-bottom: 14px;">
-                        <div style="font-size: 13px; font-weight: 800; color: var(--primary-navy);">
-                            تصفية التقارير:
-                        </div>
-                        <div class="segmented-filter-bar">
-                            <div class="segmented-group">
-                                <button type="button" class="segmented-btn active" id="fpill-dashboard-all" onclick="applyDaysFilter('dashboard', 'all', this)">
-                                    <span>الكل</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-dashboard-today" onclick="applyDaysFilter('dashboard', 'today', this)">
-                                    <span>اليوم</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-dashboard-7days" onclick="applyDaysFilter('dashboard', '7days', this)">
-                                    <span>آخر 7 أيام</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-dashboard-30days" onclick="applyDaysFilter('dashboard', '30days', this)">
-                                    <span>آخر 30 يوماً</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-dashboard-month" onclick="applyDaysFilter('dashboard', 'month', this)">
-                                    <span>هذا الشهر</span>
-                                </button>
-                            </div>
-
-                            <div class="custom-date-picker-badge" id="date-badge-dashboard" onclick="toggleArabicDatePicker('dashboard', this)">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0284c7; flex-shrink: 0;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span class="date-picker-label" id="date-label-dashboard">فترة مخصصة (من - إلى)...</span>
-                                <button type="button" class="btn-filter-reset" onclick="event.stopPropagation(); clearDateFilter('dashboard')" title="إعادة تعيين الفلترة">
-                                    <svg class="nav-icon-svg" style="width: 11px; height: 11px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="date-range-filter" data-date-filter="dashboard" style="margin-bottom: 14px;">
+                        <span class="date-range-title"><svg class="nav-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>الفترة الزمنية</span>
+                        <label class="date-range-field"><span>من</span><input type="date" id="dashboard-date-from" aria-label="من تاريخ"></label>
+                        <label class="date-range-field"><span>إلى</span><input type="date" id="dashboard-date-to" aria-label="إلى تاريخ"></label>
+                        <button type="button" class="date-range-apply" onclick="applyDateFilter('dashboard')">تطبيق</button>
+                        <button type="button" class="date-range-clear" onclick="clearDateFilter('dashboard')">مسح</button>
                     </div>
 
                     <table class="custom-table">
@@ -1534,37 +1857,21 @@
 
                 <div class="card">
                     <div class="filter-toolbar-wrap">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <input type="text" id="initial-review-search-input" placeholder="بحث في طابور الفحص الأولي باسم البحث، اسم الباحث، أو الموظف..." style="width: 320px; max-width: 100%; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 13px;" onkeyup="loadInitialReviewsQueue()">
+                        <div class="filter-controls">
+                            <label class="filter-field filter-field--search" for="initial-review-search-input">
+                                <span class="filter-label">بحث في طابور الفحص الأولي</span>
+                                <span class="filter-control-wrap">
+                                    <svg class="filter-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                                    <input class="filter-control" type="search" id="initial-review-search-input" placeholder="اسم البحث أو الباحث أو الموظف" autocomplete="off" oninput="loadInitialReviewsQueue()">
+                                </span>
+                            </label>
                         </div>
-
-                        <!-- Modern Segmented Date Filters -->
-                        <div class="segmented-filter-bar">
-                            <div class="segmented-group">
-                                <button type="button" class="segmented-btn active" id="fpill-initial-all" onclick="applyDaysFilter('initial', 'all', this)">
-                                    <span>الكل</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-initial-today" onclick="applyDaysFilter('initial', 'today', this)">
-                                    <span>اليوم</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-initial-7days" onclick="applyDaysFilter('initial', '7days', this)">
-                                    <span>آخر 7 أيام</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-initial-30days" onclick="applyDaysFilter('initial', '30days', this)">
-                                    <span>آخر 30 يوماً</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-initial-month" onclick="applyDaysFilter('initial', 'month', this)">
-                                    <span>هذا الشهر</span>
-                                </button>
-                            </div>
-
-                            <div class="custom-date-picker-badge" id="date-badge-initial" onclick="toggleArabicDatePicker('initial', this)">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0284c7; flex-shrink: 0;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span class="date-picker-label" id="date-label-initial">فترة مخصصة (من - إلى)...</span>
-                                <button type="button" class="btn-filter-reset" onclick="event.stopPropagation(); clearDateFilter('initial')" title="إعادة تعيين الفلترة">
-                                    <svg class="nav-icon-svg" style="width: 11px; height: 11px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
+                        <div class="date-range-filter" data-date-filter="initial">
+                            <span class="date-range-title">الفترة الزمنية</span>
+                            <label class="date-range-field"><span>من</span><input type="date" id="initial-date-from" aria-label="من تاريخ"></label>
+                            <label class="date-range-field"><span>إلى</span><input type="date" id="initial-date-to" aria-label="إلى تاريخ"></label>
+                            <button type="button" class="date-range-apply" onclick="applyDateFilter('initial')">تطبيق</button>
+                            <button type="button" class="date-range-clear" onclick="clearDateFilter('initial')">مسح</button>
                         </div>
                     </div>
 
@@ -1605,37 +1912,21 @@
 
                 <div class="card">
                     <div class="filter-toolbar-wrap">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <input type="text" id="preliminary-search-input" placeholder="بحث في الأبحاث المقبولة مبدئياً باسم البحث، الباحث، أو التخصص..." style="width: 320px; max-width: 100%; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 13px;" onkeyup="loadPreliminaryPapers()">
+                        <div class="filter-controls">
+                            <label class="filter-field filter-field--search" for="preliminary-search-input">
+                                <span class="filter-label">بحث في القبول المبدئي</span>
+                                <span class="filter-control-wrap">
+                                    <svg class="filter-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                                    <input class="filter-control" type="search" id="preliminary-search-input" placeholder="اسم البحث أو الباحث أو التخصص" autocomplete="off" oninput="loadPreliminaryPapers()">
+                                </span>
+                            </label>
                         </div>
-
-                        <!-- Modern Segmented Date Filters -->
-                        <div class="segmented-filter-bar">
-                            <div class="segmented-group">
-                                <button type="button" class="segmented-btn active" id="fpill-preliminary-all" onclick="applyDaysFilter('preliminary', 'all', this)">
-                                    <span>الكل</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-preliminary-today" onclick="applyDaysFilter('preliminary', 'today', this)">
-                                    <span>اليوم</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-preliminary-7days" onclick="applyDaysFilter('preliminary', '7days', this)">
-                                    <span>آخر 7 أيام</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-preliminary-30days" onclick="applyDaysFilter('preliminary', '30days', this)">
-                                    <span>آخر 30 يوماً</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-preliminary-month" onclick="applyDaysFilter('preliminary', 'month', this)">
-                                    <span>هذا الشهر</span>
-                                </button>
-                            </div>
-
-                            <div class="custom-date-picker-badge" id="date-badge-preliminary" onclick="toggleArabicDatePicker('preliminary', this)">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0284c7; flex-shrink: 0;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span class="date-picker-label" id="date-label-preliminary">فترة مخصصة (من - إلى)...</span>
-                                <button type="button" class="btn-filter-reset" onclick="event.stopPropagation(); clearDateFilter('preliminary')" title="إعادة تعيين الفلترة">
-                                    <svg class="nav-icon-svg" style="width: 11px; height: 11px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
+                        <div class="date-range-filter" data-date-filter="preliminary">
+                            <span class="date-range-title">الفترة الزمنية</span>
+                            <label class="date-range-field"><span>من</span><input type="date" id="preliminary-date-from" aria-label="من تاريخ"></label>
+                            <label class="date-range-field"><span>إلى</span><input type="date" id="preliminary-date-to" aria-label="إلى تاريخ"></label>
+                            <button type="button" class="date-range-apply" onclick="applyDateFilter('preliminary')">تطبيق</button>
+                            <button type="button" class="date-range-clear" onclick="clearDateFilter('preliminary')">مسح</button>
                         </div>
                     </div>
 
@@ -1677,36 +1968,13 @@
                     <div class="filter-toolbar-wrap">
                         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <h3 class="section-title" style="margin-bottom: 0;"><span style="font-size: 14px; font-weight: 800; color: #dc2626;">سجل قرارات الرفض للباحثين</span></h3>
-                            
                         </div>
-
-                        <!-- Modern Segmented Date Filters -->
-                        <div class="segmented-filter-bar">
-                            <div class="segmented-group">
-                                <button type="button" class="segmented-btn active" id="fpill-rejected-all" onclick="applyDaysFilter('rejected', 'all', this)">
-                                    <span>الكل</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-rejected-today" onclick="applyDaysFilter('rejected', 'today', this)">
-                                    <span>اليوم</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-rejected-7days" onclick="applyDaysFilter('rejected', '7days', this)">
-                                    <span>آخر 7 أيام</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-rejected-30days" onclick="applyDaysFilter('rejected', '30days', this)">
-                                    <span>آخر 30 يوماً</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-rejected-month" onclick="applyDaysFilter('rejected', 'month', this)">
-                                    <span>هذا الشهر</span>
-                                </button>
-                            </div>
-
-                            <div class="custom-date-picker-badge" id="date-badge-rejected" onclick="toggleArabicDatePicker('rejected', this)">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0284c7; flex-shrink: 0;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span class="date-picker-label" id="date-label-rejected">فترة مخصصة (من - إلى)...</span>
-                                <button type="button" class="btn-filter-reset" onclick="event.stopPropagation(); clearDateFilter('rejected')" title="إعادة تعيين الفلترة">
-                                    <svg class="nav-icon-svg" style="width: 11px; height: 11px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
+                        <div class="date-range-filter" data-date-filter="rejected">
+                            <span class="date-range-title">الفترة الزمنية</span>
+                            <label class="date-range-field"><span>من</span><input type="date" id="rejected-date-from" aria-label="من تاريخ"></label>
+                            <label class="date-range-field"><span>إلى</span><input type="date" id="rejected-date-to" aria-label="إلى تاريخ"></label>
+                            <button type="button" class="date-range-apply" onclick="applyDateFilter('rejected')">تطبيق</button>
+                            <button type="button" class="date-range-clear" onclick="clearDateFilter('rejected')">مسح</button>
                         </div>
                     </div>
 
@@ -1735,13 +2003,36 @@
                 <div class="page-header"><div class="page-header-info">
                     <h1 class="page-title">التقارير</h1><p class="page-subtitle">البحث في تقارير الأبحاث والرسائل ومتابعة حالة المراجعة.</p>
                 </div><button class="btn-primary" onclick="loadReportList(1)">تحديث</button></div>
-                <div class="card">
-                    <div class="page-header-actions">
-                        <input id="report-filter-q" aria-label="بحث التقارير" placeholder="بحث بالعنوان أو الباحث أو المرجع" oninput="loadReportList(1)">
-                        <label>من <input type="date" id="report-filter-date_from" onchange="loadReportList(1)"></label>
-                        <label>إلى <input type="date" id="report-filter-date_to" onchange="loadReportList(1)"></label>
-                        <select id="report-filter-scan_status" aria-label="حالة الفحص" onchange="loadReportList(1)"><option value="">كل حالات الفحص</option><option value="completed">مكتمل</option><option value="failed">فشل</option><option value="processing">قيد الفحص</option></select>
-                        <select id="report-filter-review_status" aria-label="حالة المراجعة" onchange="loadReportList(1)"><option value="">كل حالات المراجعة</option><option value="pending_review">بانتظار المراجعة</option><option value="preliminary_accepted">مقبول مبدئياً</option><option value="final_accepted">معتمد نهائياً</option><option value="rejected">مرفوض</option></select>
+                <div class="card" id="report-archive-panel">
+                    <div class="filter-toolbar-wrap">
+                        <div class="filter-controls">
+                            <label class="filter-field filter-field--search" for="report-filter-q">
+                                <span class="filter-label">بحث في التقارير</span>
+                                <span class="filter-control-wrap">
+                                    <svg class="filter-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                                    <input class="filter-control" type="search" id="report-filter-q" placeholder="العنوان أو الباحث أو الرقم المرجعي" autocomplete="off" oninput="loadReportList(1)">
+                                </span>
+                            </label>
+                            <label class="filter-field" for="report-filter-scan_status">
+                                <span class="filter-label">حالة الفحص</span>
+                                <span class="filter-control-wrap filter-select-wrap">
+                                    <select class="filter-control" id="report-filter-scan_status" onchange="loadReportList(1)"><option value="">كل حالات الفحص</option><option value="completed">مكتمل</option><option value="failed">فشل</option><option value="processing">قيد الفحص</option></select>
+                                </span>
+                            </label>
+                            <label class="filter-field" for="report-filter-review_status">
+                                <span class="filter-label">حالة المراجعة</span>
+                                <span class="filter-control-wrap filter-select-wrap">
+                                    <select class="filter-control" id="report-filter-review_status" onchange="loadReportList(1)"><option value="">كل حالات المراجعة</option><option value="pending_review">بانتظار المراجعة</option><option value="preliminary_accepted">مقبول مبدئياً</option><option value="final_accepted">معتمد نهائياً</option><option value="rejected">مرفوض</option></select>
+                                </span>
+                            </label>
+                        </div>
+                        <div class="date-range-filter" data-date-filter="reports">
+                            <span class="date-range-title">الفترة الزمنية</span>
+                            <label class="date-range-field"><span>من</span><input type="date" id="reports-date-from" aria-label="من تاريخ"></label>
+                            <label class="date-range-field"><span>إلى</span><input type="date" id="reports-date-to" aria-label="إلى تاريخ"></label>
+                            <button type="button" class="date-range-apply" onclick="applyDateFilter('reports')">تطبيق</button>
+                            <button type="button" class="date-range-clear" onclick="clearDateFilter('reports')">مسح</button>
+                        </div>
                     </div>
                     <div class="table-container"><table class="custom-table"><thead><tr><th>المرجع</th><th>العنوان</th><th>الباحث</th><th>التاريخ</th><th>الفحص</th><th>التشابه</th><th>المراجعة</th><th>الإجراءات</th></tr></thead><tbody id="report-list-body"></tbody></table></div>
                     <div id="report-list-pagination" class="page-header-actions"></div>
@@ -1767,14 +2058,18 @@
                         </div>
                         
                         <div class="page-header-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
-                            <button class="btn-primary" id="btn-quick-view-evidence" onclick="switchReportTab('evidence')" style="background:var(--primary-navy);">
+                            <button class="btn-primary" id="btn-quick-view-evidence" onclick="scrollToInlinePdfViewer()" style="background:var(--primary-navy);">
                                 <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg>
                                 <span>عرض مواضع التطابق</span>
                             </button>
 
-                            <button class="btn-secondary" id="btn-quick-view-doc" onclick="openReportPdfViewer()">
+                            <button class="btn-secondary" id="btn-quick-view-doc" onclick="scrollToInlinePdfViewer()">
                                 <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
                                 <span>فتح البحث مع التحديد</span>
+                            </button>
+
+                            <button class="btn-primary" id="btn-retry-failed-scan" onclick="retryCurrentFailedReport()" style="display:none; background:#b45309;">
+                                <span>إعادة الفحص</span>
                             </button>
 
                             <!-- زر الموظف لإرسال البحث للمدير -->
@@ -1789,9 +2084,9 @@
                                 <span>رفض البحث</span>
                             </button>
 
-                            <button class="btn-success admin-btn" id="btn-accept-initial" onclick="acceptFinalPaper()" style="display:none;">
+                            <button class="btn-success admin-btn" id="btn-accept-preliminary" onclick="acceptInitialPaper()" style="display:none;">
                                 <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                                <span>اعتماد نهائي وإضافة للمراجع</span>
+                                <span>قبول مبدئي</span>
                             </button>
 
                             <button class="btn-secondary" onclick="exportReportHTML()" title="تصدير التقرير الأكاديمي كـ HTML للطباعة">
@@ -1880,6 +2175,18 @@
                             </div>
                         </div>
 
+                        <!-- Rejected-history comparison is intentionally separate from official similarity. -->
+                        <div id="rejected-history-card" class="card" style="display:none;padding:14px 18px;margin-bottom:20px;background:#fff7ed;border:1.5px solid #fdba74;border-right:5px solid #ea580c;">
+                            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+                                <div>
+                                    <div style="font-size:13.5px;font-weight:800;color:#9a3412;">تشابه مع أبحاث مرفوضة سابقًا — مؤشر إعادة تقديم</div>
+                                    <div id="rejected-history-details" style="font-size:12px;color:#7c2d12;margin-top:4px;">لا يدخل في نسبة الاستلال الرسمية.</div>
+                                    <div id="rejected-history-sources" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;"></div>
+                                </div>
+                                <div id="rejected-history-pct" style="font-size:26px;font-weight:900;color:#ea580c;">0%</div>
+                            </div>
+                        </div>
+
                         <!-- Research Details Strip -->
                         <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
@@ -1954,28 +2261,55 @@
                         </div>
                     </div>
 
-                    <!-- ════════════════ LEVEL 2: SOURCES & EVIDENCE TABS ════════════════ -->
-                    <div class="card" style="margin-bottom: 20px; padding: 0; overflow: hidden;">
-                        <!-- Segmented Navigation Tabs for Report Sections -->
-                        <div style="display: flex; border-bottom: 1px solid var(--border-color); background: #f8fafc; padding: 6px 12px; gap: 8px;">
-                            <button type="button" class="tab-btn-active" id="rep-tab-btn-evidence" onclick="switchReportTab('evidence')" style="padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: #ffffff; color: var(--primary-navy); box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; align-items: center; gap: 6px;">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: currentColor;" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg>
-                                <span>شواهد المقارنة المكتشفة</span>
-                                <span id="tab-evidence-count-badge" style="font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #e0f2fe; color: #0369a1;">0</span>
-                            </button>
-                            <button type="button" id="rep-tab-btn-sources" onclick="switchReportTab('sources')" style="padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: transparent; color: #64748b; display: flex; align-items: center; gap: 6px;">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: currentColor;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                                <span>المصادر المرجعية وعزو الصفحات</span>
-                                <span id="tab-sources-count-badge" style="font-size: 11px; padding: 1px 6px; border-radius: 10px; background: #f1f5f9; color: #64748b;">0</span>
-                            </button>
-                            <button type="button" id="rep-tab-btn-doc" onclick="switchReportTab('doc')" style="padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 6px; cursor: pointer; border: none; background: transparent; color: #64748b; display: flex; align-items: center; gap: 6px;">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: currentColor;" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                <span>معاينة المستند والـ PDF</span>
-                            </button>
+                    <!-- ════════════════ LEVEL 2: PDF VIEWER (SIMPLIFIED) ════════════════ -->
+                    <div id="report-pdf-viewer-container" style="margin-bottom: 20px; padding: 0; overflow: hidden; display: none; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff;">
+                        <!-- Embedded PDF Viewer (reuse existing modal structure but inline) -->
+                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 18px; background:var(--primary-navy); color:#ffffff; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.12);">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:13.5px; font-weight:800; color:#ffffff;">عارض المستند الأصلي مع تحديد الشواهد</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                <button id="inline-pdf-prev" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="changePdfPage(-1)" title="الصفحة السابقة">◀ السابق</button>
+                                <div style="display:inline-flex; align-items:center; gap:4px; background:rgba(0,0,0,0.25); padding:2px 8px; border-radius:4px; border:1px solid rgba(255,255,255,0.2);">
+                                    <span style="font-size:12px; color:#cbd5e1;">صفحة</span>
+                                    <input id="inline-pdf-number" type="number" min="1" style="width:48px; background:transparent; border:none; color:#ffffff; font-weight:700; text-align:center; font-size:12px; outline:none;" onchange="jumpPdfPage(this.value)">
+                                    <span id="inline-pdf-total" style="font-size:12px; color:#cbd5e1;">/ 1</span>
+                                </div>
+                                <button id="inline-pdf-next" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="changePdfPage(1)" title="الصفحة التالية">التالي ▶</button>
+                                <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+                                <button class="btn-secondary" style="background:#059669; color:#ffffff; border:1px solid #34d399; padding:4px 10px; font-size:12px; font-weight:800;" onclick="jumpToFirstEvidence()" title="الانتقال مباشرة إلى أول موضع متطابق">اذهب لأول تطابق</button>
+                                <button id="inline-evidence-prev" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="jumpToEvidence(-1)" title="التطابق السابق" disabled>◀ تطابق</button>
+                                <span id="inline-evidence-position" style="min-width:42px; text-align:center; color:#dbeafe; font-size:11px; font-weight:800;">0 / 0</span>
+                                <button id="inline-evidence-next" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="jumpToEvidence(1)" title="التطابق التالي">تطابق ▶</button>
+                                <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+                                <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 9px; font-size:12px;" onclick="zoomPdf(.25)" title="تكبير">+</button>
+                                <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 9px; font-size:12px;" onclick="zoomPdf(-.25)" title="تصغير">-</button>
+                                <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="fitPdfWidth()" title="ملاءمة العرض">ملاءمة</button>
+                                <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+                                <div style="display:flex; align-items:center; gap:6px; font-size:11px;">
+                                    <span style="color:#cbd5e1;">الوسيلة:</span>
+                                    <div style="width:10px; height:10px; background:#dc2626; border-radius:2px; opacity:0.7;"></div>
+                                    <div style="width:10px; height:10px; background:#d97706; border-radius:2px; opacity:0.7;"></div>
+                                    <div style="width:10px; height:10px; background:#059669; border-radius:2px; opacity:0.7;"></div>
+                                </div>
+                                <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+                                <button id="inline-pdf-filter-all" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="toggleHighlightFilter('all')" title="الكل">الكل</button>
+                                <button id="inline-pdf-filter-copied" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('copied')" title="نسخ">نسخ</button>
+                                <button id="inline-pdf-filter-paraphrased" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('paraphrased')" title="عرض مواضع إعادة الصياغة">إعادة صياغة</button>
+                                <button id="inline-pdf-filter-cited" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('cited')" title="اقتباس">اقتباس</button>
+                                <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+                                <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:12px;" onclick="exportHighlightedPdf()" title="تنزيل PDF">⬇ تنزيل</button>
+                            </div>
                         </div>
+                        <div style="overflow:auto; min-height:500px; background:#475569; padding:20px; display:flex; justify-content:center; align-items:flex-start;" id="inline-pdf-container">
+                            <div style="position:relative; display:inline-block; margin:auto;">
+                                <img id="inline-pdf-image" tabindex="-1" alt="صفحة مستند PDF" style="display:block; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:2px;">
+                            </div>
+                        </div>
+                    </div>
 
                         <!-- ── TAB 1: EVIDENCE (PAGINATED & FILTERED) ── -->
-                        <div id="rep-tab-content-evidence" style="padding: 16px 20px;">
+                        <div id="rep-tab-content-evidence" style="padding: 16px 20px; display: none !important;">
                             <!-- Filter & Search Toolbar -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -2026,7 +2360,7 @@
                         </div>
 
                         <!-- ── TAB 2: SOURCES (PAGINATED & SEARCHABLE) ── -->
-                        <div id="rep-tab-content-sources" style="display: none; padding: 16px 20px;">
+                        <div id="rep-tab-content-sources" style="display: none !important; padding: 16px 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                                 <input type="text" id="sources-search-input" placeholder="بحث في عنوان المصدر أو اسم الباحث..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 280px; outline: none;" onkeyup="debouncedLoadSources()">
                             </div>
@@ -2050,8 +2384,8 @@
                             <div id="sources-pagination" style="margin-top: 12px;"></div>
                         </div>
 
-                        <!-- ── TAB 3: DOCUMENT VIEWER (LAZY LOADED) ── -->
-                        <div id="rep-tab-content-doc" style="display: none; padding: 16px 20px;">
+                        <!-- ── TAB 3: DOCUMENT VIEWER (LAZY LOADED) ── HIDDEN - REPLACED WITH INLINE PDF -->
+                        <div id="rep-tab-content-doc" style="display: none !important; padding: 16px 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
                                 <div style="font-size: 13px; font-weight: 700; color: var(--primary-navy);">
                                     <span>معاينة المستند الموثق وتظليل الشواهد المصدرية</span>
@@ -2073,7 +2407,7 @@
                     </div>
 
                     <!-- ════════════════ LEVEL 4: TECHNICAL AUDIT (COLLAPSED) ════════════════ -->
-                    <div class="card" style="margin-top: 20px; padding: 16px 20px; background: #fafcff; border: 1px solid #e2e8f0;">
+                    <div class="card" style="display: none !important; margin-top: 20px; padding: 16px 20px; background: #fafcff; border: 1px solid #e2e8f0;">
                         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #0284c7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -2105,7 +2439,6 @@
                                 <div><strong>بصمة قاعدة المراجع (Fingerprint):</strong> <span id="rep-snap-fingerprint" style="font-family: monospace; font-size: 11px; word-break: break-all;">—</span></div>
                             </div>
                         </div>
-                    </div>
                 </div>
 </section>
 
@@ -2126,37 +2459,21 @@
 
                 <div class="card">
                     <div class="filter-toolbar-wrap">
-                        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                            <input type="text" id="db-search-input" placeholder="بحث شامل باسم البحث، اسم الباحث، التخصص، أو التاريخ..." style="width: 320px; max-width: 100%; padding: 8px 12px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; font-size: 13px;" onkeyup="loadDatabasePapers()">
+                        <div class="filter-controls">
+                            <label class="filter-field filter-field--search" for="db-search-input">
+                                <span class="filter-label">بحث في قاعدة الأبحاث</span>
+                                <span class="filter-control-wrap">
+                                    <svg class="filter-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+                                    <input class="filter-control" type="search" id="db-search-input" placeholder="اسم البحث أو الباحث أو التخصص" autocomplete="off" oninput="loadDatabasePapers()">
+                                </span>
+                            </label>
                         </div>
-
-                        <!-- Modern Segmented Date Filters -->
-                        <div class="segmented-filter-bar">
-                            <div class="segmented-group">
-                                <button type="button" class="segmented-btn active" id="fpill-database-all" onclick="applyDaysFilter('database', 'all', this)">
-                                    <span>الكل</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-database-today" onclick="applyDaysFilter('database', 'today', this)">
-                                    <span>اليوم</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-database-7days" onclick="applyDaysFilter('database', '7days', this)">
-                                    <span>آخر 7 أيام</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-database-30days" onclick="applyDaysFilter('database', '30days', this)">
-                                    <span>آخر 30 يوماً</span>
-                                </button>
-                                <button type="button" class="segmented-btn" id="fpill-database-month" onclick="applyDaysFilter('database', 'month', this)">
-                                    <span>هذا الشهر</span>
-                                </button>
-                            </div>
-
-                            <div class="custom-date-picker-badge" id="date-badge-database" onclick="toggleArabicDatePicker('database', this)">
-                                <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0284c7; flex-shrink: 0;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                <span class="date-picker-label" id="date-label-database">فترة مخصصة (من - إلى)...</span>
-                                <button type="button" class="btn-filter-reset" onclick="event.stopPropagation(); clearDateFilter('database')" title="إعادة تعيين الفلترة">
-                                    <svg class="nav-icon-svg" style="width: 11px; height: 11px;" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                                </button>
-                            </div>
+                        <div class="date-range-filter" data-date-filter="database">
+                            <span class="date-range-title">الفترة الزمنية</span>
+                            <label class="date-range-field"><span>من</span><input type="date" id="database-date-from" aria-label="من تاريخ"></label>
+                            <label class="date-range-field"><span>إلى</span><input type="date" id="database-date-to" aria-label="إلى تاريخ"></label>
+                            <button type="button" class="date-range-apply" onclick="applyDateFilter('database')">تطبيق</button>
+                            <button type="button" class="date-range-clear" onclick="clearDateFilter('database')">مسح</button>
                         </div>
                     </div>
 
@@ -2766,6 +3083,11 @@
                                 <input type="text" id="audit-search-input" onkeyup="if(event.key==='Enter') applyAuditFilters()" placeholder="بحث بالرقم المرجعي (RES-...)، المستخدم، الإجراء..." style="width: 100%; padding: 7px 32px 7px 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 13px; outline: none;">
                                 <svg class="nav-icon-svg" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; stroke: #94a3b8;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             </div>
+                            <div class="date-range-filter" data-date-filter="audit">
+                                <span class="date-range-title">الفترة الزمنية</span>
+                                <label class="date-range-field"><span>من</span><input type="date" id="audit-date-from" aria-label="من تاريخ"></label>
+                                <label class="date-range-field"><span>إلى</span><input type="date" id="audit-date-to" aria-label="إلى تاريخ"></label>
+                            </div>
                         </div>
 
                         <div style="display: flex; gap: 8px;">
@@ -3273,8 +3595,8 @@
     </div>
 
     <!-- ─── Mandatory employee first-login setup ──────────────────────── -->
-    <div id="first-login-overlay" class="first-login-overlay" role="dialog" aria-modal="true" aria-labelledby="first-login-title">
-        <div class="first-login-card">
+    <div id="first-login-overlay" class="first-login-overlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="first-login-title">
+        <div class="first-login-card" tabindex="-1">
             <div id="first-login-form-step">
                 <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
                     <div style="width:44px; height:44px; border-radius:8px; background:#0f2b5c; color:white; display:flex; align-items:center; justify-content:center; flex:0 0 auto;"><svg class="nav-icon-svg" style="width:22px; height:22px; stroke:#ffffff;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div>
@@ -3407,324 +3729,68 @@
         };
         let currentReportId = null;
 
-        /* ─── Universal Date / Days Filtering Engine ─────────────────────────── */
-        const _dateFilterState = {
-            dashboard: { period: 'all', from: '', to: '' },
-            initial: { period: 'all', from: '', to: '' },
-            preliminary: { period: 'all', from: '', to: '' },
-            rejected: { period: 'all', from: '', to: '' },
-            database: { period: 'all', from: '', to: '' }
-        };
-
         let _cacheDashboardReports = [];
         let _cacheInitialReviews = [];
         let _cachePreliminaryPapers = [];
         let _cacheRejectedPapers = [];
         let _cacheDatabasePapers = [];
 
-        function checkDateMatch(dateStr, period, customFrom, customTo) {
-            if (!dateStr) return (period === 'all');
-            if (period === 'all' && !customFrom && !customTo) return true;
+        function getDateRange(viewKey) {
+            return {
+                from: document.getElementById(`${viewKey}-date-from`)?.value || '',
+                to: document.getElementById(`${viewKey}-date-to`)?.value || ''
+            };
+        }
 
-            const itemDate = new Date(dateStr.replace(' ', 'T'));
-            if (isNaN(itemDate.getTime())) return true;
+        function appendDateRange(params, viewKey) {
+            const range = getDateRange(viewKey);
+            if (range.from) params.set('date_from', range.from);
+            if (range.to) params.set('date_to', range.to);
+            return range;
+        }
 
-            const now = new Date();
-            const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-
-            if (period === 'today') {
-                return itemDate >= todayStart;
-            } else if (period === '7days') {
-                const cutoff = new Date(now.getTime() - (7 * 24 * 60 * 60 * 1000));
-                return itemDate >= cutoff;
-            } else if (period === '30days') {
-                const cutoff = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
-                return itemDate >= cutoff;
-            } else if (period === 'month') {
-                const monthStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0);
-                return itemDate >= monthStart;
-            }
-
-            // Custom Range
-            if (customFrom) {
-                const fromD = new Date(customFrom + 'T00:00:00');
-                if (itemDate < fromD) return false;
-            }
-            if (customTo) {
-                const toD = new Date(customTo + 'T23:59:59');
-                if (itemDate > toD) return false;
+        function validateDateRange(viewKey) {
+            const range = getDateRange(viewKey);
+            if (range.from && range.to && range.from > range.to) {
+                showToast('تاريخ البداية يجب أن يسبق تاريخ النهاية', 'warning');
+                return false;
             }
             return true;
         }
 
-        /* ─── Custom Arabic Date Range Picker Engine (100% Offline) ───────── */
-        const _arMonths = [
-            'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
-            'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
-        ];
-
-        let _adpCurrentView = 'initial';
-        let _adpYear = new Date().getFullYear();
-        let _adpMonth = new Date().getMonth(); // 0-11
-        let _adpSelectStart = null; // YYYY-MM-DD
-        let _adpSelectEnd = null;   // YYYY-MM-DD
-
-        function toggleArabicDatePicker(viewKey, badgeEl) {
-            const popover = document.getElementById('arabic-datepicker-popover');
-            if (!popover) return;
-
-            // If already open for same view, close it
-            if (popover.style.display === 'block' && _adpCurrentView === viewKey) {
-                closeArabicDatePicker();
-                return;
-            }
-
-            _adpCurrentView = viewKey;
-            
-            // Sync with current filter state
-            const curState = _dateFilterState[viewKey];
-            _adpSelectStart = curState.from || null;
-            _adpSelectEnd = curState.to || null;
-
-            if (_adpSelectStart) {
-                const parts = _adpSelectStart.split('-');
-                _adpYear = parseInt(parts[0]);
-                _adpMonth = parseInt(parts[1]) - 1;
-            } else {
-                const now = new Date();
-                _adpYear = now.getFullYear();
-                _adpMonth = now.getMonth();
-            }
-
-            renderArabicDatePickerCalendar();
-
-            // Position popover below badge
-            const rect = badgeEl.getBoundingClientRect();
-            popover.style.display = 'block';
-
-            let top = rect.bottom + window.scrollY + 6;
-            let left = rect.right + window.scrollX - 320; // Align right side
-
-            if (left < 10) left = 10;
-            if (top + 380 > window.innerHeight + window.scrollY) {
-                top = rect.top + window.scrollY - 390;
-            }
-
-            popover.style.top = `${top}px`;
-            popover.style.left = `${left}px`;
+        function runDateFilteredView(viewKey) {
+            const loaders = {
+                dashboard: () => renderDashboardRecentTable(),
+                initial: () => loadInitialReviewsQueue(1),
+                preliminary: () => loadPreliminaryPapers(1),
+                rejected: () => loadRejectedPapers(1),
+                reports: () => loadReportList(1),
+                database: () => loadDatabasePapers(1),
+                audit: () => loadAuditLogs(1)
+            };
+            if (loaders[viewKey]) loaders[viewKey]();
         }
 
-        function closeArabicDatePicker() {
-            const popover = document.getElementById('arabic-datepicker-popover');
-            if (popover) popover.style.display = 'none';
-        }
-
-        // Close when clicking outside
-        document.addEventListener('click', function(e) {
-            const popover = document.getElementById('arabic-datepicker-popover');
-            if (!popover || popover.style.display !== 'block') return;
-            if (!document.body.contains(e.target)) return; // Ignore elements detached during re-render
-            if (!popover.contains(e.target) && !e.target.closest('.custom-date-picker-badge')) {
-                closeArabicDatePicker();
-            }
-        });
-
-        function changePickerMonth(delta) {
-            _adpMonth += delta;
-            if (_adpMonth > 11) {
-                _adpMonth = 0;
-                _adpYear++;
-            } else if (_adpMonth < 0) {
-                _adpMonth = 11;
-                _adpYear--;
-            }
-            renderArabicDatePickerCalendar();
-        }
-
-        function renderArabicDatePickerCalendar() {
-            document.getElementById('adp-month-year-title').innerText = `${_arMonths[_adpMonth]} ${_adpYear}`;
-
-            const grid = document.getElementById('adp-days-grid');
-            grid.innerHTML = '';
-
-            const firstDayIndex = new Date(_adpYear, _adpMonth, 1).getDay();
-            // In Arabic week: Saturday is 0, Sunday is 1, etc.
-            // JS getDay(): Sunday = 0, Monday = 1, ..., Saturday = 6
-            // Map JS day to Saturday=0: (jsDay + 1) % 7
-            const startCol = (firstDayIndex + 1) % 7;
-
-            const daysInMonth = new Date(_adpYear, _adpMonth + 1, 0).getDate();
-            const todayStr = new Date().toISOString().split('T')[0];
-
-            // Empty cells for alignment
-            for (let i = 0; i < startCol; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'adp-day empty';
-                grid.appendChild(emptyCell);
-            }
-
-            // Days of month
-            for (let d = 1; d <= daysInMonth; d++) {
-                const cell = document.createElement('div');
-                cell.className = 'adp-day';
-                cell.innerText = d;
-
-                const mm = String(_adpMonth + 1).padStart(2, '0');
-                const dd = String(d).padStart(2, '0');
-                const dateStr = `${_adpYear}-${mm}-${dd}`;
-
-                if (dateStr === todayStr) cell.classList.add('today');
-
-                if (_adpSelectStart && dateStr === _adpSelectStart) {
-                    cell.classList.add('range-start');
-                }
-                if (_adpSelectEnd && dateStr === _adpSelectEnd) {
-                    cell.classList.add('range-end');
-                }
-                if (_adpSelectStart && _adpSelectEnd && dateStr > _adpSelectStart && dateStr < _adpSelectEnd) {
-                    cell.classList.add('in-range');
-                }
-
-                cell.onclick = () => onSelectPickerDate(dateStr);
-                grid.appendChild(cell);
-            }
-
-            updatePickerSummary();
-        }
-
-        function onSelectPickerDate(dateStr) {
-            if (!_adpSelectStart || (_adpSelectStart && _adpSelectEnd)) {
-                _adpSelectStart = dateStr;
-                _adpSelectEnd = null;
-            } else if (_adpSelectStart && !_adpSelectEnd) {
-                if (dateStr < _adpSelectStart) {
-                    _adpSelectEnd = _adpSelectStart;
-                    _adpSelectStart = dateStr;
-                } else {
-                    _adpSelectEnd = dateStr;
-                }
-            }
-            renderArabicDatePickerCalendar();
-        }
-
-        function updatePickerSummary() {
-            const summary = document.getElementById('adp-summary-text');
-            if (!_adpSelectStart && !_adpSelectEnd) {
-                summary.innerText = 'اختر تاريخ البداية والنهاية';
-            } else if (_adpSelectStart && !_adpSelectEnd) {
-                summary.innerText = `من: ${_adpSelectStart} (اختر تاريخ النهاية)`;
-            } else {
-                summary.innerText = `الفترة: ${_adpSelectStart} إلى ${_adpSelectEnd}`;
-            }
-        }
-
-        function clearPickerSelection() {
-            _adpSelectStart = null;
-            _adpSelectEnd = null;
-            renderArabicDatePickerCalendar();
-        }
-
-        function applyPickerRange() {
-            if (!_adpSelectStart) {
-                showToast('يرجى تحديد تاريخ على الأقل', 'warning');
-                return;
-            }
-
-            const fromVal = _adpSelectStart;
-            const toVal = _adpSelectEnd || _adpSelectStart;
-
-            _dateFilterState[_adpCurrentView].period = 'custom';
-            _dateFilterState[_adpCurrentView].from = fromVal;
-            _dateFilterState[_adpCurrentView].to = toVal;
-
-            // Update badge UI
-            const badge = document.getElementById(`date-badge-${_adpCurrentView}`);
-            const label = document.getElementById(`date-label-${_adpCurrentView}`);
-            if (badge) badge.classList.add('active-filter');
-            if (label) label.innerText = `${fromVal} إلى ${toVal}`;
-
-            // Remove active state from quick pills
-            const section = badge ? badge.closest('.segmented-filter-bar') : null;
-            if (section) {
-                section.querySelectorAll('.segmented-btn').forEach(b => b.classList.remove('active'));
-            }
-
-            closeArabicDatePicker();
-            renderViewFilteredTable(_adpCurrentView);
-            showToast(`تم تطبيق فلترة الفترة: ${fromVal} إلى ${toVal}`, 'info');
-        }
-
-        function applyDaysFilter(viewKey, period, pillEl) {
-            _dateFilterState[viewKey].period = period;
-            _dateFilterState[viewKey].from = '';
-            _dateFilterState[viewKey].to = '';
-
-            const badge = document.getElementById(`date-badge-${viewKey}`);
-            const label = document.getElementById(`date-label-${viewKey}`);
-            if (badge) badge.classList.remove('active-filter');
-            if (label) label.innerText = 'فترة مخصصة (من - إلى)...';
-
-            // Update segmented-btn active classes
-            const group = pillEl ? pillEl.closest('.segmented-group') : null;
-            if (group) {
-                group.querySelectorAll('.segmented-btn').forEach(p => p.classList.remove('active'));
-                pillEl.classList.add('active');
-            }
-
-            renderViewFilteredTable(viewKey);
-        }
-
-        function applyCustomDateFilter(viewKey) {
-            const fromInp = document.getElementById(`filter-from-${viewKey}`);
-            const toInp = document.getElementById(`filter-to-${viewKey}`);
-            const fromVal = fromInp ? fromInp.value : '';
-            const toVal = toInp ? toInp.value : '';
-
-            _dateFilterState[viewKey].period = 'custom';
-            _dateFilterState[viewKey].from = fromVal;
-            _dateFilterState[viewKey].to = toVal;
-
-            // Remove active from segmented buttons
-            const group = document.querySelector(`#filter-from-${viewKey}`)?.closest('.segmented-filter-bar')?.querySelector('.segmented-group');
-            if (group) {
-                group.querySelectorAll('.segmented-btn').forEach(p => p.classList.remove('active'));
-            }
-
-            renderViewFilteredTable(viewKey);
+        function applyDateFilter(viewKey) {
+            if (!validateDateRange(viewKey)) return;
+            runDateFilteredView(viewKey);
         }
 
         function clearDateFilter(viewKey) {
-            _dateFilterState[viewKey].period = 'all';
-            _dateFilterState[viewKey].from = '';
-            _dateFilterState[viewKey].to = '';
-
-            const badge = document.getElementById(`date-badge-${viewKey}`);
-            const label = document.getElementById(`date-label-${viewKey}`);
-            if (badge) badge.classList.remove('active-filter');
-            if (label) label.innerText = 'فترة مخصصة (من - إلى)...';
-
-            const bar = badge ? badge.closest('.segmented-filter-bar') : null;
-            if (bar) {
-                bar.querySelectorAll('.segmented-btn').forEach(p => p.classList.remove('active'));
-                const firstBtn = bar.querySelector('.segmented-btn');
-                if (firstBtn) firstBtn.classList.add('active');
-            }
-
-            renderViewFilteredTable(viewKey);
+            const fromEl = document.getElementById(`${viewKey}-date-from`);
+            const toEl = document.getElementById(`${viewKey}-date-to`);
+            if (fromEl) fromEl.value = '';
+            if (toEl) toEl.value = '';
+            runDateFilteredView(viewKey);
         }
 
-        function renderViewFilteredTable(viewKey) {
-            if (viewKey === 'dashboard') {
-                renderDashboardRecentTable();
-            } else if (viewKey === 'initial') {
-                renderInitialReviewsTable();
-            } else if (viewKey === 'preliminary') {
-                renderPreliminaryTable();
-            } else if (viewKey === 'rejected') {
-                renderRejectedTable();
-            } else if (viewKey === 'database') {
-                renderDatabaseTable();
-            }
+        function dateFallsWithinRange(value, range) {
+            if (!range.from && !range.to) return true;
+            if (!value) return false;
+            const match = String(value).match(/\d{4}-\d{2}-\d{2}/);
+            if (!match) return false;
+            const day = match[0];
+            return (!range.from || day >= range.from) && (!range.to || day <= range.to);
         }
 
         function getErrorMessage(data, fallback = 'حدث خطأ أثناء معالجة الطلب') {
@@ -3760,10 +3826,14 @@
                 iconSvg = `<svg class="nav-icon-svg" style="width:20px; height:20px; stroke:#3b82f6; flex-shrink:0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>`;
             }
 
-            toast.innerHTML = `
-                ${iconSvg}
-                <span class="custom-toast-message">${message}</span>
-            `;
+            const toastKey = `${type}:${String(message)}`;
+            if (Array.from(container.children).some(item => item.dataset.toastKey === toastKey)) return;
+            toast.dataset.toastKey = toastKey;
+            toast.innerHTML = iconSvg;
+            const messageElement = document.createElement('span');
+            messageElement.className = 'custom-toast-message';
+            messageElement.textContent = String(message);
+            toast.appendChild(messageElement);
 
             container.appendChild(toast);
 
@@ -3837,25 +3907,6 @@
             setupDropzone('modal-dropzone-area', setModalFiles);
         });
 
-        function toggleMobileSidebar(forceOpen) {
-            const sidebar = document.getElementById('app-sidebar');
-            const overlay = document.getElementById('sidebar-mobile-overlay');
-            const toggle = document.getElementById('mobile-menu-toggle');
-            if (!sidebar || !overlay || !toggle) return;
-
-            const shouldOpen = typeof forceOpen === 'boolean'
-                ? forceOpen
-                : !sidebar.classList.contains('mobile-open');
-            sidebar.classList.toggle('mobile-open', shouldOpen);
-            overlay.classList.toggle('visible', shouldOpen);
-            toggle.setAttribute('aria-expanded', String(shouldOpen));
-            toggle.setAttribute('aria-label', shouldOpen ? 'إغلاق القائمة الرئيسية' : 'فتح القائمة الرئيسية');
-        }
-
-        function closeMobileSidebar() {
-            toggleMobileSidebar(false);
-        }
-
         function initializeResponsiveTables() {
             document.querySelectorAll('.custom-table').forEach(table => {
                 if (table.parentElement?.classList.contains('table-scroll')) return;
@@ -3890,7 +3941,7 @@
                 el.style.removeProperty('display');
             });
             const parentView = ['thesis-detail', 'combined-report'].includes(viewName) ? 'theses' : viewName;
-            document.querySelectorAll('.nav-item[data-view]').forEach(el => {
+            document.querySelectorAll('.nav-item').forEach(el => {
                 const selected = el.dataset.view === parentView;
                 el.classList.toggle('active', selected);
                 if (selected) el.setAttribute('aria-current', 'page');
@@ -3901,7 +3952,9 @@
             document.querySelector('.main-content').scrollTop = 0;
             if (viewName === 'reports') {
                 const detailPanel = document.getElementById('report-detail-panel');
+                const archivePanel = document.getElementById('report-archive-panel');
                 if (detailPanel) detailPanel.hidden = !showDetail;
+                if (archivePanel) archivePanel.hidden = showDetail;
                 loadReportList(1);
             }
             if (viewName === 'initial-review') loadInitialReviewsQueue();
@@ -3943,6 +3996,24 @@
             }
         }
 
+        function openReportsArchive() {
+            const reviewFilter = document.getElementById('report-filter-review_status');
+            if (reviewFilter) reviewFilter.value = '';
+            switchView('reports', false);
+        }
+
+        function openFinalAcceptedReports() {
+            const reviewFilter = document.getElementById('report-filter-review_status');
+            if (reviewFilter) reviewFilter.value = 'final_accepted';
+            switchView('reports', false);
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            const finalNav = document.getElementById('nav-final-accepted');
+            if (finalNav) {
+                finalNav.classList.add('active');
+                finalNav.setAttribute('aria-current', 'page');
+            }
+        }
+
 
         // ─── Global Auth compatibility boundary ───
 
@@ -3952,7 +4023,39 @@
         let currentBatchId = null;       // Active batch ID for report switcher
         let currentBatchData = null;     // Cached batch state
         let currentBatchIndex = 0;       // Selected index in batch
+        let _loadingBatchReportId = null;
         let batchElapsedTimer = null;
+
+        function setReportWorkspaceLoading(message, visible = true) {
+            const detailPanel = document.getElementById('report-detail-panel');
+            const statusBox = document.getElementById('report-loading-status');
+            const statusText = document.getElementById('report-loading-status-text');
+            if (statusText && message) statusText.textContent = message;
+            if (statusBox) statusBox.style.display = visible ? 'flex' : 'none';
+            if (detailPanel) detailPanel.classList.toggle('report-workspace-loading', visible);
+        }
+
+        function prepareReportWorkspaceForNewScan(message) {
+            currentReportId = null;
+            currentBatchId = null;
+            currentBatchData = null;
+            currentBatchIndex = 0;
+            _loadingBatchReportId = null;
+
+            const tabsContainer = document.getElementById('batch-tabs-container');
+            if (tabsContainer) tabsContainer.replaceChildren();
+            const popup = document.getElementById('pdf-highlight-popup');
+            if (popup) popup.style.display = 'none';
+
+            if (typeof pdfView !== 'undefined') {
+                pdfView.request += 1;
+                pdfView.base = '';
+                pdfView.highlights = [];
+                pdfView.currentHighlight = null;
+            }
+            setReportWorkspaceLoading(message, true);
+        }
+
         function parseBatchUtcTimestamp(value) {
             if (!value) return null;
             const normalized = String(value).replace(' ', 'T');
@@ -4217,7 +4320,8 @@
                     }
 
                     showToast(`تم استقبال ${data.file_count} ملفات بنجاح. جاري التحليل...`, 'success');
-                    switchView('reports');
+                    switchView('reports', true);
+                    prepareReportWorkspaceForNewScan('جاري فحص الرسالة وتجهيز نتيجتها...');
 
                     const switcher = document.getElementById('batch-switcher-bar');
                     if (switcher) switcher.style.display = 'none';
@@ -4229,6 +4333,7 @@
                         await new Promise(r => setTimeout(r, 600));
                         const statusRes = await fetch(`/api/tasks/${taskId}`);
                         const task = await statusRes.json();
+                        setReportWorkspaceLoading(task.stage || 'جاري تحليل الرسالة...');
 
                         if (task.status === 'completed' && task.result) {
                             completed = true;
@@ -4278,8 +4383,9 @@
                         return;
                     }
 
+                    switchView('reports', true);
+                    prepareReportWorkspaceForNewScan('تم استلام الملف — جاري بدء الفحص...');
                     currentBatchId = data.batch_id;
-                    switchView('reports');
                     startBatchPolling(currentBatchId);
                     showToast(`تم إطلاق فحص الدفعة بنجاح (معالجة تدريجية للأداء)`, 'success');
                 } catch (e) {
@@ -4439,14 +4545,21 @@
                          style="flex-shrink: 0; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.15s; ${activeBorder}">
                         <span style="font-size: 12.5px; ${activeFont} max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${tooltipText}">${escapedTitle}</span>
                         <span style="font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 6px; background: ${statusBg}; color: ${statusColor}; flex-shrink: 0;">${statusLabel}</span>
-                        ${item.status === 'error' ? `<button type="button" onclick="event.stopPropagation(); retryBatchItem('${batch.id}', ${item.research_id})" style="border:none; background:#fee2e2; color:#b91c1c; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;" title="إعادة الفحص">إعادة</button>` : ''}
+                        ${['error', 'failed', 'interrupted'].includes(item.status) ? `<button type="button" onclick="event.stopPropagation(); retryBatchItem('${batch.id}', ${item.research_id})" style="border:none; background:#fee2e2; color:#b91c1c; border-radius:4px; padding:2px 6px; font-size:10px; cursor:pointer;" title="إعادة الفحص">إعادة الفحص</button>` : ''}
                     </div>
                 `;
             });
             tabsContainer.innerHTML = html;
 
             const activeItem = batch.items[currentBatchIndex];
-            if (activeItem && activeItem.status === 'completed' && activeItem.report_id && (!currentReportId || currentReportId !== activeItem.report_id)) {
+            if (activeItem && activeItem.status !== 'completed') {
+                const progress = Number(activeItem.progress || 0);
+                const label = activeItem.status === 'error'
+                    ? `تعذر فحص «${activeItem.research_title || 'البحث'}»`
+                    : `جاري فحص «${activeItem.research_title || 'البحث'}» — ${progress}%`;
+                setReportWorkspaceLoading(label);
+            }
+            if (activeItem && activeItem.status === 'completed' && activeItem.report_id && currentReportId !== activeItem.report_id && _loadingBatchReportId !== activeItem.report_id) {
                 loadBatchItemReport(batch.id, activeItem.research_id, currentBatchIndex);
             }
         }
@@ -4473,6 +4586,8 @@
         }
 
         async function loadBatchItemReport(batchId, researchId, idx) {
+            const requestedItem = currentBatchData?.items?.[idx];
+            _loadingBatchReportId = requestedItem?.report_id || `${batchId}:${researchId}`;
             try {
                 const res = await fetch(`/api/batch/${batchId}/item/${researchId}/report`);
                 if (!res.ok) return;
@@ -4480,9 +4595,12 @@
                 if (report && !report.error) {
                     currentReportId = report.id;
                     renderReport(report);
+                    setReportWorkspaceLoading('', false);
                 }
             } catch (e) {
                 console.error('Error loading batch item report:', e);
+            } finally {
+                _loadingBatchReportId = null;
             }
         }
 
@@ -4615,7 +4733,7 @@
                 contentDoc.style.display = 'block';
                 const docTextEl = document.getElementById('document-text-content');
                 if (docTextEl && docTextEl.innerText.includes('انقر على')) {
-                    loadPageTextEvidence(1);
+                    // loadPageTextEvidence(1);  // DISABLED - using PDF viewer instead
                 }
             }
         }
@@ -4626,6 +4744,46 @@
                 return;
             }
             openInternalPdf('report', currentReportId, page);
+        }
+
+        async function retryCurrentFailedReport() {
+            const report = _currentReportData || {};
+            const button = document.getElementById('btn-retry-failed-scan');
+            if (!report.batch_id || !report.research_id) {
+                showToast('بيانات دفعة الفحص غير متاحة لهذا التقرير.', 'error');
+                return;
+            }
+            if (button) {
+                button.disabled = true;
+                button.querySelector('span').innerText = 'جاري إعادة الجدولة...';
+            }
+            try {
+                const res = await fetch(`/api/batch/${report.batch_id}/item/${report.research_id}/retry`, { method: 'POST' });
+                const data = await res.json();
+                if (!res.ok || !data.success) throw new Error(data.error || 'تعذر إعادة الفحص');
+                showToast('تمت إعادة جدولة الفحص، وسيظهر التقرير الجديد تلقائياً عند اكتماله.', 'success');
+                if (button) button.style.display = 'none';
+                const scanBadge = document.getElementById('report-scan-status-badge');
+                if (scanBadge) scanBadge.innerHTML = '<strong>حالة الفحص:</strong> جاري إعادة الفحص';
+                prepareReportWorkspaceForNewScan('جاري إعادة فحص البحث — 0%');
+                startBatchPolling(report.batch_id);
+            } catch (error) {
+                showToast(error.message || 'حدث خطأ أثناء طلب إعادة الفحص.', 'error');
+                if (button) {
+                    button.disabled = false;
+                    button.querySelector('span').innerText = 'إعادة الفحص';
+                }
+            }
+        }
+
+        function scrollToInlinePdfViewer() {
+            const viewer = document.getElementById('report-pdf-viewer-container');
+            if (!viewer || viewer.style.display === 'none') {
+                showToast('المستند الأصلي غير متاح للعرض', 'warning');
+                return;
+            }
+            viewer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            document.getElementById('inline-pdf-image')?.focus({ preventScroll: true });
         }
 
         async function openReport(reportId) {
@@ -4647,9 +4805,8 @@
                     switchView('reports', true);
                     document.getElementById('report-detail-panel').hidden = false;
 
-                    // تحميل الصفحة الأولى من الشواهد والمصادر في الخلفية
-                    loadReportEvidence(1);
-                    loadReportSources(1);
+                    // The original PDF and its page-scoped overlays are now the
+                    // primary evidence view; legacy HTML evidence panels stay dormant.
                 } else {
                     showToast(report.error || 'تعذر فتح التقرير المطلوب', 'error');
                 }
@@ -4663,7 +4820,32 @@
 
         function renderReport(report) {
             document.getElementById('report-detail-panel').hidden = false;
-            attachPdfEvidence(report);
+            setReportWorkspaceLoading('', false);
+
+            // Show simplified PDF viewer, hide evidence tabs
+            const pdfContainer = document.getElementById('report-pdf-viewer-container');
+            if (pdfContainer) {
+                pdfContainer.style.display = 'block';
+                // Initialize inline PDF viewer
+                const firstFileQuery = Number(report.file_count || 1) > 1 ? '?file_index=0' : '';
+                pdfView = {base: '/api/pdf/report/' + report.id, query: firstFileQuery, page: 1, count: 0, scale: 1, request: pdfView.request + 1, highlights: [], currentHighlight: null, evidenceIndex: [], evidencePosition: -1, evidenceIndexLoaded: false, highlightFilters: {all: true, copied: true, paraphrased: true, cited: true}};
+                pdfHighlights = {};
+                // Fetch PDF info to get page count
+                fetch(pdfView.base + '/info' + pdfView.query).then(async r => {
+                    const info = await r.json();
+                    if (!r.ok) throw new Error(getErrorMessage(info, 'ملف PDF غير متاح'));
+                    return info;
+                }).then(info => {
+                    if (info.page_count) {
+                        pdfView.count = info.page_count;
+                        showInlinePdfPage();
+                    }
+                }).catch(e => {
+                    console.error('Failed to load PDF info:', e);
+                    pdfContainer.style.display = 'none';
+                    showToast(e.message || 'تعذر عرض المستند الأصلي', 'warning');
+                });
+            }
 
             const overallVal = report.overall_pct || 0;
             const overallEl = document.getElementById('report-overall-val');
@@ -4694,6 +4876,28 @@
             if (citedEl) citedEl.innerText = citedVal + '%';
             const citedWEl = document.getElementById('report-cited-words');
             if (citedWEl) citedWEl.innerText = (report.cited_words ? (report.cited_words).toLocaleString() + ' كلمة موثقة ومستبعدة' : 'موثق حسب الأصول ومستبعد');
+
+            // Separate resubmission signal from previously rejected work.
+            const rejectedHistoryPct = report.rejected_history_pct || 0;
+            const rejectedHistoryCard = document.getElementById('rejected-history-card');
+            const rejectedHistoryPctEl = document.getElementById('rejected-history-pct');
+            const rejectedHistoryDetails = document.getElementById('rejected-history-details');
+            const rejectedHistorySourcesEl = document.getElementById('rejected-history-sources');
+            if (rejectedHistoryCard) rejectedHistoryCard.style.display = rejectedHistoryPct > 0 ? 'block' : 'none';
+            if (rejectedHistoryPctEl) rejectedHistoryPctEl.innerText = rejectedHistoryPct + '%';
+            if (rejectedHistoryDetails) {
+                const rejectedSources = report.rejected_history_sources || [];
+                const sourceNames = rejectedSources.slice(0, 3).map(item => item.title).filter(Boolean).join('، ');
+                rejectedHistoryDetails.innerText = `${(report.rejected_history_words || 0).toLocaleString()} كلمة في ${(report.rejected_history_matches_count || 0).toLocaleString()} مقطع` +
+                    (sourceNames ? ` — أقرب ملفات مرفوضة: ${sourceNames}` : '') +
+                    ' — هذه النسبة منفصلة ولا تدخل في نسبة الاستلال الرسمية.';
+            }
+            if (rejectedHistorySourcesEl) {
+                rejectedHistorySourcesEl.innerHTML = (report.rejected_history_sources || []).slice(0, 3).map(item => {
+                    const url = buildSourceEvidenceUrl(null, item.page_number, item.matched_text, item.title, item.report_id);
+                    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;font-weight:700;color:#9a3412;background:#ffedd5;border:1px solid #fdba74;border-radius:5px;padding:3px 8px;">${escapeHtml(item.title || 'بحث مرفوض سابقًا')} — ${item.max_pct || 0}% ↗</a>`;
+                }).join('');
+            }
 
             // ── Progress Bars
             const _setBar = (id, pct) => { const el = document.getElementById(id); if (el) el.style.width = Math.min(pct,100)+'%'; };
@@ -4766,6 +4970,16 @@
 
             const scanBadgeEl = document.getElementById('report-scan-status-badge');
             if (scanBadgeEl) scanBadgeEl.innerHTML = '<strong>حالة الفحص:</strong> ' + scanLabel;
+
+            const retryScanButton = document.getElementById('btn-retry-failed-scan');
+            if (retryScanButton) {
+                const canRetry = ['failed', 'error', 'interrupted'].includes(scanStatus)
+                    && Boolean(report.batch_id)
+                    && Boolean(report.research_id);
+                retryScanButton.style.display = canRetry ? 'inline-flex' : 'none';
+                retryScanButton.disabled = false;
+                retryScanButton.querySelector('span').innerText = 'إعادة الفحص';
+            }
 
             document.getElementById('doc-report-title').innerText = report.title || 'تقرير فحص أكاديمي';
             document.getElementById('doc-report-author').innerHTML = '<strong>الباحث:</strong> ' + (report.author || 'غير محدد');
@@ -4899,7 +5113,7 @@
 
         function updateReportActionButtons(report) {
             const btnReject = document.getElementById('btn-reject-paper');
-            const btnAccept = document.getElementById('btn-accept-initial');
+            const btnAccept = document.getElementById('btn-accept-preliminary');
             const btnEmpSubmit = document.getElementById('btn-employee-submit');
 
             // Permissions check
@@ -4943,11 +5157,14 @@
                 if (groupBySource === '1') params.set('group_by_source', '1');
 
                 const res = await fetch(`/api/reports/${currentReportId}/evidence?${params.toString()}`);
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
                 const data = await res.json();
                 renderEvidenceCards(data);
             } catch (err) {
                 console.error('Failed to load evidence', err);
-                container.innerHTML = '<div style="text-align:center; color:#dc2626; padding:24px;">تعذر الاتصال بالخادم لتحميل شواهد التطابق.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#dc2626; padding:24px;">تعذر تحميل الشواهد. يرجى محاولة مرة أخرى.<br><small style="color:#94a3b8;">' + escapeHtml(err.message) + '</small></div>';
             }
         }
 
@@ -4957,6 +5174,11 @@
             const container = document.getElementById('evidence-comparison-container');
             const pagEl = document.getElementById('evidence-pagination');
             if (!container) return;
+
+            if (!data || typeof data !== 'object') {
+                container.innerHTML = '<div style="text-align:center; color:#dc2626; padding:24px;">حدث خطأ: البيانات المستلمة غير صحيحة.</div>';
+                return;
+            }
 
             const totalItems = data.total_items || 0;
             const totalPages = data.total_pages || 1;
@@ -4981,15 +5203,22 @@
                                 </span>
                             </div>
                             <div style="display:flex; flex-direction:column; gap:8px;">
-                                ${g.sample_matches.map(m => `
-                                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:8px 10px; font-size:12.5px;">
-                                        <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:11.5px; color:#64748b;">
-                                            <span>صفحة البحث: <strong>${m.page_number || 'غير محدد'}</strong> | صفحة المرجع: <strong>${m.source_page || 'غير محدد'}</strong></span>
-                                            <button class="btn-secondary" style="padding:2px 6px; font-size:11px;" onclick="openInternalPdf('report', '${currentReportId}', ${m.page_number || 1})">فتح في المستند ◀</button>
+                                ${g.sample_matches.map(m => {
+                                    const sourceUrl = buildSourceEvidenceUrl(m.source_id, m.source_page, m.matched_text || m.source_text, m.source_title, m.source_report_id);
+                                    return `
+                                        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 12px; font-size:12.5px;">
+                                            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:11.5px; color:#64748b; gap:8px; flex-wrap:wrap;">
+                                                <span>صفحة البحث: <strong>${m.page_number || 'غير محدد'}</strong> | صفحة المرجع: <strong>${m.source_page || 'غير محدد'}</strong></span>
+                                                <button class="btn-secondary" style="padding:2px 6px; font-size:11px;" onclick="openInternalPdf('report', '${currentReportId}', ${m.page_number || 1})">فتح في البحث الحالي ◀</button>
+                                            </div>
+                                            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:8px; line-height:1.8;">
+                                                <div><strong style="display:block; color:#475569;">المقطع محل الفحص:</strong><span dir="auto">${escapeHtml(m.text || '')}</span></div>
+                                                <div><strong style="display:block; color:#475569;">المقطع المقابل في المصدر:</strong><span dir="auto">${escapeHtml(m.matched_text || m.source_text || '')}</span></div>
+                                            </div>
+                                            ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-block; margin-top:8px; color:#0756a3; font-weight:700;">فتح الرسالة/الجزء المصدر عند موضع الشاهد ↗</a>` : ''}
                                         </div>
-                                        <div dir="auto" style="color:#0f172a;">${literalEvidence(m.text || '', m.matched_text || '')}</div>
-                                    </div>
-                                `).join('')}
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     `;
@@ -5001,7 +5230,10 @@
 
             // Normal paginated cards view
             if (!data.items || data.items.length === 0) {
-                container.innerHTML = '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding: 24px 0;">لم يتم العثور على شواهد مطابقة لمعايير الفلترة المحددة.</p>';
+                const emptyMsg = totalItems === 0
+                    ? 'لم يتم اكتشاف تطابقات في هذا البحث.'
+                    : 'لم يتم العثور على شواهد مطابقة لمعايير الفلترة المحددة.';
+                container.innerHTML = '<p style="color:var(--text-muted); font-size:13px; text-align:center; padding: 24px 0;">' + emptyMsg + '</p>';
                 if (pagEl) pagEl.innerHTML = '';
                 return;
             }
@@ -5021,22 +5253,26 @@
                 const docPage = seg.page_number ? 'ص. ' + seg.page_number : 'غير محدد';
                 const score = seg.pct != null ? `${seg.pct}%` : (seg.score != null ? `${Math.round(seg.score * 100)}%` : 'غير متاح');
                 
-                const safeSubmitted = literalEvidence(seg.text || '', seg.matched_text || '');
-                const safeMatched = literalEvidence(seg.matched_text || seg.source_text || '', seg.text || '');
+                const safeSubmitted = escapeHtml(seg.text || seg.suspect_text || '');
+                const safeMatched = escapeHtml(seg.matched_text || seg.source_text || '');
+                const sourceUrl = buildSourceEvidenceUrl(seg.source_id, seg.source_page, seg.matched_text || seg.source_text, seg.source_title, seg.source_report_id);
+                const sourceTitleMarkup = sourceUrl
+                    ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" style="font-size:13px; font-weight:700; color:var(--primary-navy); text-decoration:underline;">${srcTitle}</a>`
+                    : `<span style="font-size:13px; font-weight:700; color:var(--primary-navy);">${srcTitle}</span>`;
 
                 cardsHtml += `
                     <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                                 <span style="background: ${badgeBg}; color: ${badgeColor}; font-size: 11.5px; font-weight: 700; padding: 2px 8px; border-radius: 4px;">${badgeText}</span>
-                                <span style="font-size: 13px; font-weight: 700; color: var(--primary-navy);">${srcTitle}</span>
+                                ${sourceTitleMarkup}
                                 <span style="font-size: 12px; color: #64748b;">(${srcAuthor})</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px; font-size: 12px; flex-wrap: wrap;">
                                 <span style="color: #475569;">صفحة البحث: <strong>${docPage}</strong></span>
                                 <span style="color: #475569;">صفحة المرجع: <strong>${srcPage}</strong></span>
                                 <span style="font-weight: 800; color: var(--primary-navy); background: #f1f5f9; padding: 2px 8px; border-radius: 4px;">التطابق: ${score}</span>
-                                <button type="button" class="btn-secondary" style="padding: 3px 8px; font-size: 11.5px;" onclick="openInternalPdf('report', '${currentReportId}', ${seg.page_number || 1}, ${seg.file_index != null ? seg.file_index : 'null'})">
+                                <button type="button" class="btn-secondary" style="padding: 3px 8px; font-size: 11.5px;" onclick="openInternalPdf('report', '${currentReportId}', ${seg.page_number || 1}, ${seg.file_index != null ? seg.file_index : 'null'}, '${escapeHtml((seg.text || seg.suspect_text || '').substring(0, 30)).replace(/'/g, "\\'")}')">
                                     فتح في المستند ◀
                                 </button>
                             </div>
@@ -5049,6 +5285,7 @@
                             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 12px;">
                                 <div style="font-size: 11.5px; font-weight: 700; color: #475569; margin-bottom: 4px;">النص المقابل في المصدر المرجعي:</div>
                                 <div dir="auto" style="color: #0f172a;">${safeMatched}</div>
+                                ${sourceUrl ? `<a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener noreferrer" style="display:inline-block; margin-top:8px; color:#0756a3; font-size:12px; font-weight:700;">فتح الرسالة/الجزء المصدر عند هذا المقطع ↗</a>` : ''}
                             </div>
                         </div>
                     </div>
@@ -5062,9 +5299,8 @@
         }
 
         function loadPartEvidence(partId, partTitle) {
-            switchReportTab('evidence');
-            showToast(`جاري استعراض شواهد ${partTitle || 'الجزء المحدد'}`, 'info');
-            loadReportEvidence(1, partId);
+            showToast(`جاري فتح ${partTitle || 'الجزء المحدد'}`, 'info');
+            openInternalPdf('part', partId, 1);
         }
 
         // ─── LAZY LOADED PAGINATED SOURCES (Level 2 Sources Tab) ──────────
@@ -5234,7 +5470,7 @@
                     document.getElementById('report-status-badge').innerText = 'قبول مبدئي';
                     document.getElementById('report-status-badge').style.color = '#0284c7';
                 }
-                loadPreliminaryPapers();
+                switchView('preliminary');
             } else {
                 showToast(data.error || 'حدث خطأ أثناء القبول المبدئي', 'error');
             }
@@ -5344,12 +5580,10 @@
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع الأبحاث المقبولة مبدئياً...</td></tr>';
             }
             try {
-                const filter = _dateFilterState.preliminary;
                 const params = new URLSearchParams();
                 params.set('page', page);
                 params.set('page_size', 25);
-                if (filter.from) params.set('date_from', filter.from);
-                if (filter.to) params.set('date_to', filter.to);
+                appendDateRange(params, 'preliminary');
 
                 const res = await fetch(`/api/preliminary_papers?${params.toString()}`);
                 const data = await res.json();
@@ -5417,12 +5651,10 @@
                 tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted);"><div class="loading-spinner" style="margin:0 auto 8px;"></div>جاري استرجاع الأبحاث المرفوضة...</td></tr>';
             }
             try {
-                const filter = _dateFilterState.rejected;
                 const params = new URLSearchParams();
                 params.set('page', page);
                 params.set('page_size', 25);
-                if (filter.from) params.set('date_from', filter.from);
-                if (filter.to) params.set('date_to', filter.to);
+                appendDateRange(params, 'rejected');
 
                 const res = await fetch(`/api/rejected_papers?${params.toString()}`);
                 const data = await res.json();
@@ -5516,13 +5748,11 @@
             }
 
             try {
-                const filter = _dateFilterState.database;
                 const params = new URLSearchParams();
                 params.set('page', page);
                 params.set('page_size', 25);
                 if (query) params.set('q', query);
-                if (filter.from) params.set('date_from', filter.from);
-                if (filter.to) params.set('date_to', filter.to);
+                appendDateRange(params, 'database');
 
                 const res = await fetch(`/api/papers?${params.toString()}`);
                 const data = await res.json();
@@ -5798,11 +6028,10 @@
             const tbody = document.getElementById('dash-recent-table');
             if (!tbody) return;
 
-            const filter = _dateFilterState.dashboard;
-            const filtered = _cacheDashboardReports.filter(r => checkDateMatch(r.date, filter.period, filter.from, filter.to));
-
+            const range = getDateRange('dashboard');
+            const filteredReports = _cacheDashboardReports.filter(r => dateFallsWithinRange(r.date || r.created_at, range));
             let html = '';
-            filtered.forEach(r => {
+            filteredReports.forEach(r => {
                 let badgeClass = r.pct > 50 ? 'high' : (r.pct > 20 ? 'medium' : 'low');
                 let statusTag = r.status || 'مفحوص';
                 html += `
@@ -5851,26 +6080,45 @@
             return Boolean(user && (Number(user.must_change_password) === 1 || Number(user.must_enroll_recovery) === 1));
         }
 
+        function setFirstLoginLock(locked) {
+            document.body.classList.toggle('first-login-locked', locked);
+            document.querySelectorAll('.topbar, .app-container').forEach(shell => {
+                shell.inert = locked;
+                if (locked) shell.setAttribute('aria-hidden', 'true');
+                else shell.removeAttribute('aria-hidden');
+            });
+        }
+
         function openFirstLoginSetup() {
             const overlay = document.getElementById('first-login-overlay');
             const passwordFields = document.querySelectorAll('#first-login-password, #first-login-confirm');
             const mustChangePassword = Number(currentUser?.must_change_password) === 1;
             document.getElementById('login-screen').style.display = 'none';
+            updateUserUI();
+            switchView(normalizeUserRole(currentUser?.role) === 'employee' ? 'upload' : 'dashboard');
+            setFirstLoginLock(true);
             document.getElementById('first-login-form-step').style.display = 'block';
             document.getElementById('first-login-recovery-step').style.display = 'none';
             document.getElementById('first-login-error').style.display = 'none';
             document.getElementById('first-login-welcome').textContent = `مرحباً ${currentUser?.full_name || currentUser?.username || ''}`;
+            document.getElementById('first-login-password').value = '';
+            document.getElementById('first-login-confirm').value = '';
+            document.getElementById('first-login-pin').value = '';
             passwordFields.forEach(field => {
                 field.closest('.first-login-field').style.display = mustChangePassword ? 'flex' : 'none';
                 field.required = mustChangePassword;
             });
+            overlay.setAttribute('aria-hidden', 'false');
             overlay.style.display = 'flex';
             setTimeout(() => (mustChangePassword ? document.getElementById('first-login-password') : document.getElementById('first-login-pin'))?.focus(), 50);
         }
 
         function enterAuthenticatedApp() {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('first-login-overlay').style.display = 'none';
+            const firstLoginOverlay = document.getElementById('first-login-overlay');
+            firstLoginOverlay.style.display = 'none';
+            firstLoginOverlay.setAttribute('aria-hidden', 'true');
+            setFirstLoginLock(false);
             sessionStorage.setItem('police_academy_user', JSON.stringify(currentUser));
             updateUserUI();
             loadDashboardStats();
@@ -5992,6 +6240,10 @@
             sessionStorage.removeItem('police_academy_user');
             csrfToken = '';
             currentUser = null;
+            const firstLoginOverlay = document.getElementById('first-login-overlay');
+            firstLoginOverlay.style.display = 'none';
+            firstLoginOverlay.setAttribute('aria-hidden', 'true');
+            setFirstLoginLock(false);
             document.getElementById('login-screen').style.display = 'flex';
             document.getElementById('form-login-standard').style.display = 'block';
             document.getElementById('form-first-time-setup').style.display = 'none';
@@ -6113,6 +6365,10 @@
             sessionStorage.removeItem('police_academy_user');
             csrfToken = '';
             currentUser = null;
+            const firstLoginOverlay = document.getElementById('first-login-overlay');
+            firstLoginOverlay.style.display = 'none';
+            firstLoginOverlay.setAttribute('aria-hidden', 'true');
+            setFirstLoginLock(false);
             document.getElementById('login-username').value = '';
             document.getElementById('login-password').value = '';
             document.getElementById('login-error-alert').style.display = 'none';
@@ -6125,7 +6381,8 @@
             const badgeEl = document.getElementById('current-user-role-badge');
             const isAdmin = isSystemAdmin(currentUser);
             const thesisNav = document.getElementById("nav-theses");
-            if (thesisNav) thesisNav.textContent = isAdmin ? "إدارة الرسائل والأطروحات" : "أبحاثي / الرسائل";
+            const thesisNavLabel = thesisNav ? thesisNav.querySelector('.nav-item-label') : null;
+            if (thesisNavLabel) thesisNavLabel.textContent = isAdmin ? "إدارة الرسائل والأطروحات" : "أبحاثي / الرسائل";
 
             if (nameEl && badgeEl) {
                 nameEl.innerText = currentUser.full_name.split(' ')[0] || currentUser.username;
@@ -6203,13 +6460,11 @@
             }
 
             try {
-                const filter = _dateFilterState.initial;
                 const params = new URLSearchParams();
                 params.set('page', page);
                 params.set('page_size', 25);
                 if (searchVal) params.set('q', searchVal);
-                if (filter.from) params.set('date_from', filter.from);
-                if (filter.to) params.set('date_to', filter.to);
+                appendDateRange(params, 'initial');
 
                 const res = await fetch(`/api/initial_reviews?${params.toString()}`);
                 const data = await res.json();
@@ -6842,6 +7097,7 @@
             if (catEl && catEl.value) params.set('category', catEl.value);
             if (successEl && successEl.value) params.set('success', successEl.value);
             if (searchEl && searchEl.value.trim()) params.set('q', searchEl.value.trim());
+            appendDateRange(params, 'audit');
 
             try {
                 const res = await fetch(`/api/admin/audit_logs?${params.toString()}`, {
@@ -6957,6 +7213,7 @@
         }
 
         function applyAuditFilters() {
+            if (!validateDateRange('audit')) return;
             loadAuditLogs(1);
         }
 
@@ -6967,6 +7224,10 @@
             if (catEl) catEl.value = '';
             if (successEl) successEl.value = '';
             if (searchEl) searchEl.value = '';
+            const fromEl = document.getElementById('audit-date-from');
+            const toEl = document.getElementById('audit-date-to');
+            if (fromEl) fromEl.value = '';
+            if (toEl) toEl.value = '';
             loadAuditLogs(1);
         }
 
@@ -7339,12 +7600,6 @@
             checkAuthSession();
             setInterval(updateInitialReviewsCount, 10000);
         });
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) closeMobileSidebar();
-        });
-        document.addEventListener('keydown', event => {
-            if (event.key === 'Escape') closeMobileSidebar();
-        });
         window.addEventListener('load', () => {
             if (!currentUser) checkAuthSession();
         });
@@ -7363,41 +7618,6 @@
             } catch(e) { alert('خطأ في الحذف'); }
         }
 </script>
-
-<!-- ─── Global Custom Arabic Date Range Picker Popover ─────────────── -->
-    <div id="arabic-datepicker-popover" class="arabic-datepicker-popover" style="display: none;">
-        <div class="adp-header">
-            <button type="button" class="adp-nav-btn" onclick="changePickerMonth(1)" title="الشهر التالي">
-                <svg class="nav-icon-svg" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
-            </button>
-            <div class="adp-title" id="adp-month-year-title">أغسطس 2026</div>
-            <button type="button" class="adp-nav-btn" onclick="changePickerMonth(-1)" title="الشهر السابق">
-                <svg class="nav-icon-svg" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
-            </button>
-        </div>
-
-        <div class="adp-weekdays">
-            <div class="adp-weekday">سبت</div>
-            <div class="adp-weekday">أحد</div>
-            <div class="adp-weekday">إثن</div>
-            <div class="adp-weekday">ثلا</div>
-            <div class="adp-weekday">أرب</div>
-            <div class="adp-weekday">خمي</div>
-            <div class="adp-weekday">جمع</div>
-        </div>
-
-        <div class="adp-days-grid" id="adp-days-grid">
-            <!-- Dynamic calendar days -->
-        </div>
-
-        <div class="adp-footer">
-            <div class="adp-summary" id="adp-summary-text">اختر تاريخ البداية والنهاية</div>
-            <div class="adp-actions">
-                <button type="button" class="adp-btn-clear" onclick="clearPickerSelection()">مسح</button>
-                <button type="button" class="adp-btn-apply" onclick="applyPickerRange()">تطبيق الفلترة</button>
-            </div>
-        </div>
-    </div>
 
         <!-- ── Scan Completion Toast Notification ────────────── -->
         <div id="scan-notification-toast" style="display:none;position:fixed;bottom:24px;left:24px;z-index:9999;min-width:300px;max-width:420px;background:#1e3a5f;color:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.3);animation:slideInToast 0.4s ease;direction:rtl;font-family:inherit;">
@@ -8666,8 +8886,8 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
             <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:#38bdf8;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             <span style="font-size:13.5px; font-weight:800; color:#ffffff;">عارض المستندات والرسائل العلمية (PDF)</span>
         </div>
-        
-        <div style="display:flex; align-items:center; gap:6px;">
+
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
             <button id="internal-pdf-prev" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="changePdfPage(-1)" title="الصفحة السابقة">
                 ◀ السابق
             </button>
@@ -8679,24 +8899,66 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
             <button id="internal-pdf-next" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="changePdfPage(1)" title="الصفحة التالية">
                 التالي ▶
             </button>
-            
+
             <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
-            
+
+            <button class="btn-secondary" style="background:#059669; color:#ffffff; border:1px solid #34d399; padding:4px 10px; font-size:12px; font-weight:800;" onclick="jumpToFirstEvidence()" title="الانتقال مباشرة إلى أول موضع متطابق">اذهب لأول تطابق</button>
+            <button id="modal-evidence-prev" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="jumpToEvidence(-1)" title="التطابق السابق" disabled>◀ تطابق</button>
+            <span id="modal-evidence-position" style="min-width:42px; text-align:center; color:#dbeafe; font-size:11px; font-weight:800;">0 / 0</span>
+            <button id="modal-evidence-next" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="jumpToEvidence(1)" title="التطابق التالي">تطابق ▶</button>
+
+            <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+
             <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 9px; font-size:12px;" onclick="zoomPdf(.25)" title="تكبير">+</button>
             <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 9px; font-size:12px;" onclick="zoomPdf(-.25)" title="تصغير">-</button>
             <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 10px; font-size:12px;" onclick="fitPdfWidth()" title="ملاءمة العرض">ملاءمة العرض</button>
-            
+
             <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
-            
+
+            <!-- Legend -->
+            <div style="display:flex; align-items:center; gap:6px; font-size:11px;">
+                <span style="color:#cbd5e1;">الوسيلة:</span>
+                <div style="width:12px; height:12px; background:#dc2626; border-radius:2px; opacity:0.6;"></div>
+                <span style="color:#cbd5e1; max-width:60px;">نسخ</span>
+                <div style="width:12px; height:12px; background:#d97706; border-radius:2px; opacity:0.6;"></div>
+                <span style="color:#cbd5e1; max-width:60px;">إعادة صياغة</span>
+                <div style="width:12px; height:12px; background:#059669; border-radius:2px; opacity:0.6;"></div>
+                <span style="color:#cbd5e1; max-width:60px;">اقتباس</span>
+            </div>
+
+            <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+
+            <!-- Filters -->
+            <div style="display:flex; align-items:center; gap:4px;">
+                <button id="pdf-filter-all" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:11px;" onclick="toggleHighlightFilter('all')" title="الكل">الكل</button>
+                <button id="pdf-filter-copied" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('copied')" title="نسخ مباشر">نسخ</button>
+                <button id="pdf-filter-paraphrased" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('paraphrased')" title="عرض مواضع إعادة الصياغة">إعادة صياغة</button>
+                <button id="pdf-filter-cited" class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 6px; font-size:11px;" onclick="toggleHighlightFilter('cited')" title="اقتباس موثق">اقتباس</button>
+            </div>
+
+            <div style="width:1px; height:18px; background:rgba(255,255,255,0.2); margin:0 4px;"></div>
+
+            <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:12px;" onclick="exportHighlightedPdf()" title="تنزيل PDF مع الشواهد">⬇ تنزيل</button>
+
             <button class="btn-danger" style="padding:4px 12px; font-size:12px;" onclick="document.getElementById('internal-pdf-modal').style.display='none'" title="إغلاق العارض">
                 ✕ إغلاق
             </button>
         </div>
     </div>
-    
-    <div style="overflow:auto; flex:1; background:#475569; padding:20px; display:flex; justify-content:center; align-items:flex-start;">
-        <img id="internal-pdf-image" alt="صفحة مستند PDF" style="display:block; margin:auto; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:2px; max-width:100%;">
+
+    <div style="overflow:auto; flex:1; background:#475569; padding:20px; display:flex; justify-content:center; align-items:flex-start;" id="pdf-container">
+        <div style="position:relative; display:inline-block; margin:auto;">
+            <img id="internal-pdf-image" alt="صفحة مستند PDF" style="display:block; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:2px;">
+        </div>
     </div>
+
+    <style>
+        @keyframes pdf-highlight-pulse {
+            0% { fill-opacity: 0.35; }
+            50% { fill-opacity: 0.70; }
+            100% { fill-opacity: 0.65; }
+        }
+    </style>
 </div>
 
 <script src="/static/js/report-list.js"></script>

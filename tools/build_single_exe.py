@@ -18,6 +18,7 @@ VENDOR_DIR = ROOT_DIR / "vendor"
 TEMPLATES_DIR = ROOT_DIR / "templates"
 STATIC_DIR = ROOT_DIR / "static"
 TESSDATA_DIR = ROOT_DIR / "assets" / "tessdata"
+MODELS_DIR = ROOT_DIR / "models"
 LOGO_FILE = ROOT_DIR / "Police-Academy-College-of-Graduate-Studies.png"
 MANIFEST_FILE = ROOT_DIR / "release_manifest.json"
 SKLEARN_REPR_ASSETS_DIR = VENDOR_DIR / "sklearn" / "utils" / "_repr_html"
@@ -45,10 +46,21 @@ def build_single_exe():
     print("=" * 75)
     t0 = time.perf_counter()
 
+    # Automatically terminate running instances to prevent WinError 5 file lock
+    if sys.platform == "win32":
+        try:
+            import subprocess
+            subprocess.run(["taskkill", "/F", "/IM", "Arabic-Plagiarism-System.exe"], capture_output=True)
+            time.sleep(0.5)
+        except Exception:
+            pass
+
     required_ocr_models = [TESSDATA_DIR / 'ara.traineddata', TESSDATA_DIR / 'eng.traineddata']
     missing_ocr_models = [str(path) for path in required_ocr_models if not path.is_file()]
     if missing_ocr_models:
         raise FileNotFoundError(f"Missing bundled OCR models: {missing_ocr_models}")
+    if not MODELS_DIR.is_dir():
+        raise FileNotFoundError(f"Missing bundled semantic model directory: {MODELS_DIR}")
 
     vendor_runtime_binaries = []
     for library_dir, destination in VENDOR_RUNTIME_DIRS:
@@ -72,6 +84,7 @@ def build_single_exe():
         f"--add-data={TEMPLATES_DIR};templates",
         f"--add-data={STATIC_DIR};static",
         f"--add-data={TESSDATA_DIR};tessdata",
+        f"--add-data={MODELS_DIR};models",
         f"--add-data={LOGO_FILE};.",
         f"--add-data={MANIFEST_FILE};.",
         f"--add-data={SKLEARN_REPR_ASSETS_DIR};sklearn/utils/_repr_html",
@@ -120,6 +133,19 @@ def build_single_exe():
         "--collect-submodules=scipy._external.array_api_compat.numpy",
         "--collect-submodules=scipy._external.array_api_compat.common",
         "--collect-all=numpy",
+        "--collect-all=fitz",
+        "--collect-all=pymupdf",
+        "--collect-all=pypdfium2",
+        "--collect-all=pypdfium2_raw",
+        "--collect-all=fastembed",
+        "--hidden-import=fitz",
+        "--hidden-import=pymupdf",
+        "--hidden-import=pypdfium2",
+        "--hidden-import=pypdfium2_raw",
+        "--hidden-import=fastembed",
+        "--hidden-import=onnxruntime",
+        "--hidden-import=tokenizers",
+        "--hidden-import=_fitz",
         "--hidden-import=numpy",
         "--hidden-import=numpy._core",
         "--hidden-import=numpy._core._exceptions",
@@ -144,6 +170,11 @@ def build_single_exe():
         "--hidden-import=win32gui",
         "--hidden-import=win32con",
         "--hidden-import=win32api",
+        "--hidden-import=pythoncom",
+        "--hidden-import=pywintypes",
+        "--hidden-import=win32com",
+        "--hidden-import=win32com.client",
+        "--hidden-import=win32com.gen_py",
         "--hidden-import=argon2",
         "--hidden-import=argon2.low_level",
         "--hidden-import=argon2_cffi_bindings",

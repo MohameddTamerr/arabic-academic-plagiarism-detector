@@ -409,7 +409,8 @@ def retry_batch_item(batch_id, research_id):
         batch_id=batch_id,
         research_id=research_id,
         status='queued',
-        progress=0
+        progress=0,
+        clear_error=True
     )
 
     # إعادة تشغيل الفحص
@@ -564,4 +565,3 @@ def list_batches_paginated():
         page_size=params['page_size'],
         legacy_key='batches'
     ))
-

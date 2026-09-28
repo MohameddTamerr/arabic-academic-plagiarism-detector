@@ -1,5 +1,6 @@
 import time
 from flask import Blueprint, request, jsonify, session as flask_session, g
+import config
 from app.repositories import user_repo
 from app.services import audit_service
 from app.services.login_throttling_service import is_locked_out, record_failed_attempt, record_successful_login

@@ -12,7 +12,7 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 
 from app.repositories.base_repo import get_session
 from app.models.research_schema import Research, ResearchFile, ScanBatch, ScanBatchItem
@@ -301,7 +301,8 @@ def update_batch_item(
     scan_job_id: Optional[str] = None,
     report_id: Optional[str] = None,
     error_message: str = '',
-    similarity_pct: Optional[float] = None
+    similarity_pct: Optional[float] = None,
+    clear_error: bool = False
 ):
     """تحديث حالة عنصر في الدفعة وتحديث عدادات الدفعة تلقائياً."""
     with get_session() as session:
@@ -312,29 +313,39 @@ def update_batch_item(
         if not item:
             return
 
-        old_status = item.status
         item.status = status
         item.progress = progress
         if scan_job_id:
             item.scan_job_id = scan_job_id
         if report_id:
             item.report_id = report_id
-        if error_message:
+        if clear_error:
+            item.error_message = ''
+            item.completed_at = None
+        elif error_message:
             item.error_message = error_message
         if similarity_pct is not None:
             item.similarity_pct = similarity_pct
         if status in ('completed', 'error'):
             item.completed_at = datetime.utcnow()
 
-        # تحديث عدادات الدفعة
+        # Recompute counters from item state.  Incremental counters become
+        # incorrect when a failed item is queued again for a manual retry.
+        session.flush()
         batch = session.query(ScanBatch).filter(ScanBatch.id == batch_id).first()
         if batch:
-            if status == 'completed' and old_status != 'completed':
-                batch.completed_items = (batch.completed_items or 0) + 1
-            if status == 'error' and old_status != 'error':
-                batch.failed_items = (batch.failed_items or 0) + 1
-
-            # تحديد الحالة الإجمالية للدفعة
+            status_counts = dict(
+                session.query(ScanBatchItem.status, func.count(ScanBatchItem.id))
+                .filter(ScanBatchItem.batch_id == batch_id)
+                .group_by(ScanBatchItem.status)
+                .all()
+            )
+            batch.completed_items = int(status_counts.get('completed', 0))
+            batch.failed_items = int(
+                status_counts.get('error', 0)
+                + status_counts.get('failed', 0)
+                + status_counts.get('interrupted', 0)
+            )
             total = batch.total_items or 0
             done = (batch.completed_items or 0) + (batch.failed_items or 0)
             if done >= total > 0:
@@ -344,8 +355,10 @@ def update_batch_item(
                     batch.status = 'error'
                 else:
                     batch.status = 'completed'
-            elif status == 'running':
+            elif status_counts.get('running', 0):
                 batch.status = 'running'
+            else:
+                batch.status = 'pending'
 
 
 def start_batch(batch_id: str):
@@ -664,4 +677,3 @@ def search_batches(
         ]
 
         return items, total_count
-

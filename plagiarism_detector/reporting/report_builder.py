@@ -8,13 +8,15 @@
 """
 
 import logging
+import hashlib
+import os
 from collections import defaultdict
 from typing import Optional
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 import config
-from app.repositories import document_repo
+from app.repositories import document_repo, report_repo
 from plagiarism_detector.preprocessing.normalizer import (
     normalize_light, normalize_aggressive, split_sentences, get_shingles
 )
@@ -28,7 +30,19 @@ from plagiarism_detector.filters.common_phrases import filter_common_spans
 from plagiarism_detector.detection.candidate_retriever import CandidateRetriever
 from plagiarism_detector.detection.shingle_matcher import match_exact_or_near_copy
 from plagiarism_detector.detection.tfidf_matcher import match_lexical_paraphrase
-from plagiarism_detector.detection.semantic_matcher import match_semantic_similarity
+from plagiarism_detector.detection.evidence_gate import (
+    accept_lexical_paraphrase,
+    accept_semantic_paraphrase,
+)
+from plagiarism_detector.detection.review_history_matcher import (
+    build_review_history_index,
+    match_review_history_segment,
+)
+from plagiarism_detector.detection.semantic_matcher import (
+    check_semantic_model_availability,
+    compute_embeddings,
+    match_semantic_similarity,
+)
 from plagiarism_detector.ai_analysis.stylistic_indicators import analyze_stylistic_ai_indicators
 from plagiarism_detector.reporting.page_allowance import compute_source_allowance
 from app import versioning
@@ -37,6 +51,29 @@ logger = logging.getLogger(__name__)
 
 # كاش الفهرس في الذاكرة لتسريع الفحوصات المتتالية
 _CACHED_INDEX = None
+_CACHED_REVIEW_HISTORY_INDEX = None
+_CACHED_REVIEW_HISTORY_FINGERPRINT = ''
+
+
+def _get_review_history_index(settings: dict) -> dict:
+    """Build once per review-history state so scans do not re-embed old reports."""
+    global _CACHED_REVIEW_HISTORY_INDEX, _CACHED_REVIEW_HISTORY_FINGERPRINT
+    raw_segments = report_repo.get_review_history_segments(
+        ('preliminary_accepted', 'rejected')
+    )
+    identity = '|'.join(
+        f"{item.get('report_id')}:{item.get('review_status')}:{item.get('segment_number')}:{item.get('raw_text')}"
+        for item in raw_segments
+    )
+    fingerprint = hashlib.sha256((
+        identity
+        + f"|shingle={settings.get('shingle_size', 4)}"
+        + f"|semantic={bool(settings.get('enable_semantic_model', False))}"
+    ).encode('utf-8')).hexdigest()
+    if _CACHED_REVIEW_HISTORY_INDEX is None or fingerprint != _CACHED_REVIEW_HISTORY_FINGERPRINT:
+        _CACHED_REVIEW_HISTORY_INDEX = build_review_history_index(raw_segments, settings)
+        _CACHED_REVIEW_HISTORY_FINGERPRINT = fingerprint
+    return _CACHED_REVIEW_HISTORY_INDEX
 
 
 def build_pipeline_index(job_id: Optional[str] = None) -> dict:
@@ -118,6 +155,7 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
             corpus_metadata.append({
                 'doc_id': seg['doc_id'],
                 'reference_id': seg.get('reference_id', ''),
+                'segment_number': seg.get('segment_number'),
                 'title': seg['title'],
                 'author': seg.get('author', ''),
                 'page_number': seg.get('page_number'),  # رقم الصفحة المصدرية الحقيقي
@@ -137,6 +175,35 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
             except Exception as e:
                 logger.debug(f"تخطي بناء مصفوفة TF-IDF الشاملة: {e}")
 
+        corpus_embeddings = None
+        try:
+            from app.services.settings_service import get_current_settings
+            semantic_enabled = bool(get_current_settings().get('enable_semantic_model', False))
+            if semantic_enabled and check_semantic_model_availability().get('available'):
+                if job_id:
+                    job_queue_service.update_job_progress(job_id, 85, "جاري بناء الفهرس الدلالي العربي والإنجليزي...")
+                semantic_identity = '|'.join((
+                    config.SEMANTIC_MODEL_NAME,
+                    corpus_fingerprint or corpus_version,
+                    str(len(corpus_light_texts)),
+                ))
+                cache_key = hashlib.sha256(semantic_identity.encode('utf-8')).hexdigest()[:24]
+                cache_path = config.SEMANTIC_CACHE_DIR / f'{cache_key}.npy'
+                if cache_path.is_file():
+                    import numpy as np
+                    cached = np.load(cache_path, allow_pickle=False)
+                    if cached.ndim == 2 and cached.shape[0] == len(corpus_light_texts):
+                        corpus_embeddings = cached
+                if corpus_embeddings is None:
+                    corpus_embeddings = compute_embeddings(corpus_light_texts)
+                    if corpus_embeddings is not None:
+                        temp_path = cache_path.with_suffix('.tmp.npy')
+                        import numpy as np
+                        np.save(temp_path, corpus_embeddings, allow_pickle=False)
+                        os.replace(temp_path, cache_path)
+        except Exception as e:
+            logger.warning(f"تعذر بناء الفهرس الدلالي؛ سيستمر الفحص المعجمي: {e}")
+
         index_data = {
             'shingle_size': shingle_size,
             'retriever': retriever,
@@ -146,6 +213,7 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
             'corpus_metadata': corpus_metadata,
             'vectorizer': vectorizer,
             'tfidf_matrix': tfidf_matrix,
+            'corpus_embeddings': corpus_embeddings,
             'total_segments': len(raw_segments),
             'index_corpus_version': corpus_version,
             'index_fingerprint': corpus_fingerprint,
@@ -340,6 +408,15 @@ def analyze_academic_document(
     corpus_metadata = index_data['corpus_metadata']
     vectorizer = index_data['vectorizer']
     tfidf_matrix = index_data['tfidf_matrix']
+    corpus_embeddings = index_data.get('corpus_embeddings')
+
+    review_history_index = _get_review_history_index(settings)
+
+    semantic_query_embeddings = None
+    if settings.get('enable_semantic_model', False) and (
+        corpus_embeddings is not None or review_history_index.get('embeddings') is not None
+    ):
+        semantic_query_embeddings = compute_embeddings([seg.raw_text for seg in segments_list])
 
     total_words = 0
     copied_words = 0
@@ -354,7 +431,15 @@ def analyze_academic_document(
 
     processed_segments = []
 
-    for seg in segments_list:
+    # These settings also belong to the report snapshot when extraction yields
+    # no analysable segments.  Initialise them before the loop so an empty or
+    # image-only document produces a valid zero-evidence report instead of an
+    # UnboundLocalError while building the response.
+    citation_mode = settings.get('citation_filter_mode', 'refined')
+    common_mode = settings.get('common_text_filter_mode', 'span_level')
+    retrieval_mode = settings.get('candidate_retrieval_mode', 'dual_channel')
+
+    for segment_index, seg in enumerate(segments_list):
         w_count = seg.word_count
         total_words += w_count
 
@@ -376,10 +461,6 @@ def analyze_academic_document(
             'is_cited': False,
             'citation_detail': ''
         }
-
-        citation_mode = settings.get('citation_filter_mode', 'refined')
-        common_mode = settings.get('common_text_filter_mode', 'span_level')
-        retrieval_mode = settings.get('candidate_retrieval_mode', 'dual_channel')
 
         # 0. فحص واستبعاد النصوص المؤسسية الشائعة على مستوى المقاطع (EXP-03)
         substantive_text, has_common, extracted_spans = filter_common_spans(
@@ -411,10 +492,6 @@ def analyze_academic_document(
             seg_dict['is_cited'] = True
             seg_dict['citation_detail'] = citation_check.citation_detail
 
-        if not index_data['corpus_metadata']:
-            processed_segments.append(seg_dict)
-            continue
-
         # ── المرحلة A: كشف النسخ الحرفي عبر Shingles + Jaccard ───
         q_shingles = get_shingles(eval_aggr, size=settings['shingle_size'])
         shingle_candidates = retriever.retrieve_candidates_for_shingles(q_shingles)
@@ -440,6 +517,8 @@ def analyze_academic_document(
                 p_score = min(round(score * 100), 100)
 
                 seg_dict['source_id'] = doc_id
+                seg_dict['source_reference_id'] = meta.get('reference_id', '')
+                seg_dict['source_segment_number'] = meta.get('segment_number')
                 seg_dict['source_title'] = meta['title']
                 seg_dict['source_author'] = meta['author']
                 seg_dict['source_page'] = meta['page_number']
@@ -487,10 +566,21 @@ def analyze_academic_document(
                 if res_b:
                     cand_idx, score, m_type = res_b
                     meta = corpus_metadata[cand_idx]
+                    if not accept_lexical_paraphrase(
+                        substantive_text or seg.raw_text,
+                        meta['raw_text'],
+                    ):
+                        res_b = None
+
+                if res_b:
+                    cand_idx, score, m_type = res_b
+                    meta = corpus_metadata[cand_idx]
                     doc_id = meta['doc_id']
                     p_score = min(round(score * 100), 100)
 
                     seg_dict['source_id'] = doc_id
+                    seg_dict['source_reference_id'] = meta.get('reference_id', '')
+                    seg_dict['source_segment_number'] = meta.get('segment_number')
                     seg_dict['source_title'] = meta['title']
                     seg_dict['source_author'] = meta['author']
                     seg_dict['source_page'] = meta['page_number']
@@ -515,9 +605,120 @@ def analyze_academic_document(
                     match_found = True
 
         # ── المرحلة C: التشابه الدلالي (اختياري) ───────────────────
-        if not match_found and settings.get('enable_semantic_model', False):
-            # تُجرى فقط على المرشحين
-            pass
+        if (
+            not match_found
+            and settings.get('enable_semantic_model', False)
+            and semantic_query_embeddings is not None
+            and corpus_embeddings is not None
+        ):
+            semantic_candidates = [
+                idx for idx, meta in enumerate(corpus_metadata)
+                if not excluded_doc_ids or meta['doc_id'] not in excluded_doc_ids
+            ]
+            res_c = match_semantic_similarity(
+                query_text=seg.raw_text,
+                candidate_indices=semantic_candidates,
+                corpus_texts=corpus_light_texts,
+                corpus_embeddings=corpus_embeddings,
+                threshold=settings['semantic_threshold'],
+                query_embedding=semantic_query_embeddings[segment_index],
+            )
+            if res_c:
+                cand_idx, score, _match_type = res_c
+                meta = corpus_metadata[cand_idx]
+                if not accept_semantic_paraphrase(
+                    substantive_text or seg.raw_text,
+                    meta['raw_text'],
+                    score,
+                    settings['semantic_threshold'],
+                ):
+                    res_c = None
+
+            if res_c:
+                cand_idx, score, _match_type = res_c
+                meta = corpus_metadata[cand_idx]
+                doc_id = meta['doc_id']
+                seg_dict.update({
+                    'source_id': doc_id,
+                    'source_reference_id': meta.get('reference_id', ''),
+                    'source_segment_number': meta.get('segment_number'),
+                    'source_title': meta['title'],
+                    'source_author': meta['author'],
+                    'source_page': meta['page_number'],
+                    'source_page_display': f"ص. {meta['page_number']}" if meta['page_number'] else "غير متاح",
+                    'matched_text': meta['raw_text'],
+                    'score': score,
+                    'pct': min(round(score * 100), 100),
+                    'status': 'cited' if seg_dict['is_cited'] else 'paraphrased',
+                    'match_type': 'CITED SEMANTIC MATCH' if seg_dict['is_cited'] else 'SEMANTIC PARAPHRASE',
+                })
+                words_by_source[doc_id] += w_count
+                pages_by_source[doc_id].add(meta['page_number'])
+                source_info[doc_id] = {'title': meta['title'], 'author': meta['author']}
+
+        # ── سجل القبول المبدئي: يدخل في النسبة الأكاديمية الأساسية ──
+        history_query_embedding = (
+            semantic_query_embeddings[segment_index]
+            if semantic_query_embeddings is not None else None
+        )
+        preliminary_match = match_review_history_segment(
+            substantive_text or seg.raw_text,
+            review_history_index,
+            settings,
+            {'preliminary_accepted'},
+            history_query_embedding,
+        )
+        if preliminary_match and float(preliminary_match[1]) > float(seg_dict.get('score') or 0):
+            meta, score, history_match_type = preliminary_match
+            source_key = f"review:{meta['report_id']}"
+            is_direct = history_match_type in ('DIRECT COPY', 'NEAR COPY')
+            seg_dict.update({
+                'source_id': None,
+                'source_key': source_key,
+                'source_report_id': meta['report_id'],
+                'source_review_status': 'preliminary_accepted',
+                'source_reference_id': '',
+                'source_segment_number': meta.get('segment_number'),
+                'source_title': meta['title'],
+                'source_author': meta.get('author', ''),
+                'source_page': meta.get('page_number'),
+                'source_page_display': f"ص. {meta['page_number']}" if meta.get('page_number') else 'غير متاح',
+                'matched_text': meta['raw_text'],
+                'score': score,
+                'pct': min(round(score * 100), 100),
+                'status': 'cited' if seg_dict['is_cited'] else ('copied' if is_direct else 'paraphrased'),
+                'match_type': (
+                    'CITED MATCH' if seg_dict['is_cited'] else
+                    ('DIRECT COPY' if is_direct else history_match_type)
+                ),
+            })
+            source_info[source_key] = {
+                'title': meta['title'],
+                'author': meta.get('author', ''),
+            }
+
+        # ── سجل المرفوضات: تنبيه إعادة تقديم مستقل لا يرفع النسبة الرسمية ──
+        rejected_match = match_review_history_segment(
+            substantive_text or seg.raw_text,
+            review_history_index,
+            settings,
+            {'rejected'},
+            history_query_embedding,
+        )
+        if rejected_match:
+            meta, score, history_match_type = rejected_match
+            seg_dict['rejected_history_match'] = {
+                'report_id': meta['report_id'],
+                'research_id': meta.get('research_id'),
+                'title': meta['title'],
+                'author': meta.get('author', ''),
+                'page_number': meta.get('page_number'),
+                'segment_number': meta.get('segment_number'),
+                'matched_text': meta['raw_text'],
+                'score': score,
+                'pct': min(round(score * 100), 100),
+                'match_type': history_match_type,
+            }
 
         processed_segments.append(seg_dict)
 
@@ -529,7 +730,9 @@ def analyze_academic_document(
     para_words = 0
     cited_words = 0
     problematic_words = 0
+    rejected_history_words = 0
     clean_total_words = 0
+    rejected_history_sources: dict[str, dict] = {}
 
     # إعادة بناء إحصائيات المصادر بعد استبعاد Bibliography لضمان توافق نسب المصادر مع overall_pct
     words_by_source_clean: dict[int, int] = defaultdict(int)
@@ -553,11 +756,25 @@ def analyze_academic_document(
         elif seg['status'] == 'cited':
             cited_words += w_cnt
 
+        rejected_match = seg.get('rejected_history_match')
+        if rejected_match:
+            rejected_history_words += w_cnt
+            existing_rejected = rejected_history_sources.get(rejected_match['report_id'])
+            if not existing_rejected or rejected_match.get('pct', 0) >= existing_rejected.get('max_pct', 0):
+                rejected_history_sources[rejected_match['report_id']] = {
+                    'report_id': rejected_match['report_id'],
+                    'title': rejected_match.get('title', ''),
+                    'author': rejected_match.get('author', ''),
+                    'page_number': rejected_match.get('page_number'),
+                    'matched_text': rejected_match.get('matched_text', ''),
+                    'max_pct': rejected_match.get('pct', 0),
+                }
+
         # إعادة تجميع كلمات المصادر من النص القابل للتحليل فقط
-        s_id = seg.get('source_id')
-        if s_id is not None and seg['status'] in ('copied', 'paraphrased', 'cited'):
-            words_by_source_clean[s_id] += w_cnt
-            pages_by_source_clean[s_id].add(seg.get('source_page'))
+        source_key = seg.get('source_key') or seg.get('source_id')
+        if source_key is not None and seg['status'] in ('copied', 'paraphrased', 'cited'):
+            words_by_source_clean[source_key] += w_cnt
+            pages_by_source_clean[source_key].add(seg.get('source_page'))
 
     total_safe_words = max(clean_total_words, 1)
     matched_total_words = copied_words + para_words + cited_words
@@ -568,6 +785,7 @@ def analyze_academic_document(
     copied_pct = min(round((copied_words / total_safe_words) * 100, 1), 100.0)
     paraphrase_pct = min(round((para_words / total_safe_words) * 100, 1), 100.0)
     cited_pct = min(round((cited_words / total_safe_words) * 100, 1), 100.0)
+    rejected_history_pct = min(round((rejected_history_words / total_safe_words) * 100, 1), 100.0)
 
     # 6. تفاصيل المصادر ومنطق الصفحات المسموحة (Phase 8)
     sources_list = []
@@ -607,6 +825,16 @@ def analyze_academic_document(
         'copied_pct': copied_pct,                 # نسبة النسخ الحرفي
         'paraphrase_pct': paraphrase_pct,         # نسبة إعادة الصياغة
         'cited_pct': cited_pct,                   # نسبة الاقتباس الموثق السليم
+        'rejected_history_pct': rejected_history_pct,
+        'rejected_history_words': rejected_history_words,
+        'rejected_history_matches_count': sum(
+            1 for segment in processed_segments if segment.get('rejected_history_match')
+        ),
+        'rejected_history_sources': sorted(
+            rejected_history_sources.values(),
+            key=lambda item: item.get('max_pct', 0),
+            reverse=True,
+        ),
         'total_words': total_words,
         'copied_words': copied_words,
         'paraphrased_words': para_words,

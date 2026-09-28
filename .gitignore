@@ -60,9 +60,11 @@ config/
 *.lock
 .secret_key
 
-# Benchmark heavy generated datasets
+# Benchmark heavy generated datasets & offline model binaries
 benchmark/data/
 scratch/
+models/
+*.onnx
 
 # Secrets, keys, and environment overrides (NEVER COMMIT)
 .env
