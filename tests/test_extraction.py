@@ -13,6 +13,8 @@ from plagiarism_detector.extraction.page_extractor import (
     pdf_text_needs_ocr,
     alternative_pdf_text_is_usable,
     merge_native_and_image_ocr_text,
+    pdf_text_quality_score,
+    native_pdf_text_is_sufficient,
 )
 from plagiarism_detector.extraction.ocr_engine import check_ocr_availability, find_tessdata_dir
 
@@ -209,3 +211,151 @@ def test_docx_uses_rendered_pdf_pages_when_preview_is_available(tmp_path, monkey
     assert [page['page_number'] for page in pages] == [1, 2]
     assert 'First rendered Word page' in pages[0]['text']
     assert 'Second rendered Word page' in pages[1]['text']
+
+
+def _build_test_pdf_with_image(pdf_path, text: str, large_image: bool = True):
+    import io
+    from PIL import Image
+    import fitz
+
+    doc = fitz.open()
+    page = doc.new_page(width=595, height=842)
+    if large_image:
+        img = Image.new('RGB', (200, 200), color=(128, 128, 128))
+        buf = io.BytesIO()
+        img.save(buf, format='PNG')
+        page.insert_image(fitz.Rect(50, 50, 400, 400), stream=buf.getvalue())
+    if text:
+        page.insert_textbox(fitz.Rect(50, 420, 550, 800), text)
+    doc.save(pdf_path)
+    doc.close()
+
+
+def test_dense_clean_arabic_text_is_sufficient():
+    clean_text = (
+        "تعتبر معالجة اللغات الطبيعية فرعاً حيوياً من فروع الذكاء الاصطناعي "
+        "التي تهدف إلى فهم وتحليل وتوليد النصوص اللغوية بدقة متناهية. "
+        "وتسهم هذه التقنيات المتقدمة في فحص الأوراق العلمية وكشف الانتحال الأكاديمي "
+        "في مختلف الجامعات والمؤسسات البحثية مع الحفاظ على أعلى معايير الجودة العلمية."
+    )
+    score = pdf_text_quality_score(clean_text)
+    assert score >= config.PDF_NATIVE_TEXT_MIN_QUALITY
+    assert native_pdf_text_is_sufficient(clean_text) is True
+
+
+def test_fragmented_arabic_remains_insufficient():
+    fragmented_text = "ا ل د ر ا س ة ا ل ت ط ب ي ق ي ة ل ل ذ ك ا ء ا ل ا ص ط ن ا ع ي ف ي ك ش ف ا ل ا ن ت ح ا ل"
+    score = pdf_text_quality_score(fragmented_text)
+    assert score < config.PDF_NATIVE_TEXT_MIN_QUALITY
+    assert native_pdf_text_is_sufficient(fragmented_text) is False
+
+
+def test_sparse_arabic_remains_insufficient():
+    sparse_text = "شكل رقم 1: رسم بياني توضيحي"
+    assert native_pdf_text_is_sufficient(sparse_text) is False
+
+
+def test_corrupt_arabic_and_control_glyphs_require_ocr():
+    corrupt_text = "\ufffd\x1b دراسات أمنية غير سليمة إطلاقاً \x00 " * 15
+    needs_ocr, reason = pdf_text_needs_ocr(corrupt_text)
+    assert needs_ocr is True
+    assert reason == 'corrupt_text_layer'
+    assert native_pdf_text_is_sufficient(corrupt_text) is False
+
+
+def test_simulated_large_image_page_with_dense_searchable_text_skips_ocr(tmp_path, monkeypatch):
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'smart_skip.pdf'
+    dense_text = (
+        "This comprehensive scientific investigation evaluates machine learning algorithms "
+        "applied to natural language processing and modern academic integrity systems. "
+        "Our empirical results demonstrate substantial performance improvements across multiple "
+        "evaluation benchmarks in higher education research."
+    )
+    _build_test_pdf_with_image(pdf_path, dense_text, large_image=True)
+
+    ocr_calls = []
+
+    def fake_ocr_worker(pix, orig_text, orig_words, langs, merge):
+        ocr_calls.append(orig_text)
+        return 'Fake OCR text', True
+
+    monkeypatch.setattr(config, 'SMART_PDF_OCR_ENABLED', True)
+    monkeypatch.setattr(
+        page_extractor,
+        'check_ocr_availability',
+        lambda: {'available': True, 'has_arabic': True},
+    )
+    monkeypatch.setattr(page_extractor, '_ocr_pdf_pixmap', fake_ocr_worker)
+
+    pages = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=True)
+
+    assert len(pages) == 1
+    assert len(ocr_calls) == 0, "Smart OCR should have skipped full-page OCR for dense clean text"
+    assert pages[0]['is_ocr'] is False
+    assert pages[0]['extraction_engine'] == 'pymupdf'
+    assert "scientific investigation evaluates" in pages[0]['text']
+
+
+def test_large_image_page_with_insufficient_text_calls_ocr(tmp_path, monkeypatch):
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'insufficient_text.pdf'
+    sparse_caption = "Figure 1: Chart."
+    _build_test_pdf_with_image(pdf_path, sparse_caption, large_image=True)
+
+    ocr_calls = []
+
+    def fake_ocr_worker(pix, orig_text, orig_words, langs, merge):
+        ocr_calls.append(orig_text)
+        return 'Extracted OCR diagram content', True
+
+    monkeypatch.setattr(config, 'SMART_PDF_OCR_ENABLED', True)
+    monkeypatch.setattr(
+        page_extractor,
+        'check_ocr_availability',
+        lambda: {'available': True, 'has_arabic': True},
+    )
+    monkeypatch.setattr(page_extractor, '_ocr_pdf_pixmap', fake_ocr_worker)
+
+    pages = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=True)
+
+    assert len(pages) == 1
+    assert len(ocr_calls) == 1, "Sparse text with large image must still trigger OCR"
+    assert pages[0]['is_ocr'] is True
+    assert 'Extracted OCR diagram content' in pages[0]['text']
+
+
+def test_smart_ocr_disabled_preserves_legacy_behavior(tmp_path, monkeypatch):
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'legacy_ocr.pdf'
+    dense_text = (
+        "This comprehensive scientific investigation evaluates machine learning algorithms "
+        "applied to natural language processing and modern academic integrity systems. "
+        "Our empirical results demonstrate substantial performance improvements across multiple "
+        "evaluation benchmarks in higher education research."
+    )
+    _build_test_pdf_with_image(pdf_path, dense_text, large_image=True)
+
+    ocr_calls = []
+
+    def fake_ocr_worker(pix, orig_text, orig_words, langs, merge):
+        ocr_calls.append(orig_text)
+        return 'Merged legacy OCR text', True
+
+    monkeypatch.setattr(config, 'SMART_PDF_OCR_ENABLED', False)
+    monkeypatch.setattr(
+        page_extractor,
+        'check_ocr_availability',
+        lambda: {'available': True, 'has_arabic': True},
+    )
+    monkeypatch.setattr(page_extractor, '_ocr_pdf_pixmap', fake_ocr_worker)
+
+    pages = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=True)
+
+    assert len(pages) == 1
+    assert len(ocr_calls) == 1, "Disabling SMART_PDF_OCR_ENABLED must preserve legacy OCR trigger"
+    assert pages[0]['is_ocr'] is True
+

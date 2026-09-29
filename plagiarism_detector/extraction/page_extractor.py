@@ -37,7 +37,7 @@ def pdf_text_needs_ocr(text: str, min_words: int = 20) -> tuple[bool, str]:
     replacement_chars = text.count('\uFFFD')
     control_chars = sum(
         1 for char in text
-        if unicodedata.category(char) == 'Cc' and char not in '\n\r\t'
+        if unicodedata.category(char) in ('Cc', 'Co', 'Cs', 'Cn') and char not in '\n\r\t'
     )
     legacy_glyphs = len(_LEGACY_PDF_GLYPH_RE.findall(text))
     # Control/replacement characters are a broken text layer regardless of the
@@ -53,6 +53,154 @@ def pdf_text_needs_ocr(text: str, min_words: int = 20) -> tuple[bool, str]:
         return True, 'sparse'
 
     return False, ''
+
+
+_FRAGMENTED_ARABIC_SEQ = re.compile(r'(?:^|\s)(?:[\u0600-\u06FF]\s+){2,}[\u0600-\u06FF](?:\s|$)')
+
+
+def count_meaningful_words(text: str) -> tuple[int, int, int, int]:
+    """
+    Count meaningful Arabic and English/Latin words and inspect Arabic tokens.
+    Returns:
+        (meaningful_words, total_tokens, single_arabic_tokens, total_arabic_tokens)
+    """
+    tokens = text.split()
+    if not tokens:
+        return 0, 0, 0, 0
+
+    meaningful = 0
+    single_ar = 0
+    total_ar = 0
+
+    for tok in tokens:
+        stripped = tok.strip(' \t\n\r()[]{}<>.,;:!?\'"«»ـ-—/\\')
+        if not stripped:
+            continue
+        ar_letters = sum(
+            1 for c in stripped
+            if _ARABIC_CHAR_RE.match(c) and unicodedata.category(c).startswith('L') and c != '\u0640'
+        )
+        lat_letters = sum(
+            1 for c in stripped
+            if _LATIN_CHAR_RE.match(c) and unicodedata.category(c).startswith('L')
+        )
+
+        if ar_letters >= 2 and ar_letters >= len(stripped) * 0.6:
+            meaningful += 1
+            total_ar += 1
+        elif ar_letters == 1 and len(stripped) == 1:
+            single_ar += 1
+            total_ar += 1
+        elif lat_letters >= 2 and lat_letters >= len(stripped) * 0.6:
+            meaningful += 1
+
+    return meaningful, len(tokens), single_ar, total_ar
+
+
+def pdf_text_quality_score(text: str) -> float:
+    """
+    Conservative text-quality scorer:
+    - Detect replacement/control/private/unassigned/legacy glyphs.
+    - Measure meaningful Arabic/English word coverage.
+    - Detect fragmented Arabic letters (e.g. 'ا ل د ر ا س ة').
+    - Reward dense, continuous Arabic/English text.
+    Returns float in range [0.0, 1.0].
+    """
+    if not text or not text.strip():
+        return 0.0
+
+    bad_glyphs = 0
+    non_space_chars = 0
+    arabic_chars = 0
+    latin_chars = 0
+    digits = 0
+
+    for c in text:
+        if c.isspace():
+            continue
+        non_space_chars += 1
+        cat = unicodedata.category(c)
+        if (cat in ('Cc', 'Co', 'Cs', 'Cn') and c not in '\n\r\t') or c == '\uFFFD' or _LEGACY_PDF_GLYPH_RE.match(c):
+            bad_glyphs += 1
+        elif _ARABIC_CHAR_RE.match(c) and cat.startswith('L') and c != '\u0640':
+            arabic_chars += 1
+        elif _LATIN_CHAR_RE.match(c) and cat.startswith('L'):
+            latin_chars += 1
+        elif c.isdigit():
+            digits += 1
+
+    if non_space_chars == 0:
+        return 0.0
+
+    if bad_glyphs > 0:
+        bad_ratio = bad_glyphs / non_space_chars
+        if bad_glyphs >= 3 or bad_ratio > 0.01:
+            return 0.0
+        glyph_penalty = bad_glyphs * 0.30
+    else:
+        glyph_penalty = 0.0
+
+    meaningful_words, total_tokens, single_ar, total_ar = count_meaningful_words(text)
+    if total_tokens == 0:
+        return 0.0
+
+    frag_seqs = _FRAGMENTED_ARABIC_SEQ.findall(text)
+    frag_seq_chars = sum(len(s.split()) for s in frag_seqs)
+
+    frag_penalty = 0.0
+    if total_ar > 0:
+        frag_ratio = single_ar / total_ar
+        if frag_ratio > 0.12:
+            frag_penalty += (frag_ratio - 0.12) * 1.5
+    if frag_seq_chars >= 3:
+        frag_penalty += min(0.70, frag_seq_chars * 0.10)
+
+    meaningful_ratio = meaningful_words / total_tokens
+    letter_density = (arabic_chars + latin_chars + digits) / non_space_chars
+
+    base_score = 0.65 * meaningful_ratio + 0.35 * letter_density
+    if total_tokens < 10:
+        base_score *= (total_tokens / 10.0)
+
+    final_score = max(0.0, min(1.0, base_score - glyph_penalty - frag_penalty))
+    return round(final_score, 4)
+
+
+def native_pdf_text_is_sufficient(
+    text: str,
+    min_words: Optional[int] = None,
+    min_quality: Optional[float] = None,
+) -> bool:
+    """
+    Determine whether a native PDF text layer is sufficiently dense and clean
+    to safely skip expensive full-page raster OCR.
+    Requirements:
+    1. pdf_text_needs_ocr(text) must be False.
+    2. Meaningful words >= config.PDF_NATIVE_TEXT_MIN_WORDS.
+    3. pdf_text_quality_score(text) >= config.PDF_NATIVE_TEXT_MIN_QUALITY.
+    """
+    if not text or not text.strip():
+        return False
+
+    needs_ocr, _ = pdf_text_needs_ocr(text)
+    if needs_ocr:
+        return False
+
+    if min_words is None:
+        min_words = int(getattr(config, 'PDF_NATIVE_TEXT_MIN_WORDS', 30))
+    if min_quality is None:
+        min_quality = float(getattr(config, 'PDF_NATIVE_TEXT_MIN_QUALITY', 0.82))
+
+    meaningful_words, _, _, _ = count_meaningful_words(text)
+    if meaningful_words < min_words:
+        return False
+
+    quality = pdf_text_quality_score(text)
+    if quality < min_quality:
+        return False
+
+    return True
+
 
 
 def clean_arabic_pdf_glyphs(text: str) -> str:
@@ -341,6 +489,10 @@ def _extract_pages_from_pdf(
                     completed += 1
                     _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
 
+            smart_ocr_enabled = getattr(config, 'SMART_PDF_OCR_ENABLED', True)
+            ocr_pages_submitted = 0
+            smart_ocr_skips = 0
+
             with ThreadPoolExecutor(max_workers=worker_count, thread_name_prefix='pdf-ocr') as executor:
                 for idx, page in enumerate(doc):
                     page_num = idx + 1
@@ -348,6 +500,7 @@ def _extract_pages_from_pdf(
                     words = text.split()
                     needs_ocr, ocr_reason = pdf_text_needs_ocr(text)
                     has_large_image = pdf_page_has_large_image(page)
+                    from_alternate = False
 
                     # A second PDF parser can often recover a clean logical Arabic
                     # text layer even when PyMuPDF exposes legacy control glyphs.
@@ -368,27 +521,40 @@ def _extract_pages_from_pdf(
                                 text = alternate_text
                                 words = text.split()
                                 needs_ocr = False
-                                if not has_large_image:
-                                    pages[idx] = {
-                                        'page_number': page_num,
-                                        'text': _clean_pdf_page_result(alternate_text, True),
-                                        'is_ocr': False,
-                                        'extraction_engine': 'pypdf',
-                                    }
-                                    completed += 1
-                                    _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
-                                    continue
+                                from_alternate = True
                         except Exception as exc:
                             logger.debug("تعذر استخراج طبقة النص البديلة للصفحة %s: %s", page_num, exc)
 
+                    should_ocr = False
+                    hybrid_ocr = False
+
+                    if needs_ocr:
+                        should_ocr = True
+                        hybrid_ocr = False
+                    elif has_large_image:
+                        if smart_ocr_enabled and native_pdf_text_is_sufficient(text):
+                            should_ocr = False
+                            smart_ocr_skips += 1
+                            logger.info(
+                                "الصفحة %s: تم تخطي OCR الذكي بنجاح لوجود طبقة نصية عربية أصلية ونظيفة وكثيفة (%s كلمة).",
+                                page_num,
+                                len(words),
+                            )
+                        else:
+                            should_ocr = True
+                            hybrid_ocr = True
+                            if not ocr_reason:
+                                ocr_reason = 'image_insufficient_text' if smart_ocr_enabled else 'embedded_image'
+
                     can_ocr = (
-                        (needs_ocr or has_large_image)
+                        should_ocr
                         and enable_ocr
                         and ocr_status.get('available')
                         and ocr_status.get('has_arabic')
                     )
 
                     if can_ocr:
+                        ocr_pages_submitted += 1
                         logger.info(
                             "الصفحة %s تحتاج OCR (%s، %s كلمة) بدقة %s DPI...",
                             page_num, ocr_reason or 'embedded_image', len(words), dpi,
@@ -403,9 +569,9 @@ def _extract_pages_from_pdf(
                             text,
                             len(words),
                             languages,
-                            not needs_ocr,
+                            hybrid_ocr,
                         )
-                        pending[future] = (idx, page_num, not needs_ocr)
+                        pending[future] = (idx, page_num, hybrid_ocr)
 
                         if len(pending) >= max_pending:
                             done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
@@ -413,9 +579,9 @@ def _extract_pages_from_pdf(
                     else:
                         pages[idx] = {
                             'page_number': page_num,
-                            'text': _clean_pdf_page_result(text, False),
+                            'text': _clean_pdf_page_result(text, from_alternate),
                             'is_ocr': False,
-                            'extraction_engine': 'pymupdf',
+                            'extraction_engine': 'pypdf' if from_alternate else 'pymupdf',
                         }
                         completed += 1
                         _notify_pdf_progress(progress_callback, completed, total_pages, page_num)
@@ -423,6 +589,13 @@ def _extract_pages_from_pdf(
                 while pending:
                     done, _ = wait(tuple(pending), return_when=FIRST_COMPLETED)
                     collect(done)
+
+            logger.info(
+                "اكتمال استخراج صفحات PDF: إجمالي الصفحات %s، تم إرسال %s صفحة للـ OCR، وتخطي %s صفحة بـ Smart OCR.",
+                total_pages,
+                ocr_pages_submitted,
+                smart_ocr_skips,
+            )
 
             return [page for page in pages if page is not None]
     except Exception as e:

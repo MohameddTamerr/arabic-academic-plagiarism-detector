@@ -245,6 +245,12 @@ _DEFAULT_OCR_CONCURRENCY = _detect_safe_ocr_concurrency()
 MAX_CONCURRENT_OCR_JOBS = max(1, int(os.environ.get('MAX_CONCURRENT_OCR_JOBS', _DEFAULT_OCR_CONCURRENCY)))
 PDF_OCR_WORKERS = max(1, int(os.environ.get('PDF_OCR_WORKERS', MAX_CONCURRENT_OCR_JOBS)))
 PDF_OCR_DPI = max(150, min(300, int(os.environ.get('PDF_OCR_DPI', 220))))
+SMART_PDF_OCR_ENABLED = os.environ.get('SMART_PDF_OCR_ENABLED', '1') == '1'
+PDF_NATIVE_TEXT_MIN_WORDS = max(20, int(os.environ.get('PDF_NATIVE_TEXT_MIN_WORDS', 30)))
+PDF_NATIVE_TEXT_MIN_QUALITY = max(
+    0.50,
+    min(1.0, float(os.environ.get('PDF_NATIVE_TEXT_MIN_QUALITY', 0.82))),
+)
 OCR_CACHE_ENABLED = os.environ.get('OCR_CACHE_ENABLED', '1') == '1'
 OCR_CACHE_DIR = Path(os.environ.get('OCR_CACHE_DIR', STORAGE_ROOT / 'ocr_cache'))
 OCR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
