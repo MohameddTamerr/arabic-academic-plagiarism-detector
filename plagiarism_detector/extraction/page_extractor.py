@@ -308,6 +308,13 @@ def _extract_pages_from_pdf(
                 max(1, int(getattr(config, 'MAX_CONCURRENT_OCR_JOBS', 2))),
             )
             dpi = int(getattr(config, 'PDF_OCR_DPI', 220))
+            if enable_ocr and ocr_status.get('available'):
+                logger.info(
+                    "تهيئة OCR متكيف: %s عامل/عوامل، دقة %s DPI، كاش الصفحات %s.",
+                    worker_count,
+                    dpi,
+                    'مفعل' if getattr(config, 'OCR_CACHE_ENABLED', True) else 'معطل',
+                )
             max_pending = max(2, worker_count * 2)
             pending = {}
             alternate_reader = None

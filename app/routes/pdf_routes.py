@@ -213,16 +213,75 @@ def view_pdf(kind, record_id, action):
         return jsonify(error='تعذر عرض مستند PDF المحلي'), 400
 
 
-def _get_text_rects(page, search_text, page_text):
-    """Shared helper: Find rectangles for search_text on page, handling Arabic normalization."""
-    from plagiarism_detector.preprocessing.normalizer import normalize_light
-    import re
+def _normalize_arabic_stream(text: str) -> str:
+    """Normalize text into a unified character stream for robust PDF matching."""
+    if not text:
+        return ""
+    import unicodedata, re
+    n = unicodedata.normalize('NFKD', text)
+    # Remove diacritics, tatweel, presentation forms artifacts, combining hamza
+    n = re.sub(r'[ؐ-ًؚ-ٰٟۖ-ۭـﹰ-ﻼٕٔ]', '', n)
+    # Map letter variants
+    n = n.replace('ی', 'ي').replace('ى', 'ي').replace('ٱ', 'ا').replace('أ', 'ا').replace('إ', 'ا').replace('آ', 'ا')
+    n = n.replace('ئ', 'ي').replace('ؤ', 'و').replace('ة', 'ه').replace('ك', 'ك').replace('ک', 'ك')
+    # Keep only Arabic letters and English alphanumeric
+    n = re.sub(r'[^\u0621-\u064Aa-zA-Z0-9]', '', n)
+    return n
 
+
+def _get_page_visual_lines(page):
+    """Group page words into visual lines with pre-normalized text streams and bounding rects."""
+    import fitz, unicodedata
+    try:
+        words = page.get_text("words")
+    except Exception:
+        words = []
+    if not words:
+        return []
+
+    lines = []
+    curr_line = []
+    curr_y = None
+
+    for w in sorted(words, key=lambda x: (round(x[1] / 6) * 6, -x[0])):
+        y0 = round(w[1], 1)
+        if curr_y is None or abs(y0 - curr_y) < 6:
+            curr_line.append(w)
+            curr_y = y0
+        else:
+            if curr_line:
+                lines.append(curr_line)
+            curr_line = [w]
+            curr_y = y0
+    if curr_line:
+        lines.append(curr_line)
+
+    page_lines = []
+    for line_words in lines:
+        raw = "".join(unicodedata.normalize('NFKD', w[4]) for w in line_words)
+        clean = _normalize_arabic_stream(raw)
+        raw_rev = "".join(unicodedata.normalize('NFKD', w[4]) for w in reversed(line_words))
+        clean_rev = _normalize_arabic_stream(raw_rev)
+        if clean or clean_rev:
+            min_x = min(w[0] for w in line_words)
+            max_x = max(w[2] for w in line_words)
+            min_y = min(w[1] for w in line_words)
+            max_y = max(w[3] for w in line_words)
+            page_lines.append({
+                'rect': fitz.Rect(min_x, min_y, max_x, max_y),
+                'clean': clean,
+                'clean_rev': clean_rev,
+            })
+    return page_lines
+
+
+def _get_text_rects(page, search_text, page_text=None, page_lines=None):
+    """Shared helper: Find rectangles for search_text on page, handling Arabic normalization."""
     rects = []
     if not search_text:
         return rects
 
-    # Try direct search first
+    # Try direct search first (fast for English and standard-encoded Arabic)
     try:
         found_rects = page.search_for(search_text)
         if found_rects:
@@ -230,52 +289,40 @@ def _get_text_rects(page, search_text, page_text):
     except Exception:
         pass
 
-    # Try with normalization (Arabic diacritics, etc.)
-    try:
-        normalized_search = normalize_light(search_text)
-        normalized_page = normalize_light(page_text)
+    # Normalized visual line search (handles Presentation Forms-B and font ligatures)
+    clean_search = _normalize_arabic_stream(search_text)
+    if not clean_search or len(clean_search) < 3:
+        return []
 
-        search_pattern = re.escape(normalized_search)
-        for match in re.finditer(search_pattern, normalized_page):
-            start_pos = match.start()
-            try:
-                words = page.get_text("words")
-                char_pos = 0
-                current_rects = []
+    if page_lines is None:
+        page_lines = _get_page_visual_lines(page)
 
-                for word_info in words:
-                    word_text = word_info[4]
-                    if not word_text.strip():
-                        char_pos += len(word_text)
-                        continue
-
-                    if char_pos <= start_pos < char_pos + len(word_text):
-                        current_rects = []
-
-                    if start_pos <= char_pos < start_pos + len(normalized_search):
-                        current_rects.append(word_info[:4])
-                    elif current_rects and char_pos >= start_pos + len(normalized_search):
-                        break
-
-                    char_pos += len(word_text)
-
-                if current_rects:
-                    x0 = min(r[0] for r in current_rects)
-                    y0 = min(r[1] for r in current_rects)
-                    x1 = max(r[2] for r in current_rects)
-                    y1 = max(r[3] for r in current_rects)
-                    import fitz
-                    rects.append(fitz.Rect(x0, y0, x1, y1))
-                    break
-            except Exception:
-                pass
-    except Exception:
-        pass
+    for pl in page_lines:
+        line_clean = pl.get('clean', '')
+        line_rev = pl.get('clean_rev', '')
+        if len(line_clean) < 4 and len(line_rev) < 4:
+            continue
+        # Direct containment in either word reading order
+        if (line_clean and (line_clean in clean_search or clean_search in line_clean)) or \
+           (line_rev and (line_rev in clean_search or clean_search in line_rev)):
+            rects.append(pl['rect'])
+            continue
+        # Check 8-character shingles for lines with partial phrases or ligatures
+        found_shingle = False
+        step = 3
+        for i in range(0, max(1, len(clean_search) - 7), step):
+            sub = clean_search[i:i + 8]
+            if len(sub) >= 7 and ((line_clean and sub in line_clean) or (line_rev and sub in line_rev)):
+                rects.append(pl['rect'])
+                found_shingle = True
+                break
+        if found_shingle:
+            continue
 
     return rects
 
 
-def _get_segment_rects(segment, page, page_text):
+def _get_segment_rects(segment, page, page_text=None, page_lines=None):
     """Get rectangles for a single segment, with error tolerance."""
     member_texts = segment.get('member_texts') or [
         segment.get('text') or segment.get('suspect_text') or ''
@@ -285,7 +332,7 @@ def _get_segment_rects(segment, page, page_text):
     for search_text in member_texts:
         if not search_text or len(search_text.strip()) < 3:
             continue
-        for rect in _get_text_rects(page, search_text, page_text):
+        for rect in _get_text_rects(page, search_text, page_text, page_lines=page_lines):
             key = tuple(round(float(value), 2) for value in (rect.x0, rect.y0, rect.x1, rect.y1))
             if key not in seen:
                 rects.append(rect)
@@ -333,10 +380,12 @@ def _infer_unpaged_evidence_pages(document, indexed_segments):
             break
         try:
             page_text = page.get_text()
+            page_lines = _get_page_visual_lines(page)
         except Exception:
             page_text = ''
+            page_lines = []
         for position, segment in list(unresolved.items()):
-            if _get_segment_rects(segment, page, page_text):
+            if _get_segment_rects(segment, page, page_text, page_lines=page_lines):
                 inferred[position] = page_number
                 unresolved.pop(position, None)
     return inferred
@@ -433,12 +482,18 @@ def _get_page_highlights(kind, record_id, page_number, page, total_pages):
     except Exception:
         page_text = ""
 
+    # Precompute visual lines once for all segments on this page
+    try:
+        page_lines = _get_page_visual_lines(page)
+    except Exception:
+        page_lines = []
+
     # Process each segment
     for seg in segments:
         if not _is_highlightable_evidence(seg):
             continue
 
-        rects = _get_segment_rects(seg, page, page_text)
+        rects = _get_segment_rects(seg, page, page_text, page_lines=page_lines)
         if rects:
             status = seg.get('status', '')
             match_type = (seg.get('match_type') or '').upper()
@@ -523,12 +578,14 @@ def _export_highlighted_pdf(kind, record_id, original_path):
             page = output_doc[page_num - 1]
             try:
                 page_text = page.get_text()
+                page_lines = _get_page_visual_lines(page)
             except Exception:
                 page_text = ""
+                page_lines = []
 
             # Add highlight annotations
             for seg in segs:
-                rects = _get_segment_rects(seg, page, page_text)
+                rects = _get_segment_rects(seg, page, page_text, page_lines=page_lines)
                 if not rects:
                     continue
 

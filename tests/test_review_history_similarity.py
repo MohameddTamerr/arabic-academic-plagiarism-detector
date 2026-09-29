@@ -74,3 +74,56 @@ def test_rejected_history_is_separate_from_official_similarity(monkeypatch):
     assert result['rejected_history_pct'] == 100.0
     assert result['rejected_history_matches_count'] == 1
     assert result['rejected_history_sources'][0]['title'] == 'بحث سابق'
+    assert result['rejected_history_sources'][0]['pct'] == 100.0
+
+
+def test_rejected_history_symbol_noise_never_matches(monkeypatch):
+    """المقاطع الرمزية أو الخالية من الكلمات لا تتطابق إطلاقاً مع سجل المرفوضات."""
+    monkeypatch.setattr(report_builder, 'get_pipeline_index', lambda **_: _empty_reference_index())
+    noisy_segment = {
+        'report_id': 'rejected-noise-report',
+        'research_id': 99,
+        'review_status': 'rejected',
+        'title': 'AI AGEDNDA',
+        'author': 'Unknown',
+        'page_number': 2,
+        'segment_number': 3,
+        'raw_text': "$%  $  % & '",
+        'normalized_text': '',
+    }
+    monkeypatch.setattr(
+        report_builder.report_repo,
+        'get_review_history_segments',
+        lambda _statuses: [noisy_segment],
+    )
+
+    # فحص نص يحتوي على رموز أو مقاطع قصيرة
+    query_text = "( %    $ %\nدراسة أكاديمية جديدة تبحث في أمن المعلومات الرقمية والتصدي للهجمات"
+    result = report_builder.analyze_academic_document(
+        query_text,
+        settings_override={'enable_semantic_model': False},
+    )
+
+    assert result['rejected_history_pct'] == 0.0
+    assert result['rejected_history_matches_count'] == 0
+    assert len(result['rejected_history_sources']) == 0
+
+
+def test_sequence_ratio_empty_and_noise_protection():
+    """التحقق من أن sequence_ratio لا ترجع 1.0 للنصوص الفارغة أو الرموز."""
+    from plagiarism_detector.detection.shingle_matcher import sequence_ratio, match_exact_or_near_copy
+
+    assert sequence_ratio("", "") == 0.0
+    assert sequence_ratio("   ", "") == 0.0
+    assert sequence_ratio("abc", "") == 0.0
+
+    res = match_exact_or_near_copy(
+        query_shingles=set(),
+        query_norm_text="",
+        candidate_indices=[0],
+        corpus_shingles=[set()],
+        corpus_norm_texts=[""],
+        threshold=0.33,
+    )
+    assert res is None
+

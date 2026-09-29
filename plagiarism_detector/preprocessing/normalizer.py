@@ -117,7 +117,13 @@ def split_sentences(text: str, min_words: int = 4) -> list[str]:
     valid_sentences = []
     for s in raw_splits:
         clean_s = s.strip()
-        if clean_s and (len(clean_s.split()) >= min_words or is_bibliography_header(clean_s)):
+        if not clean_s:
+            continue
+        if is_bibliography_header(clean_s):
+            valid_sentences.append(clean_s)
+            continue
+        norm_words = normalize_aggressive(clean_s).split()
+        if len(norm_words) >= min_words:
             valid_sentences.append(clean_s)
     return valid_sentences
 

@@ -269,6 +269,10 @@ async function loadPdfEvidenceIndex() {
         if (!response.ok) throw new Error(getErrorMessage(data, 'تعذر تحميل مواضع التطابق'));
         pdfView.evidenceIndex = Array.isArray(data.items) ? data.items : [];
         pdfView.evidenceIndexLoaded = true;
+        if (pdfView.evidencePosition < 0 && pdfView.evidenceIndex.length) {
+            const currentIdx = pdfView.evidenceIndex.findIndex(item => item.page === pdfView.page);
+            pdfView.evidencePosition = currentIdx !== -1 ? currentIdx : 0;
+        }
         updateEvidenceNavigation();
         return pdfView.evidenceIndex;
     } catch (error) {
@@ -397,6 +401,16 @@ function showInlinePdfPage() {
     image.onload = async () => {
         const highlights = await loadPdfHighlights();
         renderInlinePdfHighlights(highlights);
+        if (pdfView.evidenceIndex && pdfView.evidenceIndex.length) {
+            const currentItem = pdfView.evidencePosition >= 0 ? pdfView.evidenceIndex[pdfView.evidencePosition] : null;
+            if (!currentItem || currentItem.page !== pdfView.page) {
+                const idx = pdfView.evidenceIndex.findIndex(item => item.page === pdfView.page);
+                if (idx !== -1) {
+                    pdfView.evidencePosition = idx;
+                    updateEvidenceNavigation();
+                }
+            }
+        }
         if (pdfView.targetEvidenceId) {
             const focused = focusHighlightByEvidenceId(pdfView.targetEvidenceId, 'inline-pdf-highlights-overlay');
             if (focused) pdfView.targetEvidenceId = null;

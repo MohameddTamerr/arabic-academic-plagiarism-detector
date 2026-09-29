@@ -1124,8 +1124,11 @@ def test_backup_cross_process_serialization_multiprocess(tmp_path):
     assert len(rejected_workers) == 1
 
 
-def test_ocr_concurrency_bounding_with_mock():
+def test_ocr_concurrency_bounding_with_mock(monkeypatch):
     """35. التحقق من أن تنفيذ OCR لا يتجاوز السقف المضبوط."""
+    # This test measures live OCR concurrency; persistent cache hits would
+    # intentionally bypass the mocked OCR function and invalidate the metric.
+    monkeypatch.setattr(config, 'OCR_CACHE_ENABLED', False)
     from PIL import Image
     from concurrent.futures import ThreadPoolExecutor
     from plagiarism_detector.extraction import ocr_engine
@@ -1271,5 +1274,3 @@ def test_cross_process_ocr_crash_recovery(tmp_path):
     # تحرير القفل
     lock_b.release()
     assert not os.path.exists(lock_file)
-
-

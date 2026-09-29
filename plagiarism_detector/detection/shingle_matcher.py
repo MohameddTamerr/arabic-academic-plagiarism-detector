@@ -21,6 +21,8 @@ def jaccard_similarity(set_a: set, set_b: set) -> float:
 
 def sequence_ratio(text_a: str, text_b: str) -> float:
     """حساب نسبة التشابه التسلسلي الحقيقي باستخدام SequenceMatcher."""
+    if not text_a or not text_b or not text_a.strip() or not text_b.strip():
+        return 0.0
     return SequenceMatcher(None, text_a, text_b).ratio()
 
 
@@ -30,13 +32,20 @@ def match_exact_or_near_copy(
     candidate_indices: set[int] | list[int],
     corpus_shingles: list[set[tuple]],
     corpus_norm_texts: list[str],
-    threshold: float = 0.33
+    threshold: float = 0.33,
+    min_words: int = 4
 ) -> Optional[tuple[int, float, str]]:
     """
     مقارنة المقطع المدخل بمجموعة المرشحين لكشف النسخ الحرفي أو شبه الحرفي.
     يقيّم كلاً من Jaccard و SequenceMatcher على جميع المرشحين ويختار الأفضل عالمياً.
     يرجع: (أفضل مؤشر مرشح، درجة التشابه من 0 إلى 1، نوع التطابق).
     """
+    if not query_norm_text or not query_norm_text.strip():
+        return None
+    query_words = query_norm_text.split()
+    if len(query_words) < min_words:
+        return None
+
     best_idx = -1
     best_score = 0.0
     best_match_type = 'DIRECT COPY'
@@ -44,18 +53,26 @@ def match_exact_or_near_copy(
     candidate_list = list(candidate_indices)
 
     for idx in candidate_list:
+        cand_text = corpus_norm_texts[idx]
+        if not cand_text or not cand_text.strip():
+            continue
+        cand_words = cand_text.split()
+        if len(cand_words) < min_words:
+            continue
+
         cand_shingles = corpus_shingles[idx]
 
         # 1. فحص Jaccard على مستوى الـ Shingles
-        j_score = jaccard_similarity(query_shingles, cand_shingles)
-        if j_score > best_score:
-            best_score = j_score
-            best_idx = idx
-            best_match_type = 'DIRECT COPY'
+        if query_shingles and cand_shingles:
+            j_score = jaccard_similarity(query_shingles, cand_shingles)
+            if j_score > best_score:
+                best_score = j_score
+                best_idx = idx
+                best_match_type = 'DIRECT COPY'
 
         # 2. فحص SequenceMatcher على مستوى التسلسل الحرفي للكلمات
         #    يُشغَّل على كل مرشح (ليس فقط عند فشل Jaccard) لضمان اختيار الأفضل عالمياً
-        seq_score = sequence_ratio(query_norm_text, corpus_norm_texts[idx])
+        seq_score = sequence_ratio(query_norm_text, cand_text)
         # نقبل SequenceMatcher فقط إذا تجاوز 65% (حد أدنى للنسخ شبه الحرفي)
         if seq_score >= 0.65 and seq_score > best_score:
             best_score = seq_score

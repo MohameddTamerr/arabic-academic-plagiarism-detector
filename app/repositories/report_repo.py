@@ -18,7 +18,7 @@ from app.workflow.statuses import (
     ScanStatus, ReviewStatus, SCAN_STATUS_LABELS_AR, REVIEW_STATUS_LABELS_AR,
     derive_legacy_status, map_legacy_status
 )
-from plagiarism_detector.preprocessing.normalizer import normalize_light
+from plagiarism_detector.preprocessing.normalizer import normalize_light, normalize_aggressive
 
 logger = logging.getLogger(__name__)
 
@@ -168,6 +168,18 @@ def get_report(report_id: str) -> Optional[dict]:
         from app.services import snapshot_service
         data['snapshot'] = snapshot_service.get_report_snapshot(report_id)
 
+        # حساب وتجهيز إحصائيات المراجع والمواضع لشارات التقرير
+        sources_list = data.get('sources') or []
+        data['sources_count'] = len(sources_list)
+        data['matched_sources_count'] = len(sources_list)
+        if not data.get('top_sources'):
+            data['top_sources'] = sources_list[:5]
+
+        segments_list = data.get('segments') or data.get('matches') or []
+        matched_segs = [s for s in segments_list if s.get('status') in ('copied', 'paraphrased', 'cited')]
+        data['matched_count'] = len(matched_segs)
+        data['evidence_total_count'] = len(matched_segs)
+
         return data
 
 
@@ -206,7 +218,8 @@ def get_review_history_segments(review_statuses: tuple[str, ...]) -> list[dict]:
                 if segment.get('is_bibliography'):
                     continue
                 raw_text = str(segment.get('text') or segment.get('suspect_text') or '').strip()
-                if len(raw_text.split()) < 4:
+                norm_aggr = normalize_aggressive(raw_text)
+                if len(norm_aggr.split()) < 4:
                     continue
                 history_segments.append({
                     'report_id': report.id,

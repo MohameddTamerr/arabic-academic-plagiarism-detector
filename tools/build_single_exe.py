@@ -40,17 +40,24 @@ if str(ROOT_DIR) not in sys.path:
 import PyInstaller.__main__
 
 
-def build_single_exe():
+def build_single_exe(
+    *,
+    output_name: str = "Arabic-Plagiarism-System",
+    dist_dir: Path | str = DIST_DIR,
+    terminate_running: bool = True,
+):
+    """Build the application, optionally into a side-by-side staging folder."""
+    resolved_dist_dir = Path(dist_dir).resolve()
     print("=" * 75)
-    print("   BUILDING SINGLE-EXE: Arabic-Plagiarism-System.exe")
+    print(f"   BUILDING SINGLE-EXE: {output_name}.exe")
     print("=" * 75)
     t0 = time.perf_counter()
 
     # Automatically terminate running instances to prevent WinError 5 file lock
-    if sys.platform == "win32":
+    if sys.platform == "win32" and terminate_running:
         try:
             import subprocess
-            subprocess.run(["taskkill", "/F", "/IM", "Arabic-Plagiarism-System.exe"], capture_output=True)
+            subprocess.run(["taskkill", "/F", "/IM", f"{output_name}.exe"], capture_output=True)
             time.sleep(0.5)
         except Exception:
             pass
@@ -73,12 +80,12 @@ def build_single_exe():
 
     args = [
         str(ENTRY_POINT),
-        "--name=Arabic-Plagiarism-System",
+        f"--name={output_name}",
         "--onefile",
         "--noconsole",
         f"--icon={ICON_FILE}",
         "--clean",
-        f"--distpath={DIST_DIR}",
+        f"--distpath={resolved_dist_dir}",
         f"--paths={ROOT_DIR}",
         f"--paths={VENDOR_DIR}",
         f"--add-data={TEMPLATES_DIR};templates",
@@ -214,7 +221,7 @@ def build_single_exe():
     PyInstaller.__main__.run(args)
     t1 = time.perf_counter()
 
-    exe_path = DIST_DIR / "Arabic-Plagiarism-System.exe"
+    exe_path = resolved_dist_dir / f"{output_name}.exe"
     if not exe_path.exists():
         print("[CRITICAL ERROR] Target executable was not generated!")
         sys.exit(1)

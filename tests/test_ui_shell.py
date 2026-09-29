@@ -218,6 +218,22 @@ def test_report_primary_accept_action_is_preliminary(template_content):
     assert 'id="btn-accept-initial" onclick="acceptFinalPaper()"' not in template_content
 
 
+def test_final_acceptance_has_visible_progress_and_opens_final_queue(template_content):
+    """الاعتماد النهائي يوضح أن المعالجة جارية ثم ينقل البحث لقائمة القبول النهائي."""
+    assert "actionButton.innerHTML = 'جاري الاعتماد...'" in template_content
+    assert "fetch(`/api/reports/${targetId}/final_accept`" in template_content
+    assert 'if (!res.ok || !data.success)' in template_content
+    assert 'openFinalAcceptedReports();' in template_content
+
+
+def test_reference_retirement_disappears_and_surfaces_api_errors(template_content):
+    """إيقاف المرجع يخفيه من قائمة المراجع النشطة ولا يعرض نجاحاً وهمياً عند رفض الخادم."""
+    assert "params.set('status', 'active');" in template_content
+    assert "const res = await fetch('/api/papers/' + id, { method: 'DELETE' });" in template_content
+    assert "throw new Error(getErrorMessage(data, 'تعذر إيقاف المرجع'))" in template_content
+    assert 'await loadDatabasePapers(_databaseCurrentPage);' in template_content
+
+
 def test_rejected_history_score_is_visually_separate(template_content):
     """تشابه المرفوضات يظهر كمؤشر إعادة تقديم ولا يختلط بنسبة الاستلال الرسمية."""
     assert 'id="rejected-history-card"' in template_content

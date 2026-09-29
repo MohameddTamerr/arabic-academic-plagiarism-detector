@@ -5,6 +5,7 @@
 
 import tempfile
 import os
+import config
 from plagiarism_detector.extraction.page_extractor import (
     extract_document_pages,
     clean_arabic_pdf_glyphs,
@@ -59,6 +60,57 @@ def test_ocr_availability_check():
     assert isinstance(res, dict)
     assert 'available' in res
     assert 'has_arabic' in res
+
+
+def test_adaptive_ocr_concurrency_protects_weak_devices_and_scales_up():
+    assert config._detect_safe_ocr_concurrency(cpu_count=2, memory_gb=3.0) == 1
+    assert config._detect_safe_ocr_concurrency(cpu_count=4, memory_gb=6.0) == 2
+    assert config._detect_safe_ocr_concurrency(cpu_count=8, memory_gb=12.0) == 3
+    assert config._detect_safe_ocr_concurrency(cpu_count=16, memory_gb=32.0) == 4
+
+
+def test_identical_page_uses_persistent_ocr_cache(tmp_path, monkeypatch):
+    from PIL import Image
+    from plagiarism_detector.extraction import ocr_engine
+
+    class DummyLock:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def acquire(self, *args, **kwargs):
+            return True
+
+        def release(self):
+            pass
+
+    calls = {'count': 0}
+
+    def fake_image_to_string(*args, **kwargs):
+        calls['count'] += 1
+        return 'نص عربي مستخرج بجودة ثابتة'
+
+    monkeypatch.setattr(config, 'OCR_CACHE_ENABLED', True)
+    monkeypatch.setattr(config, 'OCR_CACHE_DIR', tmp_path / 'ocr-cache')
+    monkeypatch.setattr(
+        ocr_engine,
+        'check_ocr_availability',
+        lambda: {
+            'available': True,
+            'has_arabic': True,
+            'cmd_path': 'tesseract',
+            'tessdata_path': str(tmp_path),
+        },
+    )
+    monkeypatch.setattr(ocr_engine, 'CrossProcessOcrLock', DummyLock)
+    monkeypatch.setattr('pytesseract.image_to_string', fake_image_to_string)
+
+    image = Image.new('L', (120, 80), color=255)
+    first = ocr_engine.ocr_page_pixmap(image)
+    second = ocr_engine.ocr_page_pixmap(image)
+
+    assert first == second
+    assert calls['count'] == 1
+    assert len(list((tmp_path / 'ocr-cache').glob('*.json'))) == 1
 
 
 def test_corrupt_legacy_arabic_text_layer_requires_ocr():

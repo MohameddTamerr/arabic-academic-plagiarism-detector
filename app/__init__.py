@@ -11,6 +11,7 @@
 
 import os
 import logging
+import secrets
 from pathlib import Path
 from flask import Flask, render_template, send_file
 
@@ -62,6 +63,11 @@ def create_app() -> Flask:
     app.config['SESSION_COOKIE_HTTPONLY'] = getattr(config, 'AUTH_COOKIE_HTTPONLY', True)
     app.config['SESSION_COOKIE_SAMESITE'] = getattr(config, 'AUTH_COOKIE_SAMESITE', 'Lax')
     app.config['SESSION_COOKIE_SECURE'] = getattr(config, 'AUTH_COOKIE_SECURE', False)
+    # A signed Flask cookie can otherwise remain valid across local-server
+    # restarts because SECRET_KEY is intentionally stable. Bind authenticated
+    # sessions to this concrete application run so reopening the desktop app
+    # always returns to the login gate.
+    app.config['AUTH_RUNTIME_ID'] = secrets.token_urlsafe(32)
 
     # 2. تسجيل معرف الطلب ومعالجات الأخطاء وفحص CSRF
     setup_request_id(app)

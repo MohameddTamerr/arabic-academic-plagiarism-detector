@@ -286,3 +286,124 @@ def test_pdf_viewer_has_direct_evidence_navigation_controls():
     assert 'id="inline-evidence-next"' in template
     assert "async function jumpToEvidence" in viewer_js
     assert "'/evidence-index'" in viewer_js
+
+
+def test_arabic_presentation_forms_and_ligatures_highlighted(tmp_path, monkeypatch):
+    pdf_path = tmp_path / "arabic.pdf"
+    _make_text_pdf(pdf_path)
+
+    # Arabic Presentation Forms-B and font ligatures extracted from page words:
+    # ﺳ (Seen initial), ﺮ (Reh), ﻟ (Lam initial), etc.
+    arabic_words = [
+        (50.0, 100.0, 120.0, 118.0, 'ﺳﺮﻟات', 0, 0, 0),
+        (125.0, 100.0, 180.0, 118.0, 'الطيران', 0, 0, 1),
+        (185.0, 100.0, 210.0, 118.0, 'فى', 0, 0, 2),
+        (215.0, 100.0, 260.0, 118.0, 'منطقة', 0, 0, 3),
+        (265.0, 100.0, 320.0, 118.0, 'الشرق', 0, 0, 4),
+        (325.0, 100.0, 390.0, 118.0, 'الأوسط', 0, 0, 5),
+    ]
+
+    segment = {
+        "status": "copied",
+        "match_type": "DIRECT COPY",
+        "page_number": 1,
+        "text": "شركات الطيران في منطقه الشرق الاوسط",
+        "source_title": "رسالة اختبارية",
+    }
+    monkeypatch.setattr(
+        pdf_routes.report_repo,
+        "get_report_page_evidence",
+        lambda **_kwargs: {"segments": [segment]},
+    )
+    monkeypatch.setattr(
+        pdf_routes.report_repo,
+        "get_report",
+        lambda _id: {"segments": [segment]},
+    )
+
+    app = Flask(__name__)
+    with app.test_request_context("/"):
+        with fitz.open(pdf_path) as doc:
+            page = doc[0]
+            monkeypatch.setattr(page, "get_text", lambda kind="text", **kwargs: arabic_words if kind == "words" else "")
+            payload = pdf_routes._get_page_highlights("report", "r-1", 1, page, 1).get_json()
+
+    assert len(payload["highlights"]) >= 1
+    assert payload["highlights"][0]["status"] == "copied"
+    assert payload["highlights"][0]["source_title"] == "رسالة اختبارية"
+    assert payload["highlights"][0]["rect"] == [50.0, 100.0, 390.0, 118.0]
+
+
+def test_get_report_populates_sources_and_matched_counts(monkeypatch):
+    dummy_payload = {
+        "id": "rep-test",
+        "title": "بحث اختباري",
+        "sources": [{"title": "مرجع 1"}],
+        "segments": [
+            {"status": "copied", "page_number": 1},
+            {"status": "paraphrased", "page_number": 2},
+            {"status": "original", "page_number": 3},
+        ],
+    }
+    import json
+    class DummyReport:
+        id = "rep-test"
+        title = "بحث اختباري"
+        author = "مؤلف"
+        category = "عام"
+        overall_pct = 50.0
+        copied_pct = 30.0
+        para_pct = 20.0
+        status = "completed"
+        scan_status = "completed"
+        review_status = "accepted"
+        file_path = "test.pdf"
+        submitted_by = "admin"
+        submitted_notes = ""
+        created_at = None
+        research_id = None
+        scan_execution_id = "rep-test"
+        revision_number = 1
+        supersedes_report_id = None
+        artifact_status = "draft"
+        finalization_hash = ""
+        finalized_at = None
+        finalized_by = ""
+        void_reason = ""
+        voided_by = ""
+        voided_at = None
+        reference_number = "REF-2026-TEST"
+        batch_id = None
+        report_json = json.dumps(dummy_payload)
+
+    class DummySession:
+        def query(self, model, *args, **kwargs):
+            from app.models.research_schema import Research
+            if model is Research:
+                class EmptyQuery:
+                    def filter(self, *a, **k): return self
+                    def first(self): return None
+                return EmptyQuery()
+            return self
+
+        def filter(self, *args, **kwargs):
+            return self
+
+        def first(self):
+            return DummyReport()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+    monkeypatch.setattr(pdf_routes.report_repo, "get_session", lambda: DummySession())
+    monkeypatch.setattr("app.services.snapshot_service.get_report_snapshot", lambda _id: None)
+
+    rep = pdf_routes.report_repo.get_report("rep-test")
+    assert rep["sources_count"] == 1
+    assert rep["matched_sources_count"] == 1
+    assert rep["matched_count"] == 2
+    assert rep["evidence_total_count"] == 2
+    assert len(rep["top_sources"]) == 1

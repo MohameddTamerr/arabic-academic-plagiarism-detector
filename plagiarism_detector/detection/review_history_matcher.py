@@ -4,6 +4,7 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 from plagiarism_detector.detection.evidence_gate import (
+    accept_exact_or_near_copy,
     accept_lexical_paraphrase,
     accept_semantic_paraphrase,
 )
@@ -30,6 +31,8 @@ def build_review_history_index(raw_segments: list[dict], settings: dict) -> dict
             continue
         light = segment.get('normalized_text') or normalize_light(raw_text)
         aggressive = normalize_aggressive(raw_text)
+        if len(aggressive.split()) < shingle_size:
+            continue
         metadata.append(dict(segment))
         light_texts.append(light)
         aggressive_texts.append(aggressive)
@@ -74,7 +77,11 @@ def match_review_history_segment(
 
     query_light = normalize_light(query_text)
     query_aggressive = normalize_aggressive(query_text)
-    query_shingles = get_shingles(query_aggressive, size=int(settings.get('shingle_size', 4)))
+    shingle_size = int(settings.get('shingle_size', 4))
+    if len(query_aggressive.split()) < shingle_size:
+        return None
+
+    query_shingles = get_shingles(query_aggressive, size=shingle_size)
 
     exact = match_exact_or_near_copy(
         query_shingles=query_shingles,
@@ -86,7 +93,9 @@ def match_review_history_segment(
     )
     if exact:
         candidate_index, score, match_type = exact
-        return metadata[candidate_index], score, match_type
+        candidate = metadata[candidate_index]
+        if accept_exact_or_near_copy(query_text, candidate['raw_text']):
+            return candidate, score, match_type
 
     lexical = match_lexical_paraphrase(
         query_norm_text=query_light,

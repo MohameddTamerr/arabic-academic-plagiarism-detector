@@ -1,5 +1,5 @@
 import time
-from flask import Blueprint, request, jsonify, session as flask_session, g
+from flask import Blueprint, request, jsonify, session as flask_session, g, current_app
 import config
 from app.repositories import user_repo
 from app.services import audit_service
@@ -191,6 +191,7 @@ def login():
         flask_session['username'] = user.get('username')
         flask_session['role'] = user.get('role')
         flask_session['session_version'] = user.get('session_version', 1)
+        flask_session['runtime_id'] = current_app.config.get('AUTH_RUNTIME_ID')
         flask_session['auth_time'] = time.time()
         flask_session['last_activity'] = time.time()
         csrf_token = rotate_csrf_token()

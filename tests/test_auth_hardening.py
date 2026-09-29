@@ -460,6 +460,56 @@ def test_session_fixation_defense_regenerates_state(client, clean_auth_db):
         assert sess.get('_csrf_token') == post_csrf
 
 
+def test_authenticated_session_is_bound_to_current_app_run(clean_auth_db):
+    """A valid login remains active during the same desktop application run."""
+    username = 'test_runtime_bound_user'
+    password = 'ValidPass#2026Secure'
+    user_repo.add_user(username, password, 'مستخدم جلسة التشغيل', Role.REVIEWER)
+
+    runtime_app = create_app()
+    runtime_app.config.update(TESTING=False)
+    with runtime_app.test_client() as runtime_client:
+        login = runtime_client.post('/api/auth/login', json={
+            'username': username,
+            'password': password,
+        })
+        assert login.status_code == 200
+        profile = runtime_client.get('/api/auth/me').get_json()
+        assert profile['authenticated'] is True
+        with runtime_client.session_transaction() as sess:
+            assert sess['runtime_id'] == runtime_app.config['AUTH_RUNTIME_ID']
+
+
+def test_restarting_app_invalidates_previous_browser_cookie(clean_auth_db):
+    """A cookie issued by an earlier desktop run must return to the login gate."""
+    username = 'test_restart_cookie_user'
+    password = 'ValidPass#2026Secure'
+    user_repo.add_user(username, password, 'مستخدم اختبار إعادة التشغيل', Role.REVIEWER)
+    user = user_repo.authenticate_user(username, password)
+
+    first_app = create_app()
+    second_app = create_app()
+    first_app.config.update(TESTING=False)
+    second_app.config.update(TESTING=False)
+    assert first_app.config['AUTH_RUNTIME_ID'] != second_app.config['AUTH_RUNTIME_ID']
+
+    with second_app.test_client() as restarted_client:
+        with restarted_client.session_transaction() as sess:
+            sess.update({
+                'user_id': user['id'],
+                'username': username,
+                'role': user['role'],
+                'session_version': user['session_version'],
+                'runtime_id': first_app.config['AUTH_RUNTIME_ID'],
+                'auth_time': time.time(),
+                'last_activity': time.time(),
+            })
+        profile = restarted_client.get('/api/auth/me').get_json()
+        assert profile == {'authenticated': False, 'user': None}
+        with restarted_client.session_transaction() as sess:
+            assert 'user_id' not in sess
+
+
 def test_csrf_regenerated_after_login(client, clean_auth_db):
     """15. التحقق من تغيير رمز CSRF بعد نجاح تسجيل الدخول."""
     res_token_pre = client.get('/api/auth/csrf-token')

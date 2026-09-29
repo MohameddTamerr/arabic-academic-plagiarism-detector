@@ -48,6 +48,20 @@ def get_authenticated_user() -> Optional[dict]:
         if user_id:
             now_ts = time.time()
 
+            # Session cookies are signed with a stable institutional key, so
+            # restarting the local desktop server would normally accept the
+            # previous browser cookie. Require the per-run identifier to make
+            # closing/reopening the application an authentication boundary.
+            if not current_app.config.get('TESTING'):
+                expected_runtime_id = current_app.config.get('AUTH_RUNTIME_ID')
+                if (
+                    not expected_runtime_id
+                    or flask_session.get('runtime_id') != expected_runtime_id
+                ):
+                    flask_session.clear()
+                    g.session_expired = True
+                    return None
+
             # أ. فحص مهلة خمول الجلسة (Idle Timeout)
             idle_timeout_sec = getattr(config, 'AUTH_SESSION_IDLE_TIMEOUT_MINUTES', 30) * 60
             last_activity = flask_session.get('last_activity')

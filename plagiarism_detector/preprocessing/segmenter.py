@@ -42,9 +42,10 @@ def segment_pages(pages: list[dict], min_words: int = 4) -> list[DocumentSegment
         for sent in sentences:
             n_light = normalize_light(sent)
             n_aggr = normalize_aggressive(sent)
-            w_count = len(sent.split())
-            if w_count < min_words and not is_bibliography_header(sent):
+            norm_word_count = len(n_aggr.split())
+            if norm_word_count < min_words and not is_bibliography_header(sent):
                 continue
+            w_count = len(sent.split())
 
             segments.append(DocumentSegment(
                 segment_number=seg_counter,

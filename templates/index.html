@@ -4839,6 +4839,7 @@
                     if (info.page_count) {
                         pdfView.count = info.page_count;
                         showInlinePdfPage();
+                        loadPdfEvidenceIndex();
                     }
                 }).catch(e => {
                     console.error('Failed to load PDF info:', e);
@@ -4895,7 +4896,8 @@
             if (rejectedHistorySourcesEl) {
                 rejectedHistorySourcesEl.innerHTML = (report.rejected_history_sources || []).slice(0, 3).map(item => {
                     const url = buildSourceEvidenceUrl(null, item.page_number, item.matched_text, item.title, item.report_id);
-                    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;font-weight:700;color:#9a3412;background:#ffedd5;border:1px solid #fdba74;border-radius:5px;padding:3px 8px;">${escapeHtml(item.title || 'بحث مرفوض سابقًا')} — ${item.max_pct || 0}% ↗</a>`;
+                    const displayPct = item.pct !== undefined ? item.pct : (item.max_pct || 0);
+                    return `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" style="font-size:11.5px;font-weight:700;color:#9a3412;background:#ffedd5;border:1px solid #fdba74;border-radius:5px;padding:3px 8px;">${escapeHtml(item.title || 'بحث مرفوض سابقًا')} — ${displayPct}% ↗</a>`;
                 }).join('');
             }
 
@@ -4998,15 +5000,21 @@
             }
 
             // Count badges
+            const matchedCount = report.matched_count !== undefined ? report.matched_count : ((report.segments || report.matches || []).filter(s => ['copied', 'paraphrased', 'cited'].includes(s.status)).length);
             const matchedBadge = document.getElementById('report-matched-badge');
-            if (matchedBadge) matchedBadge.innerText = `${report.matched_count || 0} موضع تطابق`;
+            if (matchedBadge) matchedBadge.innerText = `${matchedCount} موضع تطابق`;
+
+            const sourcesCount = report.sources_count !== undefined ? report.sources_count : (report.sources ? report.sources.length : (report.top_sources ? report.top_sources.length : 0));
             const sourcesBadge = document.getElementById('report-sources-badge');
-            if (sourcesBadge) sourcesBadge.innerText = `${report.sources_count || (report.top_sources ? report.top_sources.length : 0)} مراجع مطابقة`;
+            if (sourcesBadge) {
+                const label = sourcesCount === 1 ? '1 مرجع مطابق' : sourcesCount === 2 ? 'مرجعان مطابقان' : `${sourcesCount} مراجع مطابقة`;
+                sourcesBadge.innerText = label;
+            }
 
             const tabEvBadge = document.getElementById('tab-evidence-count-badge');
-            if (tabEvBadge) tabEvBadge.innerText = report.matched_count || 0;
+            if (tabEvBadge) tabEvBadge.innerText = matchedCount;
             const tabSrcBadge = document.getElementById('tab-sources-count-badge');
-            if (tabSrcBadge) tabSrcBadge.innerText = report.sources_count || 0;
+            if (tabSrcBadge) tabSrcBadge.innerText = sourcesCount;
 
             // Volume stats
             const totalWords = report.total_words || 0;
@@ -5506,6 +5514,9 @@
                 showToast('لا يوجد تقرير محدد للقبول النهائي', 'warning');
                 return;
             }
+            const actionButton = document.activeElement instanceof HTMLButtonElement
+                ? document.activeElement
+                : null;
             const confirmed = await showConfirm(
                 'هل تأكدت من النتيجة والملف النهائي وتريد إجراء القبول النهائي وإضافة البحث للقاعدة المرجعية الأساسية للمقارنة مع الأبحاث القادمة؟',
                 'تأكيد القبول النهائي للبحث',
@@ -5513,19 +5524,42 @@
                 false
             );
 
-            if (confirmed) {
+            if (!confirmed) return;
+
+            const originalButtonHtml = actionButton ? actionButton.innerHTML : '';
+            if (actionButton) {
+                actionButton.disabled = true;
+                actionButton.innerHTML = 'جاري الاعتماد...';
+            }
+            showToast('جاري الاعتماد النهائي وإضافة البحث لقاعدة المراجع...', 'info', 8000);
+
+            try {
                 const res = await fetch(`/api/reports/${targetId}/final_accept`, { method: 'POST' });
-                const data = await res.json();
-                if (data.success) {
-                    showToast('تم القبول النهائي بنجاح! تمت إضافة البحث رسمياً إلى قاعدة البيانات المرجعية وإعادة بناء الفهرس', 'success');
-                    if (targetId === currentReportId) {
-                        document.getElementById('report-status-badge').innerText = 'قبول نهائي';
-                        document.getElementById('report-status-badge').style.color = '#059669';
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(getErrorMessage(data, 'حدث خطأ أثناء إجراء القبول النهائي'));
+                }
+
+                showToast('تم القبول النهائي بنجاح، وأُضيف البحث إلى قاعدة المراجع', 'success');
+                if (targetId === currentReportId) {
+                    const statusBadge = document.getElementById('report-status-badge');
+                    if (statusBadge) {
+                        statusBadge.innerText = 'حالة المراجعة: اعتماد نهائي';
+                        statusBadge.style.color = '#059669';
                     }
-                    loadPreliminaryPapers();
-                    loadDatabasePapers();
-                } else {
-                    showToast(data.error || 'حدث خطأ أثناء إجراء القبول النهائي', 'error');
+                }
+                await Promise.allSettled([
+                    loadPreliminaryPapers(1),
+                    loadDatabasePapers(1),
+                    loadDashboardStats()
+                ]);
+                openFinalAcceptedReports();
+            } catch (error) {
+                showToast(error.message || 'تعذر إجراء القبول النهائي', 'error', 7000);
+            } finally {
+                if (actionButton && actionButton.isConnected) {
+                    actionButton.disabled = false;
+                    actionButton.innerHTML = originalButtonHtml;
                 }
             }
         }
@@ -5751,6 +5785,7 @@
                 const params = new URLSearchParams();
                 params.set('page', page);
                 params.set('page_size', 25);
+                params.set('status', 'active');
                 if (query) params.set('q', query);
                 appendDateRange(params, 'database');
 
@@ -5884,10 +5919,20 @@
                 'حذف نهائي',
                 true
             );
-            if (confirmed) {
-                await fetch('/api/papers/' + id, { method: 'DELETE' });
-                loadDatabasePapers();
-                showToast('تم حذف البحث بنجاح', 'success');
+            if (!confirmed) return;
+
+            try {
+                const res = await fetch('/api/papers/' + id, { method: 'DELETE' });
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) {
+                    throw new Error(getErrorMessage(data, 'تعذر إيقاف المرجع'));
+                }
+
+                showToast(data.message || 'تم إيقاف المرجع واستبعاده من المقارنات القادمة', 'success');
+                await loadDatabasePapers(_databaseCurrentPage);
+                loadDashboardStats();
+            } catch (error) {
+                showToast(error.message || 'حدث خطأ أثناء إيقاف المرجع', 'error', 7000);
             }
         }
 

@@ -71,3 +71,21 @@ def accept_semantic_paraphrase(
     if shorter / longer < min_length_ratio:
         return False
     return float(score) >= max(float(configured_threshold), evidence_threshold)
+
+
+def accept_exact_or_near_copy(
+    query_text: str,
+    source_text: str,
+    *,
+    min_words: int = 4,
+    min_shared_terms: int = 2,
+) -> bool:
+    """Ensure exact or near-copy matches contain substantive words, not noise/punctuation."""
+    query_tokens = meaningful_tokens(query_text)
+    source_tokens = meaningful_tokens(source_text)
+    if min(len(query_tokens), len(source_tokens)) < min_words:
+        return False
+
+    shared = set(query_tokens) & set(source_tokens)
+    return len(shared) >= min_shared_terms
+

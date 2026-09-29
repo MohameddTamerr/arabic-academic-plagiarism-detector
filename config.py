@@ -220,10 +220,34 @@ MAX_CONTENT_LENGTH = MAX_BATCH_TOTAL_BYTES  # سقف طلب Flask الإجمال
 
 # الحد الأقصى لعمليات الفحص والمهام المتزامنة لحماية موارد الخادم (Phase 17 Concurrency Bounds)
 MAX_CONCURRENT_SCANS = int(os.environ.get('MAX_CONCURRENT_SCANS', 2))
-_DEFAULT_OCR_CONCURRENCY = 2 if (os.cpu_count() or 1) >= 4 else 1
+
+
+def _detect_safe_ocr_concurrency(cpu_count: int = None, memory_gb: float = None) -> int:
+    """Choose a conservative OCR slot count from CPU and physical memory."""
+    cpu_count = max(1, cpu_count if cpu_count is not None else (os.cpu_count() or 1))
+    if memory_gb is None:
+        try:
+            import psutil
+            memory_gb = psutil.virtual_memory().total / (1024 ** 3)
+        except Exception:
+            memory_gb = 4.0
+
+    if cpu_count <= 2 or memory_gb < 4:
+        return 1
+    if cpu_count <= 4 or memory_gb < 8:
+        return 2
+    if cpu_count <= 8 or memory_gb < 16:
+        return 3
+    return 4
+
+
+_DEFAULT_OCR_CONCURRENCY = _detect_safe_ocr_concurrency()
 MAX_CONCURRENT_OCR_JOBS = max(1, int(os.environ.get('MAX_CONCURRENT_OCR_JOBS', _DEFAULT_OCR_CONCURRENCY)))
 PDF_OCR_WORKERS = max(1, int(os.environ.get('PDF_OCR_WORKERS', MAX_CONCURRENT_OCR_JOBS)))
 PDF_OCR_DPI = max(150, min(300, int(os.environ.get('PDF_OCR_DPI', 220))))
+OCR_CACHE_ENABLED = os.environ.get('OCR_CACHE_ENABLED', '1') == '1'
+OCR_CACHE_DIR = Path(os.environ.get('OCR_CACHE_DIR', STORAGE_ROOT / 'ocr_cache'))
+OCR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 MAX_CONCURRENT_INDEX_BUILDS = int(os.environ.get('MAX_CONCURRENT_INDEX_BUILDS', 1))
 MAX_CONCURRENT_BACKUPS = int(os.environ.get('MAX_CONCURRENT_BACKUPS', 1))
 OCR_LOCK_TIMEOUT_SECONDS = int(os.environ.get('OCR_LOCK_TIMEOUT_SECONDS', 60))

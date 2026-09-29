@@ -760,7 +760,7 @@ def analyze_academic_document(
         if rejected_match:
             rejected_history_words += w_cnt
             existing_rejected = rejected_history_sources.get(rejected_match['report_id'])
-            if not existing_rejected or rejected_match.get('pct', 0) >= existing_rejected.get('max_pct', 0):
+            if not existing_rejected:
                 rejected_history_sources[rejected_match['report_id']] = {
                     'report_id': rejected_match['report_id'],
                     'title': rejected_match.get('title', ''),
@@ -768,7 +768,16 @@ def analyze_academic_document(
                     'page_number': rejected_match.get('page_number'),
                     'matched_text': rejected_match.get('matched_text', ''),
                     'max_pct': rejected_match.get('pct', 0),
+                    'matched_words': w_cnt,
+                    'matched_segments_count': 1,
                 }
+            else:
+                existing_rejected['matched_words'] += w_cnt
+                existing_rejected['matched_segments_count'] += 1
+                if rejected_match.get('pct', 0) >= existing_rejected.get('max_pct', 0):
+                    existing_rejected['max_pct'] = rejected_match.get('pct', 0)
+                    existing_rejected['page_number'] = rejected_match.get('page_number')
+                    existing_rejected['matched_text'] = rejected_match.get('matched_text', '')
 
         # إعادة تجميع كلمات المصادر من النص القابل للتحليل فقط
         source_key = seg.get('source_key') or seg.get('source_id')
@@ -778,6 +787,8 @@ def analyze_academic_document(
 
     total_safe_words = max(clean_total_words, 1)
     matched_total_words = copied_words + para_words + cited_words
+    for r_source in rejected_history_sources.values():
+        r_source['pct'] = min(round((r_source.get('matched_words', 0) / total_safe_words) * 100, 1), 100.0)
 
     # ضمان النسب الرياضية الدقيقة: 0 <= % <= 100 و problematic <= overall
     overall_pct = min(round((matched_total_words / total_safe_words) * 100, 1), 100.0)

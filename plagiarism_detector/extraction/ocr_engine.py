@@ -11,6 +11,7 @@ import time
 import json
 import uuid
 import shutil
+import hashlib
 import logging
 import threading
 from functools import lru_cache
@@ -283,6 +284,52 @@ def check_ocr_availability() -> dict:
         }
 
 
+def _ocr_cache_path(image_bytes: bytes, languages: str, image_identity: str = '') -> Path | None:
+    if not getattr(config, 'OCR_CACHE_ENABLED', True):
+        return None
+    cache_root = Path(getattr(config, 'OCR_CACHE_DIR', Path(config.STORAGE_ROOT) / 'ocr_cache'))
+    cache_root.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256()
+    digest.update(b'ocr-cache-v1\0')
+    digest.update(languages.encode('utf-8'))
+    digest.update(b'\0--oem=1--psm=3\0')
+    digest.update(image_identity.encode('utf-8'))
+    digest.update(b'\0')
+    digest.update(image_bytes)
+    return cache_root / f'{digest.hexdigest()}.json'
+
+
+def _read_ocr_cache(cache_path: Path | None) -> str | None:
+    if cache_path is None or not cache_path.is_file():
+        return None
+    try:
+        payload = json.loads(cache_path.read_text(encoding='utf-8'))
+        text = payload.get('text')
+        return text if isinstance(text, str) else None
+    except Exception as exc:
+        logger.debug("تعذر قراءة كاش OCR %s: %s", cache_path, exc)
+        return None
+
+
+def _write_ocr_cache(cache_path: Path | None, text: str) -> None:
+    if cache_path is None or not text.strip():
+        return
+    temp_path = cache_path.with_name(f'.{cache_path.name}.{uuid.uuid4().hex}.tmp')
+    try:
+        temp_path.write_text(
+            json.dumps({'text': text}, ensure_ascii=False),
+            encoding='utf-8',
+        )
+        os.replace(temp_path, cache_path)
+    except Exception as exc:
+        logger.debug("تعذر حفظ كاش OCR %s: %s", cache_path, exc)
+        try:
+            if temp_path.exists():
+                temp_path.unlink()
+        except Exception:
+            pass
+
+
 def ocr_page_pixmap(pixmap_or_image, languages: str = 'ara+eng') -> str:
     """
     تنفيذ OCR على صورة صفحة واحدة فقط، مع معالجة الأخطاء بأمان.
@@ -302,15 +349,24 @@ def ocr_page_pixmap(pixmap_or_image, languages: str = 'ara+eng') -> str:
         # إذا كان المدخل صورة PIL مباشرة أو fitz Pixmap
         if isinstance(pixmap_or_image, Image.Image):
             image = pixmap_or_image
+            image_bytes = image.tobytes()
+            image_identity = f'{image.mode}:{image.width}x{image.height}'
         elif hasattr(pixmap_or_image, 'tobytes'):
             img_bytes = pixmap_or_image.tobytes('png')
             image = Image.open(io.BytesIO(img_bytes))
+            image_bytes = img_bytes
+            image_identity = 'png'
         else:
             return ''
 
         # Grayscale improves old, textured Arabic periodicals while keeping the
         # operation light enough for very large PDFs.
         image = ImageOps.grayscale(image)
+        cache_path = _ocr_cache_path(image_bytes, languages, image_identity)
+        cached_text = _read_ocr_cache(cache_path)
+        if cached_text is not None:
+            logger.debug("تم استخدام نتيجة OCR محفوظة لصفحة متطابقة.")
+            return cached_text
 
         with _OCR_SEMAPHORE:
             timeout = getattr(config, 'OCR_LOCK_TIMEOUT_SECONDS', 60)
@@ -326,7 +382,9 @@ def ocr_page_pixmap(pixmap_or_image, languages: str = 'ara+eng') -> str:
                     lang=languages,
                     config=f'{tessdata_config}--oem 1 --psm 3'
                 )
-                return text.strip()
+                result = text.strip()
+                _write_ocr_cache(cache_path, result)
+                return result
             finally:
                 ocr_lock.release()
     except Exception as e:
