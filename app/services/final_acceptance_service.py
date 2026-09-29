@@ -1,11 +1,48 @@
 """Commit approval and corpus governance together, preserving original files."""
 import json
+from collections import OrderedDict
 from datetime import datetime
 from app.repositories import base_repo, thesis_repo, batch_repo
 from app.models.schema import LegacyReport, ReviewDecisionRecord
 from app.models.research_schema import Research
 from app.workflow.statuses import validate_review_transition, derive_legacy_status
 from app.services import corpus_governance_service, audit_service
+
+
+def _preextracted_pages_for_entry(report, entry_index=0, total_entries=1):
+    """Rebuild analysed pages from report segments without re-running OCR."""
+    segments = report.get('segments') or []
+    if not isinstance(segments, list) or not segments:
+        return None
+
+    if total_entries > 1:
+        selected = [
+            segment for segment in segments
+            if segment.get('file_index') == entry_index
+        ]
+        if not selected:
+            return None
+    else:
+        selected = segments
+
+    grouped = OrderedDict()
+    for segment in selected:
+        text = str(segment.get('text') or segment.get('raw_text') or '').strip()
+        if not text:
+            continue
+        page_number = segment.get('page_number')
+        grouped.setdefault(page_number, []).append(text)
+
+    if not grouped:
+        return None
+    return [
+        {
+            'page_number': page_number,
+            'text': '\n'.join(texts),
+            'is_ocr': False,
+        }
+        for page_number, texts in grouped.items()
+    ]
 
 
 def accept_report(report, actor):
@@ -24,7 +61,9 @@ def accept_report(report, actor):
         if not entries:
             raise ValueError('لا توجد أجزاء صالحة لإضافة الرسالة إلى المراجع')
     elif report.get('research_id'):
-        entries = (batch_repo.get_research(report['research_id']) or {}).get('files', [])
+        entries = batch_repo.get_research_files_ordered(report['research_id'])
+        if not entries:
+            entries = (batch_repo.get_research(report['research_id']) or {}).get('files', [])
     if not entries:
         entries = [{'file_path': report.get('final_file_path') or report.get('file_path', ''),
                     'raw_text': report.get('final_full_text') or ' '.join(s.get('text', '') for s in report.get('segments', [])),
@@ -40,7 +79,12 @@ def accept_report(report, actor):
             raise ValueError('تم اعتماد هذا التقرير مسبقاً')
         if not validate_review_transition(previous, 'final_accepted'):
             raise ValueError('انتقال تحكيمي غير مسموح به')
-        for entry in entries:
+        for entry_index, entry in enumerate(entries):
+            preextracted_pages = _preextracted_pages_for_entry(
+                report,
+                entry_index=entry_index,
+                total_entries=len(entries),
+            )
             if entry.get('file_hash'):
                 from app.services.integrity_service import compute_stream_sha256
                 actual_hash, _ = compute_stream_sha256(entry['file_path'])
@@ -56,7 +100,9 @@ def accept_report(report, actor):
                 author=report.get('author', ''), category=report.get('category', 'عام'),
                 file_path=entry.get('file_path', ''), raw_text=entry.get('raw_text', ''),
                 original_filename=entry.get('original_filename', ''), added_by=actor.get('username', ''),
-                notes=json.dumps(provenance, ensure_ascii=False), transaction_session=db)
+                notes=json.dumps(provenance, ensure_ascii=False), transaction_session=db,
+                preextracted_pages=preextracted_pages)
+
             if not result.get('success'):
                 if result.get('is_duplicate') and result.get('existing_id'):
                     result = dict(result, id=result['existing_id'], reference_id=result.get('existing_reference_id'))

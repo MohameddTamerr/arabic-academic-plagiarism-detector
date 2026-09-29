@@ -97,6 +97,28 @@ def test_01_valid_reference_can_be_added(gov_client):
     assert res['corpus_version'].startswith("REF-")
 
 
+def test_preextracted_pages_bypass_second_document_extraction(gov_client, tmp_path, monkeypatch):
+    source = tmp_path / 'already-scanned.txt'
+    source.write_text('original binary content', encoding='utf-8')
+
+    def unexpected_extraction(*args, **kwargs):
+        raise AssertionError('final acceptance must not extract or OCR the source twice')
+
+    monkeypatch.setattr(corpus_governance_service, 'extract_document_pages', unexpected_extraction)
+    result = corpus_governance_service.add_reference_document(
+        title='مرجع مستخرج مسبقاً',
+        file_path=str(source),
+        preextracted_pages=[
+            {'page_number': 1, 'text': 'نص أكاديمي مستخرج مسبقاً من الصفحة الأولى'},
+            {'page_number': 2, 'text': 'نص الصفحة الثانية محفوظ من الفحص الأصلي'},
+        ],
+        added_by='unit_admin',
+    )
+
+    assert result['success'] is True
+    assert result['pages_count'] == 2
+
+
 def test_02_exact_duplicate_hash_rejected(gov_client):
     """2. رفض استيراد ملف متطابق تماماً في البصمة الرقمية SHA-256 للمراجع النشطة."""
     text_content = "النص المرجعي الكامل لتحقيق كتاب المفصل في صنعة الإعراب للزمخشري."
@@ -916,4 +938,3 @@ def test_47_cosmetic_metadata_edit_does_not_mark_index_stale(gov_client):
 
     assert c_info_after['index_state'] == "current"
     assert fp_after == fp_before
-

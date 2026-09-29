@@ -258,7 +258,8 @@ def add_reference_document(
     added_by: str = 'system',
     notes: str = '',
     ownership_note: str = '',
-    transaction_session=None
+    transaction_session=None,
+    preextracted_pages: Optional[List[Dict[str, Any]]] = None,
 ) -> dict:
     """
     إضافة مرجع جديد مع التحقق الصارم من عدم التكرار، وبناء الهوية المستقرة، وإصدار النسخة الذرية.
@@ -313,9 +314,22 @@ def add_reference_document(
                     'error': f"هذا الملف موجود مسبقاً في قاعدة المراجع النشطة تحت عنوان: «{existing.title}» (المعرف: {existing.reference_id})"
                 }
 
-    # 3. استخراج الصفحات الفردية
+    # 3. استخراج الصفحات الفردية. Final acceptance can safely reuse the exact
+    # pages already analysed for the report, avoiding a second full OCR pass.
     pages_data = []
-    if file_path and os.path.exists(file_path):
+    if preextracted_pages:
+        pages_data = [
+            {
+                'page_number': page.get('page_number'),
+                'text': str(page.get('text') or '').strip(),
+                'is_ocr': bool(page.get('is_ocr', False)),
+            }
+            for page in preextracted_pages
+            if str(page.get('text') or '').strip()
+        ]
+        if not raw_text:
+            raw_text = '\n\n'.join(page['text'] for page in pages_data)
+    elif file_path and os.path.exists(file_path):
         pages_data = extract_document_pages(file_path, enable_ocr=True)
         if not raw_text:
             raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])

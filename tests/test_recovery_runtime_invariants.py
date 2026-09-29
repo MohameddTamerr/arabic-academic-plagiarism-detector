@@ -91,6 +91,50 @@ def test_final_acceptance_commits_corpus_and_decision_atomically(monkeypatch):
         assert reference.active_from_version
 
 
+def test_final_acceptance_reuses_report_pages_without_second_ocr(monkeypatch):
+    from app.services import final_acceptance_service, corpus_governance_service
+
+    rid = 'reuse_pages_' + uuid.uuid4().hex
+    report_repo.save_report(
+        report_id=rid,
+        title='Pre-extracted acceptance evidence',
+        overall_pct=0,
+        copied_pct=0,
+        para_pct=0,
+        report_dict={
+            'segments': [
+                {'page_number': 1, 'text': 'المقطع الأكاديمي الأول المستخرج أثناء الفحص'},
+                {'page_number': 1, 'text': 'المقطع الأكاديمي الثاني من الصفحة نفسها'},
+                {'page_number': 2, 'text': 'محتوى الصفحة الثانية المحفوظ داخل التقرير'},
+            ],
+        },
+        review_status='preliminary_accepted',
+    )
+    captured = {}
+
+    def add_reference(**kwargs):
+        captured.update(kwargs)
+        return {
+            'success': True,
+            'id': 777001,
+            'reference_id': 'ref-preextracted-test',
+            'corpus_version': 'REF-TEST-000001',
+        }
+
+    monkeypatch.setattr(corpus_governance_service, 'add_reference_document', add_reference)
+    report = report_repo.get_report(rid)
+    final_acceptance_service.accept_report(
+        report,
+        {'id': 999991, 'username': 'acceptance_test_admin', 'role': 'system_admin'},
+    )
+
+    pages = captured['preextracted_pages']
+    assert [page['page_number'] for page in pages] == [1, 2]
+    assert 'المقطع الأكاديمي الأول' in pages[0]['text']
+    assert 'المقطع الأكاديمي الثاني' in pages[0]['text']
+    assert report_repo.get_report(rid)['review_status'] == 'final_accepted'
+
+
 def test_self_match_exclusion_uses_provenance_not_file_hash():
     import json
     from app.models.schema import Document
