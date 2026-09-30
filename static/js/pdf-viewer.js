@@ -1,6 +1,9 @@
 /* Offline viewer: bundled application controls and local PyMuPDF page images. */
 let pdfView = {base: '', page: 1, count: 0, scale: 1, request: 0, highlights: [], currentHighlight: null, evidenceIndex: [], evidencePosition: -1, evidenceIndexLoaded: false, highlightFilters: {all: true, copied: true, paraphrased: true, cited: true}};
 let pdfHighlights = {};  // Cache highlights per page
+let inlinePdfLoadController = null;
+let inlinePdfLoadSequence = 0;
+let inlinePdfObjectUrl = null;
 
 async function openInternalPdf(kind, id, page = 1, fileIndex = null, targetEvidenceId = null) {
     const request = ++pdfView.request;
@@ -379,10 +382,27 @@ async function exportHighlightedPdf() {
     }
 }
 
-// Inline PDF viewer for embedded report view
+function setInlinePdfPageState(mode, message = '') {
+    const state = document.getElementById('inline-pdf-page-state');
+    const text = document.getElementById('inline-pdf-page-state-text');
+    const spinner = document.getElementById('inline-pdf-page-spinner');
+    const retry = document.getElementById('inline-pdf-page-retry');
+    if (!state) return;
+    state.style.display = mode === 'hidden' ? 'none' : 'flex';
+    if (text && message) text.textContent = message;
+    if (spinner) spinner.style.display = mode === 'loading' ? 'block' : 'none';
+    if (retry) retry.style.display = mode === 'error' ? 'inline-flex' : 'none';
+}
+
+// Inline PDF viewer for embedded report view. Page bytes are fetched with an
+// abortable request so rapid navigation cannot let an old response overwrite
+// the current page. Transient failures are retried before exposing an error.
 function showInlinePdfPage() {
     const image = document.getElementById('inline-pdf-image');
     if (!image) return;
+
+    const loadSequence = ++inlinePdfLoadSequence;
+    if (inlinePdfLoadController) inlinePdfLoadController.abort();
 
     image.style.width = (pdfView.scale * 100) + '%';
 
@@ -396,10 +416,18 @@ function showInlinePdfPage() {
     if (prevBtn) prevBtn.disabled = pdfView.page <= 1;
     if (nextBtn) nextBtn.disabled = pdfView.page >= pdfView.count;
 
-    image.onerror = () => showToast('تعذر عرض الصفحة', 'error');
+    const oldOverlay = document.getElementById('inline-pdf-highlights-overlay');
+    if (oldOverlay) oldOverlay.innerHTML = '';
+    setInlinePdfPageState('loading', 'جاري تحميل الصفحة...');
 
-    image.onload = async () => {
+    const requestedPage = pdfView.page;
+    const pageUrl = pdfView.base + '/page' + (pdfView.query || '?') + (pdfView.query ? '&' : '') + 'page=' + requestedPage;
+
+    const onPageLoaded = async () => {
+        if (loadSequence !== inlinePdfLoadSequence) return;
+        setInlinePdfPageState('hidden');
         const highlights = await loadPdfHighlights();
+        if (loadSequence !== inlinePdfLoadSequence) return;
         renderInlinePdfHighlights(highlights);
         if (pdfView.evidenceIndex && pdfView.evidenceIndex.length) {
             const currentItem = pdfView.evidencePosition >= 0 ? pdfView.evidenceIndex[pdfView.evidencePosition] : null;
@@ -416,7 +444,57 @@ function showInlinePdfPage() {
             if (focused) pdfView.targetEvidenceId = null;
         }
     };
-    image.src = pdfView.base + '/page' + (pdfView.query || '?') + (pdfView.query ? '&' : '') + 'page=' + pdfView.page;
+
+    const attemptLoad = async (attempt) => {
+        if (loadSequence !== inlinePdfLoadSequence) return;
+        inlinePdfLoadController = new AbortController();
+        if (attempt > 0) {
+            setInlinePdfPageState('loading', `تعذر التحميل مؤقتاً — إعادة المحاولة ${attempt + 1} من 3...`);
+        }
+        try {
+            const response = await fetch(pageUrl, {
+                signal: inlinePdfLoadController.signal,
+                cache: attempt === 0 ? 'default' : 'reload',
+            });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const blob = await response.blob();
+            if (!blob.type.startsWith('image/')) throw new Error('الاستجابة ليست صورة صالحة');
+            if (loadSequence !== inlinePdfLoadSequence) return;
+
+            const objectUrl = URL.createObjectURL(blob);
+            if (inlinePdfObjectUrl) URL.revokeObjectURL(inlinePdfObjectUrl);
+            inlinePdfObjectUrl = objectUrl;
+            image.onload = async () => {
+                if (inlinePdfObjectUrl === objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    inlinePdfObjectUrl = null;
+                }
+                await onPageLoaded();
+            };
+            image.onerror = () => {
+                if (inlinePdfObjectUrl === objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    inlinePdfObjectUrl = null;
+                }
+                if (attempt < 2) {
+                    window.setTimeout(() => attemptLoad(attempt + 1), 250 * (attempt + 1));
+                } else if (loadSequence === inlinePdfLoadSequence) {
+                    setInlinePdfPageState('error', 'تعذر عرض الصفحة بعد 3 محاولات');
+                }
+            };
+            image.src = objectUrl;
+        } catch (error) {
+            if (error.name === 'AbortError' || loadSequence !== inlinePdfLoadSequence) return;
+            if (attempt < 2) {
+                window.setTimeout(() => attemptLoad(attempt + 1), 250 * (attempt + 1));
+            } else {
+                console.error('Failed to load inline PDF page:', error);
+                setInlinePdfPageState('error', 'تعذر عرض الصفحة بعد 3 محاولات');
+            }
+        }
+    };
+
+    attemptLoad(0);
 }
 
 function renderInlinePdfHighlights(highlights) {

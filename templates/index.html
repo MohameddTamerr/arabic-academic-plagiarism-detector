@@ -2301,9 +2301,16 @@
                                 <button class="btn-secondary" style="background:rgba(255,255,255,0.12); color:#ffffff; border:1px solid rgba(255,255,255,0.25); padding:4px 8px; font-size:12px;" onclick="exportHighlightedPdf()" title="تنزيل PDF">⬇ تنزيل</button>
                             </div>
                         </div>
-                        <div style="overflow:auto; min-height:500px; background:#475569; padding:20px; display:flex; justify-content:center; align-items:flex-start;" id="inline-pdf-container">
+                        <div style="overflow:auto; min-height:500px; background:#475569; padding:20px; display:flex; justify-content:center; align-items:flex-start; position:relative;" id="inline-pdf-container">
                             <div style="position:relative; display:inline-block; margin:auto;">
                                 <img id="inline-pdf-image" tabindex="-1" alt="صفحة مستند PDF" style="display:block; background:#ffffff; box-shadow:0 8px 24px rgba(0,0,0,0.3); border-radius:2px;">
+                            </div>
+                            <div id="inline-pdf-page-state" style="position:absolute; inset:0; display:none; align-items:center; justify-content:center; background:rgba(71,85,105,0.78); z-index:20;">
+                                <div style="display:flex; flex-direction:column; align-items:center; gap:10px; background:#ffffff; color:var(--primary-navy); padding:16px 22px; border-radius:8px; box-shadow:0 8px 28px rgba(15,23,42,.28); font-size:13px; font-weight:800;">
+                                    <div id="inline-pdf-page-spinner" class="loading-spinner"></div>
+                                    <span id="inline-pdf-page-state-text">جاري تحميل الصفحة...</span>
+                                    <button id="inline-pdf-page-retry" class="btn-primary" type="button" style="display:none; padding:5px 12px; font-size:12px;" onclick="showInlinePdfPage()">إعادة تحميل الصفحة</button>
+                                </div>
                             </div>
                         </div>
                     </div>

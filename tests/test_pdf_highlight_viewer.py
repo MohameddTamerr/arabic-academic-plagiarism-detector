@@ -122,6 +122,30 @@ def test_pdfium_fallback_serves_info_and_page_for_valid_pdf(tmp_path):
     assert page_response.get_data().startswith(b"\x89PNG\r\n\x1a\n")
 
 
+def test_pdf_page_preview_cache_reuses_render_and_invalidates_changed_source(tmp_path, monkeypatch):
+    source = tmp_path / 'large-source.pdf'
+    source.write_bytes(b'first-version')
+    cache_dir = tmp_path / 'page-cache'
+    monkeypatch.setattr(pdf_routes.config, 'PDF_PREVIEW_CACHE_DIR', cache_dir)
+    renders = []
+
+    def render():
+        renders.append(len(renders) + 1)
+        return b'\x89PNG\r\n\x1a\n' + bytes([len(renders)])
+
+    first, first_etag = pdf_routes._cached_page_png(source, 7, 'test-renderer', render)
+    second, second_etag = pdf_routes._cached_page_png(source, 7, 'test-renderer', render)
+    assert first == second
+    assert first_etag == second_etag
+    assert renders == [1]
+
+    source.write_bytes(b'second-version-is-different')
+    third, third_etag = pdf_routes._cached_page_png(source, 7, 'test-renderer', render)
+    assert third != first
+    assert third_etag != first_etag
+    assert renders == [1, 2]
+
+
 def test_grouped_evidence_highlights_every_member_and_exposes_source_link_data(tmp_path, monkeypatch):
     pdf_path = tmp_path / "grouped.pdf"
     document = fitz.open()
@@ -286,6 +310,18 @@ def test_pdf_viewer_has_direct_evidence_navigation_controls():
     assert 'id="inline-evidence-next"' in template
     assert "async function jumpToEvidence" in viewer_js
     assert "'/evidence-index'" in viewer_js
+
+
+def test_inline_pdf_viewer_retries_and_cancels_stale_page_requests():
+    template = Path('templates/index.html').read_text(encoding='utf-8')
+    viewer_js = Path('static/js/pdf-viewer.js').read_text(encoding='utf-8')
+
+    assert 'id="inline-pdf-page-state"' in template
+    assert 'id="inline-pdf-page-retry"' in template
+    assert 'inlinePdfLoadController.abort()' in viewer_js
+    assert "cache: attempt === 0 ? 'default' : 'reload'" in viewer_js
+    assert 'attempt < 2' in viewer_js
+    assert 'تعذر عرض الصفحة بعد 3 محاولات' in viewer_js
 
 
 def test_arabic_presentation_forms_and_ligatures_highlighted(tmp_path, monkeypatch):

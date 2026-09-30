@@ -56,6 +56,13 @@ def test_internal_pdf_evidence_navigation_and_authorization(tmp_path):
     assert info.get_json()['coordinates_available'] is False
     page = client.get(f'/api/pdf/report/{rid}/page?page=2')
     assert page.status_code == 200 and page.data.startswith(b'\x89PNG')
+    assert 'private' in page.headers.get('Cache-Control', '')
+    assert page.headers.get('ETag')
+    conditional = client.get(
+        f'/api/pdf/report/{rid}/page?page=2',
+        headers={'If-None-Match': page.headers['ETag']},
+    )
+    assert conditional.status_code == 304
     assert client.get(f'/api/pdf/report/{rid}/page?page=3').status_code == 400
     for method, route in [('get','/api/users'), ('get','/api/admin/audit_logs'), ('get','/api/settings'),
                           ('post',f'/api/reports/{rid}/final_accept'), ('post',f'/api/reports/{rid}/reject'),

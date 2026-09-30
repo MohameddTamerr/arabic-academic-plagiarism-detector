@@ -254,6 +254,10 @@ PDF_NATIVE_TEXT_MIN_QUALITY = max(
 OCR_CACHE_ENABLED = os.environ.get('OCR_CACHE_ENABLED', '1') == '1'
 OCR_CACHE_DIR = Path(os.environ.get('OCR_CACHE_DIR', STORAGE_ROOT / 'ocr_cache'))
 OCR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+PDF_PREVIEW_CACHE_DIR = Path(os.environ.get('PDF_PREVIEW_CACHE_DIR', STORAGE_ROOT / 'pdf_preview_cache'))
+PDF_PREVIEW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+PDF_PREVIEW_CACHE_MAX_MB = max(64, int(os.environ.get('PDF_PREVIEW_CACHE_MAX_MB', 512)))
+PDF_PREVIEW_BROWSER_MAX_AGE = max(60, int(os.environ.get('PDF_PREVIEW_BROWSER_MAX_AGE', 3600)))
 MAX_CONCURRENT_INDEX_BUILDS = int(os.environ.get('MAX_CONCURRENT_INDEX_BUILDS', 1))
 MAX_CONCURRENT_BACKUPS = int(os.environ.get('MAX_CONCURRENT_BACKUPS', 1))
 OCR_LOCK_TIMEOUT_SECONDS = int(os.environ.get('OCR_LOCK_TIMEOUT_SECONDS', 60))

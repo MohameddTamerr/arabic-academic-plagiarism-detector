@@ -58,6 +58,8 @@ def setup_test_database(tmp_path_factory):
     config.DEFAULT_SQLITE_PATH = test_db_path
     config.DATABASE_URL = f"sqlite:///{test_db_path.as_posix()}"
     config.STORAGE_ROOT = test_storage_root
+    config.PDF_PREVIEW_CACHE_DIR = test_storage_root / 'pdf_preview_cache'
+    config.PDF_PREVIEW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
     config.TEMP_UPLOAD_DIR = test_temp_upload_dir
     config.BACKUP_DIR = test_backup_dir
     config.SETTINGS_FILE = test_appdata_dir / 'academic_settings.json'

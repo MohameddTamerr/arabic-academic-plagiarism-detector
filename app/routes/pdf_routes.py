@@ -9,10 +9,87 @@ from app.security.authorization import (require_permission, get_authenticated_us
 from app.security.permissions import Permission
 import config
 import io
+import hashlib
 import logging
+import os
+import threading
 
 pdf_bp = Blueprint('pdf_bp', __name__)
 logger = logging.getLogger(__name__)
+_preview_cache_lock = threading.Lock()
+
+
+def _preview_cache_path(path: Path, page_number: int, renderer: str) -> tuple[Path, str]:
+    """Return a cache path that is invalidated whenever the source PDF changes."""
+    stat = path.stat()
+    identity = f'{path.resolve()}\0{stat.st_size}\0{stat.st_mtime_ns}\0{page_number}\0{renderer}'
+    digest = hashlib.sha256(identity.encode('utf-8', errors='surrogatepass')).hexdigest()
+    root = Path(getattr(config, 'PDF_PREVIEW_CACHE_DIR', Path(config.STORAGE_ROOT) / 'pdf_preview_cache'))
+    return root / digest[:2] / f'{digest}.png', digest
+
+
+def _prune_preview_cache(root: Path) -> None:
+    """Keep the on-demand preview cache bounded without touching source files."""
+    max_bytes = int(getattr(config, 'PDF_PREVIEW_CACHE_MAX_MB', 512)) * 1024 * 1024
+    try:
+        files = [item for item in root.rglob('*.png') if item.is_file()]
+        total = sum(item.stat().st_size for item in files)
+        if total <= max_bytes:
+            return
+        target = int(max_bytes * 0.9)
+        for item in sorted(files, key=lambda value: value.stat().st_mtime_ns):
+            try:
+                size = item.stat().st_size
+                item.unlink()
+                total -= size
+            except OSError:
+                continue
+            if total <= target:
+                break
+    except OSError:
+        logger.debug('تعذر تقليم كاش معاينة PDF', exc_info=True)
+
+
+def _cached_page_png(path: Path, page_number: int, renderer: str, render) -> tuple[bytes, str]:
+    """Render once, then reuse an atomic disk cache across requests and restarts."""
+    cache_path, etag = _preview_cache_path(path, page_number, renderer)
+    try:
+        if cache_path.is_file():
+            os.utime(cache_path, None)
+            return cache_path.read_bytes(), etag
+    except OSError:
+        pass
+
+    with _preview_cache_lock:
+        try:
+            if cache_path.is_file():
+                os.utime(cache_path, None)
+                return cache_path.read_bytes(), etag
+        except OSError:
+            pass
+
+        png = render()
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        temp_path = cache_path.with_name(f'.{cache_path.name}.{os.getpid()}.{threading.get_ident()}.tmp')
+        try:
+            temp_path.write_bytes(png)
+            os.replace(temp_path, cache_path)
+        finally:
+            try:
+                if temp_path.exists():
+                    temp_path.unlink()
+            except OSError:
+                pass
+        _prune_preview_cache(cache_path.parents[1])
+        return png, etag
+
+
+def _page_png_response(png: bytes, etag: str) -> Response:
+    response = Response(png, mimetype='image/png')
+    response.set_etag(etag)
+    response.cache_control.private = True
+    response.cache_control.max_age = int(getattr(config, 'PDF_PREVIEW_BROWSER_MAX_AGE', 3600))
+    return response.make_conditional(request)
 
 
 def _serve_pdf_with_pdfium(path: Path, action: str):
@@ -60,14 +137,15 @@ def _serve_pdf_with_pdfium(path: Path, action: str):
                 logger.debug("PDFium could not locate source evidence text", exc_info=True)
         return jsonify(rects=rects, page_width=page_width, page_height=page_height)
 
-    bitmap = page.render(scale=1.25)
-    image = bitmap.to_pil()
-    output = io.BytesIO()
-    image.save(output, format='PNG')
-    output.seek(0)
-    response = Response(output.getvalue(), mimetype='image/png')
-    response.headers['Cache-Control'] = 'private, no-store'
-    return response
+    def render_page():
+        bitmap = page.render(scale=1.25)
+        image = bitmap.to_pil()
+        output = io.BytesIO()
+        image.save(output, format='PNG')
+        return output.getvalue()
+
+    png, etag = _cached_page_png(path, number, 'pdfium-1.25', render_page)
+    return _page_png_response(png, etag)
 
 
 def _resolve(kind, record_id):
@@ -194,10 +272,13 @@ def view_pdf(kind, record_id, action):
             if action == 'export':
                 return _export_highlighted_pdf(kind, record_id, path)
 
-            png = page.get_pixmap(matrix=fitz.Matrix(1.25, 1.25), alpha=False).tobytes('png')
-            response = Response(png, mimetype='image/png')
-            response.headers['Cache-Control'] = 'private, no-store'
-            return response
+            png, etag = _cached_page_png(
+                path,
+                number,
+                'pymupdf-1.25',
+                lambda: page.get_pixmap(matrix=fitz.Matrix(1.25, 1.25), alpha=False).tobytes('png'),
+            )
+            return _page_png_response(png, etag)
     except OSError as exc:
         logger.warning(
             "PyMuPDF failed for %s record %s; using PDFium fallback: %s",
