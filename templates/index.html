@@ -4787,12 +4787,22 @@
         }
 
         async function openReport(reportId) {
-            const statusEl = document.getElementById('report-loading-status');
-            const statusText = document.getElementById('report-loading-status-text');
-            if (statusEl) {
-                statusEl.style.display = 'flex';
-                if (statusText) statusText.innerText = 'جاري تحميل التقرير...';
+            // Opening a completed report is a separate workspace from the live
+            // batch monitor.  Stop stale polling first so it cannot repaint the
+            // report page with an old "scan in progress" percentage.
+            if (batchPollTimer) {
+                clearInterval(batchPollTimer);
+                batchPollTimer = null;
             }
+            if (batchElapsedTimer) {
+                clearInterval(batchElapsedTimer);
+                batchElapsedTimer = null;
+            }
+            const switcher = document.getElementById('batch-switcher-bar');
+            if (switcher) switcher.style.display = 'none';
+
+            switchView('reports', true);
+            prepareReportWorkspaceForNewScan('جاري تحميل التقرير المكتمل...');
 
             try {
                 // استرجاع الموجز التنفيذي الخفيف أولاً (Level 1 Summary)
@@ -4802,19 +4812,18 @@
                     currentReportId = report.id;
                     _currentReportData = report;
                     renderReport(report);
-                    switchView('reports', true);
                     document.getElementById('report-detail-panel').hidden = false;
 
                     // The original PDF and its page-scoped overlays are now the
                     // primary evidence view; legacy HTML evidence panels stay dormant.
                 } else {
+                    setReportWorkspaceLoading('', false);
                     showToast(report.error || 'تعذر فتح التقرير المطلوب', 'error');
                 }
             } catch (err) {
                 console.error('Failed to open report', err);
+                setReportWorkspaceLoading('', false);
                 showToast('حدث خطأ أثناء الاتصال بالخادم لتحميل التقرير', 'error');
-            } finally {
-                if (statusEl) statusEl.style.display = 'none';
             }
         }
 
@@ -5751,17 +5760,6 @@
                 showToast('تم حذف التقرير بنجاح', 'success');
                 loadRejectedPapers();
                 loadPreliminaryPapers();
-            }
-        }
-
-        async function openReport(reportId) {
-            const res = await fetch('/api/reports/' + reportId);
-            const report = await res.json();
-            if (report && !report.error) {
-                currentReportId = report.id;
-                renderReport(report);
-                switchView('reports', true);
-                document.getElementById('report-detail-panel').hidden = false;
             }
         }
 

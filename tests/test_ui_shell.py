@@ -263,6 +263,15 @@ def test_new_scan_replaces_stale_report_workspace(template_content):
     assert "prepareReportWorkspaceForNewScan('جاري إعادة فحص البحث — 0%')" in template_content
 
 
+def test_opening_completed_report_cannot_be_overridden_by_stale_batch_progress(template_content):
+    """فتح تقرير مكتمل يستخدم الملخص السريع ويوقف مؤقتات شاشة الفحص القديمة."""
+    assert template_content.count('async function openReport(reportId)') == 1
+    assert "fetch('/api/reports/' + reportId + '/summary')" in template_content
+    assert "prepareReportWorkspaceForNewScan('جاري تحميل التقرير المكتمل...')" in template_content
+    assert "if (batchPollTimer)" in template_content
+    assert "if (batchElapsedTimer)" in template_content
+
+
 def test_tables_and_forms_have_mobile_fallbacks(template_content):
     """الجداول قابلة للتمرير والنماذج متعددة الأعمدة تتكدس على الشاشات الصغيرة."""
     assert 'function initializeResponsiveTables()' in template_content
