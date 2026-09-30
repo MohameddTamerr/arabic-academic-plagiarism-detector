@@ -26,7 +26,10 @@ from plagiarism_detector.preprocessing.cheating_detector import (
 from plagiarism_detector.preprocessing.segmenter import segment_pages, DocumentSegment
 from plagiarism_detector.citations.citation_detector import detect_citation
 from plagiarism_detector.citations.bibliography_detector import filter_bibliography_sections
-from plagiarism_detector.filters.common_phrases import filter_common_spans
+from plagiarism_detector.filters.common_phrases import (
+    classify_non_substantive_academic_text,
+    filter_common_spans,
+)
 from plagiarism_detector.detection.candidate_retriever import CandidateRetriever
 from plagiarism_detector.detection.shingle_matcher import match_exact_or_near_copy
 from plagiarism_detector.detection.tfidf_matcher import match_lexical_paraphrase
@@ -459,10 +462,21 @@ def analyze_academic_document(
             'source_page_display': 'غير متاح',
             'matched_text': '',
             'is_cited': False,
-            'citation_detail': ''
+            'citation_detail': '',
+            'evaluated_word_count': w_count,
         }
 
         # 0. فحص واستبعاد النصوص المؤسسية الشائعة على مستوى المقاطع (EXP-03)
+        front_matter_reason = classify_non_substantive_academic_text(seg.raw_text)
+        if front_matter_reason:
+            seg_dict['status'] = 'suppressed'
+            seg_dict['match_type'] = 'NON-SUBSTANTIVE FRONT MATTER'
+            seg_dict['is_common_phrase'] = True
+            seg_dict['exclusion_reason'] = front_matter_reason
+            seg_dict['evaluated_word_count'] = 0
+            processed_segments.append(seg_dict)
+            continue
+
         substantive_text, has_common, extracted_spans = filter_common_spans(
             seg.raw_text,
             min_substantive_words=settings.get('min_sentence_words', 4),
@@ -474,12 +488,15 @@ def analyze_academic_document(
             seg_dict['match_type'] = 'COMMON TEXT'
             seg_dict['is_common_phrase'] = True
             seg_dict['common_spans'] = extracted_spans
+            seg_dict['evaluated_word_count'] = 0
             processed_segments.append(seg_dict)
             continue
 
         if has_common and substantive_text.strip():
             seg_dict['has_common_preamble'] = True
             seg_dict['common_spans'] = extracted_spans
+            seg_dict['evaluated_word_count'] = len(substantive_text.split())
+            seg_dict['member_texts'] = [substantive_text]
             eval_aggr = normalize_aggressive(substantive_text)
             eval_light = normalize_light(substantive_text)
         else:
@@ -739,10 +756,11 @@ def analyze_academic_document(
     pages_by_source_clean: dict[int, set] = defaultdict(set)
 
     for seg in processed_segments:
-        w_cnt = len(seg['text'].split())
+        w_cnt = int(seg.get('evaluated_word_count', len(seg['text'].split())) or 0)
 
-        if seg.get('is_bibliography'):
-            # استبعاد فقرات المراجع من البسط والمقام معاً لتفادي تضخم النسب
+        if seg.get('is_bibliography') or seg.get('status') == 'suppressed':
+            # استبعاد المراجع والنصوص التمهيدية غير الموضوعية من البسط
+            # والمقام معاً حتى لا ترفع النسبة أو تخفضها بصورة مصطنعة.
             continue
 
         clean_total_words += w_cnt

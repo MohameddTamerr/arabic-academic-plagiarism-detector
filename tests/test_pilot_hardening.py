@@ -26,7 +26,11 @@ if str(_ROOT) not in sys.path:
 import config
 from app import versioning
 from plagiarism_detector.detection.candidate_retriever import CandidateRetriever
-from plagiarism_detector.filters.common_phrases import filter_common_spans, is_common_institutional_text
+from plagiarism_detector.filters.common_phrases import (
+    classify_non_substantive_academic_text,
+    filter_common_spans,
+    is_common_institutional_text,
+)
 from plagiarism_detector.citations.citation_detector import detect_citation, detect_citation_baseline, detect_citation_refined
 from plagiarism_detector.reporting.report_builder import analyze_academic_document
 from tests.evaluation.anonymized_ingest import sanitize_text, generate_anonymous_id
@@ -39,7 +43,7 @@ def test_version_registry_rc2():
     assert versioning.ENGINE_VERSION == "1.3.0"
     assert versioning.DETECTOR_VERSION == "shingle-jaccard-tfidf-dual-1.3"
     assert versioning.CITATION_ENGINE_VERSION == "citation-detector-refined-1.3"
-    assert versioning.COMMON_TEXT_HANDLING_VERSION == "common-phrases-span-1.3"
+    assert versioning.COMMON_TEXT_HANDLING_VERSION == "common-phrases-frontmatter-1.4"
 
 
 def test_default_settings_feature_flags():
@@ -93,6 +97,39 @@ def test_pure_common_boilerplate_suppression():
     substantive, has_common, spans = filter_common_spans(pure_boilerplate, min_substantive_words=4, mode='span_level')
     assert has_common is True
     assert substantive == "", "Pure boilerplate must be reduced to empty substantive string"
+
+
+@pytest.mark.parametrize('text,reason', [
+    (
+        'كما أتوجه بخالص الشكر وعظيم التقدير إلى أساتذتي الأفاضل أعضاء لجنة المناقشة والحكم على هذا العمل.',
+        'committee_front_matter',
+    ),
+    (
+        'شاكراً لهم جميعاً جهودهم المخلصة في مراجعة وتدقيق موضوع الدراسة، وأن يجزيهم الله عني خير الجزاء.',
+        'acknowledgements',
+    ),
+    (
+        'كما أتقدم بخالص الشكر والتحية والثناء والتقدير إلى أسرة أكاديمية الشرطة على ما يقدمونه من دعم.',
+        'acknowledgements',
+    ),
+    ('إهداء إلى والدي ووالدتي وأسرتي الكريمة.', 'dedication'),
+    ('فهرس المحتويات وقائمة الجداول والأشكال.', 'contents'),
+])
+def test_non_substantive_front_matter_is_conservatively_excluded(text, reason):
+    assert classify_non_substantive_academic_text(text) == reason
+
+
+def test_scientific_introduction_is_not_excluded_as_front_matter():
+    text = (
+        'مقدمة الدراسة: تتناول هذه الدراسة أثر التخطيط الأمني في خفض زمن الاستجابة '
+        'لأزمات المطارات اعتماداً على تحليل البيانات التشغيلية.'
+    )
+    assert classify_non_substantive_academic_text(text) is None
+
+
+def test_scientific_discussion_of_thanks_and_recognition_is_not_excluded():
+    text = 'تقيس الدراسة أثر الشكر والتقدير المؤسسي على الدافعية والرضا الوظيفي لدى العاملين.'
+    assert classify_non_substantive_academic_text(text) is None
 
 
 def test_refined_citation_filter_precision_and_date_exclusion():
@@ -178,7 +215,7 @@ def test_report_version_snapshot_integrity():
     assert report['engine_version'] == "1.3.0"
     assert report['detector_version'] == "shingle-jaccard-tfidf-dual-1.3"
     assert report['citation_engine_version'] == "citation-detector-refined-1.3"
-    assert report['common_text_version'] == "common-phrases-span-1.3"
+    assert report['common_text_version'] == "common-phrases-frontmatter-1.4"
     assert report['candidate_retrieval_mode'] in ('dual_channel', 'baseline')
     assert isinstance(report['settings_snapshot'], dict)
 

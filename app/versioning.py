@@ -11,6 +11,5 @@ REPORT_SCHEMA_VERSION = "1.0"
 NORMALIZATION_VERSION = "arabic-normalizer-1.0"
 DETECTOR_VERSION = "shingle-jaccard-tfidf-dual-1.3"
 CITATION_ENGINE_VERSION = "citation-detector-refined-1.3"
-COMMON_TEXT_HANDLING_VERSION = "common-phrases-span-1.3"
+COMMON_TEXT_HANDLING_VERSION = "common-phrases-frontmatter-1.4"
 DATABASE_SCHEMA_VERSION = "1.0.0"
-

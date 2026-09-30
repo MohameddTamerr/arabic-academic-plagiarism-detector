@@ -18,6 +18,12 @@ EXPANDED_COMMON_INSTITUTIONAL_MARKERS = [
     'تشكلت لجنة الحكم والمناقشة',
     'من الجدير بالذكر',
     'بخالص الشكر والتقدير',
+    'اتوجه بخالص الشكر',
+    'اتقدم بخالص الشكر',
+    'جزيل الشكر وعظيم الامتنان',
+    'خالص الشكر وعظيم التقدير',
+    'وافر الشكر والتقدير',
+    'جزاهم الله عني خير الجزاء',
     'يتضح مما تقدم',
     'حرصا على امن وسرية',
     'وفي ضوء ما اسفرت عنه النتائج',
@@ -84,6 +90,83 @@ def _load_custom_phrases_from_disk() -> list:
 _CUSTOM_PHRASES_RUNTIME = _load_custom_phrases_from_disk()
 
 _NORM_MARKERS = [(m, normalize_aggressive(m)) for m in EXPANDED_COMMON_INSTITUTIONAL_MARKERS + _CUSTOM_PHRASES_RUNTIME]
+
+
+_ACKNOWLEDGEMENT_STRONG_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'اتوجه بخالص الشكر',
+    'اتقدم بخالص الشكر',
+    'بخالص الشكر والتقدير',
+    'جزيل الشكر وعظيم الامتنان',
+    'خالص الشكر وعظيم التقدير',
+    'وافر الشكر والتقدير',
+    'الشكر والتحية والثناء والتقدير',
+    'شكر وتقدير واعتراف بالفضل',
+))
+
+_ACKNOWLEDGEMENT_SUPPORT_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'الشكر', 'التقدير', 'الامتنان', 'العرفان', 'الثناء',
+    'شاكرا لهم', 'جهودهم المخلصة', 'العون والمساعدة',
+    'الدعم والمساندة', 'كل من ساهم', 'كل من اسهم',
+    'جزاهم الله', 'خير الجزاء', 'ينفع بعلمهم', 'حكمتهم',
+))
+
+_ACKNOWLEDGEMENT_CONTEXT_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'شاكرا لهم', 'جهودهم المخلصة', 'العون والمساعدة',
+    'كل من ساهم', 'كل من اسهم', 'جزاهم الله', 'خير الجزاء',
+    'ينفع بعلمهم',
+))
+
+_COMMITTEE_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'لجنة المناقشة والحكم',
+    'لجنة الحكم والمناقشة',
+    'اعضاء لجنة المناقشة',
+    'اعضاء لجنة الحكم',
+    'اوصت لجنة الحكم بمنح',
+))
+
+_DEDICATION_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'اهداء', 'اهدي هذا العمل', 'الى والدي', 'الى والدتي',
+    'الى اسرتي', 'الى زوجتي', 'الى زوجي',
+))
+
+_CONTENTS_MARKERS = tuple(normalize_aggressive(value) for value in (
+    'فهرس المحتويات', 'قائمة المحتويات', 'فهرس الجداول',
+    'قائمة الجداول', 'فهرس الاشكال', 'قائمة الاشكال',
+))
+
+
+def classify_non_substantive_academic_text(text: str) -> Optional[str]:
+    """Return a conservative exclusion reason for academic front matter.
+
+    Scientific introductions are deliberately never excluded by their heading.
+    Only conventional acknowledgements, dedications, committee boilerplate,
+    and contents-list text are suppressed when strong evidence is present.
+    """
+    if not text or not text.strip():
+        return None
+
+    norm = normalize_aggressive(text)
+    if not norm:
+        return None
+
+    if any(marker in norm for marker in _CONTENTS_MARKERS):
+        return 'contents'
+
+    if any(marker in norm for marker in _COMMITTEE_MARKERS):
+        return 'committee_front_matter'
+
+    if any(marker in norm for marker in _DEDICATION_MARKERS):
+        personal_markers = ('الى والدي', 'الى والدتي', 'الى اسرتي', 'الى زوجتي', 'الى زوجي')
+        if len(norm.split()) <= 8 or any(normalize_aggressive(value) in norm for value in personal_markers):
+            return 'dedication'
+
+    strong_ack = any(marker in norm for marker in _ACKNOWLEDGEMENT_STRONG_MARKERS)
+    support_hits = sum(1 for marker in _ACKNOWLEDGEMENT_SUPPORT_MARKERS if marker in norm)
+    personal_ack_context = any(marker in norm for marker in _ACKNOWLEDGEMENT_CONTEXT_MARKERS)
+    if strong_ack or (support_hits >= 2 and personal_ack_context):
+        return 'acknowledgements'
+
+    return None
 
 
 def is_common_institutional_text(text: str, mode: str = 'span_level') -> bool:
