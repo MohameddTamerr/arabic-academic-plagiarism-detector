@@ -46,7 +46,7 @@ def build_review_history_index(raw_segments: list[dict], settings: dict) -> dict
 
     embeddings = None
     if light_texts and settings.get('enable_semantic_model', False):
-        embeddings = compute_embeddings(light_texts)
+        embeddings = compute_embeddings(light_texts, role='passage')
 
     return {
         'metadata': metadata,

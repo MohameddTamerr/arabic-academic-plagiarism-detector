@@ -6,7 +6,11 @@ from plagiarism_detector.detection.semantic_matcher import (
 )
 
 
-def test_batch_semantic_matches_scalar_results():
+def test_batch_semantic_matches_scalar_results(monkeypatch):
+    monkeypatch.setattr(
+        'plagiarism_detector.detection.semantic_matcher.config.SEMANTIC_MODEL_MIN_SCORE',
+        -1.0,
+    )
     rng = np.random.default_rng(20261002)
     corpus = rng.normal(size=(257, 48)).astype(np.float32)
     queries = rng.normal(size=(19, 48)).astype(np.float32)
@@ -60,3 +64,15 @@ def test_batch_semantic_accepts_one_query_vector():
     )
     assert len(matches) == 1
     assert matches[0] is not None and matches[0][0] == 1
+
+
+def test_model_specific_floor_rejects_e5_baseline_similarity():
+    corpus = np.array([[1.0, 0.0]], dtype=np.float32)
+    query = np.array([[0.82, np.sqrt(1.0 - (0.82 ** 2))]], dtype=np.float32)
+
+    assert batch_match_semantic_similarity(
+        query,
+        [0],
+        corpus,
+        threshold=0.70,
+    ) == [None]

@@ -29,6 +29,12 @@ def get_current_settings() -> dict:
     if 'tfidf_threshold' in settings and 'cosine_threshold' not in settings:
         settings['cosine_threshold'] = settings['tfidf_threshold']
 
+    # Model provenance is runtime-owned, not a user-editable preference.  This
+    # keeps new report snapshots reproducible even when an older settings file
+    # remains on disk after an application update.
+    settings['semantic_model_identifier'] = config.SEMANTIC_MODEL_IDENTIFIER
+    settings['semantic_model_version'] = config.SEMANTIC_MODEL_VERSION
+
     return settings
 
 

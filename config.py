@@ -136,14 +136,36 @@ TEMP_UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 # مجلد النماذج المحلية أوفلاين
 MODELS_DIR = BUNDLE_DIR / 'models'
+SEMANTIC_MODEL_IDENTIFIER = os.environ.get(
+    'SEMANTIC_MODEL_IDENTIFIER',
+    'intfloat/multilingual-e5-small',
+)
 SEMANTIC_MODEL_NAME = os.environ.get(
     'SEMANTIC_MODEL_NAME',
-    'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2',
+    'local/multilingual-e5-small-qint8',
 )
 SEMANTIC_MODEL_PATH = Path(os.environ.get(
     'SEMANTIC_MODEL_PATH',
-    MODELS_DIR / 'models--qdrant--paraphrase-multilingual-MiniLM-L12-v2-onnx-Q',
+    MODELS_DIR / 'models--intfloat--multilingual-e5-small',
 ))
+SEMANTIC_MODEL_FILE = os.environ.get(
+    'SEMANTIC_MODEL_FILE',
+    'onnx/model_qint8_generic.onnx',
+)
+SEMANTIC_MODEL_VERSION = os.environ.get(
+    'SEMANTIC_MODEL_VERSION',
+    '614241f622f53c4eeff9890bdc4f31cfecc418b3-int8-generic-v1',
+)
+SEMANTIC_MODEL_REVISION = os.environ.get(
+    'SEMANTIC_MODEL_REVISION',
+    '614241f622f53c4eeff9890bdc4f31cfecc418b3',
+)
+# E5 similarity scores have a high multilingual baseline.  Keep the public
+# threshold configurable, but never accept weaker semantic evidence than this
+# model-specific floor.
+SEMANTIC_MODEL_MIN_SCORE = float(os.environ.get('SEMANTIC_MODEL_MIN_SCORE', '0.84'))
+SEMANTIC_QUERY_PREFIX = 'query: '
+SEMANTIC_PASSAGE_PREFIX = 'passage: '
 SEMANTIC_CACHE_DIR = Path(os.environ.get('SEMANTIC_CACHE_DIR', STORAGE_ROOT / 'semantic_cache'))
 SEMANTIC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 

@@ -187,7 +187,8 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
                 if job_id:
                     job_queue_service.update_job_progress(job_id, 85, "جاري بناء الفهرس الدلالي العربي والإنجليزي...")
                 semantic_identity = '|'.join((
-                    config.SEMANTIC_MODEL_NAME,
+                    config.SEMANTIC_MODEL_IDENTIFIER,
+                    config.SEMANTIC_MODEL_VERSION,
                     corpus_fingerprint or corpus_version,
                     str(len(corpus_light_texts)),
                 ))
@@ -199,7 +200,7 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
                     if cached.ndim == 2 and cached.shape[0] == len(corpus_light_texts):
                         corpus_embeddings = cached
                 if corpus_embeddings is None:
-                    corpus_embeddings = compute_embeddings(corpus_light_texts)
+                    corpus_embeddings = compute_embeddings(corpus_light_texts, role='passage')
                     if corpus_embeddings is not None:
                         temp_path = cache_path.with_suffix('.tmp.npy')
                         import numpy as np
@@ -420,7 +421,10 @@ def analyze_academic_document(
     if settings.get('enable_semantic_model', False) and (
         corpus_embeddings is not None or review_history_index.get('embeddings') is not None
     ):
-        semantic_query_embeddings = compute_embeddings([seg.raw_text for seg in segments_list])
+        semantic_query_embeddings = compute_embeddings(
+            [seg.raw_text for seg in segments_list],
+            role='query',
+        )
 
     # Build the allowed corpus set once, then evaluate semantic fallbacks in
     # small batches on demand.  A batch is only calculated when at least one

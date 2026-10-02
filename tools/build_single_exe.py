@@ -38,6 +38,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 import PyInstaller.__main__
+import config as app_config
 
 
 def build_single_exe(
@@ -68,6 +69,26 @@ def build_single_exe(
         raise FileNotFoundError(f"Missing bundled OCR models: {missing_ocr_models}")
     if not MODELS_DIR.is_dir():
         raise FileNotFoundError(f"Missing bundled semantic model directory: {MODELS_DIR}")
+    semantic_snapshot_dir = (
+        app_config.SEMANTIC_MODEL_PATH
+        / 'snapshots'
+        / app_config.SEMANTIC_MODEL_REVISION
+    )
+    required_semantic_files = [
+        semantic_snapshot_dir / app_config.SEMANTIC_MODEL_FILE,
+        semantic_snapshot_dir / 'config.json',
+        semantic_snapshot_dir / 'tokenizer.json',
+        semantic_snapshot_dir / 'tokenizer_config.json',
+        semantic_snapshot_dir / 'special_tokens_map.json',
+        semantic_snapshot_dir / 'sentencepiece.bpe.model',
+    ]
+    missing_semantic_files = [
+        str(path) for path in required_semantic_files if not path.is_file()
+    ]
+    if missing_semantic_files:
+        raise FileNotFoundError(
+            f"Missing bundled semantic model files: {missing_semantic_files}"
+        )
 
     vendor_runtime_binaries = []
     for library_dir, destination in VENDOR_RUNTIME_DIRS:
