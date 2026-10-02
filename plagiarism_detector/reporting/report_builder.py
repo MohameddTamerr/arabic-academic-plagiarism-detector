@@ -42,6 +42,7 @@ from plagiarism_detector.detection.review_history_matcher import (
     match_review_history_segment,
 )
 from plagiarism_detector.detection.semantic_matcher import (
+    batch_match_semantic_similarity,
     check_semantic_model_availability,
     compute_embeddings,
     match_semantic_similarity,
@@ -421,6 +422,19 @@ def analyze_academic_document(
     ):
         semantic_query_embeddings = compute_embeddings([seg.raw_text for seg in segments_list])
 
+    # Build the allowed corpus set once, then evaluate semantic fallbacks in
+    # small batches on demand.  A batch is only calculated when at least one
+    # segment in it reaches Stage C, so direct/lexical matches keep their fast
+    # path while semantic-heavy documents use efficient matrix multiplication.
+    semantic_candidates = []
+    semantic_batch_size = 64
+    semantic_batch_cache: dict[int, list] = {}
+    if semantic_query_embeddings is not None and corpus_embeddings is not None:
+        semantic_candidates = [
+            idx for idx, meta in enumerate(corpus_metadata)
+            if not excluded_doc_ids or meta['doc_id'] not in excluded_doc_ids
+        ]
+
     total_words = 0
     copied_words = 0
     para_words = 0
@@ -628,18 +642,30 @@ def analyze_academic_document(
             and semantic_query_embeddings is not None
             and corpus_embeddings is not None
         ):
-            semantic_candidates = [
-                idx for idx, meta in enumerate(corpus_metadata)
-                if not excluded_doc_ids or meta['doc_id'] not in excluded_doc_ids
-            ]
-            res_c = match_semantic_similarity(
-                query_text=seg.raw_text,
-                candidate_indices=semantic_candidates,
-                corpus_texts=corpus_light_texts,
-                corpus_embeddings=corpus_embeddings,
-                threshold=settings['semantic_threshold'],
-                query_embedding=semantic_query_embeddings[segment_index],
-            )
+            batch_start = (segment_index // semantic_batch_size) * semantic_batch_size
+            if batch_start not in semantic_batch_cache:
+                batch_end = min(batch_start + semantic_batch_size, len(segments_list))
+                semantic_batch_cache[batch_start] = batch_match_semantic_similarity(
+                    query_embeddings=semantic_query_embeddings[batch_start:batch_end],
+                    candidate_indices=semantic_candidates,
+                    corpus_embeddings=corpus_embeddings,
+                    threshold=settings['semantic_threshold'],
+                )
+            batch_offset = segment_index - batch_start
+            batch_results = semantic_batch_cache[batch_start]
+            if batch_offset < len(batch_results):
+                res_c = batch_results[batch_offset]
+            else:
+                # Preserve the stable scalar path if a malformed batch ever
+                # returns fewer entries than requested.
+                res_c = match_semantic_similarity(
+                    query_text=seg.raw_text,
+                    candidate_indices=semantic_candidates,
+                    corpus_texts=corpus_light_texts,
+                    corpus_embeddings=corpus_embeddings,
+                    threshold=settings['semantic_threshold'],
+                    query_embedding=semantic_query_embeddings[segment_index],
+                )
             if res_c:
                 cand_idx, score, _match_type = res_c
                 meta = corpus_metadata[cand_idx]

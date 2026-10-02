@@ -100,6 +100,76 @@ def compute_embeddings(texts: list[str]) -> Optional[np.ndarray]:
         return None
 
 
+def batch_match_semantic_similarity(
+    query_embeddings: np.ndarray,
+    candidate_indices: list[int],
+    corpus_embeddings: Optional[np.ndarray],
+    threshold: float = 0.70,
+) -> list[Optional[tuple[int, float, str]]]:
+    """
+    Match a batch of query embeddings with the same exact cosine rule used by
+    ``match_semantic_similarity``.
+
+    The corpus slice and its norms are prepared once for the whole batch, then
+    NumPy performs one matrix multiplication.  This preserves the selected
+    candidate and threshold semantics while avoiding a full corpus scan for
+    every individual document segment.
+    """
+    queries = np.asarray(query_embeddings)
+    if queries.ndim == 1:
+        queries = queries.reshape(1, -1)
+
+    query_count = int(queries.shape[0]) if queries.ndim == 2 else 0
+    if query_count == 0:
+        return []
+    if corpus_embeddings is None or not candidate_indices:
+        return [None] * query_count
+
+    try:
+        candidate_array = np.asarray(candidate_indices, dtype=np.intp)
+        candidate_vectors = np.asarray(corpus_embeddings)[candidate_array]
+        if candidate_vectors.ndim != 2 or queries.shape[1] != candidate_vectors.shape[1]:
+            return [None] * query_count
+
+        dot_products = np.matmul(queries, candidate_vectors.T)
+        query_norms = np.linalg.norm(queries, axis=1)
+        candidate_norms = np.linalg.norm(candidate_vectors, axis=1)
+        denominators = query_norms[:, None] * candidate_norms[None, :]
+        denominators[denominators == 0] = 1e-10
+        similarities = dot_products / denominators
+
+        best_local_indices = np.argmax(similarities, axis=1)
+        best_scores = similarities[np.arange(query_count), best_local_indices]
+        results: list[Optional[tuple[int, float, str]]] = []
+        for query_idx, (local_idx, score) in enumerate(zip(best_local_indices, best_scores)):
+            numeric_score = float(score)
+            # BLAS may differ from one-vector np.dot by a few last decimal
+            # places. Re-run only threshold-borderline rows through the
+            # established scalar path so classification cannot flip there.
+            if abs(numeric_score - threshold) <= 1e-6:
+                results.append(match_semantic_similarity(
+                    query_text='',
+                    candidate_indices=candidate_indices,
+                    corpus_texts=[],
+                    corpus_embeddings=corpus_embeddings,
+                    threshold=threshold,
+                    query_embedding=queries[query_idx],
+                ))
+                continue
+            if numeric_score >= threshold:
+                results.append((
+                    int(candidate_array[int(local_idx)]),
+                    numeric_score,
+                    'SEMANTIC SIMILARITY / POSSIBLE PARAPHRASE',
+                ))
+            else:
+                results.append(None)
+        return results
+    except Exception as e:
+        logger.debug(f"خطأ في المقارنة الدلالية المجمعة: {e}")
+        return [None] * query_count
+
+
 def match_semantic_similarity(
     query_text: str,
     candidate_indices: list[int],
