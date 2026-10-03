@@ -11,6 +11,7 @@
 import os
 import uuid
 import logging
+import threading
 from datetime import datetime
 from typing import Optional, List, Dict, Any, Tuple
 from collections import defaultdict
@@ -28,6 +29,28 @@ from app.services.settings_service import get_current_settings
 from app import versioning
 
 logger = logging.getLogger(__name__)
+_AUTO_COMBINE_LOCK = threading.Lock()
+_AUTO_COMBINED_SIGNATURES = set()
+
+
+def _auto_generate_combined_report_if_ready(thesis_id: int) -> None:
+    """Create one combined report when the final queued thesis part completes."""
+    thesis = thesis_repo.get_thesis(thesis_id)
+    parts = (thesis or {}).get('parts') or []
+    if not parts or not all(part.get('scan_status') == 'completed' and part.get('report_id') for part in parts):
+        return
+
+    signature = (thesis_id, tuple(sorted(str(part['report_id']) for part in parts)))
+    with _AUTO_COMBINE_LOCK:
+        if signature in _AUTO_COMBINED_SIGNATURES:
+            return
+        _AUTO_COMBINED_SIGNATURES.add(signature)
+
+    success, _, message = generate_combined_thesis_report(thesis_id)
+    if not success:
+        with _AUTO_COMBINE_LOCK:
+            _AUTO_COMBINED_SIGNATURES.discard(signature)
+        raise RuntimeError(message)
 
 
 # ─── 1. تشغيل فحص جزء محدد ──────────────────────────────────────────────────
@@ -204,6 +227,13 @@ def _execute_part_scan(task_id: str, part_id: int):
                 'problematic_pct': report['problematic_pct']
             }
         )
+
+        try:
+            _auto_generate_combined_report_if_ready(part['thesis_id'])
+        except Exception:
+            # Preserve the successful part result; the user can still retry the
+            # lightweight combined-report step without rescanning any files.
+            logger.exception("تعذر إنشاء التقرير المجمع تلقائياً للرسالة %s", part['thesis_id'])
 
     except Exception as e:
         logger.error(f"خطأ أثناء فحص جزء الرسالة {part_id}: {e}", exc_info=True)

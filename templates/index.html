@@ -2619,9 +2619,23 @@
                     </div>
                     <div class="page-header-actions">
                         <button class="btn-primary" onclick="openCreateThesisModal()">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                            <span>تسجيل رسالة جديدة</span>
+                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line></svg>
+                            <span>رفع وفحص رسالة كاملة</span>
                         </button>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom:20px; padding:16px 20px; border-right:4px solid var(--primary-navy);">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap;">
+                        <div>
+                            <div style="font-size:14px; font-weight:800; color:var(--primary-navy); margin-bottom:4px;">رسالة مقسمة إلى عدة ملفات؟</div>
+                            <div style="font-size:12.5px; color:var(--text-muted);">ارفع كل ملفات PDF وWord مرة واحدة، رتّب الفصول، وسيتم فحصها وتجميعها في تقرير واحد تلقائياً.</div>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; font-size:12px; font-weight:700; color:#334155;">
+                            <span style="background:#eff6ff; padding:7px 10px; border-radius:8px;">١ — بيانات الرسالة</span>
+                            <span style="background:#eff6ff; padding:7px 10px; border-radius:8px;">٢ — اختيار وترتيب الملفات</span>
+                            <span style="background:#ecfdf5; padding:7px 10px; border-radius:8px;">٣ — فحص وتقرير موحّد</span>
+                        </div>
                     </div>
                 </div>
 
@@ -3933,6 +3947,7 @@
         }
 
         let activeView = 'dashboard';
+        let _thesisDetailPollTimer = null;
 
         function canOpenView(viewName) {
             const role = normalizeUserRole(currentUser?.role);
@@ -3945,6 +3960,10 @@
 
         function switchView(viewName, showDetail = false) {
             if (!document.getElementById('view-' + viewName) || !canOpenView(viewName)) viewName = 'dashboard';
+            if (viewName !== 'thesis-detail' && _thesisDetailPollTimer) {
+                clearTimeout(_thesisDetailPollTimer);
+                _thesisDetailPollTimer = null;
+            }
             activeView = viewName;
             document.querySelectorAll('.view-section').forEach(el => {
                 const selected = el.id === 'view-' + activeView;
@@ -7868,12 +7887,17 @@
     </div>
 </div>
 <div id="modal-create-thesis" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
-    <div class="modal-card" style="background: white; border-radius: 12px; width: 100%; max-width: 600px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="create-thesis-heading" tabindex="-1" style="background: white; border-radius: 12px; width: calc(100% - 32px); max-width: 780px; max-height:92vh; overflow-y:auto; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
-            <h3 style="font-size: 16px; font-weight: 800; color: var(--primary-navy); margin: 0;">تسجيل رسالة علمية / أطروحة جديدة</h3>
+            <div><h3 id="create-thesis-heading" style="font-size: 17px; font-weight: 800; color: var(--primary-navy); margin: 0 0 4px;">رفع وفحص رسالة علمية كاملة</h3><div style="font-size:12px;color:var(--text-muted);">أدخل البيانات مرة واحدة ثم اختر جميع الفصول والأبواب معاً.</div></div>
             <button type="button" onclick="closeModal('modal-create-thesis')" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted);">&times;</button>
         </div>
         <form id="form-create-thesis" onsubmit="submitCreateThesis(event)">
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;">
+                <div style="padding:8px;border-radius:8px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:800;text-align:center;">١. بيانات الرسالة</div>
+                <div style="padding:8px;border-radius:8px;background:#e0f2fe;color:#075985;font-size:12px;font-weight:800;text-align:center;">٢. الملفات وترتيبها</div>
+                <div style="padding:8px;border-radius:8px;background:#dcfce7;color:#166534;font-size:12px;font-weight:800;text-align:center;">٣. الفحص والتجميع</div>
+            </div>
             <div style="margin-bottom: 12px;">
                 <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">عنوان الرسالة / الأطروحة <span style="color:#dc2626;">*</span>:</label>
                 <input type="text" id="create-thesis-title" required placeholder="أدخل العنوان الأكاديمي الكامل للرسالة..." style="width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
@@ -7893,12 +7917,8 @@
                     </select>
                 </div>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-
-
-            </div>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
-                <div hidden>
+                <div>
                     <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 4px;">القسم / التخصص:</label>
                     <input type="text" id="create-thesis-department" placeholder="مثال: العلوم الجنائية" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
                 </div>
@@ -7907,9 +7927,20 @@
                     <input type="text" id="create-thesis-year" placeholder="2026/2025" style="width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 13px;">
                 </div>
             </div>
+
+            <input type="file" id="create-thesis-files" accept=".pdf,.docx,.txt" multiple hidden onchange="handleCreateThesisFiles(event)">
+            <div id="create-thesis-dropzone" role="button" tabindex="0" onclick="document.getElementById('create-thesis-files').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();document.getElementById('create-thesis-files').click();}" ondragover="event.preventDefault();this.style.background='#e0f2fe'" ondragleave="this.style.background='#f8fbff'" ondrop="handleCreateThesisDrop(event)" style="border:2px dashed #93b4d7;border-radius:10px;padding:18px;text-align:center;background:#f8fbff;cursor:pointer;margin-bottom:12px;">
+                <svg class="nav-icon-svg" style="width:34px;height:34px;stroke:var(--primary-navy);margin-bottom:6px;" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line></svg>
+                <div style="font-size:14px;font-weight:800;color:var(--primary-navy);">اضغط أو اسحب لاختيار كل ملفات الرسالة مرة واحدة</div>
+                <div style="font-size:11.5px;color:var(--text-muted);margin-top:4px;">PDF / Word / TXT — يمكنك إضافة ملفات أخرى لاحقاً وترتيبها قبل البدء</div>
+            </div>
+            <div id="create-thesis-files-wrap" style="display:none;margin-bottom:14px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;"><strong style="font-size:12.5px;color:var(--primary-navy);">ترتيب أجزاء الرسالة</strong><span id="create-thesis-files-count" style="font-size:11.5px;color:var(--text-muted);"></span></div>
+                <div id="create-thesis-files-list" style="display:flex;flex-direction:column;gap:7px;"></div>
+            </div>
             <div style="display: flex; justify-content: flex-end; gap: 8px;">
                 <button type="button" class="btn-secondary" onclick="closeModal('modal-create-thesis')" style="padding: 8px 16px; font-size: 13px;">إلغاء</button>
-                <button type="submit" class="btn-primary" style="padding: 8px 20px; font-size: 13px;">تسجيل الرسالة والانتقال لإضافة الأجزاء</button>
+                <button type="submit" class="btn-primary" id="btn-create-thesis-submit" style="padding: 8px 20px; font-size: 13px;">إنشاء الرسالة وبدء فحص كل الأجزاء</button>
             </div>
         </form>
     </div>
@@ -8422,6 +8453,7 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
         let _thesesTotalPages = 1;
         let _activeThesisId = null;
         let _activeThesisData = null;
+        let _createThesisFiles = [];
 
         async function loadThesesList(page = 1) {
             _thesesCurrentPage = page;
@@ -8526,8 +8558,68 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
 
         function openCreateThesisModal() {
             document.getElementById('form-create-thesis')?.reset();
+            _createThesisFiles = [];
+            renderCreateThesisFiles();
             const modal = document.getElementById('modal-create-thesis');
-            if (modal) modal.style.display = 'flex';
+            if (modal) {
+                modal.style.display = 'flex';
+                setTimeout(() => document.getElementById('create-thesis-title')?.focus(), 50);
+            }
+        }
+
+        function addCreateThesisFiles(files) {
+            Array.from(files || []).forEach(file => {
+                const extension = (file.name.split('.').pop() || '').toLowerCase();
+                if (!['pdf', 'docx', 'txt'].includes(extension)) return;
+                const exists = _createThesisFiles.some(item => item.file.name === file.name && item.file.size === file.size);
+                if (!exists) {
+                    _createThesisFiles.push({
+                        file,
+                        label: file.name.replace(/\.[^/.]+$/, '')
+                    });
+                }
+            });
+            renderCreateThesisFiles();
+        }
+
+        function handleCreateThesisFiles(event) {
+            addCreateThesisFiles(event.target.files);
+            event.target.value = '';
+        }
+
+        function handleCreateThesisDrop(event) {
+            event.preventDefault();
+            event.currentTarget.style.background = '#f8fbff';
+            addCreateThesisFiles(event.dataTransfer.files);
+        }
+
+        function moveCreateThesisFile(index, delta) {
+            const target = index + delta;
+            if (target < 0 || target >= _createThesisFiles.length) return;
+            [_createThesisFiles[index], _createThesisFiles[target]] = [_createThesisFiles[target], _createThesisFiles[index]];
+            renderCreateThesisFiles();
+        }
+
+        function removeCreateThesisFile(index) {
+            _createThesisFiles.splice(index, 1);
+            renderCreateThesisFiles();
+        }
+
+        function renderCreateThesisFiles() {
+            const wrap = document.getElementById('create-thesis-files-wrap');
+            const list = document.getElementById('create-thesis-files-list');
+            const count = document.getElementById('create-thesis-files-count');
+            if (!wrap || !list || !count) return;
+            wrap.style.display = _createThesisFiles.length ? 'block' : 'none';
+            count.textContent = `${_createThesisFiles.length} ملف`;
+            list.innerHTML = _createThesisFiles.map((item, index) => {
+                const size = (item.file.size / (1024 * 1024)).toFixed(1);
+                return `<div style="display:grid;grid-template-columns:30px minmax(0,1fr) 120px;gap:8px;align-items:center;border:1px solid var(--border-color);border-radius:8px;padding:8px;background:white;">
+                    <span style="width:26px;height:26px;border-radius:6px;background:var(--primary-navy);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;">${index + 1}</span>
+                    <div style="min-width:0;"><input value="${escapeHtml(item.label)}" aria-label="اسم الجزء رقم ${index + 1}" oninput="_createThesisFiles[${index}].label=this.value" style="width:100%;border:0;border-bottom:1px solid #cbd5e1;padding:4px 2px;font-size:12.5px;font-weight:700;color:#1e3a5f;"><div style="font-size:10.5px;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px;">${escapeHtml(item.file.name)} — ${size} MB</div></div>
+                    <div style="display:flex;gap:3px;justify-content:flex-end;"><button type="button" class="btn-secondary" onclick="moveCreateThesisFile(${index},-1)" ${index === 0 ? 'disabled' : ''} style="padding:3px 7px;">▲</button><button type="button" class="btn-secondary" onclick="moveCreateThesisFile(${index},1)" ${index === _createThesisFiles.length - 1 ? 'disabled' : ''} style="padding:3px 7px;">▼</button><button type="button" class="btn-danger" onclick="removeCreateThesisFile(${index})" style="padding:3px 7px;">✕</button></div>
+                </div>`;
+            }).join('');
         }
 
         async function submitCreateThesis(e) {
@@ -8535,24 +8627,34 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
             const title = document.getElementById('create-thesis-title')?.value.trim();
             const researcher = document.getElementById('create-thesis-researcher')?.value.trim();
             const degree = document.getElementById('create-thesis-degree')?.value;
-            const supervisor = document.getElementById('create-thesis-supervisor')?.value.trim();
-            const faculty = document.getElementById('create-thesis-faculty')?.value.trim();
             const department = document.getElementById('create-thesis-department')?.value.trim();
             const year = document.getElementById('create-thesis-year')?.value.trim();
+            const submitButton = document.getElementById('btn-create-thesis-submit');
 
             if (!title || !researcher) {
                 showToast('عنوان الرسالة واسم الباحث مطلوبان', 'warning');
                 return;
             }
+            if (_createThesisFiles.length === 0) {
+                showToast('اختر ملفاً واحداً على الأقل من أجزاء الرسالة', 'warning');
+                document.getElementById('create-thesis-dropzone')?.focus();
+                return;
+            }
 
             try {
+                if (submitButton) { submitButton.disabled = true; submitButton.textContent = 'جاري رفع الملفات...'; }
                 await ensureCsrfToken();
                 const form = new FormData();
-                for (const [key, value] of Object.entries({title, author: researcher, degree_type: degree, department, academic_year: year, auto_scan: '0'})) form.append(key, value || '');
+                for (const [key, value] of Object.entries({title, author: researcher, degree_type: degree, department, academic_year: year, auto_scan: '1'})) form.append(key, value || '');
+                _createThesisFiles.forEach((item, index) => {
+                    form.append('files[]', item.file);
+                    form.append('labels[]', item.label.trim() || item.file.name.replace(/\.[^/.]+$/, ''));
+                    form.append('orders[]', String(index + 1));
+                });
                 const res = await fetch('/api/theses', {method: 'POST', body: form});
                 const data = await res.json();
-                if (data.success && data.thesis_id) {
-                    showToast(`تم تسجيل الرسالة برقم مرجعي: ${data.reference_number}`, 'success');
+                if (res.ok && data.success && data.thesis_id) {
+                    showToast(`تم رفع ${data.parts_count} أجزاء وبدأ الفحص تلقائياً — ${data.reference_number}`, 'success', 6000);
                     closeModal('modal-create-thesis');
                     openThesisDetail(data.thesis_id);
                 } else {
@@ -8560,11 +8662,17 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
                 }
             } catch (err) {
                 showToast('حدث خطأ أثناء تسجيل الرسالة', 'error');
+            } finally {
+                if (submitButton) { submitButton.disabled = false; submitButton.textContent = 'إنشاء الرسالة وبدء فحص كل الأجزاء'; }
             }
         }
 
         async function openThesisDetail(thesisId) {
             _activeThesisId = thesisId;
+            if (_thesisDetailPollTimer) {
+                clearTimeout(_thesisDetailPollTimer);
+                _thesisDetailPollTimer = null;
+            }
             switchView('thesis-detail');
 
             const refEl = document.getElementById('thesis-detail-ref');
@@ -8604,6 +8712,13 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
                     }
 
                     renderThesisPartsTable(parts);
+                    const stillScanning = parts.some(part => ['queued', 'processing', 'scanning', 'running'].includes(part.scan_status));
+                    const awaitingCombined = parts.length > 0 && parts.every(part => part.scan_status === 'completed') && !t.combined_report_id;
+                    if (stillScanning || awaitingCombined) {
+                        _thesisDetailPollTimer = setTimeout(() => {
+                            if (activeView === 'thesis-detail' && _activeThesisId === thesisId) openThesisDetail(thesisId);
+                        }, 3000);
+                    }
                 } else {
                     showToast(data.error || 'تعذر تحميل بيانات الرسالة', 'error');
                 }
@@ -8625,7 +8740,7 @@ function inlineArgument(value) { return escapeHtml(JSON.stringify(value)); }
             let html = '';
             parts.forEach((p) => {
                 const scanStatus = p.scan_status || 'uploaded';
-                const isScanning = scanStatus === 'scanning' || scanStatus === 'processing';
+                const isScanning = ['queued', 'scanning', 'processing', 'running'].includes(scanStatus);
                 const isCompleted = scanStatus === 'completed';
 
                 let statusBadge = '<span style="display:inline-block; padding:3px 8px; border-radius:4px; font-size:11px; background:#f1f5f9; color:#475569;">بانتظار الفحص</span>';

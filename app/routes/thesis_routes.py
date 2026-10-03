@@ -194,9 +194,11 @@ def create_new_thesis():
                 'sort_order': order_val
             })
 
-            # بدء الفحص إذا طُلب
-            if auto_scan:
-                thesis_service.scan_thesis_part(part_id, requested_by=actor_username)
+        # ابدأ الفحص بعد تسجيل كل الأجزاء أولاً؛ بهذا يرى عامل الفحص الرسالة
+        # كاملة ولا ينشئ تقريراً مجمعاً مبكراً قبل انتهاء رفع بقية الملفات.
+        if auto_scan:
+            for part in added_parts:
+                thesis_service.scan_thesis_part(part['part_id'], requested_by=actor_username)
 
     audit_service.record_event(
         action="THESIS_CREATED",
