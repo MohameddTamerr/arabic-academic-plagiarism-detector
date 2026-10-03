@@ -276,6 +276,15 @@ PDF_NATIVE_TEXT_MIN_QUALITY = max(
 OCR_CACHE_ENABLED = os.environ.get('OCR_CACHE_ENABLED', '1') == '1'
 OCR_CACHE_DIR = Path(os.environ.get('OCR_CACHE_DIR', STORAGE_ROOT / 'ocr_cache'))
 OCR_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+PDF_EXTRACTION_CACHE_ENABLED = os.environ.get('PDF_EXTRACTION_CACHE_ENABLED', '1') == '1'
+PDF_EXTRACTION_CACHE_DIR = Path(
+    os.environ.get('PDF_EXTRACTION_CACHE_DIR', STORAGE_ROOT / 'pdf_extraction_cache')
+)
+PDF_EXTRACTION_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+PDF_EXTRACTION_CACHE_MAX_MB = max(
+    128,
+    int(os.environ.get('PDF_EXTRACTION_CACHE_MAX_MB', 1024)),
+)
 PDF_PREVIEW_CACHE_DIR = Path(os.environ.get('PDF_PREVIEW_CACHE_DIR', STORAGE_ROOT / 'pdf_preview_cache'))
 PDF_PREVIEW_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 PDF_PREVIEW_CACHE_MAX_MB = max(64, int(os.environ.get('PDF_PREVIEW_CACHE_MAX_MB', 512)))

@@ -188,6 +188,68 @@ def test_pdf_progress_callback_reports_all_pages(tmp_path):
     assert updates[-1][:2] == (3, 3)
 
 
+def test_identical_pdf_reuses_full_extraction_cache(tmp_path, monkeypatch):
+    import fitz
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'cached-document.pdf'
+    document = fitz.open()
+    document.new_page().insert_text(
+        (72, 72),
+        'Searchable academic document page with enough stable English words for extraction cache testing',
+    )
+    document.save(pdf_path)
+    document.close()
+
+    cache_dir = tmp_path / 'pdf-extraction-cache'
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_ENABLED', True)
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_DIR', cache_dir)
+
+    first = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=False)
+    assert len(first) == 1
+    assert len(list(cache_dir.glob('*.json'))) == 1
+
+    def fail_if_extracted_again(*args, **kwargs):
+        raise AssertionError('A byte-identical PDF must reuse the full extraction cache')
+
+    monkeypatch.setattr(page_extractor, '_extract_pages_from_pdf', fail_if_extracted_again)
+    updates = []
+    second = page_extractor.extract_document_pages(
+        str(pdf_path),
+        enable_ocr=False,
+        progress_callback=lambda done, total, page: updates.append((done, total, page)),
+    )
+
+    assert second == first
+    assert updates == [(1, 1, 1)]
+
+
+def test_pdf_extraction_cache_invalidates_when_file_changes(tmp_path, monkeypatch):
+    import fitz
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'changing-document.pdf'
+    cache_dir = tmp_path / 'pdf-extraction-cache'
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_ENABLED', True)
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_DIR', cache_dir)
+
+    first_document = fitz.open()
+    first_document.new_page().insert_text((72, 72), 'First document content for cache identity validation')
+    first_document.save(pdf_path)
+    first_document.close()
+    first = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=False)
+
+    pdf_path.unlink()
+    second_document = fitz.open()
+    second_document.new_page().insert_text((72, 72), 'Second and different document content for cache identity validation')
+    second_document.save(pdf_path)
+    second_document.close()
+    second = page_extractor.extract_document_pages(str(pdf_path), enable_ocr=False)
+
+    assert first != second
+    assert len(list(cache_dir.glob('*.json'))) == 2
+
+
 def test_docx_uses_rendered_pdf_pages_when_preview_is_available(tmp_path, monkeypatch):
     import fitz
     from plagiarism_detector.extraction import page_extractor
@@ -358,4 +420,3 @@ def test_smart_ocr_disabled_preserves_legacy_behavior(tmp_path, monkeypatch):
     assert len(pages) == 1
     assert len(ocr_calls) == 1, "Disabling SMART_PDF_OCR_ENABLED must preserve legacy OCR trigger"
     assert pages[0]['is_ocr'] is True
-

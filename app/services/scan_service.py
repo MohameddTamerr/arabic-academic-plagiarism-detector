@@ -10,6 +10,7 @@
 
 import os
 import uuid
+import time
 import logging
 import datetime
 import threading
@@ -190,6 +191,7 @@ def _execute_thesis_pipeline(
     ثم يُشغّل المحرك الأكاديمي على النص الموحد.
     """
     try:
+        pipeline_started = time.perf_counter()
         if job_queue_service.is_cancellation_requested(task_id):
             job_queue_service.finalize_cancellation(task_id)
             return
@@ -222,6 +224,7 @@ def _execute_thesis_pipeline(
 
             file_start = 10 + int((f_idx / total_files) * 40)
             file_end = 10 + int(((f_idx + 1) / total_files) * 40)
+            extraction_started = time.perf_counter()
             if exact_reference_match:
                 _update_progress(
                     task_id,
@@ -240,6 +243,13 @@ def _execute_thesis_pipeline(
                         f'قراءة الملف {f_idx + 1} من {total_files}',
                     ),
                 )
+            logger.info(
+                "توقيت فحص %s: استخراج الملف %s استغرق %.2f ثانية (%s صفحة).",
+                task_id,
+                f_idx + 1,
+                time.perf_counter() - extraction_started,
+                len(pages),
+            )
 
             # إضافة معرف الملف الأصلي لكل صفحة (للعزو في التقرير)
             for pg in pages:
@@ -263,12 +273,18 @@ def _execute_thesis_pipeline(
 
         _update_progress(task_id, 55, 'جاري تحليل الرسالة واكتشاف التطابقات...')
 
+        analysis_started = time.perf_counter()
         report = analyze_academic_document(
             raw_text=raw_text,
             pages_data=all_pages_data,
             settings_override=settings,
             exact_reference_match=exact_reference_match,
             excluded_doc_ids=reference_ids_for_work(research_id=research_id),
+        )
+        logger.info(
+            "توقيت فحص %s: التحليل والمطابقة استغرق %.2f ثانية.",
+            task_id,
+            time.perf_counter() - analysis_started,
         )
 
         if job_queue_service.is_cancellation_requested(task_id):
@@ -358,6 +374,11 @@ def _execute_thesis_pipeline(
             result_dict=report
         )
         job_queue_service.complete_job(task_id, result=report, report_id=report_id)
+        logger.info(
+            "توقيت فحص %s: إجمالي خط المعالجة %.2f ثانية.",
+            task_id,
+            time.perf_counter() - pipeline_started,
+        )
 
     except Exception as e:
         logger.error(f"خطأ أثناء فحص الرسالة {task_id}: {e}", exc_info=True)
@@ -537,6 +558,7 @@ def _execute_scan_pipeline(
 ):
     """تنفيذ خط أنابيب الفحص الأكاديمي الشامل في مسار الخلفية."""
     try:
+        pipeline_started = time.perf_counter()
         if job_queue_service.is_cancellation_requested(task_id):
             job_queue_service.finalize_cancellation(task_id)
             return
@@ -547,6 +569,7 @@ def _execute_scan_pipeline(
         exact_reference_match = _find_exact_reference_match(file_path)
 
         if file_path and os.path.exists(file_path):
+            extraction_started = time.perf_counter()
             settings = get_current_settings()
             if exact_reference_match:
                 _update_progress(
@@ -561,6 +584,12 @@ def _execute_scan_pipeline(
                     enable_ocr=settings.get('enable_ocr', True),
                     progress_callback=_pdf_progress_callback(task_id, 20, 44),
                 )
+            logger.info(
+                "توقيت فحص %s: استخراج المستند استغرق %.2f ثانية (%s صفحة).",
+                task_id,
+                time.perf_counter() - extraction_started,
+                len(pages_data),
+            )
             if not raw_text:
                 raw_text = '\n\n'.join(p['text'] for p in pages_data if p['text'])
 
@@ -582,12 +611,18 @@ def _execute_scan_pipeline(
         # المرحلة 3: المطابقة متعددة المراحل واسترجاع المرشحين
         _update_progress(task_id, 70, 'جاري مطابقة المتواليات واسترجاع المرشحين من المراجع...')
         settings = get_current_settings()
+        analysis_started = time.perf_counter()
         report = analyze_academic_document(
             raw_text=raw_text,
             pages_data=pages_data if pages_data else None,
             settings_override=settings,
             exact_reference_match=exact_reference_match,
             excluded_doc_ids=reference_ids_for_scan(task_id),
+        )
+        logger.info(
+            "توقيت فحص %s: التحليل والمطابقة استغرق %.2f ثانية.",
+            task_id,
+            time.perf_counter() - analysis_started,
         )
 
         if job_queue_service.is_cancellation_requested(task_id):
@@ -707,6 +742,11 @@ def _execute_scan_pipeline(
             result_dict=report
         )
         job_queue_service.complete_job(task_id, result=report, report_id=report_id)
+        logger.info(
+            "توقيت فحص %s: إجمالي خط المعالجة %.2f ثانية.",
+            task_id,
+            time.perf_counter() - pipeline_started,
+        )
 
     except Exception as e:
         logger.error(f"خطأ أثناء فحص المهمة {task_id}: {e}", exc_info=True)

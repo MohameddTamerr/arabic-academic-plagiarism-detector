@@ -9,6 +9,10 @@
 
 import os
 import re
+import json
+import time
+import uuid
+import hashlib
 import logging
 import unicodedata
 from difflib import SequenceMatcher
@@ -20,6 +24,8 @@ import config
 from .ocr_engine import check_ocr_availability, ocr_page_pixmap
 
 logger = logging.getLogger(__name__)
+
+_PDF_EXTRACTION_CACHE_SCHEMA = 'pdf-pages-v1'
 
 # الكلمات المعكوسة الشائعة لاكتشاف مشاكل الـ Bidi
 _REVERSED_ARABIC = re.compile(r'\b(ة[ا-ي]{2,}|[ا-ي]{2,}لا|[ا-ي]{2,}ةي|هيلع|ءاكذ|ميلعت)\b')
@@ -285,7 +291,7 @@ def extract_document_pages(
     pages: list[dict] = []
 
     if ext == '.pdf':
-        pages = _extract_pages_from_pdf(
+        pages = _extract_pdf_pages_cached(
             file_path,
             enable_ocr=enable_ocr,
             progress_callback=progress_callback,
@@ -316,6 +322,140 @@ def extract_document_pages(
     else:
         logger.warning(f"صيغة ملف غير مدعومة للاستخراج: {ext}")
 
+    return pages
+
+
+def _stream_file_sha256(path: str) -> str:
+    digest = hashlib.sha256()
+    with open(path, 'rb') as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _pdf_extraction_cache_path(path: str, enable_ocr: bool) -> Path | None:
+    """Build a content-addressed cache key that changes with OCR behaviour."""
+    if not getattr(config, 'PDF_EXTRACTION_CACHE_ENABLED', True):
+        return None
+    source = Path(path)
+    if not source.is_file():
+        return None
+    identity = {
+        'schema': _PDF_EXTRACTION_CACHE_SCHEMA,
+        'sha256': _stream_file_sha256(str(source)),
+        'enable_ocr': bool(enable_ocr),
+        'dpi': int(getattr(config, 'PDF_OCR_DPI', 220)),
+        'smart_ocr': bool(getattr(config, 'SMART_PDF_OCR_ENABLED', True)),
+        'native_min_words': int(getattr(config, 'PDF_NATIVE_TEXT_MIN_WORDS', 30)),
+        'native_min_quality': float(getattr(config, 'PDF_NATIVE_TEXT_MIN_QUALITY', 0.82)),
+        'languages': 'ara+eng',
+    }
+    key = hashlib.sha256(
+        json.dumps(identity, sort_keys=True, separators=(',', ':')).encode('utf-8')
+    ).hexdigest()
+    root = Path(
+        getattr(
+            config,
+            'PDF_EXTRACTION_CACHE_DIR',
+            Path(config.STORAGE_ROOT) / 'pdf_extraction_cache',
+        )
+    )
+    root.mkdir(parents=True, exist_ok=True)
+    return root / f'{key}.json'
+
+
+def _read_pdf_extraction_cache(cache_path: Path | None) -> list[dict] | None:
+    if cache_path is None or not cache_path.is_file():
+        return None
+    try:
+        payload = json.loads(cache_path.read_text(encoding='utf-8'))
+        if payload.get('schema') != _PDF_EXTRACTION_CACHE_SCHEMA:
+            return None
+        pages = payload.get('pages')
+        if not isinstance(pages, list) or not pages:
+            return None
+        for page in pages:
+            if not isinstance(page, dict) or 'page_number' not in page or not isinstance(page.get('text'), str):
+                return None
+        os.utime(cache_path, None)
+        return pages
+    except Exception as exc:
+        logger.debug("تعذر قراءة كاش استخراج PDF %s: %s", cache_path, exc)
+        return None
+
+
+def _prune_pdf_extraction_cache(root: Path, protected_path: Path | None = None) -> None:
+    max_bytes = int(getattr(config, 'PDF_EXTRACTION_CACHE_MAX_MB', 1024)) * 1024 * 1024
+    try:
+        entries = [p for p in root.glob('*.json') if p.is_file()]
+        total = sum(p.stat().st_size for p in entries)
+        if total <= max_bytes:
+            return
+        for entry in sorted(entries, key=lambda p: p.stat().st_mtime):
+            if protected_path is not None and entry == protected_path:
+                continue
+            size = entry.stat().st_size
+            entry.unlink(missing_ok=True)
+            total -= size
+            if total <= max_bytes:
+                break
+    except Exception as exc:
+        logger.debug("تعذر تقليم كاش استخراج PDF: %s", exc)
+
+
+def _write_pdf_extraction_cache(cache_path: Path | None, pages: list[dict]) -> None:
+    if cache_path is None or not pages:
+        return
+    temp_path = cache_path.with_name(f'.{cache_path.name}.{os.getpid()}.{uuid.uuid4().hex}.tmp')
+    try:
+        temp_path.write_text(
+            json.dumps(
+                {'schema': _PDF_EXTRACTION_CACHE_SCHEMA, 'pages': pages},
+                ensure_ascii=False,
+                separators=(',', ':'),
+            ),
+            encoding='utf-8',
+        )
+        os.replace(temp_path, cache_path)
+        _prune_pdf_extraction_cache(cache_path.parent, protected_path=cache_path)
+    except Exception as exc:
+        logger.debug("تعذر حفظ كاش استخراج PDF %s: %s", cache_path, exc)
+        try:
+            temp_path.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+def _extract_pdf_pages_cached(
+    path: str,
+    enable_ocr: bool = True,
+    progress_callback: Optional[Callable[[int, int, int], None]] = None,
+) -> list[dict]:
+    started = time.perf_counter()
+    cache_path = _pdf_extraction_cache_path(path, enable_ocr)
+    cached_pages = _read_pdf_extraction_cache(cache_path)
+    if cached_pages is not None:
+        total = len(cached_pages)
+        if progress_callback:
+            _notify_pdf_progress(progress_callback, total, total, total)
+        logger.info(
+            "تم استخدام كاش استخراج PDF الكامل: %s صفحة خلال %.2f ثانية.",
+            total,
+            time.perf_counter() - started,
+        )
+        return cached_pages
+
+    pages = _extract_pages_from_pdf(
+        path,
+        enable_ocr=enable_ocr,
+        progress_callback=progress_callback,
+    )
+    _write_pdf_extraction_cache(cache_path, pages)
+    logger.info(
+        "اكتمل استخراج PDF وحفظ الكاش: %s صفحة خلال %.2f ثانية.",
+        len(pages),
+        time.perf_counter() - started,
+    )
     return pages
 
 
