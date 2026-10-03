@@ -2093,6 +2093,11 @@
                                 <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                                 <span>تصدير HTML</span>
                             </button>
+
+                            <button class="btn-success" id="btn-report-certificate" onclick="openCertificate()" style="display:none;" title="عرض وطباعة شهادة نتيجة الفحص">
+                                <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:white;" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"></circle><path d="M8.5 12 7 22l5-3 5 3-1.5-10"></path></svg>
+                                <span>شهادة الفحص</span>
+                            </button>
                         </div>
                     </div>
 
@@ -5139,6 +5144,13 @@
             const btnReject = document.getElementById('btn-reject-paper');
             const btnAccept = document.getElementById('btn-accept-preliminary');
             const btnEmpSubmit = document.getElementById('btn-employee-submit');
+            const btnCertificate = document.getElementById('btn-report-certificate');
+
+            if (btnCertificate) {
+                btnCertificate.style.display = report.review_status === 'final_accepted'
+                    ? 'inline-flex'
+                    : 'none';
+            }
 
             // Permissions check
             const role = currentUser ? (currentUser.role || '').toLowerCase() : 'employee';
@@ -5556,7 +5568,7 @@
                     throw new Error(getErrorMessage(data, 'حدث خطأ أثناء إجراء القبول النهائي'));
                 }
 
-                showToast('تم القبول النهائي بنجاح، وأُضيف البحث إلى قاعدة المراجع', 'success');
+                showToast('تم القبول النهائي وإضافة البحث لقاعدة المراجع، والشهادة جاهزة للطباعة', 'success');
                 if (targetId === currentReportId) {
                     const statusBadge = document.getElementById('report-status-badge');
                     if (statusBadge) {
@@ -5569,6 +5581,7 @@
                     loadDatabasePapers(1),
                     loadDashboardStats()
                 ]);
+                openCertificate(targetId);
                 openFinalAcceptedReports();
             } catch (error) {
                 showToast(error.message || 'تعذر إجراء القبول النهائي', 'error', 7000);
@@ -5578,6 +5591,19 @@
                     actionButton.innerHTML = originalButtonHtml;
                 }
             }
+        }
+
+        function openCertificate(reportId = null) {
+            const targetId = reportId || currentReportId;
+            if (!targetId) {
+                showToast('لا يوجد تقرير محدد لعرض شهادته', 'warning');
+                return;
+            }
+            window.open(
+                `/api/reports/${encodeURIComponent(targetId)}/certificate`,
+                '_blank',
+                'noopener'
+            );
         }
 
         // ─── Debounce & Server-Side Pagination Helpers (Phase 10) ───────────

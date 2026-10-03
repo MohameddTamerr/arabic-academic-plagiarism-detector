@@ -163,6 +163,23 @@ def get_report(report_id: str) -> Optional[dict]:
             data['reference_number'] = data.get('research_reference_number', '')
         if res:
             data['batch_id'] = res.batch_id or data.get('batch_id')
+            data['specialization'] = res.specialization or data.get('specialization') or data.get('category', 'عام')
+            data['degree_type'] = res.degree_type or data.get('degree_type') or ''
+
+        # الرسائل المجمعة قد لا يكون لها سجل Research مستقل؛ استكمل بيانات
+        # الشهادة من سجل الرسالة المرتبط بالتقرير المجمع.
+        if not res and (data.get('is_combined_thesis') or data.get('thesis_id')):
+            from app.models.research_schema import Thesis
+            thesis = None
+            if data.get('thesis_id'):
+                thesis = session.get(Thesis, data['thesis_id'])
+            if not thesis:
+                thesis = session.query(Thesis).filter(Thesis.combined_report_id == report_id).first()
+            if thesis:
+                data['reference_number'] = thesis.reference_number or data.get('reference_number', '')
+                data['specialization'] = thesis.department or data.get('specialization') or data.get('category', 'عام')
+                data['department'] = thesis.department or data.get('department', '')
+                data['degree_type'] = thesis.degree_type or data.get('degree_type', '')
 
         # جلب لقطة تشغيل ومعايير الفحص الأكاديمي (Snapshot)
         from app.services import snapshot_service

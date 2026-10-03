@@ -23,11 +23,23 @@ async function loadReportList(page = 1) {
                 report.created_at, report.scan_status_label, report.overall_pct + '%', report.review_status_label]) {
                 row.insertCell().textContent = value ?? '—';
             }
+            const actions = document.createElement('div');
+            actions.style.display = 'flex';
+            actions.style.gap = '6px';
+            actions.style.flexWrap = 'wrap';
             const button = document.createElement('button');
             button.className = 'btn-secondary';
             button.textContent = 'عرض التقرير';
             button.onclick = () => openReport(report.id);
-            row.insertCell().append(button);
+            actions.append(button);
+            if (report.review_status === 'final_accepted') {
+                const certificateButton = document.createElement('button');
+                certificateButton.className = 'btn-success';
+                certificateButton.textContent = 'الشهادة';
+                certificateButton.onclick = () => openCertificate(report.id);
+                actions.append(certificateButton);
+            }
+            row.insertCell().append(actions);
         }
         if (!data.reports.length) body.innerHTML = '<tr><td colspan="8">لا توجد تقارير مطابقة</td></tr>';
         pager.replaceChildren();

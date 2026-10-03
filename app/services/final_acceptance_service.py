@@ -7,6 +7,7 @@ from app.models.schema import LegacyReport, ReviewDecisionRecord
 from app.models.research_schema import Research
 from app.workflow.statuses import validate_review_transition, derive_legacy_status
 from app.services import corpus_governance_service, audit_service
+from app.services.certificate_service import build_certificate_payload
 
 
 def _preextracted_pages_for_entry(report, entry_index=0, total_entries=1):
@@ -113,6 +114,13 @@ def accept_report(report, actor):
         row.status = derive_legacy_status(row.scan_status, row.review_status)
         data = json.loads(row.report_json or '{}')
         data.update(review_status=row.review_status, status=row.status)
+        certificate_source = dict(report)
+        certificate_source.update(data)
+        data['certificate'] = build_certificate_payload(
+            certificate_source,
+            approved_at=timestamp,
+            approved_by=actor.get('full_name') or actor.get('username', ''),
+        )
         row.report_json = json.dumps(data, ensure_ascii=False)
         research = db.query(Research).filter(Research.report_id == report['id']).first()
         if research: research.review_status = row.review_status

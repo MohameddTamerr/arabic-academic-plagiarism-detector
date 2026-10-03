@@ -6,7 +6,7 @@
 """
 
 import os
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response, render_template
 from werkzeug.utils import secure_filename
 
 import config
@@ -695,8 +695,67 @@ def final_accept(report_id):
         'author': author,
         'scan_status': report.get('scan_status', 'completed'),
         'review_status': 'final_accepted',
-        'status': 'قبول نهائي'
+        'status': 'قبول نهائي',
+        'certificate_url': f'/api/reports/{report_id}/certificate'
     })
+
+
+@report_bp.route('/api/reports/<report_id>/certificate', methods=['GET'])
+@require_permission(Permission.REPORT_EXPORT)
+def report_certificate(report_id):
+    """عرض شهادة الفحص الرسمية القابلة للطباعة للتقارير المعتمدة نهائياً فقط."""
+    report = report_repo.get_report(report_id)
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report):
+        return jsonify({
+            'error': 'غير مصرح: لا تملك صلاحية الوصول إلى شهادة هذا البحث',
+            'code': ErrorCode.AUTH_FORBIDDEN,
+        }), 403
+    if report.get('review_status') != 'final_accepted':
+        return jsonify({
+            'error': 'لا يمكن إصدار الشهادة قبل الاعتماد النهائي للبحث',
+            'code': ErrorCode.VALIDATION_ERROR,
+        }), 409
+
+    from app.models.schema import ReviewDecisionRecord
+    from app.services.certificate_service import build_certificate_payload
+
+    approved_at = None
+    approved_by = ''
+    with base_repo.get_session() as session:
+        decision = (
+            session.query(ReviewDecisionRecord)
+            .filter(
+                ReviewDecisionRecord.report_id == report_id,
+                ReviewDecisionRecord.decision == 'final_accepted',
+            )
+            .order_by(ReviewDecisionRecord.created_at.desc(), ReviewDecisionRecord.id.desc())
+            .first()
+        )
+        if decision:
+            approved_at = decision.created_at
+            approved_by = decision.reviewer or ''
+
+    certificate = build_certificate_payload(report, approved_at=approved_at, approved_by=approved_by)
+    audit_service.record_event(
+        action='certificate.opened',
+        category='report',
+        user=actor,
+        object_type='certificate',
+        object_id=certificate['certificate_number'],
+        report_id=report_id,
+        research_id=report.get('research_id'),
+        research_reference_number=report.get('reference_number', ''),
+        success=True,
+        metadata={'certificate_fingerprint': certificate['certificate_fingerprint']},
+    )
+    return Response(
+        render_template('certificate.html', certificate=certificate),
+        mimetype='text/html; charset=utf-8',
+    )
 
 
 @report_bp.route('/api/export_html/<report_id>', methods=['GET'])
