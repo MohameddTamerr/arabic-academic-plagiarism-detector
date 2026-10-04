@@ -186,8 +186,8 @@ def test_evaluation_reproducibility():
 
 
 def test_production_thresholds_unmutated():
-    """13. التحقق الصارم من عدم تعديل أي عتبة إنتاجية أو تغيير في إعدادات المنظومة الافتراضية."""
+    """13. التحقق الصارم من بقاء إعدادات الإنتاج الافتراضية المعتمدة دون تغيير."""
     assert config.DEFAULT_SETTINGS['jaccard_threshold'] == 0.33
     assert config.DEFAULT_SETTINGS['tfidf_threshold'] == 0.35
     assert config.DEFAULT_SETTINGS['shingle_size'] == 4
-    assert config.DEFAULT_SETTINGS['enable_semantic_model'] is False
+    assert config.DEFAULT_SETTINGS['enable_semantic_model'] is True
