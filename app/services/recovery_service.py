@@ -440,31 +440,48 @@ def verify_recovery_and_authorize(
     }, "تم التحقق من بيانات الاسترداد بنجاح! يرجى إدخال كلمة المرور الجديدة.", None
 
 
+class RecoveryResetResult(tuple):
+    """كائن نتيجة إعادة تعيين كلمة المرور يدعم التوافق مع التفكيك الثلاثي والوصول للبطاقة البديلة."""
+    def __new__(cls, success: bool, message: str, error_code: Optional[str] = None, replacement_card: Optional[dict] = None):
+        return super().__new__(cls, (success, message, error_code))
+
+    def __init__(self, success: bool, message: str, error_code: Optional[str] = None, replacement_card: Optional[dict] = None):
+        self.success = success
+        self.message = message
+        self.error_code = error_code
+        self.replacement_card = replacement_card
+
+
 def complete_password_reset_with_token(
     reset_token: str,
     new_password: str,
     confirm_password: str,
-    client_ip: str = '127.0.0.1'
-) -> Tuple[bool, str, Optional[str]]:
+    client_ip: str = '127.0.0.1',
+    recovery_pin: Optional[str] = None
+) -> RecoveryResetResult:
     """
     إتمام إعادة تعيين كلمة المرور باستخدام رمز التفويض المؤقت:
     - التحقق من مطابقة ومتانة كلمة المرور.
     - ترقية إصدار الجلسة session_version لإبطال الجلسات السابقة فوراً.
     - إغلاق معاملة الاسترداد ومنع إعادة استخدام الرمز.
-    - تصفير قيود الكبح والحظر على الحساب.
+    - إبطال مفتاح الاسترداد القديم ومنع إعادة استخدامه نهائياً (Key Invalidation).
+    - توليد مفتاح وبطاقة استرداد بديلة جديدة فوراً للمستخدم.
+    - تصفير قيود الكبح والحظر على الحساب وتوثيق الحدث في سجل التدقيق.
     """
     if not reset_token:
-        return False, "رمز تفويض الاسترداد مفقود", ErrorCode.VALIDATION_ERROR
+        return RecoveryResetResult(False, "رمز تفويض الاسترداد مفقود", ErrorCode.VALIDATION_ERROR)
 
     if not new_password or not confirm_password:
-        return False, "يرجى إدخال كلمة المرور الجديدة وتأكيدها", ErrorCode.VALIDATION_ERROR
+        return RecoveryResetResult(False, "يرجى إدخال كلمة المرور الجديدة وتأكيدها", ErrorCode.VALIDATION_ERROR)
 
     if new_password != confirm_password:
-        return False, "كلمة المرور وتأكيدها غير متطابقين", ErrorCode.VALIDATION_ERROR
+        return RecoveryResetResult(False, "كلمة المرور وتأكيدها غير متطابقين", ErrorCode.VALIDATION_ERROR)
 
     token_hash = hashlib.sha256(reset_token.strip().encode('utf-8')).hexdigest()
 
     user_event_data = None
+    old_cred_public_id = ""
+    target_user_id = None
     with get_session() as session:
         tx = (
             session.query(RecoveryTransaction)
@@ -473,35 +490,39 @@ def complete_password_reset_with_token(
         )
 
         if not tx or tx.state != 'pending':
-            return False, "رمز تفويض الاسترداد غير صالح أو تم استخدامه مسبقاً", ErrorCode.RECOVERY_TOKEN_EXPIRED
+            return RecoveryResetResult(False, "رمز تفويض الاسترداد غير صالح أو تم استخدامه مسبقاً", ErrorCode.RECOVERY_TOKEN_EXPIRED)
 
         if tx.expires_at < datetime.utcnow():
             tx.state = 'expired'
-            return False, "انتهت صلاحية جلسة الاسترداد (المهلة 10 دقائق). يرجى إعادة المحاولة.", ErrorCode.RECOVERY_TOKEN_EXPIRED
+            return RecoveryResetResult(False, "انتهت صلاحية جلسة الاسترداد (المهلة 10 دقائق). يرجى إعادة المحاولة.", ErrorCode.RECOVERY_TOKEN_EXPIRED)
 
         user = session.query(User).filter(User.id == tx.user_id).first()
         if not user or getattr(user, 'is_active', 1) == 0:
             tx.state = 'revoked'
-            return False, "المستخدم المرتبط بهذه المعاملة غير صالح أو معطل", ErrorCode.ACCOUNT_DISABLED
+            return RecoveryResetResult(False, "المستخدم المرتبط بهذه المعاملة غير صالح أو معطل", ErrorCode.ACCOUNT_DISABLED)
 
         # التحقق من متانة كلمة المرور وفق السياسة المعتمدة
         is_valid, err_msg = validate_password_strength(new_password, username=user.username, full_name=user.full_name)
         if not is_valid:
-            return False, err_msg, ErrorCode.PASSWORD_TOO_WEAK
+            return RecoveryResetResult(False, err_msg, ErrorCode.PASSWORD_TOO_WEAK)
 
         # تحديث كلمة المرور وإبطال الجلسات السابقة
         user.password_hash = hash_password(new_password)
         user.session_version = getattr(user, 'session_version', 1) + 1
 
-        # تحديث حالة المعاملة والاعتماد
+        # تحديث حالة المعاملة وإغلاقها
         tx.state = 'completed'
         tx.used_at = datetime.utcnow()
 
+        # إبطال مفتاح الاسترداد السابق ومنع إعادة استخدامه نهائياً
         cred = session.query(AccountRecoveryCredential).filter(AccountRecoveryCredential.id == tx.credential_id).first()
         if cred:
             cred.last_used_at = datetime.utcnow()
             cred.failure_count = 0
             cred.locked_until = None
+            cred.status = 'superseded'
+            cred.revoked_at = datetime.utcnow()
+            old_cred_public_id = cred.credential_public_id
 
         # تصفير أي قفل مسجل على الحساب
         user_ident = f"user_{user.username.lower()}"
@@ -511,6 +532,7 @@ def complete_password_reset_with_token(
             lo.locked_until = None
             lo.lockout_count = 0
 
+        target_user_id = user.id
         user_event_data = {
             "id": user.id,
             "username": user.username,
@@ -518,7 +540,19 @@ def complete_password_reset_with_token(
             "session_version": user.session_version
         }
 
-    # توثيق الحدث خارج الجلسة
+    # توليد بطاقة ومفتاح استرداد بديل جديد للمستخدم خارج المعاملة
+    replacement_pin = recovery_pin.strip() if (recovery_pin and recovery_pin.strip().isdigit() and 6 <= len(recovery_pin.strip()) <= 10) else f"{secrets.randbelow(900000) + 100000}"
+    rec_ok, replacement_card, _ = enroll_recovery_credential(
+        user_id=target_user_id,
+        pin=replacement_pin,
+        actor_context=user_event_data,
+        clear_requirement=True
+    )
+
+    if replacement_card and (not recovery_pin or not recovery_pin.strip()):
+        replacement_card["temporary_pin"] = replacement_pin
+
+    # توثيق الحدثين في سجل التدقيق المؤسسي
     audit_service.record_event(
         action="auth.recovery.password_reset",
         category="auth",
@@ -530,11 +564,33 @@ def complete_password_reset_with_token(
             "username": user_event_data["username"],
             "user_id": user_event_data["id"],
             "session_version": user_event_data["session_version"],
-            "method": "offline_qr_recovery"
+            "method": "offline_qr_recovery",
+            "old_credential_id": old_cred_public_id,
+            "new_credential_id": replacement_card.get("credential_id") if replacement_card else ""
         }
     )
 
-    return True, "تم تغيير كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.", None
+    audit_service.record_event(
+        action="auth.recovery.key_rotated",
+        category="security",
+        user={"id": user_event_data["id"], "username": user_event_data["username"], "role": user_event_data["role"]},
+        object_type="recovery_credential",
+        object_id=replacement_card.get("credential_id") if replacement_card else "",
+        success=True,
+        metadata={
+            "username": user_event_data["username"],
+            "user_id": user_event_data["id"],
+            "old_credential_id": old_cred_public_id,
+            "new_credential_id": replacement_card.get("credential_id") if replacement_card else ""
+        }
+    )
+
+    return RecoveryResetResult(
+        True,
+        "تم تغيير كلمة المرور بنجاح وإبطال مفتاح الاسترداد السابق وإصدار مفتاح استرداد بديل جديد!",
+        None,
+        replacement_card
+    )
 
 
 def revoke_recovery_credential(user_id: int, actor_user: Optional[dict] = None) -> Tuple[bool, str]:

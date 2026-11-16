@@ -4883,6 +4883,10 @@
                         <label class="login-field-label">كلمة المرور الجديدة:</label>
                         <input type="password" id="setup-password" class="login-input-premium" placeholder="••••••••" required>
                     </div>
+                    <div class="login-field-group">
+                        <label class="login-field-label">رمز PIN السري لبطاقة الاسترداد (6 إلى 10 أرقام):</label>
+                        <input type="password" id="setup-pin" class="login-input-premium" placeholder="مثال: 987654" pattern="[0-9]{6,10}" maxlength="10" required>
+                    </div>
                     <button type="submit" id="btn-setup-submit" class="login-submit-btn-premium" style="background: #059669;">
                         <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
                         <span>إنشاء حساب مدير المنظومة والبدء</span>
@@ -5015,19 +5019,19 @@
         </div>
     </div>
 
-    <!-- ─── Professional Modal: Employee Password Recovery (100% Offline) ── -->
+    <!-- ─── Professional Modal: Institutional Password & Account Recovery (100% Offline) ── -->
     <div id="forgot-password-modal" style="position: fixed; inset: 0; z-index: 200005; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 20px; direction: rtl;">
-        <div style="background: #ffffff; border-radius: 16px; padding: 30px 34px; width: 100%; max-width: 480px; box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35); border: 1px solid #e2e8f0; animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);">
+        <div style="background: #ffffff; border-radius: 16px; padding: 26px 30px; width: 100%; max-width: 520px; box-shadow: 0 25px 60px rgba(15, 23, 42, 0.35); border: 1px solid #e2e8f0; animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1); max-height: 90vh; overflow-y: auto;">
             
             <!-- Institutional Header -->
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 14px;">
                 <div style="display: flex; align-items: center; gap: 12px;">
                     <div style="width: 44px; height: 44px; border-radius: 10px; background: #0f2b5c; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                         <svg class="nav-icon-svg" style="width: 22px; height: 22px; stroke: #ffffff;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                     </div>
                     <div>
-                        <h3 style="font-size: 17px; font-weight: 800; color: #0f2b5c; margin: 0;">استعادة كلمة المرور</h3>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">طلب تعيين كلمة مرور جديدة لموظف الفحص</div>
+                        <h3 style="font-size: 17px; font-weight: 800; color: #0f2b5c; margin: 0;">استرداد الحساب وكلمة المرور</h3>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">منظومة الاسترداد الآمنة دون اتصال بالإنترنت</div>
                     </div>
                 </div>
                 <button type="button" onclick="closeForgotPasswordModal()" style="background: none; border: none; cursor: pointer; color: #94a3b8; padding: 4px; display: flex; align-items: center; justify-content: center;" title="إغلاق">
@@ -5035,36 +5039,124 @@
                 </button>
             </div>
 
-            <!-- Employee Reset Request Form -->
-            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;">
-                <div style="font-size: 13px; line-height: 1.7; color: #475569;">
-                    أدخل <strong>اسم المستخدم</strong> و<strong>كلمة المرور الجديدة</strong> المطلوبة لإرسال الطلب لمدير النظام. فور موافقة المدير، ستصبح كلمة المرور الجديدة مفعلة فوراً لتسجيل الدخول.
+            <!-- Tab Switcher -->
+            <div style="display: flex; background: #f1f5f9; padding: 4px; border-radius: 8px; margin-bottom: 16px; gap: 4px;">
+                <button type="button" id="tab-btn-offline-key" onclick="switchForgotTab('key')" style="flex: 1; padding: 8px 12px; font-size: 12.5px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; background: #0f2b5c; color: #ffffff; transition: all 0.2s;">
+                    مفتاح الاسترداد (المدير / دون إنترنت)
+                </button>
+                <button type="button" id="tab-btn-emp-request" onclick="switchForgotTab('request')" style="flex: 1; padding: 8px 12px; font-size: 12.5px; font-weight: 700; border: none; border-radius: 6px; cursor: pointer; background: transparent; color: #64748b; transition: all 0.2s;">
+                    طلب اعتماد (لموظفي الفحص)
+                </button>
+            </div>
+
+            <!-- TAB 1: Offline Key Recovery (System Admin & Enrolled Users) -->
+            <div id="forgot-tab-key" style="display: block;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 14px; margin-bottom: 14px; font-size: 12.5px; line-height: 1.6; color: #334155;">
+                    🔐 <strong>استرداد فوري دون اتصال:</strong> أدخل رمز الاسترداد المكتبي أو ارفع صورة بطاقة QR مع رمز PIN السري لإعادة تعيين كلمة المرور فوراً دون الحاجة لمسؤول آخر.
                 </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #0f2b5c; margin-bottom: 4px;">اسم المستخدم (Username):</label>
+                    <input type="text" id="rec-username" placeholder="مثال: admin" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px; font-size: 13px; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <label style="font-size: 12px; font-weight: 700; color: #0f2b5c;">رمز الاسترداد المكتبي (Recovery Key):</label>
+                        <label style="font-size: 11.5px; color: #2563eb; cursor: pointer; text-decoration: underline; font-weight: 700;" for="rec-qr-file-input">أو رفع صورة بطاقة QR</label>
+                        <input type="file" id="rec-qr-file-input" accept="image/*" style="display: none;" onchange="handleRecoveryFileSelect(event)">
+                    </div>
+                    <input type="text" id="rec-code" placeholder="مثال: A1B2C3D4-E5F6G7H8-..." style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px; font-size: 12.5px; font-family: monospace; box-sizing: border-box; outline: none;">
+                    <div id="rec-qr-file-status" style="display: none; font-size: 11.5px; color: #059669; margin-top: 4px; font-weight: 700;"></div>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <label style="display: block; font-size: 12px; font-weight: 700; color: #0f2b5c; margin-bottom: 4px;">رمز PIN السري للاسترداد (من 6 إلى 10 أرقام):</label>
+                    <input type="password" id="rec-pin" placeholder="••••••" maxlength="10" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px; font-size: 13px; box-sizing: border-box; outline: none;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px;">
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: #0f2b5c; margin-bottom: 4px;">كلمة المرور الجديدة:</label>
+                        <input type="password" id="rec-newpass" placeholder="••••••••" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px; font-size: 13px; box-sizing: border-box; outline: none;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 12px; font-weight: 700; color: #0f2b5c; margin-bottom: 4px;">تأكيد كلمة المرور:</label>
+                        <input type="password" id="rec-confirmpass" placeholder="••••••••" style="width: 100%; padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 7px; font-size: 13px; box-sizing: border-box; outline: none;">
+                    </div>
+                </div>
+
+                <div id="rec-error-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; border-radius: 7px; padding: 8px 12px; font-size: 12px; margin-bottom: 12px; line-height: 1.5;"></div>
+
+                <button type="button" id="btn-submit-key-recovery" onclick="submitOfflineKeyRecovery()" style="width: 100%; padding: 11px; font-size: 13.5px; font-weight: 700; background: #0f2b5c; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+                    <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #ffffff;" viewBox="0 0 24 24"><path d="M21 2l-2 2m-2-2l2 2"></path><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <span>استرداد الحساب وتعيين كلمة المرور</span>
+                </button>
             </div>
 
-            <div style="margin-bottom: 14px;">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #0f2b5c; margin-bottom: 6px;">
-                    <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0f2b5c;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    <span>اسم المستخدم الخاص بالموظف:</span>
-                </label>
-                <input type="text" id="forgot-emp-username" placeholder="أدخل اسم المستخدم (مثال: mohamed)" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; outline: none; background: #ffffff; box-sizing: border-box; transition: border-color 0.2s;" onfocus="this.style.borderColor='#0f2b5c'" onblur="this.style.borderColor='#cbd5e1'">
+            <!-- TAB 1 SUCCESS VIEW: Replacement Recovery Card -->
+            <div id="forgot-rec-success-view" style="display: none; text-align: center;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: #dcfce7; color: #059669; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 24px;">✓</div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f2b5c; margin: 0 0 6px;">تم استرداد الحساب وتعيين كلمة المرور بنجاح!</h4>
+                <p style="font-size: 12.5px; color: #475569; margin: 0 0 14px; line-height: 1.6;">
+                    تم إبطال مفتاح الاسترداد السابق نهائياً لمنع إعادة استخدامه، وتم إصدار مفتاح وبطاقة استرداد بديلة جديدة:
+                </p>
+
+                <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; margin-bottom: 14px; text-align: center;">
+                    <div style="font-size: 11px; color: #64748b; font-weight: 700; margin-bottom: 4px;">رمز الاسترداد المكتبي البديل الجديد:</div>
+                    <div id="rec-new-code-display" style="font-size: 13.5px; font-family: monospace; font-weight: 800; color: #0f2b5c; letter-spacing: 0.5px; word-break: break-all;"></div>
+                </div>
+
+                <div id="rec-new-qr-container" style="margin-bottom: 14px; display: none;">
+                    <img id="rec-new-qr-img" style="width: 130px; height: 130px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 8px;" alt="بطاقة الاسترداد الجديدة">
+                    <div>
+                        <a id="rec-new-qr-download" href="#" download="replacement-recovery-qr.png" class="btn-secondary" style="font-size: 12px; padding: 6px 14px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                            <span>تنزيل بطاقة QR الجديدة</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div style="background: #fffbeb; border: 1px solid #fef3c7; border-radius: 8px; padding: 9px 12px; font-size: 11.5px; color: #92400e; margin-bottom: 16px; line-height: 1.5; text-align: right;">
+                    ⚠️ <strong>تنبيه أمني هام:</strong> احفظ هذا الرمز في مكان مادي آمن (خزنة المؤسسة). لن يعرض النظام هذا السر مرة أخرى.
+                </div>
+
+                <button type="button" onclick="closeForgotPasswordModal();" style="width: 100%; padding: 11px; font-size: 13.5px; font-weight: 700; background: #059669; color: #ffffff; border: none; border-radius: 8px; cursor: pointer;">
+                    تسجيل الدخول بالبيانات الجديدة
+                </button>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #0f2b5c; margin-bottom: 6px;">
-                    <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0f2b5c;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                    <span>كلمة المرور الجديدة المطلوبة:</span>
-                </label>
-                <input type="password" id="forgot-emp-newpass" placeholder="أدخل كلمة المرور الجديدة (••••••••)" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; outline: none; background: #ffffff; box-sizing: border-box; transition: border-color 0.2s;" onfocus="this.style.borderColor='#0f2b5c'" onblur="this.style.borderColor='#cbd5e1'">
-            </div>
+            <!-- TAB 2: Employee Request (Standard Staff Workflow) -->
+            <div id="forgot-tab-request" style="display: none;">
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 16px; margin-bottom: 18px;">
+                    <div style="font-size: 13px; line-height: 1.7; color: #475569;">
+                        أدخل <strong>اسم المستخدم</strong> و<strong>كلمة المرور الجديدة</strong> المطلوبة لإرسال الطلب لمدير النظام. فور موافقة المدير، ستصبح كلمة المرور الجديدة مفعلة فوراً لتسجيل الدخول.
+                    </div>
+                </div>
 
-            <button type="button" id="btn-submit-forgot-request" onclick="submitEmployeeForgotRequest()" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; background: #0f2b5c; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
-                <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #ffffff;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                <span>إرسال طلب الاعتماد للمدير</span>
-            </button>
+                <div style="margin-bottom: 14px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #0f2b5c; margin-bottom: 6px;">
+                        <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0f2b5c;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                        <span>اسم المستخدم الخاص بالموظف:</span>
+                    </label>
+                    <input type="text" id="forgot-emp-username" placeholder="أدخل اسم المستخدم (مثال: mohamed)" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; outline: none; background: #ffffff; box-sizing: border-box; transition: border-color 0.2s;" onfocus="this.style.borderColor='#0f2b5c'" onblur="this.style.borderColor='#cbd5e1'">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #0f2b5c; margin-bottom: 6px;">
+                        <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #0f2b5c;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                        <span>كلمة المرور الجديدة المطلوبة:</span>
+                    </label>
+                    <input type="password" id="forgot-emp-newpass" placeholder="أدخل كلمة المرور الجديدة (••••••••)" style="width: 100%; padding: 11px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; font-size: 13.5px; outline: none; background: #ffffff; box-sizing: border-box; transition: border-color 0.2s;" onfocus="this.style.borderColor='#0f2b5c'" onblur="this.style.borderColor='#cbd5e1'">
+                </div>
+
+                <button type="button" id="btn-submit-forgot-request" onclick="submitEmployeeForgotRequest()" style="width: 100%; padding: 12px; font-size: 14px; font-weight: 700; background: #0f2b5c; color: #ffffff; border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: background 0.2s;">
+                    <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #ffffff;" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <span>إرسال طلب الاعتماد للمدير</span>
+                </button>
+            </div>
 
             <!-- Footer Close -->
-            <div style="margin-top: 20px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+            <div style="margin-top: 16px; text-align: center; border-top: 1px solid #f1f5f9; padding-top: 12px;">
                 <button type="button" onclick="closeForgotPasswordModal()" style="background: none; border: none; font-size: 13px; font-weight: 700; color: #64748b; cursor: pointer; padding: 4px 12px;">
                     إلغاء والعودة
                 </button>
@@ -7930,6 +8022,8 @@
             const fullname = document.getElementById('setup-fullname').value.trim();
             const username = document.getElementById('setup-username').value.trim();
             const password = document.getElementById('setup-password').value.trim();
+            const pinInp = document.getElementById('setup-pin');
+            const pin = pinInp ? pinInp.value.trim() : '123456';
             const errAlert = document.getElementById('login-error-alert');
             const errText = document.getElementById('login-error-text');
 
@@ -7938,16 +8032,33 @@
                 errText.innerText = 'يرجى ملء كافة بيانات مدير المنظومة';
                 return;
             }
+            if (!pin || pin.length < 6 || pin.length > 10 || !/^\d+$/.test(pin)) {
+                errAlert.style.display = 'flex';
+                errText.innerText = 'رمز PIN السري لاسترداد الحساب يجب أن يتكون من 6 إلى 10 أرقام.';
+                return;
+            }
 
             try {
                 const res = await fetch('/api/auth/setup_admin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ full_name: fullname, username, password })
+                    body: JSON.stringify({ full_name: fullname, username, password, recovery_pin: pin })
                 });
                 const data = await res.json();
                 if (data.success) {
                     showToast('تم إنشاء حساب مدير المنظومة بنجاح! جاري تسجيل الدخول...', 'success');
+                    if (data.recovery_card) {
+                        const card = data.recovery_card;
+                        const qr = document.getElementById('first-login-qr');
+                        if (qr) qr.src = card.qr_image_data_url;
+                        const codeElem = document.getElementById('first-login-manual-code');
+                        if (codeElem) codeElem.textContent = card.manual_recovery_code;
+                        const dl = document.getElementById('first-login-download');
+                        if (dl) {
+                            dl.href = card.qr_image_data_url;
+                            dl.download = `${username}-recovery-qr.png`;
+                        }
+                    }
                     // Automatically login
                     document.getElementById('login-username').value = username;
                     document.getElementById('login-password').value = password;
@@ -9279,14 +9390,232 @@
             }
         }
 
+        let _decodedQrPayload = null;
+
+        function switchForgotTab(tab) {
+            const tabKey = document.getElementById('forgot-tab-key');
+            const tabReq = document.getElementById('forgot-tab-request');
+            const succView = document.getElementById('forgot-rec-success-view');
+            const btnKey = document.getElementById('tab-btn-offline-key');
+            const btnReq = document.getElementById('tab-btn-emp-request');
+
+            if (succView) succView.style.display = 'none';
+
+            if (tab === 'key') {
+                if (tabKey) tabKey.style.display = 'block';
+                if (tabReq) tabReq.style.display = 'none';
+                if (btnKey) { btnKey.style.background = '#0f2b5c'; btnKey.style.color = '#ffffff'; }
+                if (btnReq) { btnReq.style.background = 'transparent'; btnReq.style.color = '#64748b'; }
+            } else {
+                if (tabKey) tabKey.style.display = 'none';
+                if (tabReq) tabReq.style.display = 'block';
+                if (btnKey) { btnKey.style.background = 'transparent'; btnKey.style.color = '#64748b'; }
+                if (btnReq) { btnReq.style.background = '#0f2b5c'; btnReq.style.color = '#ffffff'; }
+            }
+        }
+
+        async function handleRecoveryFileSelect(event) {
+            const file = event.target.files && event.target.files[0];
+            const statusDiv = document.getElementById('rec-qr-file-status');
+            if (!file) return;
+
+            if (statusDiv) {
+                statusDiv.style.display = 'block';
+                statusDiv.style.color = '#2563eb';
+                statusDiv.innerText = 'جاري فحص وقراءة رمز QR محلياً...';
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                const res = await fetch('/api/recovery/decode_qr', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await res.json();
+                if (data.success && data.payload) {
+                    _decodedQrPayload = data.payload;
+                    if (data.payload.account_public_id && document.getElementById('rec-username')) {
+                        document.getElementById('rec-username').value = data.payload.account_public_id;
+                    }
+                    if (statusDiv) {
+                        statusDiv.style.color = '#059669';
+                        statusDiv.innerText = '✓ تم قراءة بطاقة QR بنجاح!';
+                    }
+                } else {
+                    _decodedQrPayload = null;
+                    if (statusDiv) {
+                        statusDiv.style.color = '#dc2626';
+                        statusDiv.innerText = data.error || 'تعذر قراءة رمز QR صالح من الصورة';
+                    }
+                }
+            } catch (e) {
+                _decodedQrPayload = null;
+                if (statusDiv) {
+                    statusDiv.style.color = '#dc2626';
+                    statusDiv.innerText = 'فشل معالجة ملف الصورة محلياً';
+                }
+            }
+        }
+
+        async function submitOfflineKeyRecovery() {
+            const uInp = document.getElementById('rec-username');
+            const cInp = document.getElementById('rec-code');
+            const pInp = document.getElementById('rec-pin');
+            const npInp = document.getElementById('rec-newpass');
+            const cpInp = document.getElementById('rec-confirmpass');
+            const errAlert = document.getElementById('rec-error-alert');
+            const submitBtn = document.getElementById('btn-submit-key-recovery');
+
+            const username = uInp ? uInp.value.trim() : '';
+            const code = cInp ? cInp.value.trim() : '';
+            const pin = pInp ? pInp.value.trim() : '';
+            const newPass = npInp ? npInp.value.trim() : '';
+            const confirmPass = cpInp ? cpInp.value.trim() : '';
+
+            if (errAlert) { errAlert.style.display = 'none'; errAlert.innerText = ''; }
+
+            if (!username) {
+                if (errAlert) { errAlert.style.display = 'block'; errAlert.innerText = 'يرجى إدخال اسم المستخدم.'; }
+                return;
+            }
+            if (!code && !_decodedQrPayload) {
+                if (errAlert) { errAlert.style.display = 'block'; errAlert.innerText = 'يرجى إدخال رمز الاسترداد المكتبي أو رفع صورة بطاقة QR.'; }
+                return;
+            }
+            if (!pin || pin.length < 6) {
+                if (errAlert) { errAlert.style.display = 'block'; errAlert.innerText = 'يرجى إدخال رمز PIN السري (من 6 إلى 10 أرقام).'; }
+                return;
+            }
+            if (!newPass || !confirmPass) {
+                if (errAlert) { errAlert.style.display = 'block'; errAlert.innerText = 'يرجى إدخال كلمة المرور الجديدة وتأكيدها.'; }
+                return;
+            }
+            if (newPass !== confirmPass) {
+                if (errAlert) { errAlert.style.display = 'block'; errAlert.innerText = 'كلمة المرور وتأكيدها غير متطابقين.'; }
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'جاري التحقق والاسترداد...';
+
+            try {
+                // الخطوة 1: التحقق من بيانات الاعتماد وإصدار رمز تفويض مؤقت
+                const verifyBody = {
+                    username: username,
+                    pin: pin
+                };
+                if (_decodedQrPayload) {
+                    verifyBody.qr_payload = _decodedQrPayload;
+                } else {
+                    verifyBody.manual_code = code;
+                }
+
+                const authRes = await fetch('/api/recovery/verify_and_authorize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(verifyBody)
+                });
+                const authData = await authRes.json();
+
+                if (!authRes.ok || !authData.success || !authData.reset_token) {
+                    throw new Error(authData.error || 'فشل التحقق من بيانات الاسترداد');
+                }
+
+                // الخطوة 2: إتمام تغيير كلمة المرور وإبطال المفتاح السابق وتوليد البديل
+                const resetRes = await fetch('/api/recovery/complete_reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        reset_token: authData.reset_token,
+                        new_password: newPass,
+                        confirm_password: confirmPass,
+                        recovery_pin: pin
+                    })
+                });
+                const resetData = await resetRes.json();
+
+                if (!resetRes.ok || !resetData.success) {
+                    throw new Error(resetData.error || 'تعذر استكمال تغيير كلمة المرور');
+                }
+
+                // نجاح الاسترداد: إظهار البطاقة البديلة وتحديث حقول تسجيل الدخول
+                document.getElementById('forgot-tab-key').style.display = 'none';
+                const succView = document.getElementById('forgot-rec-success-view');
+                if (succView) succView.style.display = 'block';
+
+                const repCard = resetData.replacement_card;
+                if (repCard) {
+                    const codeDisp = document.getElementById('rec-new-code-display');
+                    if (codeDisp) codeDisp.innerText = repCard.manual_recovery_code || '';
+
+                    if (repCard.qr_image_data_url) {
+                        const qrContainer = document.getElementById('rec-new-qr-container');
+                        const qrImg = document.getElementById('rec-new-qr-img');
+                        const qrDl = document.getElementById('rec-new-qr-download');
+                        if (qrContainer) qrContainer.style.display = 'block';
+                        if (qrImg) qrImg.src = repCard.qr_image_data_url;
+                        if (qrDl) {
+                            qrDl.href = repCard.qr_image_data_url;
+                            qrDl.download = `${username}-replacement-recovery-qr.png`;
+                        }
+                    }
+                }
+
+                // ملء حقول تسجيل الدخول بالبيانات الجديدة
+                const lUser = document.getElementById('login-username');
+                const lPass = document.getElementById('login-password');
+                if (lUser) lUser.value = username;
+                if (lPass) lPass.value = newPass;
+
+                showToast('تم استرداد الحساب بنجاح وتعيين كلمة المرور الجديدة!', 'success');
+
+            } catch (err) {
+                if (errAlert) {
+                    errAlert.style.display = 'block';
+                    errAlert.innerText = err.message || 'فشلت عملية الاسترداد';
+                }
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: #ffffff;" viewBox="0 0 24 24"><path d="M21 2l-2 2m-2-2l2 2"></path><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg><span>استرداد الحساب وتعيين كلمة المرور</span>';
+            }
+        }
+
         function openForgotPasswordModal() {
             const modal = document.getElementById('forgot-password-modal');
+            _decodedQrPayload = null;
+            switchForgotTab('key');
+
+            const loginUserVal = document.getElementById('login-username') ? document.getElementById('login-username').value.trim() : '';
+            const recUser = document.getElementById('rec-username');
+            const recCode = document.getElementById('rec-code');
+            const recPin = document.getElementById('rec-pin');
+            const recNew = document.getElementById('rec-newpass');
+            const recConf = document.getElementById('rec-confirmpass');
+            const recStatus = document.getElementById('rec-qr-file-status');
+            const recErr = document.getElementById('rec-error-alert');
+            const qrFileInput = document.getElementById('rec-qr-file-input');
+
+            if (recUser) recUser.value = loginUserVal || '';
+            if (recCode) recCode.value = '';
+            if (recPin) recPin.value = '';
+            if (recNew) recNew.value = '';
+            if (recConf) recConf.value = '';
+            if (recStatus) recStatus.style.display = 'none';
+            if (recErr) recErr.style.display = 'none';
+            if (qrFileInput) qrFileInput.value = '';
+
             const uInp = document.getElementById('forgot-emp-username');
             const pInp = document.getElementById('forgot-emp-newpass');
-            if (uInp) uInp.value = '';
+            if (uInp) uInp.value = loginUserVal || '';
             if (pInp) pInp.value = '';
+
             if (modal) modal.style.display = 'flex';
-            if (uInp) setTimeout(() => uInp.focus(), 50);
+            if (recUser && !loginUserVal) {
+                setTimeout(() => recUser.focus(), 50);
+            } else if (recCode) {
+                setTimeout(() => recCode.focus(), 50);
+            }
         }
 
         function closeForgotPasswordModal() {

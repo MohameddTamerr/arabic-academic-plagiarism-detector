@@ -110,20 +110,27 @@ def verify_and_authorize_route():
 @recovery_bp.route('/api/recovery/complete_reset', methods=['POST'])
 def complete_reset_route():
     """
-    إتمام تغيير كلمة المرور للمستخدم المصرح له عبر رمز الاسترداد المؤقت.
+    إتمام تغيير كلمة المرور للمستخدم المصرح له عبر رمز الاسترداد المؤقت:
+    - إبطال مفتاح الاسترداد السابق فوراً.
+    - إصدار مفتاح وبطاقة استرداد بديلة جديدة.
     """
     data = request.get_json(silent=True) or request.form or {}
     reset_token = (data.get('reset_token') or '').strip()
     new_pass = (data.get('new_password') or '').strip()
     confirm_pass = (data.get('confirm_password') or '').strip()
+    recovery_pin = (data.get('pin') or data.get('recovery_pin') or data.get('new_pin') or '').strip() or None
     client_ip = request.remote_addr or '127.0.0.1'
 
-    ok, msg, err_code = recovery_service.complete_password_reset_with_token(
+    res = recovery_service.complete_password_reset_with_token(
         reset_token=reset_token,
         new_password=new_pass,
         confirm_password=confirm_pass,
-        client_ip=client_ip
+        client_ip=client_ip,
+        recovery_pin=recovery_pin
     )
+
+    ok, msg, err_code = res[0], res[1], res[2]
+    replacement_card = getattr(res, 'replacement_card', None)
 
     if not ok:
         return jsonify({
@@ -134,7 +141,8 @@ def complete_reset_route():
 
     return jsonify({
         'success': True,
-        'message': msg
+        'message': msg,
+        'replacement_card': replacement_card
     })
 
 
