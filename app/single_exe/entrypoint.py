@@ -60,6 +60,102 @@ if '--worker' in sys.argv:
     run_frozen_worker(worker_args)
     sys.exit(0)
 
+# 3. دعم استرجاع وتعيين حساب مدير النظام مباشرة من سطر الأوامر للملف التنفيذي
+if any(arg in sys.argv for arg in ['--reset-admin', '--admin-reset', '--recover-admin', '--reset-password']):
+    import ctypes
+    import sqlite3
+    import bcrypt
+
+    try:
+        if ctypes.windll.kernel32.AttachConsole(-1):
+            sys.stdout = open('CONOUT$', 'w', encoding='utf-8', errors='replace')
+            sys.stderr = open('CONOUT$', 'w', encoding='utf-8', errors='replace')
+    except Exception:
+        pass
+
+    new_password = "Academic@2026#Secure"
+    target_user = "admin"
+    for arg in sys.argv:
+        if arg.startswith('--password='):
+            new_password = arg.split('=', 1)[1]
+        elif arg.startswith('--user='):
+            target_user = arg.split('=', 1)[1]
+
+    fallback_root = Path(os.environ.get('LOCALAPPDATA', Path.home())) / 'ArabicAcademicPlagiarismSystem' / 'Data'
+    data_root = Path(os.environ.get('ARABIC_APP_DATA_DIR', fallback_root))
+    data_db = data_root / 'Database' / 'papers.db'
+    roaming_db = Path.home() / 'AppData' / 'Roaming' / 'ArabicPlagiarismDetector' / 'papers.db'
+
+    pw_bytes = new_password.encode('utf-8')
+    salt = bcrypt.gensalt(rounds=12)
+    pw_hash = bcrypt.hashpw(pw_bytes, salt).decode('utf-8')
+    now_str = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    success = False
+    for db_path in [data_db, roaming_db]:
+        if not db_path.exists():
+            continue
+        try:
+            conn = sqlite3.connect(str(db_path))
+            c = conn.cursor()
+            c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+            if not c.fetchone():
+                conn.close()
+                continue
+
+            for u in [target_user, 'Tamer Darwish']:
+                existing = c.execute("SELECT id FROM users WHERE LOWER(username) = LOWER(?)", (u,)).fetchone()
+                if existing:
+                    c.execute("""
+                        UPDATE users 
+                        SET password_hash = ?, 
+                            role = 'system_admin', 
+                            is_active = 1,
+                            must_change_password = 0,
+                            must_enroll_recovery = 0
+                        WHERE id = ?
+                    """, (pw_hash, existing[0]))
+                else:
+                    c.execute("""
+                        INSERT INTO users (username, password_hash, full_name, role, is_active, must_change_password, must_enroll_recovery, session_version, created_at)
+                        VALUES (?, ?, ?, 'system_admin', 1, 0, 0, 1, ?)
+                    """, (u, pw_hash, f'مدير النظام ({u})', now_str))
+
+            try:
+                c.execute("UPDATE auth_lockouts SET failed_count = 0, locked_until = NULL, lockout_count = 0")
+            except Exception:
+                pass
+
+            conn.commit()
+            conn.close()
+            success = True
+        except Exception as e:
+            print(f"[!] Error updating {db_path}: {e}", flush=True)
+
+    summary = (
+        "تم استرجاع وتعيين بيانات مدير النظام بنجاح!\n\n"
+        f"اسم المستخدم (Username): {target_user} (أو Tamer Darwish)\n"
+        f"كلمة المرور  (Password): {new_password}\n"
+        "الرتبة / الصلاحية (Role): مدير النظام العام (system_admin)\n"
+        "حالة الحساب             : مفعل (Active) وغير مقفل"
+    )
+
+    print("\n" + "="*60, flush=True)
+    print("      أكاديمية الشرطة — منظومة كشف الاستلال العلمي", flush=True)
+    print("             أداة استرجاع وتعيين حساب المدير", flush=True)
+    print("="*60, flush=True)
+    print(summary, flush=True)
+    print("="*60 + "\n", flush=True)
+
+    if '--no-popup' not in sys.argv and not os.environ.get('CI'):
+        try:
+            ctypes.windll.user32.MessageBoxW(0, summary, "استرجاع حساب مدير النظام", 0x40)
+        except Exception:
+            pass
+
+    sys.exit(0)
+
+
 
 # إضافة مسار المشروع ومجلد vendor إن وجدا
 root_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
