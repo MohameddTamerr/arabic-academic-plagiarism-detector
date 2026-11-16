@@ -74,3 +74,27 @@ def test_bundled_e5_separates_arabic_paraphrase_from_unrelated_text():
     assert float(scores[0]) >= config.SEMANTIC_MODEL_MIN_SCORE
     assert float(scores[1]) < config.SEMANTIC_MODEL_MIN_SCORE
     assert float(scores[0] - scores[1]) >= 0.08
+
+
+def test_e5_empty_and_long_arabic_passages_fail_safe_or_return_vectors():
+    assert semantic_matcher.compute_embeddings([], role='query') is None
+    long_text = ('التحليل الأكاديمي للنصوص العربية يتطلب فهما للسياق. ' * 300).strip()
+    vectors = semantic_matcher.compute_embeddings([long_text], role='query')
+    assert vectors is not None
+    assert vectors.shape[0] == 1
+
+
+def test_missing_local_model_is_reported_without_network_fallback(monkeypatch, tmp_path):
+    monkeypatch.setattr(config, 'SEMANTIC_MODEL_PATH', tmp_path / 'absent-model')
+    status = semantic_matcher.check_semantic_model_availability()
+    assert status['available'] is False
+    assert status['missing_files']
+
+
+def test_semantic_inference_failure_fails_closed(monkeypatch):
+    class BrokenEmbedder:
+        def embed(self, _texts, batch_size):
+            raise RuntimeError('corrupt local ONNX session')
+
+    monkeypatch.setattr(semantic_matcher, 'get_embedder', lambda: BrokenEmbedder())
+    assert semantic_matcher.compute_embeddings(['نص عربي'], role='query') is None

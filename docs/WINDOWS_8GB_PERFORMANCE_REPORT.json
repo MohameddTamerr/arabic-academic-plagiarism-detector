@@ -1,0 +1,102 @@
+{
+  "timestamp": "2026-11-16 15:48:05",
+  "environment": {
+    "os": "Windows-11-10.0.26300-SP0",
+    "processor": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "python_version": "3.13.2",
+    "host_total_ram_gb": 31.68,
+    "host_available_ram_gb": 10.66,
+    "target_specification": "Windows 10/11 64-bit, 8GB RAM, CPU-only, 100% Offline"
+  },
+  "cold_start": {
+    "model_name": "Nawaf-AraBERT-INT8-TorchScript",
+    "load_time_seconds": 0.771,
+    "ram_after_load_mb": 394.19
+  },
+  "benchmarks": [
+    {
+      "pages_extracted": 10,
+      "words_extracted": 2656,
+      "paragraphs_eligible": 80,
+      "paragraphs_analyzed": 80,
+      "paragraphs_truncated_512_tokens": 0,
+      "paragraphs_excluded": 0,
+      "plagiarism_baseline": {
+        "time_seconds": 5.62,
+        "throughput_pages_per_sec": 1.78,
+        "throughput_words_per_sec": 472.71,
+        "ram_mb": 786.64
+      },
+      "plagiarism_with_semantic": {
+        "time_seconds": 3.29,
+        "throughput_pages_per_sec": 3.04,
+        "ram_mb": 1206.53
+      },
+      "ai_research_mode": {
+        "time_seconds": 21.71,
+        "time_per_paragraph_ms": 271.34,
+        "throughput_paragraphs_per_sec": 3.69,
+        "ram_mb": 1502.82,
+        "estimated_ai_pct": 100.0
+      },
+      "peak_ram_mb": 1502.82,
+      "ram_budget_8gb_pct": 18.34
+    },
+    {
+      "pages_extracted": 50,
+      "words_extracted": 13280,
+      "paragraphs_eligible": 400,
+      "paragraphs_analyzed": 400,
+      "paragraphs_truncated_512_tokens": 0,
+      "paragraphs_excluded": 0,
+      "plagiarism_baseline": {
+        "time_seconds": 7.61,
+        "throughput_pages_per_sec": 6.57,
+        "throughput_words_per_sec": 1746.06,
+        "ram_mb": 1514.41
+      },
+      "plagiarism_with_semantic": {
+        "time_seconds": 10.53,
+        "throughput_pages_per_sec": 4.75,
+        "ram_mb": 1518.77
+      },
+      "ai_research_mode": {
+        "time_seconds": 109.6,
+        "time_per_paragraph_ms": 274.01,
+        "throughput_paragraphs_per_sec": 3.65,
+        "ram_mb": 1518.68,
+        "estimated_ai_pct": 100.0
+      },
+      "peak_ram_mb": 1518.77,
+      "ram_budget_8gb_pct": 18.54
+    },
+    {
+      "pages_extracted": 100,
+      "words_extracted": 26560,
+      "paragraphs_eligible": 800,
+      "paragraphs_analyzed": 800,
+      "paragraphs_truncated_512_tokens": 0,
+      "paragraphs_excluded": 0,
+      "plagiarism_baseline": {
+        "time_seconds": 15.65,
+        "throughput_pages_per_sec": 6.39,
+        "throughput_words_per_sec": 1697.42,
+        "ram_mb": 1521.98
+      },
+      "plagiarism_with_semantic": {
+        "time_seconds": 21.12,
+        "throughput_pages_per_sec": 4.74,
+        "ram_mb": 1524.42
+      },
+      "ai_research_mode": {
+        "time_seconds": 216.57,
+        "time_per_paragraph_ms": 270.71,
+        "throughput_paragraphs_per_sec": 3.69,
+        "ram_mb": 1524.53,
+        "estimated_ai_pct": 100.0
+      },
+      "peak_ram_mb": 1524.53,
+      "ram_budget_8gb_pct": 18.61
+    }
+  ]
+}

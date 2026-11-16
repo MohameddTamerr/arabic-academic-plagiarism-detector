@@ -135,15 +135,276 @@
             direction: rtl;
         }
 
+        /* ── Right Section (Login Form: ~32.5% width, clamp(400px, 32.5vw, 640px)) ── */
+        .login-form-side {
+            flex: 0 0 clamp(400px, 32.5vw, 640px);
+            width: clamp(400px, 32.5vw, 640px);
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 44px 48px 24px 48px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            z-index: 3;
+            box-shadow: -6px 0 28px rgba(15, 23, 42, 0.08);
+            border-left: 1px solid var(--border-color);
+        }
+
+        .login-form-box {
+            margin: auto 0;
+            width: 100%;
+            max-width: 430px;
+        }
+
+        .login-brand-header-center {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .login-brand-logo-center {
+            height: 84px;
+            width: auto;
+            object-fit: contain;
+            margin: 0 auto 14px auto;
+            display: block;
+        }
+
+        .login-brand-subheading {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+
+        .login-form-title-center {
+            font-size: 28px;
+            font-weight: 800;
+            color: #0f2b5c;
+            margin: 0 0 6px 0;
+            letter-spacing: -0.3px;
+            line-height: 1.3;
+        }
+
+        .login-form-subtitle-center {
+            font-size: 14px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .login-badge-pill {
+            display: inline-block;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 16px;
+            border-radius: 20px;
+        }
+
+        /* ── Login Form Fields ── */
+        .login-field-group {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .login-field-label {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #0f2b5c;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            text-align: right;
+        }
+
+        .login-field-label svg {
+            width: 17px;
+            height: 17px;
+            stroke: #0f2b5c;
+        }
+
+        .login-input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .login-input-premium {
+            width: 100%;
+            height: 52px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 0 16px;
+            font-size: 15.5px;
+            font-weight: 600;
+            color: #0f2b5c;
+            background: #ffffff;
+            box-sizing: border-box;
+            transition: all 0.18s ease;
+            outline: none;
+        }
+
+        .login-input-premium::placeholder {
+            color: #94a3b8;
+            font-size: 14.5px;
+            font-weight: 500;
+        }
+
+        .login-input-premium:focus {
+            border-color: #0f2b5c;
+            box-shadow: 0 0 0 3px rgba(15, 43, 92, 0.12);
+            background: #ffffff;
+        }
+
+        .password-input-wrapper .login-input-premium {
+            padding-left: 48px; /* Space for eye toggle button on the left in RTL */
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            transition: color 0.15s ease;
+        }
+
+        .password-toggle-btn svg {
+            width: 19px;
+            height: 19px;
+            stroke: #64748b;
+        }
+
+        .password-toggle-btn:hover {
+            color: #0f2b5c;
+        }
+
+        .password-toggle-btn:focus {
+            outline: 2px solid #2563eb;
+        }
+
+        .login-submit-btn-premium {
+            width: 100%;
+            height: 54px;
+            background: #0f2b5c;
+            color: #ffffff;
+            border: none;
+            border-radius: 9px;
+            font-size: 16.5px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+            box-shadow: 0 4px 14px rgba(15, 43, 92, 0.22);
+            transition: all 0.18s ease;
+        }
+
+        .login-submit-btn-premium svg {
+            width: 20px;
+            height: 20px;
+            stroke: #ffffff;
+        }
+
+        .login-submit-btn-premium:hover {
+            background: #1e3a8a;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(15, 43, 92, 0.30);
+        }
+
+        .login-submit-btn-premium:active {
+            transform: translateY(0);
+        }
+
+        .login-submit-btn-premium:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .forgot-password-container {
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .forgot-password-btn {
+            background: none;
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            color: #2563eb;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: color 0.15s ease;
+        }
+
+        .forgot-password-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: #2563eb;
+        }
+
+        .forgot-password-btn:hover {
+            color: #1d4ed8;
+            text-decoration: underline;
+        }
+
+        .login-footer-institutional {
+            text-align: center;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+            margin-top: 24px;
+            width: 100%;
+        }
+
+        .login-footer-copy {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .login-footer-sub {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            line-height: 1.4;
+        }
+
+        /* ── Left Section (Hero Background: flex 1 remaining width) ── */
         .login-hero-side {
-            flex: 1.35;
+            flex: 1;
+            height: 100%;
             position: relative;
             background: url('/static/login.jpg') no-repeat center center;
             background-size: cover;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 60px 50px;
+            padding: 56px 64px;
+            box-sizing: border-box;
             color: #ffffff;
             overflow: hidden;
         }
@@ -151,174 +412,142 @@
         .login-hero-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(180deg, rgba(10, 28, 61, 0.55) 0%, rgba(10, 28, 61, 0.82) 50%, rgba(6, 18, 41, 0.96) 100%);
+            background: linear-gradient(180deg, 
+                rgba(10, 30, 65, 0.12) 0%, 
+                rgba(10, 30, 65, 0.32) 35%, 
+                rgba(7, 22, 50, 0.68) 60%, 
+                rgba(6, 18, 42, 0.90) 82%, 
+                rgba(5, 14, 34, 0.97) 100%);
             z-index: 1;
         }
 
         .login-hero-content {
             position: relative;
             z-index: 2;
-            max-width: 680px;
+            max-width: 780px;
         }
 
         .login-hero-title {
-            font-size: 30px;
+            font-size: 29px;
             font-weight: 800;
-            line-height: 1.35;
-            margin-bottom: 12px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            margin: 0 0 14px 0;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+            line-height: 1.3;
+        }
+
+        .hero-title-accent-bar {
+            display: inline-block;
+            width: 4.5px;
+            height: 32px;
+            background: #f59e0b; /* Gold accent */
+            border-radius: 2px;
+            flex-shrink: 0;
         }
 
         .login-hero-desc {
-            font-size: 14.5px;
+            font-size: 15.5px;
             line-height: 1.85;
             color: #e2e8f0;
-            margin-bottom: 24px;
+            margin: 0 0 26px 0;
             font-weight: 500;
+            max-width: 740px;
+            text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero-features-row {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            max-width: 760px;
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            padding-top: 22px;
+        }
+
+        .hero-feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .hero-feature-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            backdrop-filter: blur(4px);
+        }
+
+        .hero-feature-icon svg {
+            width: 22px;
+            height: 22px;
+            stroke: #93c5fd;
+        }
+
+        .hero-feature-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .hero-feature-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.35;
+            margin-bottom: 3px;
             text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
         }
 
-        .login-form-side {
-            flex: 1;
-            min-width: 440px;
-            max-width: 520px;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 50px 45px;
-            box-shadow: -6px 0 24px rgba(15, 23, 42, 0.06);
-            border-left: 1px solid var(--border-color);
-            z-index: 3;
-            overflow-y: auto;
-        }
-
-        .login-form-box {
-            margin: auto 0;
-            width: 100%;
-        }
-
-        .login-brand-header {
-            margin-bottom: 28px;
-            text-align: right;
-        }
-
-        .login-brand-logo {
-            height: 90px;
-            width: auto;
-            object-fit: contain;
-            margin-bottom: 18px;
-            display: block;
-        }
-
-        .login-form-title {
-            font-size: 21px;
-            font-weight: 800;
-            color: var(--primary-navy);
-            margin-bottom: 4px;
-        }
-
-        .login-form-subtitle {
+        .hero-feature-sub {
             font-size: 13px;
-            color: var(--text-muted);
-            font-weight: 600;
+            color: #cbd5e1;
+            line-height: 1.3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        .login-input-group {
-            margin-bottom: 18px;
+        .hero-feature-divider {
+            width: 1px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.18);
+            flex-shrink: 0;
         }
 
-        .login-input-label {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary-navy);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 6px;
-        }
-
-        .login-input-field {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-md);
-            font-size: 13.5px;
-            font-weight: 600;
-            color: var(--text-dark);
-            outline: none;
-            box-sizing: border-box;
-            background: #f8fafc;
-            transition: all 0.18s ease;
-        }
-
-        .login-input-field:focus {
-            background: #ffffff;
-            border-color: var(--primary-navy);
-            box-shadow: 0 0 0 3px rgba(15, 43, 92, 0.1);
-        }
-
-        .login-submit-btn {
-            width: 100%;
-            padding: 11px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #ffffff;
-            background: var(--primary-navy);
-            border: 1px solid var(--primary-navy);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.18s ease;
-            margin-top: 20px;
-        }
-
-        .login-submit-btn:hover {
-            background: var(--primary-hover);
-            border-color: var(--primary-hover);
-        }
-
-        .login-submit-btn:active {
-            background: var(--primary-active);
-        }
-
-        .login-footer-info {
-            font-size: 11.5px;
-            color: #64748b;
-            font-weight: 600;
-            text-align: center;
-            padding-top: 16px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        @media (max-width: 960px) {
+        /* ── Responsive Behavior ── */
+        @media (max-width: 1024px) {
             .login-screen-wrapper {
-                flex-direction: column;
-            }
-            .login-hero-side {
-                flex: 0.6;
-                padding: 30px 24px;
-            }
-            .login-hero-title {
-                font-size: 22px;
-            }
-            .login-hero-desc {
-                font-size: 13px;
-                margin-bottom: 12px;
+                flex-direction: column-reverse;
+                overflow-y: auto;
             }
             .login-form-side {
-                flex: 1;
+                width: 100%;
+                max-width: 100%;
                 min-width: unset;
-                max-width: unset;
-                padding: 30px 24px;
+                flex: unset;
+                box-shadow: none;
+                padding: 36px 24px;
+            }
+            .login-hero-side {
+                width: 100%;
+                min-height: 320px;
+                flex: unset;
+                padding: 36px 24px;
+            }
+            .hero-features-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 14px;
+            }
+            .hero-feature-divider {
+                display: none;
             }
         }
 
@@ -1142,27 +1371,778 @@
         .hero-welcome h2 { font-size: 18px; font-weight: 800; margin-bottom: 3px; }
         .hero-welcome p { opacity: 0.9; font-size: 13px; }
 
-        /* ─── Upload Screen Styles ──────────────────────────────────── */
-        .upload-dropzone {
-            border: 1.5px dashed var(--border-subtle);
-            border-radius: var(--radius-lg);
+        /* ─── Home Dashboard Enhanced Styles (Mockup Reference) ────── */
+        .dash-banner {
             background: #ffffff;
-            padding: 24px 18px;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            padding: 16px 24px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            min-height: 80px;
+        }
+
+        .dash-banner-right {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dash-banner-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background: #1e3a8a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(30, 58, 138, 0.25);
+        }
+
+        .dash-banner-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 4px 0;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .dash-banner-subtitle {
+            font-size: 13.5px;
+            color: #64748b;
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .dash-banner-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 340px;
+            background-image: url('/static/login.jpg');
+            background-size: cover;
+            background-position: center left;
+            opacity: 0.22;
+            mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .dash-kpis-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 960px) {
+            .dash-kpis-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dash-kpi-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dash-kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .dash-kpi-card.accent-green {
+            border-top: 3.5px solid #10b981;
+        }
+
+        .dash-kpi-card.accent-blue {
+            border-top: 3.5px solid #2563eb;
+        }
+
+        .dash-kpi-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dash-kpi-header {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .dash-kpi-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .dash-kpi-number {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1;
+            color: #0f172a;
+            font-feature-settings: "tnum";
+        }
+
+        .dash-kpi-number.green {
+            color: #10b981;
+        }
+
+        .dash-kpi-number.blue {
+            color: #2563eb;
+        }
+
+        .dash-kpi-desc {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+        }
+
+        .dash-kpi-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .dash-kpi-icon.navy {
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            color: #0f172a;
+        }
+
+        .dash-kpi-icon.green {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            color: #10b981;
+        }
+
+        .dash-kpi-icon.blue {
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            color: #2563eb;
+        }
+
+        .dash-table-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .dash-quick-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dash-btn-primary {
+            background: #0f172a;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.1s ease;
+        }
+
+        .dash-btn-primary:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .dash-btn-secondary {
+            background: #ffffff;
+            color: #0f172a;
+            border: 1.5px solid #0f172a;
+            border-radius: 8px;
+            padding: 7px 16px;
+            font-size: 13.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .dash-btn-secondary:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .dash-bottom-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 960px) {
+            .dash-bottom-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .dash-bottom-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color, #e2e8f0);
+            border-radius: 12px;
+            padding: 18px 22px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+        }
+
+        .dash-bottom-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 10px;
+        }
+
+        .dash-bottom-card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        /* ─── Upload Screen Styles ──────────────────────────────────── */
+        #view-upload .content-constrained {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .new-scan-banner {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 16px;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+            flex-wrap: wrap;
+        }
+
+        .banner-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .banner-info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            color: #2563eb;
+        }
+
+        .banner-title {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin: 0;
+        }
+
+        .banner-subtitle {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .upload-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .upload-header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary-navy);
+        }
+
+        .upload-dropzone {
+            border: 2px dashed #93c5fd;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 34px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 14px;
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
         }
 
         .upload-dropzone.drag-active {
-            border-color: var(--primary-navy);
+            border-color: #2563eb;
             background: #eff6ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
         }
 
         .upload-dropzone:hover {
-            border-color: var(--primary-navy);
+            border-color: #2563eb;
+            background: #f1f5f9;
+        }
+
+        .selected-file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 9px 14px;
+            transition: all 0.15s ease;
+        }
+
+        .selected-file-row:hover {
+            border-color: #cbd5e1;
             background: #f8fafc;
         }
+
+        .selected-file-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .file-check-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #16a34a;
+            flex-shrink: 0;
+        }
+
+        .file-type-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .file-type-badge.badge-pdf {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .file-type-badge.badge-word {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .file-type-badge.badge-txt {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .selected-file-name {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--primary-navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .selected-file-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .selected-file-size {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .btn-remove-file {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+
+        .btn-remove-file:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* ─── Bottom Settings & Action Row ──────────────────────────── */
+        .upload-bottom-settings-container {
+            margin-top: 24px;
+        }
+
+        .upload-settings-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 900px) {
+            .upload-settings-row {
+                grid-template-columns: 1fr !important;
+                gap: 14px !important;
+            }
+        }
+
+        .settings-card {
+            border-radius: 12px;
+            padding: 16px 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+            box-sizing: border-box;
+        }
+
+        .ocr-settings-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .ai-research-card {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            box-shadow: 0 1px 3px rgba(37,99,235,0.04);
+        }
+
+        .settings-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .settings-card-title-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .settings-card-title {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: var(--primary-navy);
+        }
+
+        .ocr-options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 520px) {
+            .ocr-options-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
+        .ocr-mode-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            user-select: none;
+            text-align: right;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .ocr-mode-card:hover {
+            border-color: #93c5fd;
+            background: #f8fafc;
+        }
+
+        .ocr-mode-card.active {
+            background: #eff6ff !important;
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 1px #2563eb !important;
+        }
+
+        .ocr-card-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+
+        .ocr-mode-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--primary-navy);
+        }
+
+        .ocr-mode-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        .ocr-radio-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid #94a3b8;
+            background: white;
+            flex-shrink: 0;
+            transition: all 0.15s ease;
+        }
+
+        .ocr-mode-card.active .ocr-radio-circle {
+            border-color: #2563eb;
+        }
+
+        .ocr-radio-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: transparent;
+            transition: all 0.15s ease;
+        }
+
+        .ocr-mode-card.active .ocr-radio-dot {
+            background: #2563eb;
+        }
+
+        .ai-research-toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-research-toggle-label {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .ai-research-disclaimer {
+            font-size: 11px;
+            color: #334155;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.65);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(191, 219, 254, 0.7);
+        }
+
+        .switch-toggle {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .switch-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider-toggle {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #cbd5e1;
+            transition: 0.25s;
+            border-radius: 20px;
+        }
+
+        .slider-toggle:before {
+            position: absolute;
+            content: "";
+            height: 14px;
+            width: 14px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.25s;
+            border-radius: 50%;
+        }
+
+        .switch-toggle input:checked + .slider-toggle {
+            background-color: #2563eb;
+        }
+
+        .switch-toggle input:checked + .slider-toggle:before {
+            transform: translateX(16px);
+        }
+
+        .switch-toggle input:disabled + .slider-toggle {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .upload-action-footer {
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .analysis-summary-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .analysis-summary-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            color: var(--primary-navy);
+            flex-shrink: 0;
+        }
+
+        .analysis-summary-content {
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .analysis-summary-title {
+            font-weight: 800;
+            color: var(--primary-navy);
+            margin-bottom: 2px;
+        }
+
+        .analysis-summary-engines {
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .analyze-action-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .btn-start-analysis-main {
+            font-size: 14.5px !important;
+            font-weight: 800 !important;
+            padding: 11px 28px !important;
+            border-radius: 8px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            background: var(--primary-navy) !important;
+            color: #ffffff !important;
+            border: none !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 12px rgba(15, 43, 92, 0.25) !important;
+            transition: all 0.18s ease !important;
+        }
+
+        .btn-start-analysis-main:hover {
+            background: #1e3a8a !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(15, 43, 92, 0.3) !important;
+        }
+
+        .btn-start-analysis-main:active {
+            transform: translateY(0);
+        }
+
+        .btn-start-analysis-main:disabled {
+            opacity: 0.65 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
 
         /* ─── Toast Notifications ──────────────────────────────────── */
         .toast-container {
@@ -1487,6 +2467,81 @@
                 grid-template-columns: minmax(0, 1fr) !important;
             }
         }
+
+        /* ─── Production Polish: Text Selection, Tab Navigation & LTR Support ─── */
+        .selectable-text,
+        .selectable-content,
+        .custom-table td,
+        .custom-table th,
+        .report-section-container,
+        .evidence-card,
+        #doc-report-title,
+        #doc-report-author,
+        #report-ref-badge,
+        .source-passage,
+        [dir="auto"] {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            cursor: auto;
+        }
+
+        .btn-rep-tab {
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .btn-rep-tab:hover {
+            background: #e2e8f0 !important;
+            color: var(--primary-navy) !important;
+        }
+        .btn-rep-tab.active {
+            background: #ffffff !important;
+            color: var(--primary-navy) !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08) !important;
+        }
+
+        .btn-ocr-toggle {
+            transition: all 0.15s ease;
+            outline: none;
+        }
+        .btn-ocr-toggle.active {
+            background: #ffffff !important;
+            color: var(--primary-navy) !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.06) !important;
+        }
+
+        .ltr-token {
+            direction: ltr !important;
+            unicode-bidi: isolate;
+            display: inline-block;
+            font-family: monospace;
+        }
+
+        input[dir="auto"], textarea[dir="auto"] {
+            text-align: start;
+        }
+
+        .empty-state-card {
+            text-align: center;
+            padding: 36px 20px;
+            color: var(--text-muted);
+            background: #ffffff;
+            border: 1px dashed var(--border-color);
+            border-radius: 8px;
+            margin: 12px 0;
+        }
+        .empty-state-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+        }
+
 </style>
 </head>
 <body>
@@ -1592,30 +2647,40 @@
 
             <!-- ================= VIEW 1: DASHBOARD ================= -->
             <section id="view-dashboard" class="view-section active">
-                <div class="page-header">
-                    <div class="page-header-info">
-                        <h1 class="page-title">الرئيسية</h1>
-                        <p class="page-subtitle">نظرة عامة على عمليات الفحص والأبحاث</p>
+                <!-- Dashboard Header Banner -->
+                <div class="dash-banner">
+                    <div class="dash-banner-right">
+                        <div class="dash-banner-icon">
+                            <svg style="width: 22px; height: 22px;" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h1 class="dash-banner-title">الرئيسية</h1>
+                            <p class="dash-banner-subtitle">نظرة عامة على عمليات الفحص والأبحاث والتقارير</p>
+                        </div>
                     </div>
+                    <!-- Faded Police Academy Background graphic on left side -->
+                    <div class="dash-banner-bg" aria-hidden="true"></div>
                 </div>
 
-                <!-- Metrics & Statistics KPI Cards Grid -->
-                <div class="stats-grid">
-                    <!-- Card 1: Base Papers in Database (قاعدة الأبحاث المرجعية) -->
-                    <div class="stat-card card-database" onclick="switchView('database')" title="انقر لفتح قاعدة الأبحاث الأساسية">
-                        <div class="stat-card-info">
-                            <span class="stat-card-title">
-                                <span>قاعدة الأبحاث المرجعية</span>
-                            </span>
-                            <span class="stat-card-value" id="stat-total-papers">0</span>
-                            <span class="stat-card-desc">
-                                <svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#0284c7;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <!-- Metrics & Statistics KPI Cards Grid (3 Cards in RTL) -->
+                <div class="dash-kpis-container">
+                    <!-- Card 1: Reference Corpus (قاعدة الأبحاث المرجعية) -->
+                    <div class="dash-kpi-card" onclick="switchView('database')" title="انقر لفتح قاعدة الأبحاث الأساسية">
+                        <div class="dash-kpi-info">
+                            <div class="dash-kpi-header">
+                                <span class="dash-kpi-title">قاعدة الأبحاث المرجعية</span>
+                                <span class="dash-kpi-number" id="stat-total-papers">0</span>
+                            </div>
+                            <div class="dash-kpi-desc">
+                                <svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#0ea5e9;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 <span>بحث مسجل ومفهرس للمقارنة</span>
-                            </span>
+                            </div>
                         </div>
-                        <div class="stat-card-icon blue-gradient">
-                            <!-- Professional Database & Archive Vector Icon -->
-                            <svg style="width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="dash-kpi-icon navy">
+                            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="#0f172a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
                                 <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path>
                                 <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
@@ -1625,64 +2690,43 @@
                         </div>
                     </div>
 
-                    <!-- Card 2: Preliminary Accepted Papers (الأبحاث المقبولة مبدئياً) -->
-                    <div class="stat-card card-preliminary" style="display:none" title="سجل الحالات السابقة">
-                        <div class="stat-card-info">
-                            <span class="stat-card-title">
-                                <span>الأبحاث المقبولة مبدئياً</span>
-                            </span>
-                            <span class="stat-card-value" style="color: #0284c7;" id="stat-preliminary-count">0</span>
-                            <span class="stat-card-desc">
-                                <svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#0284c7;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                <span>بانتظار رفع التحديث والاعتماد</span>
-                            </span>
-                        </div>
-                        <div class="stat-card-icon sky-gradient">
-                            <!-- Professional Clipboard & Audit Check Vector Icon -->
-                            <svg style="width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="#0284c7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                                <path d="M9 14l2 2 4-4"></path>
-                            </svg>
-                        </div>
-                    </div>
+                    <!-- Hidden placeholder for backwards compatibility with stat-preliminary-count -->
+                    <span id="stat-preliminary-count" style="display:none;">0</span>
 
-                    <!-- Card 3: Final Accepted Papers (الأبحاث المعتمدة نهائياً) -->
-                    <div class="stat-card card-final" onclick="switchView('reports')" title="انقر لفتح التقارير المعتمدة">
-                        <div class="stat-card-info">
-                            <span class="stat-card-title">
-                                <span>الأبحاث المعتمدة نهائياً</span>
-                            </span>
-                            <span class="stat-card-value" style="color: #059669;" id="stat-final-count">0</span>
-                            <span class="stat-card-desc">
-                                <svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#059669;" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <!-- Card 2: Final Accepted Papers (الأبحاث المعتمدة نهائيًا) -->
+                    <div class="dash-kpi-card accent-green" onclick="switchView('reports')" title="انقر لفتح الأبحاث المعتمدة نهائياً">
+                        <div class="dash-kpi-info">
+                            <div class="dash-kpi-header">
+                                <span class="dash-kpi-title">الأبحاث المعتمدة نهائيًا</span>
+                                <span class="dash-kpi-number green" id="stat-final-count">0</span>
+                            </div>
+                            <div class="dash-kpi-desc">
+                                <svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#10b981;" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                 <span>أضيفت لقاعدة البيانات للمقارنة</span>
-                            </span>
+                            </div>
                         </div>
-                        <div class="stat-card-icon emerald-gradient">
-                            <!-- Professional Security Shield & Verified Star Vector Icon -->
-                            <svg style="width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="dash-kpi-icon green">
+                            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                <path d="M9 12l2 2 4-4"></path>
+                                <polyline points="9 12 11 14 15 10"></polyline>
                             </svg>
                         </div>
                     </div>
 
-                    <!-- Card 4: Total Scans / Reports (إجمالي عمليات الفحص) -->
-                    <div class="stat-card card-scans" onclick="switchView('reports')" title="انقر لفتح التقارير">
-                        <div class="stat-card-info">
-                            <span class="stat-card-title">
-                                <span>إجمالي عمليات الفحص</span>
-                            </span>
-                            <span class="stat-card-value" style="color: #4f46e5;" id="stat-total-scans">0</span>
-                            <span class="stat-card-desc">
-                                <svg class="nav-icon-svg" style="width:12px; height:12px; stroke:#4f46e5;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <!-- Card 3: Total Completed Scans (إجمالي عمليات الفحص) -->
+                    <div class="dash-kpi-card accent-blue" onclick="switchView('reports')" title="انقر لفتح جميع تقارير الفحص">
+                        <div class="dash-kpi-info">
+                            <div class="dash-kpi-header">
+                                <span class="dash-kpi-title">إجمالي عمليات الفحص</span>
+                                <span class="dash-kpi-number blue" id="stat-total-scans">0</span>
+                            </div>
+                            <div class="dash-kpi-desc">
+                                <svg class="nav-icon-svg" style="width:13px; height:13px; stroke:#2563eb;" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                                 <span>أبحاث وتقارير تم فحصها وتحليلها</span>
-                            </span>
+                            </div>
                         </div>
-                        <div class="stat-card-icon indigo-gradient">
-                            <!-- Professional Plagiarism Analysis & Radar Vector Icon -->
-                            <svg style="width:30px; height:30px;" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <div class="dash-kpi-icon blue">
+                            <svg style="width:24px; height:24px;" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                 <polyline points="14 2 14 8 20 8"></polyline>
                                 <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -1693,60 +2737,156 @@
                     </div>
                 </div>
 
-                <!-- Recent Reports Table -->
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
-                        <h3 class="section-title" style="margin-bottom: 0;">
-                            <svg class="nav-icon-svg" style="stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
-                            <span>آخر تقارير الفحص والتواريخ</span>
-                        </h3>
-                        <button class="btn-secondary" onclick="loadDashboardStats()" style="padding: 6px 14px; font-size: 13px;">
-                            <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
-                            <span>تحديث</span>
-                        </button>
+                <!-- Recent Reports Card -->
+                <div class="card" style="padding: 20px 24px; margin-bottom: 20px;">
+                    <div class="dash-table-top">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <svg class="nav-icon-svg" style="width: 20px; height: 20px; stroke: #0f172a;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <h3 class="section-title" style="margin-bottom: 0; font-size: 16px; font-weight: 800; color: #0f172a;">آخر تقارير الفحص والتقارير</h3>
+                        </div>
+                        <div class="dash-quick-actions">
+                            <button type="button" class="dash-btn-primary" onclick="switchView('upload')" title="بدء فحص بحث جديد">
+                                <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                <span>فحص بحث جديد</span>
+                            </button>
+                            <button type="button" class="dash-btn-secondary" onclick="switchView('reports')" title="عرض جميع التقارير">
+                                <svg style="width: 15px; height: 15px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                <span>عرض جميع التقارير</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="date-range-filter" data-date-filter="dashboard" style="margin-bottom: 14px;">
-                        <span class="date-range-title"><svg class="nav-icon-svg" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>الفترة الزمنية</span>
-                        <label class="date-range-field"><span>من</span><input type="date" id="dashboard-date-from" aria-label="من تاريخ"></label>
-                        <label class="date-range-field"><span>إلى</span><input type="date" id="dashboard-date-to" aria-label="إلى تاريخ"></label>
-                        <button type="button" class="date-range-apply" onclick="applyDateFilter('dashboard')">تطبيق</button>
-                        <button type="button" class="date-range-clear" onclick="clearDateFilter('dashboard')">مسح</button>
+                    <div class="dash-filter-toolbar" style="display: flex; justify-content: space-between; align-items: center; margin: 16px 0 14px 0; flex-wrap: wrap; gap: 12px;">
+                        <div class="date-range-filter" data-date-filter="dashboard" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="date-range-title" style="display: flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; color: #334155;">
+                                <svg class="nav-icon-svg" style="width: 14px; height: 14px; stroke: #334155;" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                الفترة الزمنية:
+                            </span>
+                            <label class="date-range-field" style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #475569;">
+                                <span>من</span>
+                                <input type="date" id="dashboard-date-from" aria-label="من تاريخ" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: 12.5px; background: #ffffff;">
+                            </label>
+                            <label class="date-range-field" style="display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: #475569;">
+                                <span>إلى</span>
+                                <input type="date" id="dashboard-date-to" aria-label="إلى تاريخ" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 4px 8px; font-size: 12.5px; background: #ffffff;">
+                            </label>
+                            <button type="button" class="btn-filter-apply" onclick="applyDateFilter('dashboard')" style="background: #1e3a8a; color: #ffffff; border: none; border-radius: 6px; padding: 5px 14px; font-size: 12.5px; font-weight: 700; cursor: pointer;">تطبيق</button>
+                            <button type="button" class="btn-filter-clear" onclick="clearDateFilter('dashboard')" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; border-radius: 6px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; cursor: pointer;">مسح</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-secondary" onclick="loadDashboardStats()" style="display: flex; align-items: center; gap: 6px; padding: 6px 14px; font-size: 12.5px; font-weight: 700; border: 1px solid #cbd5e1; border-radius: 6px; background: #ffffff; color: #1e293b; cursor: pointer;">
+                                <svg class="nav-icon-svg" style="width: 13px; height: 13px;" viewBox="0 0 24 24"><path d="M23 4v6h-6"></path><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                                <span>تحديث</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <table class="custom-table">
-                        <thead>
-                            <tr>
-                                <th>عنوان البحث</th>
-                                <th>اسم الباحث</th>
-                                <th>تاريخ التحليل</th>
-                                <th>الحالة</th>
-                                <th>نسبة الاستلال</th>
-                                <th>الإجراءات</th>
-                            </tr>
-                        </thead>
-                        <tbody id="dash-recent-table">
-                            <!-- Live DB Data -->
-                        </tbody>
-                    </table>
+                    <div style="overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <table class="custom-table" style="width: 100%; border-collapse: collapse; text-align: right;">
+                            <thead>
+                                <tr style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b;">عنوان البحث</th>
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b;">اسم الباحث</th>
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b;">تاريخ التحليل</th>
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b; text-align: center;">الحالة</th>
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b; text-align: center;">نسبة الاستلال</th>
+                                    <th style="padding: 12px 16px; font-size: 13px; font-weight: 800; color: #1e293b; text-align: center;">الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-recent-table">
+                                <!-- Populated dynamically by renderDashboardRecentTable() -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Bottom Two-Panel Grid (النشاط الأخير + حالة مكونات النظام) -->
+                <div class="dash-bottom-grid">
+                    <!-- Panel 1 (Right in RTL): Recent Activity (النشاط الأخير) -->
+                    <div class="dash-bottom-card">
+                        <div class="dash-bottom-card-header">
+                            <svg style="width: 18px; height: 18px; stroke: #0f172a;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                            <h3 class="dash-bottom-card-title">النشاط الأخير</h3>
+                        </div>
+                        <div id="dash-recent-activity-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- Populated dynamically by renderDashboardRecentActivity() -->
+                        </div>
+                    </div>
+
+                    <!-- Panel 2 (Left in RTL): System Status (حالة مكونات النظام) -->
+                    <div class="dash-bottom-card">
+                        <div class="dash-bottom-card-header">
+                            <svg style="width: 18px; height: 18px; stroke: #0f172a;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                            <h3 class="dash-bottom-card-title">حالة مكونات النظام</h3>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 14px;">
+                            <!-- Component 1: محرك كشف الاستلال النصي -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 10px; color: #1e293b; font-size: 13.5px; font-weight: 700;">
+                                    <svg style="width: 17px; height: 17px; stroke: #2563eb;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                                    <span>محرك كشف الاستلال النصي</span>
+                                </div>
+                                <span style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg style="width: 12px; height: 12px; stroke: #15803d;" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    جاهز
+                                </span>
+                            </div>
+
+                            <!-- Component 2: التحليل الدلالي والمتقدم -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 10px; color: #1e293b; font-size: 13.5px; font-weight: 700;">
+                                    <svg style="width: 17px; height: 17px; stroke: #4f46e5;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                                    <span>التحليل الدلالي والمتقدم</span>
+                                </div>
+                                <span style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg style="width: 12px; height: 12px; stroke: #15803d;" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    جاهز
+                                </span>
+                            </div>
+
+                            <!-- Component 3: فحص الكتابة بالذكاء الاصطناعي (تجريبي) -->
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; align-items: center; gap: 10px; color: #1e293b; font-size: 13.5px; font-weight: 700;">
+                                    <svg style="width: 17px; height: 17px; stroke: #0284c7;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                                    <span>فحص الكتابة بالذكاء الاصطناعي <span style="font-size: 11.5px; color: #0284c7; font-weight: 600;">(تجريبي)</span></span>
+                                </div>
+                                <span id="dash-status-ai" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 4px;">
+                                    <svg style="width: 12px; height: 12px; stroke: #15803d;" viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    جاهز
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- ================= VIEW 2: UPLOAD (MULTI-PDF) ================= -->
             <!-- ================= VIEW 2: UPLOAD (MULTI-PDF / THESIS / BATCH) ================= -->
             <section id="view-upload" class="view-section"><div class="content-constrained">
-                <div class="page-header">
-                    <div class="page-header-info">
-                        <h1 class="page-title">فحص أبحاث جديدة</h1>
-                        <p class="page-subtitle">يمكن رفع عدة أبحاث مستقلة أو تجميع ملفات رسالة واحدة للفحص الأكاديمي الشامل.</p>
+                <!-- Top Banner: New Scan -->
+                <div class="new-scan-banner">
+                    <div class="banner-title-group">
+                        <span class="banner-info-icon">
+                            <svg class="nav-icon-svg" style="width:20px; height:20px; stroke:#2563eb;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </span>
+                        <h2 class="banner-title">فحص جديد</h2>
+                    </div>
+                    <div class="banner-subtitle">
+                        يمكن رفع بحث واحد أو عدة أبحاث مستقلة أو تجميع ملفات رسالة واحدة للفحص الأكاديمي الشامل.
                     </div>
                 </div>
                 
                 <div class="card">
                     <!-- Default Upload Header with Secondary Thesis Action -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <span id="upload-main-heading" style="font-size: 14px; font-weight: 700; color: var(--primary-navy);">رفع المستندات والأبحاث للفحص الأكاديمي</span>
+                    <div class="upload-card-header">
+                        <div class="upload-header-title">
+                            <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                            <span id="upload-main-heading">رفع المستندات والأبحاث للفحص الأكاديمي</span>
                         </div>
                         <!-- Secondary Optional Action for Multi-file Thesis -->
                         <div>
@@ -1761,10 +2901,10 @@
                     
                     <div class="upload-dropzone" id="dropzone-area" onclick="document.getElementById('file-input').click()">
                         <div style="margin-bottom: 12px;">
-                            <svg class="nav-icon-svg" style="width:48px; height:48px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line></svg>
+                            <svg class="nav-icon-svg" style="width:52px; height:52px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path><polyline points="16 16 12 12 8 16"></polyline><line x1="12" y1="12" x2="12" y2="21"></line></svg>
                         </div>
-                        <h3 id="dropzone-title" style="font-size: 17px; color: var(--primary-navy); margin-bottom: 6px;">اسحب ملفات الأبحاث هنا أو انقر لاختيار ملف أو عدة ملفات</h3>
-                        <p id="dropzone-subtitle" style="color: var(--text-muted); font-size: 12.5px;">يدعم رفع بحث واحد أو عدة أبحاث بصيغ PDF / Word / TXT (يُفحص كل ملف كبحث مستقل تلقائياً)</p>
+                        <h3 id="dropzone-title" style="font-size: 17px; font-weight: 700; color: var(--primary-navy); margin-bottom: 6px;">اسحب ملفات الأبحاث هنا أو انقر لاختيار ملف أو عدة ملفات</h3>
+                        <p id="dropzone-subtitle" style="color: var(--text-muted); font-size: 12.5px;">يدعم رفع بحث واحد أو عدة أبحاث بصيغ: PDF / Word / TXT (لفحص كل ملف كمستند مستقل تلقائياً)</p>
                     </div>
 
                     <!-- ─── THESIS METADATA (Asked ONLY ONCE in Thesis Mode) ─── -->
@@ -1810,29 +2950,108 @@
                     </div>
 
                     <!-- ─── BATCH INDEPENDENT FILES LIST ─── -->
-                    <div id="batch-files-list" style="display: none; margin-top: 20px;">
-                        <h4 style="font-size: 14px; font-weight: 700; color: var(--primary-navy); margin-bottom: 12px;">الأبحاث المختارة (تأكد من عنوان كل بحث واسم الباحث):</h4>
-                        <div id="batch-items-container" style="display: flex; flex-direction: column; gap: 12px;">
-                            <!-- Dynamic File Cards with Title/Author/Delete -->
+                    <div id="batch-files-list" style="display: none; margin-top: 18px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                            <h4 id="batch-files-count-heading" style="font-size: 14px; font-weight: 700; color: var(--primary-navy); margin: 0;">الملفات المختارة (0)</h4>
+                        </div>
+                        <div id="batch-items-container" style="display: flex; flex-direction: column; gap: 8px;">
+                            <!-- Dynamic File Cards matching mockup -->
                         </div>
                     </div>
 
                     <!-- Single Raw Text Input (Preserved for quick single text) -->
                     <div id="raw-text-container" style="margin-top: 20px;">
-                        <h4 style="font-size: 14px; margin-bottom: 8px; color: var(--text-muted);">أو ادخل نص البحث مباشرة (للفحص الفردي السريع):</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
-                            <input type="text" id="raw-single-title" placeholder="عنوان البحث (مطلوب عند الفحص النصي)" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;">
-                            <input type="text" id="raw-single-author" placeholder="اسم الباحث / صاحب البحث" style="padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;">
+                        <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                            <svg class="nav-icon-svg" style="width:14px; height:14px; stroke:var(--text-secondary);" viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                            <h4 style="font-size: 13.5px; font-weight: 700; color: var(--text-secondary); margin: 0;">أو ادخل نص البحث مباشرة (للفحص الفردي السريع):</h4>
                         </div>
-                        <textarea id="raw-text-input" rows="4" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 14px; outline: none;" placeholder="الصق نص البحث هنا..."></textarea>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px;">
+                            <input type="text" id="raw-single-title" placeholder="عنوان البحث (مطلوب عند الفحص النصي)" style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; background: white;">
+                            <input type="text" id="raw-single-author" placeholder="اسم الباحث / صاحب البحث" style="padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; background: white;">
+                        </div>
+                        <textarea id="raw-text-input" rows="3" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13.5px; outline: none; resize: vertical;" placeholder="الصق نص البحث هنا..."></textarea>
                     </div>
 
-                    <!-- Submit Button -->
-                    <div style="margin-top: 20px; text-align: left;">
-                        <button class="btn-primary" id="btn-start-analysis" onclick="startAnalysis()">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            <span id="btn-start-analysis-text">بدء فحص جميع الملفات المختارة</span>
-                        </button>
+                    <!-- ================= BOTTOM SECTION: SETTINGS & ANALYSIS ================= -->
+                    <div class="upload-bottom-settings-container">
+                        <!-- 1. Two Horizontal Setting Cards (Desktop) / Vertical Stack (Mobile) -->
+                        <div class="upload-settings-row">
+                            <!-- Right Card (in RTL): OCR Settings Card -->
+                            <div class="settings-card ocr-settings-card">
+                                <div class="settings-card-header">
+                                    <div class="settings-card-title-group">
+                                        <svg class="nav-icon-svg" style="width: 17px; height: 17px; stroke: var(--primary-navy);" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                                        <span class="settings-card-title">نمط معالجة المستندات (OCR):</span>
+                                    </div>
+                                    <span id="ocr-mode-desc-text" style="display: none;">أعلى دقة للتعرف على النصوص الأكاديمية والممسوحة ضوئياً</span>
+                                </div>
+                                <div class="ocr-options-grid">
+                                    <!-- Option A: Accurate (default active) -->
+                                    <button type="button" id="ocr-btn-accurate" class="ocr-mode-card active" onclick="setOcrModeSelection('accurate')">
+                                        <div class="ocr-card-top">
+                                            <span class="ocr-mode-title">دقة قصوى (افتراضي)</span>
+                                            <span class="ocr-radio-circle"><span class="ocr-radio-dot"></span></span>
+                                        </div>
+                                        <div class="ocr-mode-desc">مناسب للملفات الممسوحة ضوئيًا أو ذات الجودة الضعيفة.</div>
+                                    </button>
+                                    <!-- Option B: Fast -->
+                                    <button type="button" id="ocr-btn-fast" class="ocr-mode-card" onclick="setOcrModeSelection('fast')">
+                                        <div class="ocr-card-top">
+                                            <span class="ocr-mode-title">فحص سريع</span>
+                                            <span class="ocr-radio-circle"><span class="ocr-radio-dot"></span></span>
+                                        </div>
+                                        <div class="ocr-mode-desc">مناسب للملفات الرقمية الواضحة.</div>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Left Card (in RTL): AI Research Mode Card -->
+                            <div id="ai-research-upload-card" class="settings-card ai-research-card">
+                                <div class="settings-card-header">
+                                    <div class="settings-card-title-group">
+                                        <svg class="nav-icon-svg" style="width: 17px; height: 17px; stroke: #2563eb;" viewBox="0 0 24 24"><path d="M10 2v7.31L4.69 18.5A2 2 0 0 0 6.4 21.5h11.2a2 2 0 0 0 1.71-3L14 9.31V2"></path><line x1="8.5" y1="2" x2="15.5" y2="2"></line><line x1="14" y1="9.3" x2="10" y2="9.3"></line></svg>
+                                        <span class="settings-card-title">فحص تجريبي للذكاء الاصطناعي (Research Mode)</span>
+                                    </div>
+                                    <div class="ai-research-toggle-group">
+                                        <label class="switch-toggle" id="ai-toggle-label-control">
+                                            <input type="checkbox" id="toggle-ai-research" checked onchange="toggleAiResearchMode(this.checked)">
+                                            <span class="slider-toggle"></span>
+                                        </label>
+                                        <span id="ai-toggle-status-label" class="ai-research-toggle-label">مُفعّل (للمستخدمين المصرح لهم فقط)</span>
+                                    </div>
+                                </div>
+                                <div class="ai-research-disclaimer">
+                                    <svg class="nav-icon-svg" style="width: 15px; height: 15px; stroke: #2563eb; flex-shrink: 0; margin-top: 1px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                    <span>نتائج كشف الكتابة بالذكاء الاصطناعي استرشادية وتجريبية، ولا تُعد دليلًا قاطعًا على مصدر النص أو ارتكاب مخالفة أكاديمية.</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 2. Dedicated Row Underneath: Analysis Engines Summary + Primary Analyze Action Button -->
+                        <div class="upload-action-footer">
+                            <div class="analysis-summary-block">
+                                <span class="analysis-summary-icon">
+                                    <svg class="nav-icon-svg" style="width: 18px; height: 18px; stroke: #1e3a8a;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                                </span>
+                                <div class="analysis-summary-content">
+                                    <div class="analysis-summary-title">سيتم فحص الملفات باستخدام:</div>
+                                    <div id="analysis-summary-text" class="analysis-summary-engines">كشف الاستلال اللفظي + المطابقة الدلالية (E5) + التحليل التجريبي للذكاء الاصطناعي (AraBERT)</div>
+                                </div>
+                            </div>
+
+                            <div class="analyze-action-wrapper">
+                                <button class="btn-primary btn-start-analysis-main" id="btn-start-analysis" onclick="startAnalysis()">
+                                    <svg class="nav-icon-svg" style="width: 16px; height: 16px; stroke: white; fill: white;" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                    <span id="btn-start-analysis-text">بدء فحص البحث</span>
+                                </button>
+                                <!-- Retain btn-start-fast-analysis hidden for backwards compatibility -->
+                                <button id="btn-start-fast-analysis" hidden onclick="startAnalysis('fast')">
+                                    <svg class="nav-icon-svg" style="width: 15px; height: 15px;" viewBox="0 0 24 24"><path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"></path></svg>
+                                    <span>فحص سريع</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div></section>
@@ -2195,23 +3414,51 @@
                         <!-- Research Details Strip -->
                         <div class="card" style="padding: 16px 20px; margin-bottom: 20px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-                                <div>
+                                <div style="flex: 1;">
                                     <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                        <span style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title">عنوان البحث</span>
-                                        <span id="report-ref-badge" style="font-size: 11.5px; font-weight: 800; font-family: monospace; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; border: 1px solid #bae6fd; display: none;"></span>
+                                        <span style="font-weight: 700; color: var(--primary-navy); font-size: 16px;" id="doc-report-title" dir="auto">عنوان البحث</span>
+                                        <span id="report-ref-badge" class="ltr-token" style="font-size: 11.5px; font-weight: 800; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 6px; border: 1px solid #bae6fd; display: none;"></span>
+                                        <span id="report-ocr-mode-badge" style="font-size: 11.5px; font-weight: 800; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 6px; border: 1px solid #bbf7d0; display: none;"></span>
                                         <span id="report-matched-badge" style="font-size: 11.5px; font-weight: 700; color: #475569; background: #f1f5f9; padding: 2px 8px; border-radius: 6px;">0 موضع تطابق</span>
                                         <span id="report-sources-badge" style="font-size: 11.5px; font-weight: 700; color: #0369a1; background: #e0f2fe; padding: 2px 8px; border-radius: 6px;">0 مراجع مطابقة</span>
                                     </div>
                                     <div style="display: flex; gap: 16px; margin-top: 6px; font-size: 13px; color: var(--text-muted); flex-wrap: wrap;">
-                                        <span id="doc-report-author"><strong>الباحث:</strong> غير محدد</span>
-                                        <span id="report-date-str"><strong>التاريخ:</strong> غير محدد</span>
+                                        <span id="doc-report-author" dir="auto"><strong>الباحث:</strong> غير محدد</span>
+                                        <span id="report-date-str" class="ltr-token"><strong>التاريخ:</strong> غير محدد</span>
                                         <span id="report-domain-badge"><strong>التخصص:</strong> عام</span>
                                         <span id="report-scan-status-badge" style="color: var(--primary-navy);"><strong>حالة الفحص:</strong> مكتمل الفحص</span>
                                         <span id="report-volume-stats" style="color: var(--primary-navy); font-weight: 600;">الحجم: 0 صفحة</span>
                                     </div>
                                 </div>
-                                <div id="report-ai-status-box" style="background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #6b21a8;">
-                                    <strong>مؤشرات الأسلوب:</strong> <span id="report-ai-status" style="font-weight: 700;">طبيعي (نص بشري)</span>
+                            </div>
+                        </div>
+
+                        <!-- ════════════════ SECTION 2: AI WRITING & AUTHORSHIP ANALYSIS ════════════════ -->
+                        <div id="section-ai-detection-results" class="card" style="margin-bottom: 20px; border: 1.5px solid #d8b4fe; background: linear-gradient(180deg, #faf5ff 0%, #ffffff 100%); border-radius: 10px; padding: 18px 22px; box-shadow: var(--shadow-sm);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f3e8ff; padding-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 8px; background: #f3e8ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                        <svg class="nav-icon-svg" style="width: 18px; height: 18px; stroke: #7e22ce;" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 15px; font-weight: 800; color: #581c87;">القسم الثاني: فحص الكتابة بالذكاء الاصطناعي (AI Authorship Analysis)</div>
+                                        <div style="font-size: 11.5px; color: #7e22ce;">تحليل محايد ومستقل تماماً عن درجات ونسب الاستلال المرجعي</div>
+                                    </div>
+                                </div>
+                                <span id="ai-detection-status-pill" style="font-size: 11.5px; font-weight: 800; padding: 3px 12px; border-radius: 99px; background: #ede9fe; color: #6d28d9; border: 1px solid #ddd6fe;">غير مدقق أكاديمياً</span>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; align-items: center;">
+                                <div id="report-ai-status-box" style="background: #ffffff; border: 1px solid #e9d5ff; border-radius: 8px; padding: 12px 14px; font-size: 12.5px; color: #581c87;">
+                                    <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+                                        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #9333ea;"></span>
+                                        <strong style="font-weight: 800;">نتيجة الفحص المعتمدة:</strong>
+                                    </div>
+                                    <div id="report-ai-status" style="font-weight: 700; font-size: 13.5px; color: #6b21a8;">غير متاح — لا يوجد نموذج مدقق؛ لا يمكن استنتاج مصدر النص</div>
+                                </div>
+                                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; font-size: 12px; color: var(--text-secondary); line-height: 1.55;">
+                                    <strong style="color: var(--primary-navy); display: block; margin-bottom: 2px; font-size: 12px;">معايير العدالة والنزاهة المؤسسية (Fail-Closed Integrity):</strong>
+                                    <span style="color: #475569;">لا يختلق النظام أي نسب أو أحكام ظنية في غياب نموذج محلي مصادق عليه رسمياً. فحص الاستلال المرجعي الوارد أعلاه يعمل باستقلالية تامة (100% Offline) ومبني على شواهد نصية قطعية.</span>
                                 </div>
                             </div>
                         </div>
@@ -2266,8 +3513,29 @@
                         </div>
                     </div>
 
-                    <!-- ════════════════ LEVEL 2: PDF VIEWER (SIMPLIFIED) ════════════════ -->
-                    <div id="report-pdf-viewer-container" style="margin-bottom: 20px; padding: 0; overflow: hidden; display: none; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff;">
+                    <!-- ════════════════ LEVEL 2: DETAILED EVIDENCE & DOCUMENT VIEWER TABS ════════════════ -->
+                    <div id="report-tabs-nav-bar" style="display: flex; gap: 6px; background: #e2e8f0; padding: 4px; border-radius: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+                            <button type="button" id="rep-tab-btn-pdf" class="btn-rep-tab active" onclick="switchReportTab('pdf')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 700; border-radius: 7px; border: none; background: #ffffff; color: var(--primary-navy); box-shadow: 0 1px 3px rgba(0,0,0,0.06); cursor: pointer;">
+                                <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                                <span>عارض المستند الأصلي مع التحديد (PDF Viewer)</span>
+                            </button>
+                            <button type="button" id="rep-tab-btn-evidence" class="btn-rep-tab" onclick="switchReportTab('evidence')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 7px; border: none; background: transparent; color: #64748b; cursor: pointer;">
+                                <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:currentColor;" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path></svg>
+                                <span>شواهد ومواضع التطابق المقارنة</span>
+                                <span id="tab-evidence-count-badge" style="background:#cbd5e1; color:#1e293b; font-size:11px; padding:1px 7px; border-radius:10px; font-weight:700;">0</span>
+                            </button>
+                            <button type="button" id="rep-tab-btn-sources" class="btn-rep-tab" onclick="switchReportTab('sources')" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 7px; border: none; background: transparent; color: #64748b; cursor: pointer;">
+                                <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:currentColor;" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                                <span>قائمة المراجع والمصادر المطابقة</span>
+                                <span id="tab-sources-count-badge" style="background:#bae6fd; color:#0369a1; font-size:11px; padding:1px 7px; border-radius:10px; font-weight:700;">0</span>
+                            </button>
+                            <button type="button" id="rep-tab-btn-doc" class="btn-rep-tab" onclick="switchReportTab('doc')" style="display: none; align-items: center; gap: 6px; padding: 8px 16px; font-size: 13px; font-weight: 600; border-radius: 7px; border: none; background: transparent; color: #64748b; cursor: pointer;">
+                                <span>نص البحث الكامل</span>
+                            </button>
+                        </div>
+
+                        <!-- Tab 1: Embedded PDF Viewer -->
+                        <div id="report-pdf-viewer-container" style="padding: 0; overflow: hidden; display: block; border: 1px solid var(--border-color); border-radius: 8px; background: #ffffff;">
                         <!-- Embedded PDF Viewer (reuse existing modal structure but inline) -->
                         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 18px; background:var(--primary-navy); color:#ffffff; flex-wrap:wrap; gap:10px; border-bottom:1px solid rgba(255,255,255,0.12);">
                             <div style="display:flex; align-items:center; gap:8px;">
@@ -2321,7 +3589,7 @@
                     </div>
 
                         <!-- ── TAB 1: EVIDENCE (PAGINATED & FILTERED) ── -->
-                        <div id="rep-tab-content-evidence" style="padding: 16px 20px; display: none !important;">
+                        <div id="rep-tab-content-evidence" style="padding: 16px 20px; display: none;">
                             <!-- Filter & Search Toolbar -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px; background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
                                 <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
@@ -2372,7 +3640,7 @@
                         </div>
 
                         <!-- ── TAB 2: SOURCES (PAGINATED & SEARCHABLE) ── -->
-                        <div id="rep-tab-content-sources" style="display: none !important; padding: 16px 20px;">
+                        <div id="rep-tab-content-sources" style="padding: 16px 20px; display: none;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
                                 <input type="text" id="sources-search-input" placeholder="بحث في عنوان المصدر أو اسم الباحث..." style="padding: 6px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12.5px; width: 280px; outline: none;" onkeyup="debouncedLoadSources()">
                             </div>
@@ -2397,7 +3665,7 @@
                         </div>
 
                         <!-- ── TAB 3: DOCUMENT VIEWER (LAZY LOADED) ── HIDDEN - REPLACED WITH INLINE PDF -->
-                        <div id="rep-tab-content-doc" style="display: none !important; padding: 16px 20px;">
+                        <div id="rep-tab-content-doc" style="padding: 16px 20px; display: none;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
                                 <div style="font-size: 13px; font-weight: 700; color: var(--primary-navy);">
                                     <span>معاينة المستند الموثق وتظليل الشواهد المصدرية</span>
@@ -3526,96 +4794,175 @@
 
 
     <!-- ─── Full-Screen Login Gate (First thing that appears on open) ────── -->
-        <!-- ─── Full-Screen Modern Split Login Gate ────────────────────────── -->
+    <!-- ─── Full-Screen Modern Split Login Gate ────────────────────────── -->
     <div id="login-screen" class="login-screen-wrapper">
-        <!-- Right / Form Side -->
+        <!-- Right / Form Side (31% width, white) -->
         <div class="login-form-side">
-            <div>
-                <img src="/static/logo.png" alt="شعار أكاديمية الشرطة" class="login-brand-logo">
-            </div>
-
             <div class="login-form-box">
-                <div class="login-brand-header">
-                    <div style="font-size: 13px; font-weight: 800; color: #0284c7; margin-bottom: 4px;">أكاديمية الشرطة — كلية الدراسات العليا</div>
-                    <h2 class="login-form-title" id="login-title-heading">نظام كشف الاستلال العلمي</h2>
-                    <div class="login-form-subtitle" id="login-subtitle-heading">تسجيل الدخول الآمن للمنظومة الأكاديمية (تشغيل محلي بالكامل)</div>
+                <!-- Branding Header (Centered) -->
+                <div class="login-brand-header-center">
+                    <img src="/static/logo.png" alt="شعار أكاديمية الشرطة" class="login-brand-logo-center">
+                    <div class="login-brand-subheading">أكاديمية الشرطة — كلية الدراسات العليا</div>
+                    <h2 class="login-form-title-center" id="login-title-heading">نظام كشف الاستلال العلمي</h2>
+                    <div class="login-form-subtitle-center" id="login-subtitle-heading">تسجيل الدخول الآمن للمنظومة الأكاديمية</div>
+                    <div class="login-badge-pill">(تشغيل محلي بالكامل)</div>
                 </div>
 
-                <div id="login-error-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-bottom: 20px; align-items: center; gap: 8px;">
-                    <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:#991b1b;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                <!-- Error Alert Box -->
+                <div id="login-error-alert" style="display: none; background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; padding: 10px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 700; margin-bottom: 16px; align-items: center; gap: 8px;">
+                    <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:#991b1b; flex-shrink: 0;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     <span id="login-error-text">اسم المستخدم أو كلمة المرور غير صحيحة</span>
                 </div>
 
-                <!-- Regular Login Form -->
+                <!-- Standard Login Form -->
                 <form id="form-login-standard" onsubmit="event.preventDefault(); submitLogin();">
-                    <div class="login-input-group">
-                        <label class="login-input-label">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    <div class="login-field-group">
+                        <label class="login-field-label" for="login-username">
+                            <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:#0f2b5c;" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                             <span>اسم المستخدم:</span>
                         </label>
-                        <input type="text" id="login-username" class="login-input-field" placeholder="أدخل اسم المستخدم..." autocomplete="username" autofocus>
+                        <div class="login-input-wrapper">
+                            <input type="text" id="login-username" class="login-input-premium" placeholder="أدخل اسم المستخدم..." autocomplete="username" autofocus>
+                        </div>
                     </div>
 
-                    <div class="login-input-group" style="margin-bottom: 8px;">
-                        <label class="login-input-label">
-                            <svg class="nav-icon-svg" style="width:16px; height:16px; stroke:var(--primary-navy);" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <div class="login-field-group">
+                        <label class="login-field-label" for="login-password">
+                            <svg class="nav-icon-svg" style="width:15px; height:15px; stroke:#0f2b5c;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
                             <span>كلمة المرور:</span>
                         </label>
-                        <input type="password" id="login-password" class="login-input-field" placeholder="••••••••" autocomplete="current-password">
+                        <div class="login-input-wrapper password-input-wrapper">
+                            <input type="password" id="login-password" class="login-input-premium" placeholder="••••••••" autocomplete="current-password">
+                            <button type="button" id="btn-toggle-password-visibility" class="password-toggle-btn" onclick="togglePasswordVisibility()" aria-label="إظهار / إخفاء كلمة المرور" tabindex="0">
+                                <svg id="eye-icon-open" class="nav-icon-svg" style="width: 17px; height: 17px; stroke: #64748b;" viewBox="0 0 24 24">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <svg id="eye-icon-closed" class="nav-icon-svg" style="width: 17px; height: 17px; stroke: #64748b; display: none;" viewBox="0 0 24 24">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
-                    <button type="submit" id="btn-login-submit" class="login-submit-btn">
-                        <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
-                        <span>تسجيل الدخول للنظام</span>
+                    <button type="submit" id="btn-login-submit" class="login-submit-btn-premium">
+                        <span>تسجيل الدخول</span>
+                        <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24">
+                            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                            <polyline points="10 17 15 12 10 7"></polyline>
+                            <line x1="15" y1="12" x2="3" y2="12"></line>
+                        </svg>
                     </button>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
-                        <button type="button" onclick="openForgotPasswordModal()" style="background: none; border: none; font-size: 13px; font-weight: 700; color: #0284c7; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; padding: 0;">
-                            <svg class="nav-icon-svg" style="width: 14px; height: 14px; stroke: #0284c7;" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    <div class="forgot-password-container">
+                        <button type="button" onclick="openForgotPasswordModal()" class="forgot-password-btn">
+                            <svg class="nav-icon-svg" style="width: 14px; height: 14px; stroke: #2563eb;" viewBox="0 0 24 24">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
                             <span>هل نسيت كلمة المرور؟</span>
                         </button>
-                        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">الدعم الأكاديمي المحلي</span>
                     </div>
                 </form>
 
-                <!-- First-Time Administrator Setup Form -->
+                <!-- First-Time Administrator Setup Form (Preserved) -->
                 <form id="form-first-time-setup" style="display: none;" onsubmit="event.preventDefault(); submitFirstTimeSetup();">
                     <div style="background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 8px; padding: 10px 12px; margin-bottom: 14px; font-size: 12.5px; color: #0369a1; line-height: 1.6;">
                         <strong>تهيئة المنظومة لأول مرة:</strong> يرجى إنشاء حساب مدير النظام الرئيسي وتعيين بيانات الدخول الخاصة به.
                     </div>
-                    <div class="login-input-group">
-                        <label class="login-input-label">الاسم الكامل لمدير المنظومة:</label>
-                        <input type="text" id="setup-fullname" class="login-input-field" placeholder="مثال: د. طارق عبد الرحمن" required>
+                    <div class="login-field-group">
+                        <label class="login-field-label">الاسم الكامل لمدير المنظومة:</label>
+                        <input type="text" id="setup-fullname" class="login-input-premium" placeholder="مثال: د. طارق عبد الرحمن" required>
                     </div>
-                    <div class="login-input-group">
-                        <label class="login-input-label">اسم المستخدم (Username):</label>
-                        <input type="text" id="setup-username" class="login-input-field" placeholder="مثال: admin" required>
+                    <div class="login-field-group">
+                        <label class="login-field-label">اسم المستخدم (Username):</label>
+                        <input type="text" id="setup-username" class="login-input-premium" placeholder="مثال: admin" required>
                     </div>
-                    <div class="login-input-group">
-                        <label class="login-input-label">كلمة المرور الجديدة:</label>
-                        <input type="password" id="setup-password" class="login-input-field" placeholder="••••••••" required>
+                    <div class="login-field-group">
+                        <label class="login-field-label">كلمة المرور الجديدة:</label>
+                        <input type="password" id="setup-password" class="login-input-premium" placeholder="••••••••" required>
                     </div>
-                    <button type="submit" id="btn-setup-submit" class="login-submit-btn" style="background: #059669;">
+                    <button type="submit" id="btn-setup-submit" class="login-submit-btn-premium" style="background: #059669;">
                         <svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
                         <span>إنشاء حساب مدير المنظومة والبدء</span>
                     </button>
                 </form>
             </div>
 
-            <div class="login-footer-info" style="flex-direction: column; gap: 4px; border-top: 1px solid var(--border-color); padding-top: 16px; margin-top: 24px; text-align: center;">
-                <div style="font-size: 12px; font-weight: 700; color: #475569;">جميع الحقوق محفوظة © كلية الدراسات العليا — أكاديمية الشرطة</div>
-                <div style="font-size: 11px; color: #94a3b8; font-weight: 600;">منظومة الفحص الأكاديمي الموحدة • الإصدار 2.4 (تشغيل محلي بالكامل)</div>
+            <!-- Footer of Right Section -->
+            <div class="login-footer-institutional">
+                <div class="login-footer-copy">جميع الحقوق محفوظة © كلية الدراسات العليا — أكاديمية الشرطة</div>
+                <div class="login-footer-sub">منظومة الفحص الأكاديمي الموحدة — الإصدار 2.4 (تشغيل محلي بالكامل)</div>
             </div>
         </div>
 
-        <!-- Left / Hero Showcase Side (with user's login.jpg) -->
+        <!-- Left / Hero Showcase Side (~69% width, Authentic Police Academy photo) -->
         <div class="login-hero-side">
             <div class="login-hero-overlay"></div>
             <div class="login-hero-content">
-                <h1 class="login-hero-title">منظومة كشف الاستلال العلمي والاستشهادات</h1>
+                <h1 class="login-hero-title">
+                    <span class="hero-title-accent-bar"></span>
+                    <span>نظام كشف الاستلال العلمي والاستشهادات</span>
+                </h1>
                 <p class="login-hero-desc">
-                    نظام فحص ذكي ومحلي بالكامل مصمم لخدمة كلية الدراسات العليا بأكاديمية الشرطة، يتيح فحص الرسائل والأبحاث العلمية، كشف التطابق والنسخ الحرفي وإعادة الصياغة، والتحقق من نزاهة الاقتباس ونماذج الذكاء الاصطناعي مع الحفاظ التام على سرية وأمان البيانات.
+                    منظومة فحص أكاديمي متكاملة لخدمة كلية الدراسات العليا بأكاديمية الشرطة، تساعد في مراجعة التطابق والاستنساخ وإعادة الصياغة، والتحليل التجريبي للكتابة بالذكاء الاصطناعي.
                 </p>
+
+                <!-- 3 Capability Highlights (Horizontal) -->
+                <div class="hero-features-row">
+                    <!-- Feature 1: Text Plagiarism -->
+                    <div class="hero-feature-item">
+                        <div class="hero-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </div>
+                        <div class="hero-feature-text">
+                            <div class="hero-feature-title">كشف الاستلال النصي</div>
+                            <div class="hero-feature-sub">(التطابق الحرفي والجزئي)</div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="hero-feature-divider"></div>
+
+                    <!-- Feature 2: Semantic Analysis -->
+                    <div class="hero-feature-item">
+                        <div class="hero-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="hero-feature-text">
+                            <div class="hero-feature-title">تحليل دلالي متقدم</div>
+                            <div class="hero-feature-sub">(تشابه المعنى وإعادة الصياغة)</div>
+                        </div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="hero-feature-divider"></div>
+
+                    <!-- Feature 3: Experimental AI Analysis -->
+                    <div class="hero-feature-item">
+                        <div class="hero-feature-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <path d="M10 9h2"></path>
+                            </svg>
+                        </div>
+                        <div class="hero-feature-text">
+                            <div class="hero-feature-title">تحليل تجريبي للذكاء الاصطناعي</div>
+                            <div class="hero-feature-sub">(للمستخدمين المصرح لهم)</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -4122,6 +5469,56 @@
             }
         }
 
+        let isAiResearchEnabled = true;
+
+        function isAiResearchAuthorized() {
+            if (!currentUser) return false;
+            if (isSystemAdmin(currentUser)) return true;
+            const role = currentUser.role || '';
+            if (['unit_manager', 'admin'].includes(role)) return true;
+            const perms = currentUser.permissions || [];
+            return perms.includes('settings.manage') || perms.includes('settings.view');
+        }
+
+        function updateAnalysisSummaryText() {
+            const summaryEl = document.getElementById('analysis-summary-text');
+            if (!summaryEl) return;
+            const isAuth = isAiResearchAuthorized();
+            const isAiActive = isAiResearchEnabled && isAuth;
+            let text = 'كشف الاستلال اللفظي + المطابقة الدلالية (E5)';
+            if (isAiActive) {
+                text += ' + التحليل التجريبي للذكاء الاصطناعي (AraBERT)';
+            } else if (!isAuth) {
+                text += ' (الذكاء الاصطناعي التجريبي: غير مصرح)';
+            } else {
+                text += ' (الذكاء الاصطناعي التجريبي: معطّل)';
+            }
+            summaryEl.innerText = text;
+        }
+
+        function toggleAiResearchMode(enabled) {
+            const isAuth = isAiResearchAuthorized();
+            if (!isAuth) {
+                isAiResearchEnabled = false;
+                const toggle = document.getElementById('toggle-ai-research');
+                if (toggle) {
+                    toggle.checked = false;
+                    toggle.disabled = true;
+                }
+                const lbl = document.getElementById('ai-toggle-status-label');
+                if (lbl) lbl.innerText = 'غير متاح (للمستخدمين المصرح لهم فقط)';
+                updateAnalysisSummaryText();
+                return;
+            }
+
+            isAiResearchEnabled = Boolean(enabled);
+            const lbl = document.getElementById('ai-toggle-status-label');
+            if (lbl) {
+                lbl.innerText = isAiResearchEnabled ? 'مُفعّل (للمستخدمين المصرح لهم فقط)' : 'مُعطّل (استثناء فحص AI)';
+            }
+            updateAnalysisSummaryText();
+        }
+
         function setUploadMode(mode) {
             currentUploadMode = mode;
             const toggleBtn = document.getElementById('toggle-thesis-mode-btn');
@@ -4151,11 +5548,11 @@
                 if (toggleBtn) toggleBtn.className = 'btn-secondary';
                 if (mainHeading) mainHeading.innerText = 'رفع المستندات والأبحاث للفحص الأكاديمي';
                 if (dropTitle) dropTitle.innerText = 'اسحب ملفات الأبحاث هنا أو انقر لاختيار ملف أو عدة ملفات';
-                if (dropSub) dropSub.innerText = 'يدعم رفع بحث واحد أو عدة أبحاث بصيغ PDF / Word / TXT (يُفحص كل ملف كبحث مستقل تلقائياً)';
+                if (dropSub) dropSub.innerText = 'يدعم رفع بحث واحد أو عدة أبحاث بصيغ: PDF / Word / TXT (لفحص كل ملف كمستند مستقل تلقائياً)';
                 if (thesisMeta) thesisMeta.style.display = 'none';
                 if (thesisList) thesisList.style.display = 'none';
                 if (batchList) batchList.style.display = batchFiles.length > 0 ? 'block' : 'none';
-                if (btnText) btnText.innerText = batchFiles.length > 1 ? 'بدء فحص جميع الأبحاث المختارة' : 'بدء فحص البحث';
+                if (btnText) btnText.innerText = batchFiles.length > 0 ? `بدء فحص الملفات (${batchFiles.length})` : 'بدء فحص البحث';
                 if (rawContainer) rawContainer.style.display = 'block';
             }
         }
@@ -4256,42 +5653,43 @@
         function renderBatchFiles() {
             const container = document.getElementById('batch-items-container');
             const listWrapper = document.getElementById('batch-files-list');
+            const countHeading = document.getElementById('batch-files-count-heading');
+            const btnText = document.getElementById('btn-start-analysis-text');
             if (!container || !listWrapper) return;
 
             if (batchFiles.length === 0) {
                 listWrapper.style.display = 'none';
+                if (btnText && currentUploadMode === 'batch') btnText.innerText = 'بدء فحص البحث';
                 return;
             }
             listWrapper.style.display = 'block';
+            if (countHeading) countHeading.innerText = `الملفات المختارة (${batchFiles.length})`;
+            if (btnText && currentUploadMode === 'batch') {
+                btnText.innerText = `بدء فحص الملفات (${batchFiles.length})`;
+            }
 
             let html = '';
             batchFiles.forEach((item, idx) => {
-                const ext = item.file.name.split('.').pop().toUpperCase();
+                const ext = item.file.name.split('.').pop().toLowerCase();
+                const extBadge = ext.toUpperCase();
+                const badgeClass = ext === 'pdf' ? 'badge-pdf' : (ext === 'docx' || ext === 'doc' ? 'badge-word' : 'badge-txt');
                 const sizeMB = (item.file.size / (1024 * 1024)).toFixed(2);
+                const safeName = (item.file.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
                 html += `
-                    <div style="background: #ffffff; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
-                                <span style="display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: #e0f2fe; color: #0284c7; font-size: 11.5px; font-weight: 700;">${idx + 1}</span>
-                                <span style="font-weight: 700; font-size: 13.5px; color: var(--primary-navy);">${item.file.name}</span>
-                                <span style="font-size: 11.5px; color: var(--text-muted); background: #f1f5f9; padding: 1px 6px; border-radius: 4px;">${ext}</span>
-                                <span style="font-size: 11.5px; color: var(--text-muted);">(${sizeMB} MB)</span>
-                            </div>
-                            <button type="button" class="btn-danger" onclick="removeBatchFile(${idx})" style="padding: 2px 8px; font-size: 11px; border-radius: 6px;" title="إزالة">
-                                ✕
-                            </button>
+                    <div class="selected-file-row">
+                        <div class="selected-file-right">
+                            <span class="file-check-circle" title="ملف صالح للفحص">
+                                <svg viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke: white; stroke-width: 3; fill: none;"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            </span>
+                            <span class="file-type-badge ${badgeClass}">${extBadge}</span>
+                            <span class="selected-file-name" title="${safeName}">${safeName}</span>
                         </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                            <div>
-                                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 3px;">عنوان البحث <span style="color:#dc2626;">*</span>:</label>
-                                <input type="text" id="batch-title-${idx}" value="${item.title}" oninput="batchFiles[${idx}].title = this.value" placeholder="ادخل عنوان البحث..." style="width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12.5px;">
-                            </div>
-                            <div>
-                                <label style="font-size: 11.5px; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 3px;">اسم الباحث / صاحب البحث <span style="color:#dc2626;">*</span>:</label>
-                                <input type="text" id="batch-author-${idx}" value="${item.author}" oninput="batchFiles[${idx}].author = this.value" placeholder="ادخل اسم الباحث..." style="width: 100%; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12.5px;">
-                            </div>
+                        <div class="selected-file-left">
+                            <span class="selected-file-size">${sizeMB} MB</span>
+                            <button type="button" class="btn-remove-file" onclick="removeBatchFile(${idx})" title="حذف الملف">
+                                <svg viewBox="0 0 24 24" style="width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
                         </div>
                     </div>
                 `;
@@ -4304,7 +5702,41 @@
             renderBatchFiles();
         }
 
-        async function startAnalysis() {
+        let currentOcrModeSelection = 'accurate';
+
+        function setOcrModeSelection(mode) {
+            currentOcrModeSelection = mode === 'fast' ? 'fast' : 'accurate';
+            const btnAccurate = document.getElementById('ocr-btn-accurate');
+            const btnFast = document.getElementById('ocr-btn-fast');
+            const desc = document.getElementById('ocr-mode-desc-text');
+            if (currentOcrModeSelection === 'fast') {
+                if (btnAccurate) { btnAccurate.classList.remove('active'); }
+                if (btnFast) { btnFast.classList.add('active'); }
+                if (desc) desc.innerText = 'فحص سريع يقلل زمن OCR للملفات الممسوحة ضوئياً (مناسب لبيئة 8GB RAM)';
+            } else {
+                if (btnAccurate) { btnAccurate.classList.add('active'); }
+                if (btnFast) { btnFast.classList.remove('active'); }
+                if (desc) desc.innerText = 'أعلى دقة للتعرف على النصوص الأكاديمية والممسوحة ضوئياً';
+            }
+        }
+
+        async function startAnalysis(requestedOcrMode = currentOcrModeSelection) {
+            const analyzeBtn = document.getElementById('btn-start-analysis');
+            if (analyzeBtn.disabled) return;
+            const analyzeBtnText = document.getElementById('btn-start-analysis-text');
+            const originalBtnText = analyzeBtnText.innerText;
+            analyzeBtn.disabled = true;
+            analyzeBtnText.innerText = 'جاري إطلاق الفحص...';
+            try {
+                await submitAnalysis(requestedOcrMode === 'fast' ? 'fast' : 'accurate');
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtnText.innerText = originalBtnText;
+            }
+        }
+
+        async function submitAnalysis(ocrMode) {
+            const scanModeLabel = ocrMode === 'fast' ? 'الفحص السريع' : 'الفحص عالي الدقة';
             const currentUserName = currentUser ? (currentUser.full_name || currentUser.username) : 'المستخدم';
 
             // ─── 1. THESIS MULTI-FILE SCAN ──────────────────────────────────────────
@@ -4329,7 +5761,7 @@
                     return;
                 }
 
-                showToast('جاري رفع ملفات الرسالة وبدء الفحص الموحد...', 'info');
+                showToast(`جاري رفع ملفات الرسالة وبدء ${scanModeLabel}...`, 'info');
 
                 const formData = new FormData();
                 thesisFiles.forEach((file, i) => {
@@ -4341,6 +5773,8 @@
                 formData.append('specialization', spec);
                 formData.append('degree_type', degree);
                 formData.append('created_by', currentUserName);
+                formData.append('ocr_mode', ocrMode);
+                formData.append('enable_ai_research', isAiResearchEnabled ? '1' : '0');
 
                 try {
                     const res = await fetch('/api/batch/thesis', { method: 'POST', body: formData });
@@ -4384,18 +5818,19 @@
 
             // ─── 2. BATCH INDEPENDENT MULTI-RESEARCH SCAN ───────────────────────────
             if (currentUploadMode === 'batch' && batchFiles.length > 0) {
+                const globalAuthor = (document.getElementById('raw-single-author') ? document.getElementById('raw-single-author').value.trim() : '') || currentUserName;
+                const globalTitle = (document.getElementById('raw-single-title') ? document.getElementById('raw-single-title').value.trim() : '');
+
                 for (let i = 0; i < batchFiles.length; i++) {
-                    const t = (batchFiles[i].title || '').trim();
-                    const a = (batchFiles[i].author || '').trim();
-                    if (!t || !a) {
-                        showToast(`يرجى استكمال عنوان البحث واسم الباحث للبحث رقم ${i + 1}`, 'warning');
-                        const el = document.getElementById(`batch-title-${i}`) || document.getElementById(`batch-author-${i}`);
-                        if (el) el.focus();
-                        return;
+                    if (!batchFiles[i].title) {
+                        batchFiles[i].title = (batchFiles.length === 1 && globalTitle) ? globalTitle : batchFiles[i].file.name.replace(/\.[^/.]+$/, '');
+                    }
+                    if (!batchFiles[i].author) {
+                        batchFiles[i].author = globalAuthor;
                     }
                 }
 
-                showToast(`جاري إطلاق فحص دفعة من ${batchFiles.length} أبحاث...`, 'info');
+                showToast(`جاري إطلاق ${scanModeLabel} لدفعة من ${batchFiles.length} أبحاث...`, 'info');
 
                 const formData = new FormData();
                 batchFiles.forEach(item => {
@@ -4405,6 +5840,8 @@
                 });
                 formData.append('created_by', currentUserName);
                 formData.append('label', `دفعة ${batchFiles.length} أبحاث`);
+                formData.append('ocr_mode', ocrMode);
+                formData.append('enable_ai_research', isAiResearchEnabled ? '1' : '0');
 
                 try {
                     const res = await fetch('/api/batch/independent', { method: 'POST', body: formData });
@@ -4444,6 +5881,8 @@
             formData.append('text', rawText);
             formData.append('title', rawTitle);
             formData.append('author', rawAuthor || 'غير محدد');
+            formData.append('ocr_mode', ocrMode);
+            formData.append('enable_ai_research', isAiResearchEnabled ? '1' : '0');
 
             try {
                 const res = await fetch('/api/analyze', { method: 'POST', body: formData });
@@ -4718,54 +6157,73 @@
 
         function switchReportTab(tabName) {
             _activeReportTab = tabName;
+            const tabPdfBtn = document.getElementById('rep-tab-btn-pdf');
             const tabEvidenceBtn = document.getElementById('rep-tab-btn-evidence');
             const tabSourcesBtn = document.getElementById('rep-tab-btn-sources');
             const tabDocBtn = document.getElementById('rep-tab-btn-doc');
+            const contentPdf = document.getElementById('report-pdf-viewer-container');
             const contentEvidence = document.getElementById('rep-tab-content-evidence');
             const contentSources = document.getElementById('rep-tab-content-sources');
             const contentDoc = document.getElementById('rep-tab-content-doc');
 
-            if (!contentEvidence || !contentSources || !contentDoc) return;
-
             // Reset tab styles
-            [tabEvidenceBtn, tabSourcesBtn, tabDocBtn].forEach(btn => {
+            [tabPdfBtn, tabEvidenceBtn, tabSourcesBtn, tabDocBtn].forEach(btn => {
                 if (btn) {
                     btn.style.background = 'transparent';
                     btn.style.color = '#64748b';
                     btn.style.boxShadow = 'none';
+                    btn.classList.remove('active');
                 }
             });
 
-            contentEvidence.style.display = 'none';
-            contentSources.style.display = 'none';
-            contentDoc.style.display = 'none';
+            if (contentPdf) contentPdf.style.display = 'none';
+            if (contentEvidence) contentEvidence.style.display = 'none';
+            if (contentSources) contentSources.style.display = 'none';
+            if (contentDoc) contentDoc.style.display = 'none';
 
-            if (tabName === 'evidence') {
+            if (tabName === 'pdf') {
+                if (tabPdfBtn) {
+                    tabPdfBtn.style.background = '#ffffff';
+                    tabPdfBtn.style.color = 'var(--primary-navy)';
+                    tabPdfBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+                    tabPdfBtn.classList.add('active');
+                }
+                if (contentPdf) {
+                    contentPdf.style.display = 'block';
+                    if (typeof showInlinePdfPage === 'function' && pdfView && pdfView.count > 0) {
+                        showInlinePdfPage();
+                    }
+                }
+            } else if (tabName === 'evidence') {
                 if (tabEvidenceBtn) {
                     tabEvidenceBtn.style.background = '#ffffff';
                     tabEvidenceBtn.style.color = 'var(--primary-navy)';
-                    tabEvidenceBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                    tabEvidenceBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+                    tabEvidenceBtn.classList.add('active');
                 }
-                contentEvidence.style.display = 'block';
+                if (contentEvidence) {
+                    contentEvidence.style.display = 'block';
+                    loadReportEvidence(_currentEvidencePage || 1);
+                }
             } else if (tabName === 'sources') {
                 if (tabSourcesBtn) {
                     tabSourcesBtn.style.background = '#ffffff';
                     tabSourcesBtn.style.color = 'var(--primary-navy)';
-                    tabSourcesBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                    tabSourcesBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+                    tabSourcesBtn.classList.add('active');
                 }
-                contentSources.style.display = 'block';
-                loadReportSources(_currentSourcesPage);
+                if (contentSources) {
+                    contentSources.style.display = 'block';
+                    loadReportSources(_currentSourcesPage || 1);
+                }
             } else if (tabName === 'doc') {
                 if (tabDocBtn) {
                     tabDocBtn.style.background = '#ffffff';
                     tabDocBtn.style.color = 'var(--primary-navy)';
-                    tabDocBtn.style.boxShadow = '0 1px 2px rgba(0,0,0,0.05)';
+                    tabDocBtn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06)';
+                    tabDocBtn.classList.add('active');
                 }
-                contentDoc.style.display = 'block';
-                const docTextEl = document.getElementById('document-text-content');
-                if (docTextEl && docTextEl.innerText.includes('انقر على')) {
-                    // loadPageTextEvidence(1);  // DISABLED - using PDF viewer instead
-                }
+                if (contentDoc) contentDoc.style.display = 'block';
             }
         }
 
@@ -4845,8 +6303,6 @@
                     renderReport(report);
                     document.getElementById('report-detail-panel').hidden = false;
 
-                    // The original PDF and its page-scoped overlays are now the
-                    // primary evidence view; legacy HTML evidence panels stay dormant.
                 } else {
                     setReportWorkspaceLoading('', false);
                     showToast(report.error || 'تعذر فتح التقرير المطلوب', 'error');
@@ -4859,31 +6315,36 @@
         }
 
         function renderReport(report) {
+            _currentReportData = report;
+            _currentEvidencePage = 1;
+            _currentSourcesPage = 1;
             document.getElementById('report-detail-panel').hidden = false;
             setReportWorkspaceLoading('', false);
 
-            // Show simplified PDF viewer, hide evidence tabs
+            // Start each report on its own PDF tab.
             const pdfContainer = document.getElementById('report-pdf-viewer-container');
             if (pdfContainer) {
-                pdfContainer.style.display = 'block';
                 // Initialize inline PDF viewer
                 const firstFileQuery = Number(report.file_count || 1) > 1 ? '?file_index=0' : '';
                 pdfView = {base: '/api/pdf/report/' + report.id, query: firstFileQuery, page: 1, count: 0, scale: 1, request: pdfView.request + 1, highlights: [], currentHighlight: null, evidenceIndex: [], evidencePosition: -1, evidenceIndexLoaded: false, highlightFilters: {all: true, copied: true, paraphrased: true, cited: true}};
                 pdfHighlights = {};
+                switchReportTab('pdf');
+                const activePdf = pdfView;
                 // Fetch PDF info to get page count
                 fetch(pdfView.base + '/info' + pdfView.query).then(async r => {
                     const info = await r.json();
                     if (!r.ok) throw new Error(getErrorMessage(info, 'ملف PDF غير متاح'));
                     return info;
                 }).then(info => {
-                    if (info.page_count) {
+                    if (pdfView === activePdf && info.page_count) {
                         pdfView.count = info.page_count;
-                        showInlinePdfPage();
+                        if (_activeReportTab === 'pdf') showInlinePdfPage();
                         loadPdfEvidenceIndex();
                     }
                 }).catch(e => {
+                    if (pdfView !== activePdf) return;
                     console.error('Failed to load PDF info:', e);
-                    pdfContainer.style.display = 'none';
+                    if (_activeReportTab === 'pdf') switchReportTab('evidence');
                     showToast(e.message || 'تعذر عرض المستند الأصلي', 'warning');
                 });
             }
@@ -5039,6 +6500,19 @@
                 }
             }
 
+            const ocrModeBadge = document.getElementById('report-ocr-mode-badge');
+            if (ocrModeBadge) {
+                if (report.ocr_mode === 'fast') {
+                    ocrModeBadge.innerText = 'OCR سريع';
+                    ocrModeBadge.style.display = 'inline-block';
+                } else if (report.ocr_mode === 'accurate') {
+                    ocrModeBadge.innerText = 'OCR عالي الدقة';
+                    ocrModeBadge.style.display = 'inline-block';
+                } else {
+                    ocrModeBadge.style.display = 'none';
+                }
+            }
+
             // Count badges
             const matchedCount = report.matched_count !== undefined ? report.matched_count : ((report.segments || report.matches || []).filter(s => ['copied', 'paraphrased', 'cited'].includes(s.status)).length);
             const matchedBadge = document.getElementById('report-matched-badge');
@@ -5066,11 +6540,48 @@
                 volStatsEl.innerText = `الحجم التقديري: ${totalPages} صفحة (${totalWords.toLocaleString()} كلمة) | المستل: ${plagPages} صفحة (${plagWords.toLocaleString()} كلمة)`;
             }
 
-            // AI Stylistic Indicator
-            if (report.ai_analysis) {
-                const aiPct = report.ai_analysis.ai_percentage || 0;
-                const aiStat = report.ai_analysis.status || (aiPct > 50 ? 'خصائص تركيبية تستدعي الفحص' : 'طبيعي (نص بشري)');
-                document.getElementById('report-ai-status').innerText = `${aiPct}% — ${aiStat}`;
+            // Historical stylistic heuristics are not an authorship classifier.
+            const isAiError = Boolean(report.ai_analysis && report.ai_analysis.reason === 'analysis_error');
+            const isAiCompleted = Boolean(report.ai_analysis && report.ai_analysis.status === 'completed');
+            const aiAnalysis = report.ai_analysis || {};
+
+            if (isAiCompleted) {
+                const aiPct = (aiAnalysis.estimated_ai_percentage !== null && aiAnalysis.estimated_ai_percentage !== undefined)
+                    ? aiAnalysis.estimated_ai_percentage
+                    : 0;
+                const aiModel = aiAnalysis.model || 'AraBERT-INT8';
+                const aiStatusEl = document.getElementById('report-ai-status');
+                if (aiStatusEl) {
+                    aiStatusEl.innerText = 'مؤشر بحثي استكشافي: %' + aiPct + ' (' + aiModel + ') — ' + (aiAnalysis.paragraphs_count || 0) + ' فقرة';
+                }
+                const aiPillEl = document.getElementById('ai-detection-status-pill');
+                if (aiPillEl) {
+                    aiPillEl.innerText = 'نمط بحثي تجريبي (%' + aiPct + ')';
+                    aiPillEl.style.background = '#fef3c7';
+                    aiPillEl.style.color = '#92400e';
+                    aiPillEl.style.borderColor = '#fcd34d';
+                }
+            } else {
+                const aiStatusText = isAiError
+                    ? 'غير متاح — تعذر تحليل الكتابة بالذكاء الاصطناعي'
+                    : 'غير متاح — لا يوجد نموذج مدقق؛ لا يمكن استنتاج مصدر النص';
+                const aiStatusEl = document.getElementById('report-ai-status');
+                if (aiStatusEl) aiStatusEl.innerText = aiStatusText;
+
+                const aiPillEl = document.getElementById('ai-detection-status-pill');
+                if (aiPillEl) {
+                    if (isAiError) {
+                        aiPillEl.innerText = 'تعذر الفحص';
+                        aiPillEl.style.background = '#fef2f2';
+                        aiPillEl.style.color = '#b91c1c';
+                        aiPillEl.style.borderColor = '#fca5a5';
+                    } else {
+                        aiPillEl.innerText = 'غير مدقق أكاديمياً';
+                        aiPillEl.style.background = '#ede9fe';
+                        aiPillEl.style.color = '#6d28d9';
+                        aiPillEl.style.borderColor = '#ddd6fe';
+                    }
+                }
             }
 
             // Submitter banner
@@ -5610,6 +7121,7 @@
                     actionButton.innerHTML = originalButtonHtml;
                 }
             }
+
         }
 
         function openCertificate(reportId = null) {
@@ -6094,7 +7606,7 @@
             }
         }
 
-        async function loadDashboardStats() {
+                async function loadDashboardStats() {
             try {
                 const res = await fetch('/api/stats');
                 const data = await res.json();
@@ -6114,6 +7626,7 @@
 
                 _cacheDashboardReports = data.recent_reports || [];
                 renderDashboardRecentTable();
+                renderDashboardRecentActivity(_cacheDashboardReports);
             } catch (e) {
                 console.error('Failed to load dashboard stats', e);
             }
@@ -6127,24 +7640,80 @@
             const filteredReports = _cacheDashboardReports.filter(r => dateFallsWithinRange(r.date || r.created_at, range));
             let html = '';
             filteredReports.forEach(r => {
-                let badgeClass = r.pct > 50 ? 'high' : (r.pct > 20 ? 'medium' : 'low');
-                let statusTag = r.status || 'مفحوص';
+                let badgeStyle = 'background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;';
+                let statusLabel = r.status || 'مفحوص';
+                if (statusLabel === 'قبول نهائي' || r.review_status === 'final_accepted') {
+                    badgeStyle = 'background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;';
+                    statusLabel = 'قبول نهائي';
+                } else if (statusLabel === 'قبول مبدئي' || r.review_status === 'preliminary_accepted') {
+                    badgeStyle = 'background: #fef3c7; color: #b45309; border: 1px solid #fde68a;';
+                    statusLabel = 'قبول مبدئي';
+                } else if (statusLabel === 'مرفوض' || r.review_status === 'rejected') {
+                    badgeStyle = 'background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;';
+                    statusLabel = 'مرفوض';
+                }
+
                 html += `
-                    <tr>
-                        <td style="font-weight: 700;">${r.title}${r.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0369a1; margin-top:2px;">${r.reference_number}</div>` : ''}</td>
-                        <td>${r.author || 'غير محدد'}</td>
-                        <td style="font-size:13px; color:var(--text-muted);">${r.date}</td>
-                        <td><span style="font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px; background:#f1f5f9;">${statusTag}</span></td>
-                        <td><span class="badge-pct ${badgeClass}">${r.pct}%</span></td>
-                        <td>
-                            <button class="btn-secondary" style="padding: 4px 10px;" onclick="openReport('${r.id}')" title="عرض التقرير">
-                                <svg class="nav-icon-svg" style="width:14px; height:14px;" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.1s ease;">
+                        <td style="padding: 12px 16px; font-weight: 700; color: #1e293b;">
+                            ${r.title}
+                            ${r.reference_number ? `<div style="font-size:11px; font-weight:700; font-family:monospace; color:#0284c7; margin-top:3px;">${r.reference_number}</div>` : ''}
+                        </td>
+                        <td style="padding: 12px 16px; color: #334155; font-weight: 600;">${r.author || 'غير محدد'}</td>
+                        <td style="padding: 12px 16px; font-size: 13px; color: #64748b; font-family: monospace; white-space: nowrap;">${r.date || ''}</td>
+                        <td style="padding: 12px 16px; text-align: center;">
+                            <span style="font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 6px; display: inline-block; ${badgeStyle}">${statusLabel}</span>
+                        </td>
+                        <td style="padding: 12px 16px; text-align: center; font-weight: 800; font-size: 13.5px; color: #0f172a;">${r.pct}%</td>
+                        <td style="padding: 12px 16px; text-align: center;">
+                            <button type="button" class="btn-secondary" style="padding: 4px 10px; border-radius: 6px; border: 1px solid #cbd5e1; background: #ffffff; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" onclick="openReport('${r.id}')" title="عرض التقرير">
+                                <svg style="width: 15px; height: 15px; stroke: #0f172a;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                             </button>
                         </td>
                     </tr>
                 `;
             });
             tbody.innerHTML = html || getEmptyStateHtml('لا توجد عمليات فحص سابقة', 'ستظهر هنا أحدث الأبحاث المفحوصة فور إجراء أول عملية تحليل.', 6);
+        }
+
+        function renderDashboardRecentActivity(reports) {
+            const listEl = document.getElementById('dash-recent-activity-list');
+            if (!listEl) return;
+            if (!reports || reports.length === 0) {
+                listEl.innerHTML = '<div style="text-align: center; color: #94a3b8; font-size: 13px; padding: 20px 0;">لا توجد أنشطة حديثة متاحة للعرض</div>';
+                return;
+            }
+            const topReports = reports.slice(0, 5);
+            let html = '';
+            topReports.forEach((r, idx) => {
+                let iconSvg = '';
+                let actionText = '';
+                if (r.review_status === 'final_accepted') {
+                    if (idx === 1) {
+                        iconSvg = `<svg style="width:16px; height:16px; stroke:#10b981; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>`;
+                        actionText = 'تم اعتماد بحث وإضافته لقاعدة المراجع';
+                    } else {
+                        iconSvg = `<svg style="width:16px; height:16px; stroke:#10b981; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>`;
+                        actionText = `تم قبول بحث نهائياً: ${r.title}`;
+                    }
+                } else {
+                    iconSvg = `<svg style="width:16px; height:16px; stroke:#2563eb; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`;
+                    actionText = `تم فحص بحث جديد: ${r.title}`;
+                }
+
+                html += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f8fafc;">
+                        <div style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 75%;">
+                            ${iconSvg}
+                            <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${actionText}">${actionText}</span>
+                        </div>
+                        <div style="font-size: 11.5px; color: #64748b; font-family: monospace; white-space: nowrap; direction: ltr;">
+                            ${r.date || ''}
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
         }
 
         // ─── Authentication & Session Management (100% Offline) ───────────
@@ -6395,6 +7964,22 @@
             }
         }
 
+                function togglePasswordVisibility() {
+            const pwdInp = document.getElementById('login-password');
+            const eyeOpen = document.getElementById('eye-icon-open');
+            const eyeClosed = document.getElementById('eye-icon-closed');
+            if (!pwdInp) return;
+            if (pwdInp.type === 'password') {
+                pwdInp.type = 'text';
+                if (eyeOpen) eyeOpen.style.display = 'none';
+                if (eyeClosed) eyeClosed.style.display = 'block';
+            } else {
+                pwdInp.type = 'password';
+                if (eyeOpen) eyeOpen.style.display = 'block';
+                if (eyeClosed) eyeClosed.style.display = 'none';
+            }
+        }
+
         async function submitLogin() {
             const usernameInp = document.getElementById('login-username');
             const passwordInp = document.getElementById('login-password');
@@ -6443,7 +8028,7 @@
                 errText.innerText = 'فشل الاتصال بخادم المصادقة المحلي';
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = '<svg class="nav-icon-svg" style="width:16px; height:16px; stroke:white;" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg><span>تسجيل الدخول للنظام</span>';
+                submitBtn.innerHTML = '<span>تسجيل الدخول</span><svg class="nav-icon-svg" style="width:18px; height:18px; stroke:white;" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>';
             }
         }
 
@@ -6485,6 +8070,28 @@
                 badgeEl.style.background = isAdmin ? '#e0f2fe' : '#ecfdf5';
                 badgeEl.style.color = isAdmin ? '#0369a1' : '#047857';
             }
+
+            // تحديث بطاقة فحص الذكاء الاصطناعي التجريبي حسب الصلاحيات
+            const aiToggle = document.getElementById('toggle-ai-research');
+            const aiStatusLabel = document.getElementById('ai-toggle-status-label');
+            const isAuth = isAiResearchAuthorized();
+            if (aiToggle) {
+                if (isAuth) {
+                    aiToggle.disabled = false;
+                    aiToggle.checked = isAiResearchEnabled;
+                    if (aiStatusLabel) {
+                        aiStatusLabel.innerText = isAiResearchEnabled ? 'مُفعّل (للمستخدمين المصرح لهم فقط)' : 'مُعطّل (استثناء فحص AI)';
+                    }
+                } else {
+                    aiToggle.disabled = true;
+                    aiToggle.checked = false;
+                    isAiResearchEnabled = false;
+                    if (aiStatusLabel) {
+                        aiStatusLabel.innerText = 'غير متاح (للمستخدمين المصرح لهم فقط)';
+                    }
+                }
+            }
+            updateAnalysisSummaryText();
 
             // التحكم في ظهور عناصر القائمة الجانبية بناءً على الصلاحيات
             document.querySelectorAll('.admin-only').forEach(el => {

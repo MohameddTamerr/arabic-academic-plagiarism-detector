@@ -21,11 +21,16 @@ from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 from typing import Callable, Optional
 
 import config
-from .ocr_engine import check_ocr_availability, ocr_page_pixmap
+from .ocr_engine import (
+    OCR_MODE_ACCURATE,
+    check_ocr_availability,
+    normalize_ocr_mode,
+    ocr_page_pixmap,
+)
 
 logger = logging.getLogger(__name__)
 
-_PDF_EXTRACTION_CACHE_SCHEMA = 'pdf-pages-v1'
+_PDF_EXTRACTION_CACHE_SCHEMA = 'pdf-pages-v2'
 
 # الكلمات المعكوسة الشائعة لاكتشاف مشاكل الـ Bidi
 _REVERSED_ARABIC = re.compile(r'\b(ة[ا-ي]{2,}|[ا-ي]{2,}لا|[ا-ي]{2,}ةي|هيلع|ءاكذ|ميلعت)\b')
@@ -277,6 +282,7 @@ def extract_document_pages(
     file_path: str,
     enable_ocr: bool = True,
     progress_callback: Optional[Callable[[int, int, int], None]] = None,
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ) -> list[dict]:
     """
     استخراج محتوى المستند صفحة-بصفحة.
@@ -295,6 +301,7 @@ def extract_document_pages(
             file_path,
             enable_ocr=enable_ocr,
             progress_callback=progress_callback,
+            ocr_mode=ocr_mode,
         )
     elif ext in ('.docx', '.doc'):
         # DOCX has no stable page model of its own. When a local office engine
@@ -309,6 +316,7 @@ def extract_document_pages(
                     str(preview_path),
                     enable_ocr=False,
                     progress_callback=progress_callback,
+                    ocr_mode=ocr_mode,
                 )
             except Exception as preview_error:
                 logger.warning(
@@ -333,7 +341,11 @@ def _stream_file_sha256(path: str) -> str:
     return digest.hexdigest()
 
 
-def _pdf_extraction_cache_path(path: str, enable_ocr: bool) -> Path | None:
+def _pdf_extraction_cache_path(
+    path: str,
+    enable_ocr: bool,
+    ocr_mode: str = OCR_MODE_ACCURATE,
+) -> Path | None:
     """Build a content-addressed cache key that changes with OCR behaviour."""
     if not getattr(config, 'PDF_EXTRACTION_CACHE_ENABLED', True):
         return None
@@ -344,6 +356,7 @@ def _pdf_extraction_cache_path(path: str, enable_ocr: bool) -> Path | None:
         'schema': _PDF_EXTRACTION_CACHE_SCHEMA,
         'sha256': _stream_file_sha256(str(source)),
         'enable_ocr': bool(enable_ocr),
+        'ocr_mode': normalize_ocr_mode(ocr_mode),
         'dpi': int(getattr(config, 'PDF_OCR_DPI', 220)),
         'smart_ocr': bool(getattr(config, 'SMART_PDF_OCR_ENABLED', True)),
         'native_min_words': int(getattr(config, 'PDF_NATIVE_TEXT_MIN_WORDS', 30)),
@@ -430,9 +443,11 @@ def _extract_pdf_pages_cached(
     path: str,
     enable_ocr: bool = True,
     progress_callback: Optional[Callable[[int, int, int], None]] = None,
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ) -> list[dict]:
     started = time.perf_counter()
-    cache_path = _pdf_extraction_cache_path(path, enable_ocr)
+    mode = normalize_ocr_mode(ocr_mode)
+    cache_path = _pdf_extraction_cache_path(path, enable_ocr, mode)
     cached_pages = _read_pdf_extraction_cache(cache_path)
     if cached_pages is not None:
         total = len(cached_pages)
@@ -449,6 +464,7 @@ def _extract_pdf_pages_cached(
         path,
         enable_ocr=enable_ocr,
         progress_callback=progress_callback,
+        ocr_mode=mode,
     )
     _write_pdf_extraction_cache(cache_path, pages)
     logger.info(
@@ -560,10 +576,11 @@ def _ocr_pdf_pixmap(
     original_word_count: int,
     languages: str,
     merge_with_original: bool = False,
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ) -> tuple[str, bool]:
     """OCR worker for one already-rendered page, returning safe fallback text."""
     try:
-        ocr_text = ocr_page_pixmap(pixmap, languages=languages)
+        ocr_text = ocr_page_pixmap(pixmap, languages=languages, ocr_mode=ocr_mode)
         minimum_words = 2 if merge_with_original else (
             4 if original_word_count < 20 else max(8, int(original_word_count * 0.25))
         )
@@ -580,9 +597,14 @@ def _extract_pages_from_pdf(
     path: str,
     enable_ocr: bool = True,
     progress_callback: Optional[Callable[[int, int, int], None]] = None,
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ) -> list[dict]:
     """استخراج PDF بصفحات OCR متوازية ومحدودة الذاكرة مع حفظ الترتيب."""
-    ocr_status = check_ocr_availability() if enable_ocr else {'available': False}
+    mode = normalize_ocr_mode(ocr_mode)
+    ocr_status = (
+        (check_ocr_availability(mode) if mode != OCR_MODE_ACCURATE else check_ocr_availability())
+        if enable_ocr else {'available': False}
+    )
 
     # المحاولة الأولى: PyMuPDF (fitz)
     try:
@@ -598,7 +620,8 @@ def _extract_pages_from_pdf(
             dpi = int(getattr(config, 'PDF_OCR_DPI', 220))
             if enable_ocr and ocr_status.get('available'):
                 logger.info(
-                    "تهيئة OCR متكيف: %s عامل/عوامل، دقة %s DPI، كاش الصفحات %s.",
+                    "تهيئة OCR متكيف (%s): %s عامل/عوامل، دقة %s DPI، كاش الصفحات %s.",
+                    mode,
                     worker_count,
                     dpi,
                     'مفعل' if getattr(config, 'OCR_CACHE_ENABLED', True) else 'معطل',
@@ -622,8 +645,8 @@ def _extract_pages_from_pdf(
                         'text': page_text,
                         'is_ocr': is_ocr,
                         'extraction_engine': (
-                            'pymupdf+tesseract' if is_ocr and hybrid_ocr
-                            else ('tesseract' if is_ocr else 'pymupdf')
+                            f'pymupdf+tesseract-{mode}' if is_ocr and hybrid_ocr
+                            else (f'tesseract-{mode}' if is_ocr else 'pymupdf')
                         ),
                     }
                     completed += 1
@@ -703,14 +726,11 @@ def _extract_pages_from_pdf(
                         # Always load both bundled models: text inside an image
                         # can use a different language from the searchable layer.
                         languages = 'ara+eng'
-                        future = executor.submit(
-                            _ocr_pdf_pixmap,
-                            pix,
-                            text,
-                            len(words),
-                            languages,
-                            hybrid_ocr,
-                        )
+                        worker_args = (pix, text, len(words), languages, hybrid_ocr)
+                        if mode == OCR_MODE_ACCURATE:
+                            future = executor.submit(_ocr_pdf_pixmap, *worker_args)
+                        else:
+                            future = executor.submit(_ocr_pdf_pixmap, *worker_args, mode)
                         pending[future] = (idx, page_num, hybrid_ocr)
 
                         if len(pending) >= max_pending:

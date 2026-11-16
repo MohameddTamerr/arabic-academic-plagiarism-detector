@@ -1,0 +1,758 @@
+{
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.13.2 (tags/v3.13.2:4f8bb39, Feb  4 2025, 15:23:48) [MSC v.1942 64 bit (AMD64)]",
+  "workflow": "plagiarism",
+  "logical_cpus": 16,
+  "total_ram": 34011582464,
+  "exit_code": 0,
+  "elapsed": 74.47417659999337,
+  "samples": [
+    {
+      "elapsed": 0.015090000000782311,
+      "available_physical_bytes": 7395864576,
+      "system_cpu_percent": 58.3,
+      "system_commit": {
+        "CommitTotal": 46350012416,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 1.0165913999662735,
+      "available_physical_bytes": 7353110528,
+      "system_cpu_percent": 44.0,
+      "system_commit": {
+        "CommitTotal": 46377652224,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 2.0177842999692075,
+      "available_physical_bytes": 7350923264,
+      "system_cpu_percent": 36.8,
+      "system_commit": {
+        "CommitTotal": 46402129920,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 3.0199163999641314,
+      "available_physical_bytes": 7347834880,
+      "system_cpu_percent": 40.2,
+      "system_commit": {
+        "CommitTotal": 46411141120,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 4.021876399987377,
+      "available_physical_bytes": 7293284352,
+      "system_cpu_percent": 50.2,
+      "system_commit": {
+        "CommitTotal": 46484615168,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 5.02365029999055,
+      "available_physical_bytes": 7300468736,
+      "system_cpu_percent": 39.5,
+      "system_commit": {
+        "CommitTotal": 46489722880,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 6.026549599948339,
+      "available_physical_bytes": 7284707328,
+      "system_cpu_percent": 34.1,
+      "system_commit": {
+        "CommitTotal": 46512943104,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 7.02873759996146,
+      "available_physical_bytes": 7335534592,
+      "system_cpu_percent": 34.3,
+      "system_commit": {
+        "CommitTotal": 46517993472,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 8.030596799973864,
+      "available_physical_bytes": 7380369408,
+      "system_cpu_percent": 41.8,
+      "system_commit": {
+        "CommitTotal": 46439837696,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 9.03268579998985,
+      "available_physical_bytes": 7362277376,
+      "system_cpu_percent": 39.1,
+      "system_commit": {
+        "CommitTotal": 46465150976,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 10.034349499968812,
+      "available_physical_bytes": 7327899648,
+      "system_cpu_percent": 49.9,
+      "system_commit": {
+        "CommitTotal": 46541783040,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 11.03596429998288,
+      "available_physical_bytes": 7347191808,
+      "system_cpu_percent": 35.4,
+      "system_commit": {
+        "CommitTotal": 46483107840,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 12.03757659997791,
+      "available_physical_bytes": 7346032640,
+      "system_cpu_percent": 33.1,
+      "system_commit": {
+        "CommitTotal": 46487580672,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 13.039102499955334,
+      "available_physical_bytes": 7287758848,
+      "system_cpu_percent": 43.8,
+      "system_commit": {
+        "CommitTotal": 46576050176,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 14.04025369998999,
+      "available_physical_bytes": 7287701504,
+      "system_cpu_percent": 47.1,
+      "system_commit": {
+        "CommitTotal": 46570053632,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 15.041765799978748,
+      "available_physical_bytes": 7289749504,
+      "system_cpu_percent": 42.9,
+      "system_commit": {
+        "CommitTotal": 46555316224,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 16.04391409998061,
+      "available_physical_bytes": 7296090112,
+      "system_cpu_percent": 30.3,
+      "system_commit": {
+        "CommitTotal": 46541656064,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 17.046455399948172,
+      "available_physical_bytes": 8229765120,
+      "system_cpu_percent": 31.4,
+      "system_commit": {
+        "CommitTotal": 46545874944,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 18.048448299989104,
+      "available_physical_bytes": 8223784960,
+      "system_cpu_percent": 31.2,
+      "system_commit": {
+        "CommitTotal": 46553395200,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 19.05036019999534,
+      "available_physical_bytes": 8088260608,
+      "system_cpu_percent": 41.0,
+      "system_commit": {
+        "CommitTotal": 46676529152,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 20.052064799994696,
+      "available_physical_bytes": 7856238592,
+      "system_cpu_percent": 44.2,
+      "system_commit": {
+        "CommitTotal": 46921351168,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 21.05382189998636,
+      "available_physical_bytes": 7691341824,
+      "system_cpu_percent": 55.9,
+      "system_commit": {
+        "CommitTotal": 47144312832,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 22.056135299964808,
+      "available_physical_bytes": 7692197888,
+      "system_cpu_percent": 53.4,
+      "system_commit": {
+        "CommitTotal": 47139778560,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 23.057677699951455,
+      "available_physical_bytes": 7689814016,
+      "system_cpu_percent": 48.6,
+      "system_commit": {
+        "CommitTotal": 47137382400,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 24.059587499999907,
+      "available_physical_bytes": 7687766016,
+      "system_cpu_percent": 34.6,
+      "system_commit": {
+        "CommitTotal": 47137587200,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 25.061654999968596,
+      "available_physical_bytes": 7651647488,
+      "system_cpu_percent": 34.0,
+      "system_commit": {
+        "CommitTotal": 47176142848,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 26.063815299945418,
+      "available_physical_bytes": 7632097280,
+      "system_cpu_percent": 32.2,
+      "system_commit": {
+        "CommitTotal": 47191957504,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 27.06537899997784,
+      "available_physical_bytes": 7634255872,
+      "system_cpu_percent": 30.7,
+      "system_commit": {
+        "CommitTotal": 47189491712,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 28.067213399976026,
+      "available_physical_bytes": 7635189760,
+      "system_cpu_percent": 28.8,
+      "system_commit": {
+        "CommitTotal": 47189159936,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 29.068536199978553,
+      "available_physical_bytes": 7617671168,
+      "system_cpu_percent": 33.3,
+      "system_commit": {
+        "CommitTotal": 47209816064,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 30.07261719997041,
+      "available_physical_bytes": 7566397440,
+      "system_cpu_percent": 55.1,
+      "system_commit": {
+        "CommitTotal": 47284764672,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 31.101932399964426,
+      "available_physical_bytes": 7542312960,
+      "system_cpu_percent": 58.9,
+      "system_commit": {
+        "CommitTotal": 47281180672,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 32.103512799949385,
+      "available_physical_bytes": 7564967936,
+      "system_cpu_percent": 39.0,
+      "system_commit": {
+        "CommitTotal": 47271706624,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 33.105591999948956,
+      "available_physical_bytes": 7558369280,
+      "system_cpu_percent": 36.5,
+      "system_commit": {
+        "CommitTotal": 47293054976,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 34.10683710000012,
+      "available_physical_bytes": 7508992000,
+      "system_cpu_percent": 50.4,
+      "system_commit": {
+        "CommitTotal": 47320080384,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 35.10847619996639,
+      "available_physical_bytes": 7492198400,
+      "system_cpu_percent": 38.0,
+      "system_commit": {
+        "CommitTotal": 47315554304,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 36.113417299988214,
+      "available_physical_bytes": 7527747584,
+      "system_cpu_percent": 37.8,
+      "system_commit": {
+        "CommitTotal": 47264063488,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 37.11468759999843,
+      "available_physical_bytes": 7530504192,
+      "system_cpu_percent": 36.4,
+      "system_commit": {
+        "CommitTotal": 47264980992,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 38.11618589999853,
+      "available_physical_bytes": 7516913664,
+      "system_cpu_percent": 32.9,
+      "system_commit": {
+        "CommitTotal": 47276376064,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 39.11831959994743,
+      "available_physical_bytes": 7540928512,
+      "system_cpu_percent": 38.3,
+      "system_commit": {
+        "CommitTotal": 47247831040,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 40.12076749996049,
+      "available_physical_bytes": 7464624128,
+      "system_cpu_percent": 70.1,
+      "system_commit": {
+        "CommitTotal": 47309340672,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 41.122095999948215,
+      "available_physical_bytes": 7492108288,
+      "system_cpu_percent": 54.4,
+      "system_commit": {
+        "CommitTotal": 47294861312,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 42.12401619995944,
+      "available_physical_bytes": 7471423488,
+      "system_cpu_percent": 40.1,
+      "system_commit": {
+        "CommitTotal": 47294926848,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 43.12626209994778,
+      "available_physical_bytes": 7492206592,
+      "system_cpu_percent": 59.8,
+      "system_commit": {
+        "CommitTotal": 47310643200,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 44.12802519998513,
+      "available_physical_bytes": 7459897344,
+      "system_cpu_percent": 34.2,
+      "system_commit": {
+        "CommitTotal": 47362228224,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 45.12979479995556,
+      "available_physical_bytes": 7308197888,
+      "system_cpu_percent": 72.4,
+      "system_commit": {
+        "CommitTotal": 47530463232,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 46.132514099997934,
+      "available_physical_bytes": 7285129216,
+      "system_cpu_percent": 56.7,
+      "system_commit": {
+        "CommitTotal": 47528583168,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 47.135104799992405,
+      "available_physical_bytes": 7278186496,
+      "system_cpu_percent": 46.4,
+      "system_commit": {
+        "CommitTotal": 47526182912,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 48.1376366999466,
+      "available_physical_bytes": 7339327488,
+      "system_cpu_percent": 45.5,
+      "system_commit": {
+        "CommitTotal": 47452221440,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 49.13923429994611,
+      "available_physical_bytes": 7319576576,
+      "system_cpu_percent": 38.7,
+      "system_commit": {
+        "CommitTotal": 47480061952,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 50.140827999974135,
+      "available_physical_bytes": 7295135744,
+      "system_cpu_percent": 35.5,
+      "system_commit": {
+        "CommitTotal": 47510511616,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 51.145900399948005,
+      "available_physical_bytes": 7298691072,
+      "system_cpu_percent": 49.1,
+      "system_commit": {
+        "CommitTotal": 47501549568,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 52.14793589996407,
+      "available_physical_bytes": 7315677184,
+      "system_cpu_percent": 34.8,
+      "system_commit": {
+        "CommitTotal": 47478992896,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 53.149973799998406,
+      "available_physical_bytes": 7352721408,
+      "system_cpu_percent": 34.4,
+      "system_commit": {
+        "CommitTotal": 47447990272,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 54.17229369998677,
+      "available_physical_bytes": 7339724800,
+      "system_cpu_percent": 42.6,
+      "system_commit": {
+        "CommitTotal": 47469805568,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 55.23967519996222,
+      "available_physical_bytes": 7310041088,
+      "system_cpu_percent": 55.1,
+      "system_commit": {
+        "CommitTotal": 47461945344,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 56.241224299999885,
+      "available_physical_bytes": 7378980864,
+      "system_cpu_percent": 35.4,
+      "system_commit": {
+        "CommitTotal": 47398350848,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 57.24396909994539,
+      "available_physical_bytes": 7446159360,
+      "system_cpu_percent": 37.1,
+      "system_commit": {
+        "CommitTotal": 47332024320,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 58.246737199951895,
+      "available_physical_bytes": 7516540928,
+      "system_cpu_percent": 42.7,
+      "system_commit": {
+        "CommitTotal": 47262433280,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 59.24850940000033,
+      "available_physical_bytes": 7439355904,
+      "system_cpu_percent": 52.7,
+      "system_commit": {
+        "CommitTotal": 47383969792,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 60.25086099997861,
+      "available_physical_bytes": 7377133568,
+      "system_cpu_percent": 46.4,
+      "system_commit": {
+        "CommitTotal": 47423148032,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 61.25235609995434,
+      "available_physical_bytes": 7327236096,
+      "system_cpu_percent": 39.1,
+      "system_commit": {
+        "CommitTotal": 47467044864,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 62.253807699948084,
+      "available_physical_bytes": 7331008512,
+      "system_cpu_percent": 33.2,
+      "system_commit": {
+        "CommitTotal": 47462080512,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 63.255587799998466,
+      "available_physical_bytes": 7296499712,
+      "system_cpu_percent": 44.4,
+      "system_commit": {
+        "CommitTotal": 47490928640,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 64.2576248999685,
+      "available_physical_bytes": 7252131840,
+      "system_cpu_percent": 44.8,
+      "system_commit": {
+        "CommitTotal": 47591260160,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 65.26060669997241,
+      "available_physical_bytes": 7377747968,
+      "system_cpu_percent": 30.2,
+      "system_commit": {
+        "CommitTotal": 47403143168,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 66.26286389998859,
+      "available_physical_bytes": 7354679296,
+      "system_cpu_percent": 37.8,
+      "system_commit": {
+        "CommitTotal": 47391240192,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 67.26437699998496,
+      "available_physical_bytes": 7335686144,
+      "system_cpu_percent": 37.3,
+      "system_commit": {
+        "CommitTotal": 47429255168,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 68.26639299996896,
+      "available_physical_bytes": 7333998592,
+      "system_cpu_percent": 54.3,
+      "system_commit": {
+        "CommitTotal": 47469588480,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 69.26798359997338,
+      "available_physical_bytes": 7358038016,
+      "system_cpu_percent": 49.1,
+      "system_commit": {
+        "CommitTotal": 47390257152,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 70.26955939998152,
+      "available_physical_bytes": 7345631232,
+      "system_cpu_percent": 50.3,
+      "system_commit": {
+        "CommitTotal": 47434739712,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 71.27100889995927,
+      "available_physical_bytes": 7364177920,
+      "system_cpu_percent": 34.4,
+      "system_commit": {
+        "CommitTotal": 47384858624,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 72.27254649996758,
+      "available_physical_bytes": 7550410752,
+      "system_cpu_percent": 41.9,
+      "system_commit": {
+        "CommitTotal": 47189151744,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    },
+    {
+      "elapsed": 73.2745137999882,
+      "available_physical_bytes": 7789613056,
+      "system_cpu_percent": 34.2,
+      "system_commit": {
+        "CommitTotal": 46960041984,
+        "CommitLimit": 51477630976,
+        "CommitPeak": 61232996352
+      }
+    }
+  ],
+  "limitations": [
+    "System counters include other applications",
+    "Paging CSV contains whole-system Windows counters; localized counter availability must be checked; GUI responsiveness is unmeasured",
+    "Synthetic corpus/documents, test client, test antivirus and authentication mode"
+  ],
+  "paging_file_updated_this_run": true,
+  "paging_monitor_exit_before_stop": null
+}

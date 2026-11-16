@@ -1,0 +1,4 @@
+[
+  {"sample_id":"s8-human-1","document_id":"s8-human-doc","text":"تناقش الدراسة حدود الدليل الرقمي في ضوء إجراءات التحقيق العملي.","provenance_label":"HUMAN","generator_family":"NONE","editing_category":"NONE","academic_domain":"security_science","collection_method":"developer fixture","license_permission":true,"annotation_confidence":1.0,"data_origin":"DEVELOPER_SYNTHETIC"},
+  {"sample_id":"s8-ai-1","document_id":"s8-ai-doc","text":"تهدف هذه الفقرة الاصطناعية إلى تمثيل كتابة مولدة لاستخدام اختبار البنية فقط.","provenance_label":"AI_GENERATED","generator_family":"SYNTHETIC_FIXTURE","editing_category":"NONE","academic_domain":"security_science","collection_method":"developer fixture","license_permission":true,"annotation_confidence":1.0,"data_origin":"DEVELOPER_SYNTHETIC"}
+]

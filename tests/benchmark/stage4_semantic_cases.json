@@ -1,0 +1,23 @@
+{
+  "dataset_id": "arabic-semantic-retrieval-synthetic-v1",
+  "origin": "developer-authored synthetic calibration and held-out fixtures; not real-world validation",
+  "sources": [
+    {"source_id": "S1", "text": "تتطلب إدارة الأزمات في المطارات خططا استباقية وتنسيقا بين الجهات الأمنية لضمان سلامة المسافرين واستمرار التشغيل."},
+    {"source_id": "S2", "text": "استخدم الباحث المنهج الوصفي التحليلي لجمع البيانات وتصنيفها وتفسير العلاقات بين المتغيرات."},
+    {"source_id": "S3", "text": "تساعد الطاقة الشمسية والرياح على خفض الانبعاثات وتنويع مصادر الكهرباء في المدن."},
+    {"source_id": "S4", "text": "تحفظ المكتبات الرقمية الرسائل الجامعية وتيسر للباحثين الوصول إلى المعرفة الموثقة."},
+    {"source_id": "S5", "text": "يوفر الذكاء الاصطناعي أدوات لتخصيص التعلم وتحليل أداء الطلاب في التعليم الجامعي."}
+  ],
+  "cases": [
+    {"case_id": "CAL-EXACT", "split": "calibration", "kind": "exact_copy", "text": "تتطلب إدارة الأزمات في المطارات خططا استباقية وتنسيقا بين الجهات الأمنية لضمان سلامة المسافرين واستمرار التشغيل.", "expected_source_id": "S1", "semantic_relevant": true},
+    {"case_id": "CAL-PARA", "split": "calibration", "kind": "academic_paraphrase", "text": "يساعد التخطيط المبكر والتعاون بين المؤسسات المختصة على مواجهة مشكلات المطارات وحماية الركاب واستدامة العمل.", "expected_source_id": "S1", "semantic_relevant": true},
+    {"case_id": "CAL-TOPIC", "split": "calibration", "kind": "same_topic_different_claim", "text": "تركز المطارات الصغيرة على زيادة المتاجر التجارية لجذب المسافرين في مواسم العطلات.", "expected_source_id": null, "semantic_relevant": false},
+    {"case_id": "CAL-UNRELATED", "split": "calibration", "kind": "unrelated", "text": "تعتمد الزراعة الصحراوية على الري بالتنقيط والأسمدة العضوية لتحسين إنتاج المحاصيل.", "expected_source_id": null, "semantic_relevant": false},
+    {"case_id": "HOLD-SUBSTITUTION", "split": "held_out", "kind": "word_substitution", "text": "اعتمدت الدراسة المنهج الوصفي والتحليلي في جمع المعلومات وترتيبها وشرح الروابط بين المتغيرات.", "expected_source_id": "S2", "semantic_relevant": true},
+    {"case_id": "HOLD-PARA", "split": "held_out", "kind": "academic_paraphrase", "text": "تقلل مصادر الرياح والشمس الغازات الملوثة وتوسع بدائل توليد الكهرباء داخل المناطق الحضرية.", "expected_source_id": "S3", "semantic_relevant": true},
+    {"case_id": "HOLD-REORDER", "split": "held_out", "kind": "reordered", "text": "تيسر المكتبات الإلكترونية الوصول إلى المعرفة الموثقة وتحفظ أطروحات الجامعات للباحثين.", "expected_source_id": "S4", "semantic_relevant": true},
+    {"case_id": "HOLD-TERMINOLOGY", "split": "held_out", "kind": "shared_terminology", "text": "تبحث الجامعة في أخلاقيات استخدام الذكاء الاصطناعي في تقييم الواجبات المنزلية.", "expected_source_id": null, "semantic_relevant": false},
+    {"case_id": "HOLD-CONTRADICTION", "split": "held_out", "kind": "contradictory_claim", "text": "لا يفيد الذكاء الاصطناعي في تخصيص التعليم ولا يمكنه تحليل أداء الطلبة.", "expected_source_id": null, "semantic_relevant": false},
+    {"case_id": "HOLD-CITED", "split": "held_out", "kind": "cited_text", "text": "يوفر الذكاء الاصطناعي أدوات لتخصيص التعلم وتحليل أداء الطلاب في التعليم الجامعي (محمد، 2024).", "expected_source_id": "S5", "semantic_relevant": true}
+  ]
+}

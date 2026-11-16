@@ -50,16 +50,21 @@ def save_report(
         review_status = mapped_rev
 
     legacy_status_val = status or derive_legacy_status(scan_status, review_status)
-    report_json_str = json.dumps(report_dict, ensure_ascii=False)
-
     with get_session() as session:
         rep = session.query(LegacyReport).filter(LegacyReport.id == report_id).first()
+        if rep and rep.artifact_status == 'finalized':
+            logger.warning(f"محاولة تحديث تقرير معتمد مسبقاً تم تجاهلها للحفاظ على النزاهة: {report_id}")
+            return
+        stored_report = dict(report_dict)
+        if file_path:
+            from pathlib import Path
+            source = Path(file_path)
+            if source.is_file():
+                from app.services.integrity_service import compute_stream_sha256
+                stored_report['source_sha256'] = compute_stream_sha256(source)[0]
+        report_json_str = json.dumps(stored_report, ensure_ascii=False)
         if rep:
             # حماية التقرير المعتمد من التعديل الصامت للمقاييس
-            if rep.artifact_status == 'finalized':
-                logger.warning(f"محاولة تحديث تقرير معتمد مسبقاً تم تجاهلها للحفاظ على النزاهة: {report_id}")
-                return
-
             rep.title = title
             rep.author = author
             rep.overall_pct = overall_pct
@@ -700,35 +705,61 @@ def get_pending_initial_reviews_count() -> int:
         return session.query(LegacyReport).filter(LegacyReport.review_status == ReviewStatus.PENDING_REVIEW.value).count()
 
 
-def submit_report_to_admin(report_id: str, employee_name: str, notes: str):
+def submit_report_to_admin(report_id: str, employee_name: str, notes: str) -> bool:
     """إرسال بحث من موظف لمدير النظام للاعتماد."""
     with get_session() as session:
-        rep = session.query(LegacyReport).filter(LegacyReport.id == report_id).first()
-        if rep:
-            rep.review_status = ReviewStatus.PENDING_REVIEW.value
-            rep.status = 'بانتظار الفحص الأولي'
-            rep.submitted_by = employee_name
-            rep.submitted_notes = notes
+        pending = ReviewStatus.PENDING_REVIEW.value
+        updated = session.query(LegacyReport).filter(
+            LegacyReport.id == report_id,
+            LegacyReport.artifact_status == 'draft',
+            LegacyReport.scan_status == ScanStatus.COMPLETED.value,
+            LegacyReport.review_status.in_((pending, ReviewStatus.REJECTED.value)),
+        ).update({LegacyReport.review_status: pending, LegacyReport.status: 'بانتظار الفحص الأولي',
+                  LegacyReport.submitted_by: employee_name, LegacyReport.submitted_notes: notes},
+                 synchronize_session=False)
+        if not updated:
+            return False
 
-            from app.models.research_schema import Research
-            res = session.query(Research).filter(Research.report_id == report_id).first()
-            if res:
-                res.review_status = ReviewStatus.PENDING_REVIEW.value
+        from app.models.research_schema import Research
+        res = session.query(Research).filter(Research.report_id == report_id).first()
+        if res:
+            res.review_status = pending
+        return True
 
 
-def update_report_latest_pdf(report_id: str, file_path: str, full_text: str):
+def update_report_latest_pdf(report_id: str, file_path: str, full_text: str, *, require_preliminary: bool = False) -> bool:
     """تحديث ملف الـ PDF النهائي للبحث المقبول مبدئياً."""
     with get_session() as session:
         rep = session.query(LegacyReport).filter(LegacyReport.id == report_id).first()
-        if rep:
-            rep.file_path = file_path
-            try:
-                data = json.loads(rep.report_json)
-                data['final_file_path'] = file_path
-                data['final_full_text'] = full_text
-                rep.report_json = json.dumps(data, ensure_ascii=False)
-            except Exception:
-                pass
+        if not rep:
+            return False
+        from pathlib import Path
+        from app.services.integrity_service import compute_stream_sha256
+        source = Path(file_path) if file_path else None
+        source_hash = compute_stream_sha256(source)[0] if source and source.is_file() else None
+        try:
+            data = json.loads(rep.report_json)
+        except (TypeError, ValueError):
+            return False
+        data['final_file_path'] = file_path
+        data['final_full_text'] = full_text
+        if source_hash:
+            data['source_sha256'] = source_hash
+        else:
+            data.pop('source_sha256', None)
+
+        report_query = session.query(LegacyReport).filter(
+            LegacyReport.id == report_id, LegacyReport.report_json == rep.report_json,
+        )
+        if require_preliminary:
+            report_query = report_query.filter(
+                LegacyReport.artifact_status == 'draft',
+                LegacyReport.review_status == ReviewStatus.PRELIMINARY_ACCEPTED.value,
+            )
+        return bool(report_query.update(
+            {LegacyReport.file_path: file_path, LegacyReport.report_json: json.dumps(data, ensure_ascii=False)},
+            synchronize_session=False,
+        ))
 
 
 # إدارة مهام الفحص في الخلفية
@@ -884,6 +915,7 @@ def get_report_summary(report_id: str) -> Optional[dict]:
             'cheating': full_data.get('cheating', {}),
             'page_limit_alert': full_data.get('page_limit_alert', {}),
             'ai_analysis': full_data.get('ai_analysis', {}),
+            'plagiarism_analysis': full_data.get('plagiarism_analysis', {'status': rep.scan_status or 'completed'}),
             'settings_snapshot': full_data.get('settings_snapshot', {}),
             'is_combined_thesis': full_data.get('is_combined_thesis', False),
             'thesis_id': rep.thesis_id or full_data.get('thesis_id'),
@@ -891,6 +923,7 @@ def get_report_summary(report_id: str) -> Optional[dict]:
             'part_summaries': full_data.get('part_summaries', []),
             'file_count': full_data.get('file_count', 1),
             'file_names': full_data.get('file_names', []),
+            'ocr_mode': full_data.get('ocr_mode', 'accurate'),
             'research_id': rep.research_id,
             'scan_execution_id': rep.scan_execution_id or rep.id,
             'revision_number': rep.revision_number or 1,

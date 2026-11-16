@@ -1,0 +1,128 @@
+{
+  "startup_factory_seconds": 0.15860520000569522,
+  "baseline_process_rss": 716767232,
+  "available_ram_before": 8608522240,
+  "total_ram": 34011582464,
+  "runs": [
+    {
+      "pages": 10,
+      "nominal_words": 1000,
+      "pdf_bytes": 2136211,
+      "total_request_seconds": 154.93257350003114,
+      "extracted_words": 1000,
+      "extracted_characters": 7300,
+      "extraction_seconds": 0.3959379000007175,
+      "plagiarism_seconds": 5.96006720000878,
+      "torch_import_seconds": 6.89999433234334e-06,
+      "transformers_import_seconds": 140.76383520005038,
+      "thread_configuration_seconds": 0.004657800018321723,
+      "artifact_verification_seconds": 0.6860301000415348,
+      "source_asset_verification_seconds": 1.7877891000243835,
+      "tokenizer_load_seconds": 0.4710316000273451,
+      "model_file_load_seconds": 1.3454560000100173,
+      "ai_load_seconds": 145.0735273999744,
+      "ai_seconds": 2.8569916000124067,
+      "ai_paragraphs": 10,
+      "ai_tokens": 1020,
+      "report_persistence_seconds": 0.04422010004054755,
+      "overall_pct": 0.0,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "pages": 50,
+      "nominal_words": 5000,
+      "pdf_bytes": 10680412,
+      "total_request_seconds": 11.146899899991695,
+      "extracted_words": 5000,
+      "extracted_characters": 36500,
+      "extraction_seconds": 0.635942300024908,
+      "plagiarism_seconds": 0.8052720999694429,
+      "ai_load_seconds": 1.400010660290718e-06,
+      "ai_seconds": 9.292023399961181,
+      "ai_paragraphs": 50,
+      "ai_tokens": 5100,
+      "report_persistence_seconds": 0.03225160000147298,
+      "overall_pct": 0.0,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "pages": 100,
+      "nominal_words": 10000,
+      "pdf_bytes": 21362271,
+      "total_request_seconds": 21.964406200044323,
+      "extracted_words": 10000,
+      "extracted_characters": 73000,
+      "extraction_seconds": 1.2668622999917716,
+      "plagiarism_seconds": 1.538927900022827,
+      "ai_load_seconds": 1.600012183189392e-06,
+      "ai_seconds": 18.336897300032433,
+      "ai_paragraphs": 100,
+      "ai_tokens": 10200,
+      "report_persistence_seconds": 0.08875370002351701,
+      "overall_pct": 0.0,
+      "production_ai_reason": "disabled"
+    }
+  ],
+  "stage_peaks": {
+    "startup": {
+      "peak_tree_rss": 716820480,
+      "peak_tree_private_bytes": 2103091200,
+      "peak_system_used": 25404821504
+    },
+    "fixture_generation": {
+      "peak_tree_rss": 1755770880,
+      "peak_tree_private_bytes": 3203452928,
+      "peak_system_used": 26497781760
+    },
+    "upload": {
+      "peak_tree_rss": 1710276608,
+      "peak_tree_private_bytes": 3172556800,
+      "peak_system_used": 26530988032
+    },
+    "extraction": {
+      "peak_tree_rss": 1740529664,
+      "peak_tree_private_bytes": 3186069504,
+      "peak_system_used": 26523058176
+    },
+    "plagiarism": {
+      "peak_tree_rss": 1707421696,
+      "peak_tree_private_bytes": 3158781952,
+      "peak_system_used": 26558586880
+    },
+    "ai_load": {
+      "peak_tree_rss": 1707421696,
+      "peak_tree_private_bytes": 3158781952,
+      "peak_system_used": 26564083712
+    },
+    "ai_inference": {
+      "peak_tree_rss": 1707663360,
+      "peak_tree_private_bytes": 3159752704,
+      "peak_system_used": 26852405248
+    },
+    "report_processing": {
+      "peak_tree_rss": 1714290688,
+      "peak_tree_private_bytes": 3169251328,
+      "peak_system_used": 26495283200
+    },
+    "cleanup": {
+      "peak_tree_rss": 1475956736,
+      "peak_tree_private_bytes": 2920038400,
+      "peak_system_used": 26211921920
+    }
+  },
+  "after_cleanup_rss": 1475956736,
+  "process_cpu_seconds": 205.4375,
+  "elapsed_seconds": 191.7308777999715,
+  "limitations": [
+    "Flask test client, not network server",
+    "test authentication/CSRF compatibility mode",
+    "antivirus test double",
+    "isolated empty corpus",
+    "semantic and OCR disabled",
+    "synthetic PDFs; no DOCX measurement",
+    "model cached after first request; score outputs discarded"
+  ],
+  "corpus_import_seconds": 0.0,
+  "corpus_profile": "empty",
+  "sampling_interval": 0.02
+}

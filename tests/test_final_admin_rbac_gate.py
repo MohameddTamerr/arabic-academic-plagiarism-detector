@@ -35,6 +35,89 @@ def client(app_instance):
     return app_instance.test_client()
 
 
+def test_report_submission_and_latest_pdf_enforce_scope_and_review_state(client, monkeypatch):
+    username = 'submission_' + uuid.uuid4().hex[:8]
+    with get_db_session() as session:
+        user = User(username=username, password_hash='fixture', full_name='Test employee',
+                    role='employee', department='acceptance-unit', is_active=1)
+        session.add(user)
+        session.flush()
+        user_id = user.id
+    with client.session_transaction() as sess:
+        sess.update(user_id=user_id, role='employee', username=username)
+
+    prefix = uuid.uuid4().hex[:8]
+    for suffix, category, state in (
+        ('foreign', 'other-unit', 'pending_review'),
+        ('final', 'acceptance-unit', 'final_accepted'),
+        ('draft', 'acceptance-unit', 'pending_review'),
+    ):
+        report_repo.save_report(f'{prefix}-{suffix}', suffix, 0, 0, 0, {},
+                                category=category, review_status=state)
+
+    for endpoint in ('submit_to_admin', 'upload_latest_pdf'):
+        assert client.post(f'/api/reports/{prefix}-foreign/{endpoint}').status_code == 403
+        assert client.post(f'/api/reports/{prefix}-final/{endpoint}').status_code == 409
+    assert report_repo.get_report(f'{prefix}-final')['review_status'] == 'final_accepted'
+
+    from app.routes import scan_routes
+    from app.repositories import batch_repo
+    from app.services import scan_service
+
+    foreign = report_repo.get_report(f'{prefix}-foreign')
+    task = {'status': 'completed', 'result': foreign}
+    monkeypatch.setattr(scan_routes, 'get_scan_status', lambda *_: task)
+    monkeypatch.setattr(scan_service, 'get_scan_status', lambda *_: task)
+    monkeypatch.setattr(batch_repo, 'get_batch_item_report_id', lambda *_: foreign['id'])
+    monkeypatch.setattr(batch_repo, 'get_research', lambda *_: {'scan_job_id': 'fixture'})
+    for url in ('/api/tasks/fixture', '/api/batch/fixture/item/1/report', '/api/thesis/1/status'):
+        assert client.get(url).status_code == 403
+
+    response = client.post(f'/api/reports/{prefix}-draft/submit_to_admin',
+                           json={'employee_name': 'spoofed identity', 'notes': 'acceptance fixture'})
+    assert response.status_code == 200
+    assert report_repo.get_report(f'{prefix}-draft')['submitted_by'] == username
+
+
+def test_live_scan_and_batches_hide_other_departments(client, monkeypatch):
+    from app.repositories import batch_repo
+    from app.routes import scan_routes
+    from app.services import job_queue_service
+
+    suffix = uuid.uuid4().hex[:8]
+    owner = f'owner_{suffix}'
+    other = f'other_{suffix}'
+    same_unit = f'same_unit_{suffix}'
+    user_ids = {}
+    with get_db_session() as session:
+        for username, department in ((owner, 'law-unit'), (same_unit, 'law-unit'), (other, 'health-unit')):
+            user = User(username=username, password_hash='fixture', full_name=username,
+                        role='employee', department=department, is_active=1)
+            session.add(user)
+            session.flush()
+            user_ids[username] = user.id
+
+    batch_id = batch_repo.create_batch(created_by=owner, label=f'Batch {suffix}')
+    research_id = batch_repo.create_research(title=f'Research {suffix}', created_by=owner, batch_id=batch_id)
+    batch_repo.add_batch_item(batch_id, research_id, 0)
+    task_id = f'task-{suffix}'
+    job_queue_service.enqueue_job(job_type=job_queue_service.JobType.SCAN, payload={},
+                                  requested_by=owner, custom_job_id=task_id)
+    monkeypatch.setattr(scan_routes, 'get_scan_status', lambda *_: {'status': 'running', 'file_name': 'private.pdf'})
+    direct_urls = (f'/api/tasks/{task_id}', f'/api/batch/{batch_id}', f'/api/thesis/{research_id}/status')
+
+    for username, expected in ((owner, 200), (same_unit, 200), (other, 403)):
+        with client.session_transaction() as sess:
+            sess.clear()
+            sess.update(user_id=user_ids[username], role='employee', username=username)
+        for url in direct_urls:
+            assert client.get(url).status_code == expected, url
+        for route, key in (('researches', 'researches'), ('batches', 'batches')):
+            entries = client.get(f'/api/{route}?q={suffix}').get_json()[key]
+            assert bool(entries) == (expected == 200)
+    assert client.post(f'/api/batch/{batch_id}/item/{research_id}/retry').status_code == 403
+
+
 def test_rbac_permission_matrix_authoritative():
     """Verify authoritative permission mapping for all institutional roles."""
     # EMPLOYEE
@@ -416,6 +499,13 @@ def test_idor_department_scoping_protection(client):
 
 def test_thesis_weighted_aggregation_math():
     """Verify that multi-part thesis overall plagiarism uses weighted analyzable words, not arithmetic average."""
+    import config
+    # The session-scoped test database retains these parts for later backup tests.
+    # Provide real, isolated source files rather than dangling placeholder paths.
+    marker = uuid.uuid4().hex
+    part_paths = [config.TEMP_UPLOAD_DIR / f'{marker}_part{i}.docx' for i in (1, 2)]
+    for path in part_paths:
+        path.write_bytes(b'weighted aggregation fixture')
     # Part 1: 1000 words, 500 copied (50%)
     # Part 2: 9000 words, 100 copied (1.11%)
     # Arithmetic average: (50 + 1.11) / 2 = 25.55%
@@ -460,7 +550,7 @@ def test_thesis_weighted_aggregation_math():
             sort_order=1,
             original_filename="p1.docx",
             stored_filename="stored_p1.docx",
-            file_path="p1.docx",
+            file_path=str(part_paths[0]),
             scan_status="completed",
             report_id=rep1_id,
             total_words=1000,
@@ -479,7 +569,7 @@ def test_thesis_weighted_aggregation_math():
             sort_order=2,
             original_filename="p2.docx",
             stored_filename="stored_p2.docx",
-            file_path="p2.docx",
+            file_path=str(part_paths[1]),
             scan_status="completed",
             report_id=rep2_id,
             total_words=9000,

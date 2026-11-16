@@ -321,10 +321,10 @@ class TrayController:
                     "هل أنت متأكد من رغبتك في إيقاف المنظومة بالكامل والخروج؟\n\nسيتم تجفيف مهام العمال وحفظ كافة المعاملات بأمان."
                 )
                 if confirm:
-                    self.stop()
                     self.controller.stop()
+                    self.stop()
                     root.destroy()
                     sys.exit(0)
                 root.destroy()
-            except Exception:
-                pass
+            except Exception as exc:
+                logger.error('Shutdown incomplete; tray remains available for retry: %s', exc)

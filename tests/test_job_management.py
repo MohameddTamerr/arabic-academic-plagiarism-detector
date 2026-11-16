@@ -640,7 +640,7 @@ def _mp_backup_worker_fn(worker_id: int, lock_file_str: str, return_list):
     acquired = lock.acquire(blocking=False)
     if acquired:
         t_enter = time.time()
-        time.sleep(0.15)
+        time.sleep(0.6)  # كافٍ لضمان بقاء القفل محجوزاً أثناء بدء العملية الثانية على ويندوز
         t_exit = time.time()
         lock.release()
         return_list.append((worker_id, True, t_enter, t_exit))
@@ -1250,7 +1250,8 @@ def test_cross_process_ocr_concurrency_bounding_multiprocess(tmp_path):
     assert not os.path.exists(lock_file)
 
 
-def test_cross_process_ocr_crash_recovery(tmp_path):
+@pytest.mark.parametrize('trial',range(5))
+def test_cross_process_ocr_crash_recovery(tmp_path,trial):
     """38. التحقق من التعافي التلقائي لقفل OCR عند انهيار العملية المالكة (Dead PID recovery) دون الحاجة لتدخل يدوي."""
     from pathlib import Path
     from plagiarism_detector.extraction.ocr_engine import CrossProcessOcrLock
@@ -1258,11 +1259,21 @@ def test_cross_process_ocr_crash_recovery(tmp_path):
     ready_evt = multiprocessing.Event()
 
     # إطلاق عملية تحجز القفل ثم تنهار فوراً
-    p_crash = multiprocessing.Process(target=_mp_crashing_ocr_holder_fn, args=(lock_file, ready_evt))
+    from tests.ocr_spawn_fixture import crash_holder
+    target=(_mp_crashing_ocr_holder_fn if os.environ.get('STAGE8K_LEGACY_OCR_TARGET')=='1' else crash_holder)
+    p_crash = multiprocessing.Process(target=target, args=(lock_file, ready_evt))
+    started=time.perf_counter()
     p_crash.start()
 
-    ready_evt.wait(timeout=5)
-    p_crash.join(timeout=5)
+    try:
+        assert ready_evt.wait(timeout=5), 'OCR fixture did not initialize within its existing deadline'
+        ready_seconds=time.perf_counter()-started
+        p_crash.join(timeout=5)
+    finally:
+        if p_crash.is_alive():
+            p_crash.terminate();p_crash.join(timeout=5)
+    if os.environ.get('STAGE8K_OCR_TIMINGS')=='1':
+        print(json.dumps({'trial':trial,'ready_seconds':ready_seconds,'exit_seconds':time.perf_counter()-started,'legacy_target':target is _mp_crashing_ocr_holder_fn}))
     assert p_crash.exitcode == 0
     assert os.path.exists(lock_file)
 

@@ -62,6 +62,9 @@ def test_dual_channel_retrieval_and_top_k_contract():
     assert len(candidates) > 0
     # التحقق من أن أعلى المرشحين يحتوي على الكلمات المفتاحية
     assert all(isinstance(c_id, int) for c_id in candidates)
+    explained = index.search_candidates(query, top_k=3, include_scores=True)
+    assert explained and isinstance(explained[0][0], int)
+    assert isinstance(explained[0][1], float)
 
 
 def test_incremental_add_and_remove():

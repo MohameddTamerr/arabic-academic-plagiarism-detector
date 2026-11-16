@@ -17,7 +17,6 @@ import io
 import json
 import math
 import uuid
-import time
 import shutil
 import hashlib
 import logging
@@ -28,7 +27,7 @@ from typing import Optional, Dict, Any, List, Set, Union, Tuple
 
 logger = logging.getLogger(__name__)
 
-INDEX_SCHEMA_VERSION = "2.1.0"
+INDEX_SCHEMA_VERSION = "3.0.0"
 
 
 class RetrievalIndex(ABC):
@@ -39,7 +38,8 @@ class RetrievalIndex(ABC):
         self,
         query_input: Union[str, List[str]],
         top_k: int = 50,
-        allowed_doc_ids: Optional[Set[int]] = None
+        allowed_doc_ids: Optional[Set[int]] = None,
+        include_scores: bool = False,
     ) -> List[int]:
         """استرجاع أعلى top_k مقطع مرجعي مرشح للمطابقة الدقيقة."""
         pass
@@ -79,12 +79,20 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
         self,
         index_dir: Optional[Path] = None,
         corpus_version: str = "REF-2026-000001",
-        fingerprint: str = ""
+        fingerprint: str = "",
+        segment_fingerprint: str = "",
+        normalization_version: str = "",
+        bm25_k1: float = 1.2,
+        bm25_b: float = 0.75,
     ):
         self.index_dir = Path(index_dir) if index_dir else None
         self.corpus_version = corpus_version
         self.fingerprint = fingerprint
+        self.segment_fingerprint = segment_fingerprint
+        self.normalization_version = normalization_version
         self.index_version = INDEX_SCHEMA_VERSION
+        self.bm25_k1 = float(bm25_k1)
+        self.bm25_b = float(bm25_b)
 
         # القوائم المقلوبة: كلمة/ngram -> قائمة معرفات المقاطع
         self.word_postings: Dict[str, List[int]] = defaultdict(list)
@@ -95,13 +103,19 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
         
         # بيانات وصفية للمقاطع: seg_idx -> (doc_id, page_num, seg_num, word_count, words_set)
         self.segments_metadata: Dict[int, Dict[str, Any]] = {}
+        self.document_fingerprints: Dict[int, str] = {}
         
         self.total_segments: int = 0
         self.total_documents: int = 0
         self.built_at: Optional[str] = None
         self.is_stale: bool = False
 
-    def add_document(self, doc_id: int, segments_data: List[Dict[str, Any]]) -> None:
+    def add_document(
+        self,
+        doc_id: int,
+        segments_data: List[Dict[str, Any]],
+        document_fingerprint: str = "",
+    ) -> None:
         """إضافة مستند بمقاطعه تدريجياً وتحديث القوائم المقلوبة."""
         if doc_id in self.doc_to_segments:
             self.remove_document(doc_id)
@@ -118,12 +132,19 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
 
             self.total_segments += 1
             doc_seg_ids.add(seg_idx)
+            term_frequencies = defaultdict(int)
+            for word in words:
+                if len(word) >= 3:
+                    term_frequencies[word] += 1
             self.segments_metadata[seg_idx] = {
                 'doc_id': doc_id,
                 'page_number': page_num,
                 'segment_number': seg_num,
                 'word_count': len(words),
-                'words': list(set(words))
+                'words': list(set(words)),
+                # Persists true term frequencies so a reloaded index has the
+                # same BM25 ordering as a newly built one.
+                'term_frequencies': dict(term_frequencies),
             }
 
             # 1. القناة المعجمية (الكلمات النادرة بطول 3 أحرف فأكثر)
@@ -139,6 +160,7 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
                     self.char_ngrams_postings[cng].append(seg_idx)
 
         self.doc_to_segments[doc_id] = doc_seg_ids
+        self.document_fingerprints[doc_id] = document_fingerprint
 
     def remove_document(self, doc_id: int) -> None:
         """إزالة مستند ومقاطعه من القوائم المقلوبة تدريجياً."""
@@ -165,14 +187,16 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
                         del self.char_ngrams_postings[cng]
 
         del self.doc_to_segments[doc_id]
+        self.document_fingerprints.pop(doc_id, None)
         self.total_documents = max(0, self.total_documents - 1)
 
     def search_candidates(
         self,
         query_input: Union[str, List[str]],
         top_k: int = 50,
-        allowed_doc_ids: Optional[Set[int]] = None
-    ) -> List[int]:
+        allowed_doc_ids: Optional[Set[int]] = None,
+        include_scores: bool = False,
+    ) -> Union[List[int], List[Tuple[int, float]]]:
         """
         استرجاع المرشحين ثنائي المرحلة عالي الدقة والسرعة:
         - المرحلة 1: تصفية القوائم المقلوبة واحتساب أوزان BM25-IDF وتعزيز التطابق الإحداثي (Coordinate Boost).
@@ -190,6 +214,10 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
         scores: Dict[int, float] = defaultdict(float)
         matched_terms_count: Dict[int, int] = defaultdict(int)
         n_total = max(self.total_segments, 1)
+        avgdl = (
+            sum(int(meta.get('word_count', 0)) for meta in self.segments_metadata.values()) / n_total
+            if self.segments_metadata else 1.0
+        )
 
         # 1. المرحلة الأولى: استعلام القناة المعجمية (الكلمات)
         q_words = [w for w in set(words) if len(w) >= 3 and w in self.word_postings]
@@ -210,7 +238,15 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
                     meta = self.segments_metadata.get(seg_idx)
                     if not meta or meta['doc_id'] not in allowed_doc_ids:
                         continue
-                scores[seg_idx] += idf_weight
+                meta = self.segments_metadata.get(seg_idx, {})
+                # Legacy pre-v3 metadata has no frequencies. Treat it as one
+                # occurrence; the Stage 3 reconciliation path will rebuild it.
+                tf = int(meta.get('term_frequencies', {}).get(w, 1))
+                dl = max(int(meta.get('word_count', 0)), 1)
+                denominator = tf + self.bm25_k1 * (
+                    1.0 - self.bm25_b + self.bm25_b * (dl / max(avgdl, 1.0))
+                )
+                scores[seg_idx] += idf_weight * ((tf * (self.bm25_k1 + 1.0)) / denominator)
                 matched_terms_count[seg_idx] += 1
 
         # 2. دعم القناة المورفولوجية للكلمات النادرة جداً أو القصيرة عند قلة المرشحين
@@ -264,8 +300,13 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
 
         # الترتيب النهائي واقتطاع أعلى top_k فقط (K <= 50)
         reranked_pool.sort(key=lambda x: x[1], reverse=True)
-        final_top = [x[0] for x in reranked_pool[:top_k]]
-        return final_top
+        final_top = reranked_pool[:top_k]
+        # Retrieval scores are deliberately exposed only as ranking evidence.
+        # They are not plagiarism percentages and are never passed to report
+        # scoring or Stage 2 alignment.
+        if include_scores:
+            return final_top
+        return [x[0] for x in final_top]
 
     def save(self, target_dir: Path) -> Path:
         """
@@ -296,11 +337,18 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
             with open(staging_dir / "doc_to_segments.json", "w", encoding="utf-8") as f:
                 json.dump(doc_data, f)
 
+            doc_fingerprints = {str(k): v for k, v in self.document_fingerprints.items()}
+            with open(staging_dir / "document_fingerprints.json", "w", encoding="utf-8") as f:
+                json.dump(doc_fingerprints, f)
+
             # 5. احتساب البصمات الإلكترونية للملفات
             manifest_data = {
                 "index_version": self.index_version,
                 "corpus_version": self.corpus_version,
                 "corpus_fingerprint": self.fingerprint,
+                "segment_fingerprint": self.segment_fingerprint,
+                "normalization_version": self.normalization_version,
+                "bm25": {"k1": self.bm25_k1, "b": self.bm25_b},
                 "built_at": datetime_utcnow_iso(),
                 "total_documents": self.total_documents,
                 "total_segments": self.total_segments,
@@ -311,6 +359,7 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
                     "postings_cng": compute_file_hash(staging_dir / "postings_cng.json"),
                     "segments_metadata": compute_file_hash(staging_dir / "segments_metadata.json"),
                     "doc_to_segments": compute_file_hash(staging_dir / "doc_to_segments.json"),
+                    "document_fingerprints": compute_file_hash(staging_dir / "document_fingerprints.json"),
                 }
             }
 
@@ -374,9 +423,18 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
                 d_raw = json.load(f)
                 self.doc_to_segments = defaultdict(set, {int(k): set(v) for k, v in d_raw.items()})
 
+            with open(index_dir / "document_fingerprints.json", "r", encoding="utf-8") as f:
+                fp_raw = json.load(f)
+                self.document_fingerprints = {int(k): str(v) for k, v in fp_raw.items()}
+
             self.index_version = manifest.get("index_version", INDEX_SCHEMA_VERSION)
             self.corpus_version = manifest.get("corpus_version", "")
             self.fingerprint = manifest.get("corpus_fingerprint", "")
+            self.segment_fingerprint = manifest.get("segment_fingerprint", "")
+            self.normalization_version = manifest.get("normalization_version", "")
+            bm25 = manifest.get("bm25", {})
+            self.bm25_k1 = float(bm25.get("k1", self.bm25_k1))
+            self.bm25_b = float(bm25.get("b", self.bm25_b))
             self.total_documents = manifest.get("total_documents", len(self.doc_to_segments))
             self.total_segments = manifest.get("total_segments", len(self.segments_metadata))
             self.built_at = manifest.get("built_at")
@@ -396,6 +454,9 @@ class LocalDiskRetrievalIndex(RetrievalIndex):
             "index_version": self.index_version,
             "corpus_version": self.corpus_version,
             "corpus_fingerprint": self.fingerprint,
+            "segment_fingerprint": self.segment_fingerprint,
+            "normalization_version": self.normalization_version,
+            "bm25": {"k1": self.bm25_k1, "b": self.bm25_b},
             "total_documents": self.total_documents,
             "total_segments": self.total_segments,
             "vocabulary_size": len(self.word_postings),

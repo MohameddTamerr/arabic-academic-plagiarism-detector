@@ -293,3 +293,13 @@ def test_employee_first_login_is_a_locked_modal_not_inline_content(template_cont
     assert 'shell.inert = locked;' in template_content
     assert "switchView(normalizeUserRole(currentUser?.role) === 'employee' ? 'upload' : 'dashboard');" in template_content
     assert "overlay.setAttribute('aria-hidden', 'false');" in template_content
+
+
+def test_scan_mode_buttons_submit_selected_ocr_profile(template_content):
+    """الفحص السريع والدقيق يرسلان نموذج OCR المختار لكل مسارات الرفع."""
+    assert 'id="btn-start-fast-analysis" hidden' in template_content
+    assert "onclick=\"startAnalysis('fast')\"" in template_content
+    assert 'id="btn-start-analysis" onclick="startAnalysis()"' in template_content
+    assert "async function startAnalysis(requestedOcrMode = currentOcrModeSelection)" in template_content
+    assert template_content.count("formData.append('ocr_mode', ocrMode);") == 3
+    assert 'id="report-ocr-mode-badge"' in template_content

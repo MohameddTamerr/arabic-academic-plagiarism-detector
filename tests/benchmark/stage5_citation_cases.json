@@ -1,0 +1,19 @@
+{
+  "dataset_id": "arabic-citation-intelligence-synthetic-v1",
+  "origin": "developer-authored synthetic fixtures; not independently annotated academic material",
+  "bibliography_segments": [
+    {"text": "قائمة المراجع", "is_bibliography": true},
+    {"text": "1. درويش، 2023. الأمن الإنساني. دار المعرفة.", "is_bibliography": true},
+    {"text": "2. Smith & Jones, 2020. Mixed Methods. Academic Press. doi:10.1000/test", "is_bibliography": true},
+    {"text": "3. العلي، 2020. الإدارة العامة. الناشر الأول.", "is_bibliography": true},
+    {"text": "4. العلي، 2020. إدارة المؤسسات. الناشر الثاني.", "is_bibliography": true}
+  ],
+  "cases": [
+    {"id": "C1", "text": "يشير الباحث إلى أهمية الأمن (درويش، 2023، ص. 45).", "expected_count": 1, "expected_link": "LINKED"},
+    {"id": "C2", "text": "تؤكد الأدبيات (Smith & Jones, 2020, p. 11) أهمية المنهج المختلط.", "expected_count": 1, "expected_link": "LINKED"},
+    {"id": "C3", "text": "تتباين الآراء (العلي، 2020) حول التنظيم.", "expected_count": 1, "expected_link": "AMBIGUOUS"},
+    {"id": "C4", "text": "وفقاً لـ(الشمري، 2019) تتطور السياسات.", "expected_count": 1, "expected_link": "UNRESOLVED"},
+    {"id": "C5", "text": "يوثق الباحث النتائج [١، ٢، ص. ٥].", "expected_count": 1, "expected_link": "AMBIGUOUS"},
+    {"id": "C6", "text": "بدأ البرنامج الوطني في عام (2020) وفق الخطة.", "expected_count": 0, "expected_link": null}
+  ]
+}

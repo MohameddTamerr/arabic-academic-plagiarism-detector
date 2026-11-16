@@ -16,11 +16,24 @@ from app.services.paper_service import import_reference_paper
 from plagiarism_detector.extraction.page_extractor import extract_text
 from plagiarism_detector.preprocessing.cheating_detector import clean_cheating_text
 from plagiarism_detector.reporting.html_exporter import export_report_to_html
+from plagiarism_detector.ai_detection.analysis import public_ai_analysis
 from app.security.permissions import Permission
-from app.security.authorization import require_permission, get_authenticated_user, can_view_report
+from app.security.authorization import require_permission, get_authenticated_user, can_view_report, has_permission
 from app.errors.error_codes import ErrorCode
 
 report_bp = Blueprint('report_bp', __name__)
+
+
+def _reviewer_evidence_enabled() -> bool:
+    """Stage 6 remains off until its separate storage migration is approved."""
+    return bool(config.DEFAULT_SETTINGS.get('enable_reviewer_evidence_workflow', False))
+
+
+def _reviewer_evidence_disabled_response():
+    return jsonify({
+        'error': 'مسار مراجعة الشواهد غير مفعل حتى اعتماد ترحيل التخزين وصلاحياته.',
+        'code': 'REVIEWER_EVIDENCE_WORKFLOW_DISABLED',
+    }), 404
 
 
 @report_bp.route('/api/reports/<report_id>', methods=['GET'])
@@ -65,6 +78,8 @@ def get_report_route(report_id):
         report['user_role'] = actor.get('role', '')
         report['can_review'] = r in ('system_admin', 'senior_reviewer', 'reviewer', 'admin')
 
+    report['ai_analysis'] = public_ai_analysis(report.get('ai_analysis'))
+    report.setdefault('plagiarism_analysis', {'status': report.get('scan_status') or 'completed'})
     return jsonify(report)
 
 
@@ -109,6 +124,112 @@ def get_report_evidence_route(report_id):
         group_by_source=group_by_source
     )
     return jsonify(evidence_data)
+
+
+@report_bp.route('/api/reports/<report_id>/reviewer-evidence', methods=['GET'])
+@require_permission(Permission.REPORT_VIEW)
+def get_reviewer_evidence_route(report_id):
+    """Stage 6 review view; all source alternatives remain visible."""
+    if not _reviewer_evidence_enabled():
+        return _reviewer_evidence_disabled_response()
+    report = report_repo.get_report(report_id)
+    actor = get_authenticated_user()
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+    if not can_view_report(actor, report):
+        return jsonify({'error': 'غير مصرح', 'code': ErrorCode.AUTH_FORBIDDEN}), 403
+    from sqlalchemy.exc import SQLAlchemyError
+    from plagiarism_detector.reporting.reviewer_evidence import build_evidence_catalog, calculate_reviewer_adjusted_coverage
+    from app.services.reviewer_workflow_service import list_decisions
+    try:
+        with base_repo.get_session() as session:
+            decisions = list_decisions(session, report_id)
+    except SQLAlchemyError:
+        return jsonify({'error': 'مخزن قرارات المراجعة غير مهيأ بعد.', 'code': 'REVIEWER_STORAGE_NOT_MIGRATED'}), 503
+    return jsonify({
+        'report_id': report_id,
+        'raw_lexical_similarity_pct': report.get('raw_lexical_similarity_pct', report.get('overall_pct')),
+        'citation_aware_similarity_pct': report.get('citation_adjusted_similarity_pct', report.get('overall_pct')),
+        'semantic_candidate_evidence_is_non_counting': True,
+        'evidence': build_evidence_catalog(report),
+        'decisions': decisions,
+        'reviewer_adjusted': calculate_reviewer_adjusted_coverage(report, decisions),
+    })
+
+
+@report_bp.route('/api/reports/<report_id>/reviewer-evidence/<evidence_id>/decision', methods=['POST'])
+@require_permission(Permission.REVIEW_VIEW)
+def record_reviewer_evidence_decision_route(report_id, evidence_id):
+    """Append a permission-checked evidence decision; raw reports are immutable."""
+    if not _reviewer_evidence_enabled():
+        return _reviewer_evidence_disabled_response()
+    report = report_repo.get_report(report_id)
+    actor = get_authenticated_user()
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+    if not can_view_report(actor, report):
+        return jsonify({'error': 'غير مصرح', 'code': ErrorCode.AUTH_FORBIDDEN}), 403
+    data = request.get_json(silent=True) or request.form or {}
+    decision_type = str(data.get('decision_type') or '').upper()
+    required_permission = (
+        Permission.REVIEW_FINAL if decision_type == 'EXCLUDED_WITH_JUSTIFICATION' else
+        Permission.REVIEW_REJECT if decision_type == 'REJECTED' else
+        Permission.REVIEW_PRELIMINARY
+    )
+    if not has_permission(actor, required_permission):
+        return jsonify({'error': 'غير مصرح لاتخاذ هذا القرار', 'code': ErrorCode.AUTH_FORBIDDEN}), 403
+    if report.get('submitted_by_user_id') and actor and actor.get('id') == report.get('submitted_by_user_id'):
+        return jsonify({'error': 'لا يجوز للمستخدم مراجعة شواهد تقرير قام برفعه.', 'code': ErrorCode.AUTH_FORBIDDEN}), 403
+    from plagiarism_detector.reporting.reviewer_evidence import build_evidence_catalog, evidence_version
+    evidence = next((item for item in build_evidence_catalog(report) if item['evidence_id'] == evidence_id), None)
+    if not evidence:
+        return jsonify({'error': 'الشاهد غير موجود أو لا ينتمي إلى هذا الإصدار من التقرير'}), 404
+    if decision_type == 'EXCLUDED_WITH_JUSTIFICATION' and evidence['kind'] != 'lexical':
+        return jsonify({'error': 'لا يمكن استبعاد شاهد دلالي من التغطية المعجمية.'}), 400
+    if data.get('evidence_version') != evidence_version(report):
+        return jsonify({'error': 'إصدار الشاهد قديم؛ أعد تحميل التقرير.', 'code': 'STALE_EVIDENCE_VERSION'}), 409
+    idempotency_key = str(data.get('idempotency_key') or '')
+    if not idempotency_key:
+        return jsonify({'error': 'مفتاح منع التكرار مطلوب.'}), 400
+    from sqlalchemy.exc import SQLAlchemyError
+    from app.services.reviewer_workflow_service import record_decision, ReviewWorkflowError
+    try:
+        with base_repo.get_session() as session:
+            decision = record_decision(
+                session, report_id=report_id, evidence_id=evidence_id,
+                evidence_version=evidence_version(report), actor=actor or {},
+                decision_type=decision_type, justification=data.get('justification', ''),
+                source_ids=[str(evidence.get('source_id') or '')], idempotency_key=idempotency_key,
+                expected_previous_decision_id=data.get('expected_previous_decision_id'),
+                allow_other_reviewer_revision=has_permission(actor, Permission.REVIEW_FINAL),
+                request_id=request.headers.get('X-Request-ID', ''),
+            )
+    except ReviewWorkflowError as exc:
+        return jsonify({'error': str(exc), 'code': str(exc)}), 409 if str(exc) == 'STALE_DECISION_CONFLICT' else 400
+    except SQLAlchemyError:
+        return jsonify({'error': 'مخزن قرارات المراجعة غير مهيأ بعد.', 'code': 'REVIEWER_STORAGE_NOT_MIGRATED'}), 503
+    audit_service.record_event(
+        action='review.evidence_decision_recorded', category='review', user=actor,
+        object_type='evidence_review_decision', object_id=decision['id'], report_id=report_id,
+        research_id=report.get('research_id'), success=True,
+        metadata={'evidence_id': evidence_id, 'decision_type': decision_type, 'evidence_version': decision['evidence_version']},
+    )
+    return jsonify({'success': True, 'decision': decision}), 201
+
+
+@report_bp.route('/reports/<report_id>/review-dashboard', methods=['GET'])
+@require_permission(Permission.REVIEW_VIEW)
+def reviewer_evidence_dashboard(report_id):
+    """Small RTL dashboard shell; data and state changes stay on protected APIs."""
+    if not _reviewer_evidence_enabled():
+        return _reviewer_evidence_disabled_response()
+    report = report_repo.get_report(report_id)
+    actor = get_authenticated_user()
+    if not report:
+        return jsonify({'error': 'التقرير غير موجود'}), 404
+    if not can_view_report(actor, report):
+        return jsonify({'error': 'غير مصرح', 'code': ErrorCode.AUTH_FORBIDDEN}), 403
+    return render_template('reviewer_evidence.html', report_id=report_id, title=report.get('title', ''))
 
 
 @report_bp.route('/api/reports/<report_id>/sources', methods=['GET'])
@@ -207,18 +328,22 @@ def delete_report_route(report_id):
 def submit_to_admin(report_id):
     """إرسال بحث من موظف لمدير النظام للاعتماد والفحص الأولي."""
     data = request.get_json(silent=True) or request.form or {}
-    emp_name = data.get('employee_name', 'موظف الفحص').strip()
+    actor = get_authenticated_user()
+    emp_name = actor['username']
     notes = data.get('notes', '').strip()
 
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
-
-    report_repo.submit_report_to_admin(report_id, emp_name, notes)
+    if not can_view_report(actor, report):
+        return jsonify(error='غير مصرح بالوصول إلى هذا التقرير', code=ErrorCode.AUTH_FORBIDDEN), 403
+    if not report_repo.submit_report_to_admin(report_id, emp_name, notes):
+        return jsonify(error='حالة التقرير الحالية لا تسمح بإرساله للمراجعة.'), 409
 
     audit_service.record_event(
         action="review.submitted_to_admin",
         category="review",
+        user=actor,
         object_type="report",
         object_id=report_id,
         report_id=report_id,
@@ -568,6 +693,10 @@ def upload_latest_pdf(report_id):
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود'}), 404
+    if not can_view_report(get_authenticated_user(), report):
+        return jsonify(error='غير مصرح بالوصول إلى هذا التقرير', code=ErrorCode.AUTH_FORBIDDEN), 403
+    if report['review_status'] != 'preliminary_accepted' or report['artifact_status'] != 'draft':
+        return jsonify(error='يمكن تحديث ملف البحث المقبول مبدئياً فقط.'), 409
 
     if 'file' not in request.files or not request.files['file'].filename:
         return jsonify({'error': 'لم يتم اختيار ملف PDF جديد'}), 400
@@ -580,7 +709,7 @@ def upload_latest_pdf(report_id):
         file_stream=file,
         original_filename=orig_name,
         max_bytes=config.MAX_UPLOAD_BYTES,
-        allowed_extensions=config.ALLOWED_EXTENSIONS
+        allowed_extensions={'.pdf'}
     )
     final_res = upload_validation_service.finalize_validated_upload(
         validation_result=val_res,
@@ -592,7 +721,8 @@ def upload_latest_pdf(report_id):
     extracted_text = extract_text(str(save_path))
     cleaned = clean_cheating_text(extracted_text) if extracted_text else ''
 
-    report_repo.update_report_latest_pdf(report_id, str(save_path), cleaned)
+    if not report_repo.update_report_latest_pdf(report_id, str(save_path), cleaned, require_preliminary=True):
+        return jsonify(error='تغيرت حالة التقرير قبل حفظ ملف PDF.'), 409
 
     audit_service.record_event(
         action="research.latest_pdf_uploaded",

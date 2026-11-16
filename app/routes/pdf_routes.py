@@ -231,6 +231,25 @@ def view_pdf(kind, record_id, action):
         if status != 200:
             return jsonify(error='غير مصرح أو تعذر تحديد المستند وصفحاته'), status
         source_path = Path(value or '')
+        if value:
+            # Historical report JSON is immutable; restored multi-file paths are
+            # resolved through the separately stored, hash-verified mapping.
+            from app.services.backup_persistent_files import path_fingerprint, digest
+            from sqlalchemy import inspect, text
+            try:
+                with base_repo.get_session() as db:
+                    mapped=(db.execute(text('SELECT file_path,sha256 FROM restored_source_paths WHERE path_fingerprint=:key'),{'key':path_fingerprint(value)}).first()
+                            if inspect(db.get_bind()).has_table('restored_source_paths') else None)
+                if mapped:
+                    candidate=Path(mapped[0]).resolve()
+                    if candidate.is_relative_to(Path(config.STORAGE_ROOT).resolve()) and candidate.is_file() and digest(candidate)[0]==mapped[1]:
+                        source_path=candidate
+                    else:
+                        logger.warning('Restored source is missing or corrupt for %s',record_id)
+                        return jsonify(error='المستند المستعاد مفقود أو تالف'),404
+            except Exception:
+                logger.exception('Restored source mapping unavailable')
+                return jsonify(error='تعذر التحقق من المستند المستعاد'),503
         if not value or not source_path.is_file():
             logger.warning("PDF source is unavailable for %s record %s", kind, record_id)
             return jsonify(error='المستند الأصلي غير متاح لهذا السجل'), 404
@@ -404,10 +423,27 @@ def _get_text_rects(page, search_text, page_text=None, page_lines=None):
 
 
 def _get_segment_rects(segment, page, page_text=None, page_lines=None):
-    """Get rectangles for a single segment, with error tolerance."""
-    member_texts = segment.get('member_texts') or [
-        segment.get('text') or segment.get('suspect_text') or ''
-    ]
+    """Get rectangles for lexical spans; retain full-segment legacy fallback.
+
+    Stage 2 reports carry original-text span strings.  A span that cannot be
+    resolved in the rendered PDF produces no rectangle rather than highlighting
+    unmatched text.  Reports created before Stage 2 do not have the field and
+    keep their established full-segment behavior.
+    """
+    if 'alignment_evidence' in segment:
+        member_texts = []
+        for evidence in segment.get('alignment_evidence') or []:
+            if evidence.get('kind') != 'lexical':
+                continue
+            member_texts.extend(
+                span.get('suspicious_text', '') for span in evidence.get('spans') or []
+            )
+        if not member_texts:
+            return []
+    else:
+        member_texts = segment.get('member_texts') or [
+            segment.get('text') or segment.get('suspect_text') or ''
+        ]
     rects = []
     seen = set()
     for search_text in member_texts:

@@ -2,7 +2,7 @@
 """
 Tests for Phase 20 — Release Candidate Verification & Audit Suite.
 Validates:
-- Integrity of release_manifest.json and critical file SHA-256 hashes
+- Integrity of the current release source manifest and critical file SHA-256 hashes
 - Immutability of production default settings and thresholds
 - Version registry synchronization across core modules
 - Strict air-gapped zero-network invariants
@@ -13,6 +13,7 @@ Validates:
 import sys
 import json
 import hashlib
+import re
 from pathlib import Path
 import pytest
 
@@ -26,31 +27,28 @@ if str(_ROOT) not in sys.path:
 import config
 import app.versioning as versioning
 
-_MANIFEST_FILE = _ROOT / "release_manifest.json"
+_MANIFEST_FILE = _ROOT / "release_source_manifest.json"
 _DOCS_DIR = _ROOT / "docs"
 
 
 def test_release_manifest_integrity_and_hashes():
-    """Verify release_manifest.json exists and all critical file SHA-256 hashes match disk."""
+    """Verify the frozen release input hashes against the current source tree."""
     assert _MANIFEST_FILE.exists(), f"Missing manifest: {_MANIFEST_FILE}"
     with open(_MANIFEST_FILE, "r", encoding="utf-8") as f:
         manifest = json.load(f)
 
-    assert manifest["release_version"] in [
-        "v1.0.0-rc2",
-        "v1.1.0-ministry-db-alpha",
-        "v1.2.0-ministry-storage-retrieval-alpha",
-        "v1.3.0-ministry-distributed-processing-alpha",
-        "v1.4.0-ministry-final-validation-rc",
-        "v1.4.1-sqlite-portable-rc",
-        "v1.4.2-single-exe-user-test-rc"
-    ]
+    assert re.fullmatch(r"windows-final-acceptance-rc(?:[1-9][0-9]*)?", manifest["release_version"])
     assert "readiness_verdict" in manifest
-    assert manifest["application_version"] in [versioning.APPLICATION_VERSION, "2.5.0", "2.6.0", "2.7.0"]
-    assert manifest["engine_version"] in [versioning.ENGINE_VERSION, "1.3.0", "1.4.0", "1.5.0"]
+    assert manifest["application_version"] == versioning.APPLICATION_VERSION
+    assert manifest["engine_version"] == versioning.ENGINE_VERSION
 
     # Verify critical file SHA-256 hashes match disk
     hashes = manifest["critical_file_hashes_sha256"]
+    assert {
+        'config.py', 'templates/index.html', 'app/routes/report_routes.py',
+        'app/routes/scan_routes.py', 'app/routes/batch_routes.py',
+        'app/repositories/batch_repo.py', 'app/security/authorization.py',
+    } <= hashes.keys()
     for rel_path, expected_hash in hashes.items():
         file_path = _ROOT / rel_path
         assert file_path.exists(), f"Critical file missing: {rel_path}"

@@ -1,0 +1,628 @@
+{
+  "baseline": {
+    "mode": "BASELINE",
+    "benchmark_runtime_seconds": 4.208,
+    "average_sample_latency_ms": 14.229,
+    "peak_memory_mb": 11.106,
+    "stratum_1_deduplicated_overlap": {
+      "total_samples": 71,
+      "binary_plagiarism_metrics": {
+        "tp": 46,
+        "fp": 0,
+        "fn": 15,
+        "tn": 10,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.9229,
+          1.0
+        ],
+        "recall": 0.7541,
+        "recall_95ci": [
+          0.6332,
+          0.8449
+        ],
+        "f1_score": 0.8598,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.2775
+        ],
+        "false_negative_rate": 0.2459,
+        "fnr_95ci": [
+          0.1551,
+          0.3668
+        ],
+        "specificity": 1.0
+      },
+      "multi_class_metrics": {
+        "EXACT_COPY": {
+          "tp": 31,
+          "fp": 0,
+          "fn": 0,
+          "tn": 40,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0
+        },
+        "MODIFIED_COPY": {
+          "tp": 15,
+          "fp": 0,
+          "fn": 0,
+          "tn": 56,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0
+        },
+        "PARAPHRASE": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 56,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0
+        },
+        "ORIGINAL_UNRELATED": {
+          "tp": 10,
+          "fp": 15,
+          "fn": 0,
+          "tn": 46,
+          "precision": 0.4,
+          "recall": 1.0,
+          "f1_score": 0.5714
+        }
+      },
+      "macro_plagiarism_f1_exact_modified": 1.0,
+      "four_class_macro_f1": 0.6429,
+      "confusion_matrix": {
+        "EXACT_COPY": {
+          "EXACT_COPY": 31,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "MODIFIED_COPY": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 15,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "PARAPHRASE": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 15
+        },
+        "ORIGINAL_UNRELATED": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 10
+        }
+      }
+    },
+    "stratum_2_hard_academic": {
+      "total_samples": 10,
+      "binary_plagiarism_metrics": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 1,
+        "tn": 5,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.5101,
+          1.0
+        ],
+        "recall": 0.8,
+        "recall_95ci": [
+          0.3755,
+          0.9638
+        ],
+        "f1_score": 0.8889,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.4345
+        ],
+        "false_negative_rate": 0.2,
+        "fnr_95ci": [
+          0.0362,
+          0.6245
+        ],
+        "specificity": 1.0
+      },
+      "detailed_cases": [
+        {
+          "id": "hard_neg_law_01",
+          "discipline": "Law",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.2182,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_med_02",
+          "discipline": "Medicine",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.246,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_cs_03",
+          "discipline": "Computer Science",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.0535,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_islamic_04",
+          "discipline": "Islamic Studies",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.1981,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_economy_05",
+          "discipline": "Economics",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.3448,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_law_01",
+          "discipline": "Law",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "MODIFIED_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.6111,
+            "shingle_score": 0.6111,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_cs_02",
+          "discipline": "Computer Science",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "MODIFIED_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.6526,
+            "shingle_score": 0.6526,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_education_03",
+          "discipline": "Education",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": false,
+          "scores": {
+            "sequence_ratio": 0.5211,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_ocr_exact_01",
+          "discipline": "History",
+          "expected_class": "EXACT_COPY",
+          "predicted_class": "EXACT_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 1.0,
+            "shingle_score": 1.0,
+            "tfidf_score": 1.0
+          }
+        },
+        {
+          "id": "hard_exact_academic_02",
+          "discipline": "Political Science",
+          "expected_class": "EXACT_COPY",
+          "predicted_class": "EXACT_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.9898,
+            "shingle_score": 0.9898,
+            "tfidf_score": 1.0
+          }
+        }
+      ]
+    },
+    "stratum_3_full_323_overlap": {
+      "total_samples": 215,
+      "binary_plagiarism_metrics": {
+        "tp": 110,
+        "fp": 0,
+        "fn": 55,
+        "tn": 50,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.9663,
+          1.0
+        ],
+        "recall": 0.6667,
+        "recall_95ci": [
+          0.5917,
+          0.7341
+        ],
+        "f1_score": 0.8,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.0713
+        ],
+        "false_negative_rate": 0.3333,
+        "fnr_95ci": [
+          0.2659,
+          0.4083
+        ],
+        "specificity": 1.0
+      },
+      "confusion_matrix": {
+        "EXACT_COPY": {
+          "EXACT_COPY": 55,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "MODIFIED_COPY": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 55,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "PARAPHRASE": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 55
+        },
+        "ORIGINAL_UNRELATED": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 50
+        }
+      }
+    }
+  },
+  "camel": {
+    "mode": "CAMEL",
+    "benchmark_runtime_seconds": 3.955,
+    "average_sample_latency_ms": 11.263,
+    "peak_memory_mb": 6.871,
+    "stratum_1_deduplicated_overlap": {
+      "total_samples": 71,
+      "binary_plagiarism_metrics": {
+        "tp": 46,
+        "fp": 0,
+        "fn": 15,
+        "tn": 10,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.9229,
+          1.0
+        ],
+        "recall": 0.7541,
+        "recall_95ci": [
+          0.6332,
+          0.8449
+        ],
+        "f1_score": 0.8598,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.2775
+        ],
+        "false_negative_rate": 0.2459,
+        "fnr_95ci": [
+          0.1551,
+          0.3668
+        ],
+        "specificity": 1.0
+      },
+      "multi_class_metrics": {
+        "EXACT_COPY": {
+          "tp": 31,
+          "fp": 0,
+          "fn": 0,
+          "tn": 40,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0
+        },
+        "MODIFIED_COPY": {
+          "tp": 15,
+          "fp": 0,
+          "fn": 0,
+          "tn": 56,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1_score": 1.0
+        },
+        "PARAPHRASE": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 15,
+          "tn": 56,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1_score": 0.0
+        },
+        "ORIGINAL_UNRELATED": {
+          "tp": 10,
+          "fp": 15,
+          "fn": 0,
+          "tn": 46,
+          "precision": 0.4,
+          "recall": 1.0,
+          "f1_score": 0.5714
+        }
+      },
+      "macro_plagiarism_f1_exact_modified": 1.0,
+      "four_class_macro_f1": 0.6429,
+      "confusion_matrix": {
+        "EXACT_COPY": {
+          "EXACT_COPY": 31,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "MODIFIED_COPY": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 15,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "PARAPHRASE": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 15
+        },
+        "ORIGINAL_UNRELATED": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 10
+        }
+      }
+    },
+    "stratum_2_hard_academic": {
+      "total_samples": 10,
+      "binary_plagiarism_metrics": {
+        "tp": 4,
+        "fp": 0,
+        "fn": 1,
+        "tn": 5,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.5101,
+          1.0
+        ],
+        "recall": 0.8,
+        "recall_95ci": [
+          0.3755,
+          0.9638
+        ],
+        "f1_score": 0.8889,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.4345
+        ],
+        "false_negative_rate": 0.2,
+        "fnr_95ci": [
+          0.0362,
+          0.6245
+        ],
+        "specificity": 1.0
+      },
+      "detailed_cases": [
+        {
+          "id": "hard_neg_law_01",
+          "discipline": "Law",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.2182,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_med_02",
+          "discipline": "Medicine",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.246,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_cs_03",
+          "discipline": "Computer Science",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.0535,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_islamic_04",
+          "discipline": "Islamic Studies",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.1981,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_neg_economy_05",
+          "discipline": "Economics",
+          "expected_class": "ORIGINAL_UNRELATED",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.3448,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_law_01",
+          "discipline": "Law",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "MODIFIED_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.6111,
+            "shingle_score": 0.6111,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_cs_02",
+          "discipline": "Computer Science",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "MODIFIED_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.6526,
+            "shingle_score": 0.6526,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_mod_education_03",
+          "discipline": "Education",
+          "expected_class": "MODIFIED_COPY",
+          "predicted_class": "ORIGINAL_UNRELATED",
+          "is_correct": false,
+          "scores": {
+            "sequence_ratio": 0.5211,
+            "shingle_score": 0.0,
+            "tfidf_score": 0.0
+          }
+        },
+        {
+          "id": "hard_ocr_exact_01",
+          "discipline": "History",
+          "expected_class": "EXACT_COPY",
+          "predicted_class": "EXACT_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 1.0,
+            "shingle_score": 1.0,
+            "tfidf_score": 1.0
+          }
+        },
+        {
+          "id": "hard_exact_academic_02",
+          "discipline": "Political Science",
+          "expected_class": "EXACT_COPY",
+          "predicted_class": "EXACT_COPY",
+          "is_correct": true,
+          "scores": {
+            "sequence_ratio": 0.9898,
+            "shingle_score": 0.9898,
+            "tfidf_score": 1.0
+          }
+        }
+      ]
+    },
+    "stratum_3_full_323_overlap": {
+      "total_samples": 215,
+      "binary_plagiarism_metrics": {
+        "tp": 110,
+        "fp": 0,
+        "fn": 55,
+        "tn": 50,
+        "precision": 1.0,
+        "precision_95ci": [
+          0.9663,
+          1.0
+        ],
+        "recall": 0.6667,
+        "recall_95ci": [
+          0.5917,
+          0.7341
+        ],
+        "f1_score": 0.8,
+        "false_positive_rate": 0.0,
+        "fpr_95ci": [
+          0.0,
+          0.0713
+        ],
+        "false_negative_rate": 0.3333,
+        "fnr_95ci": [
+          0.2659,
+          0.4083
+        ],
+        "specificity": 1.0
+      },
+      "confusion_matrix": {
+        "EXACT_COPY": {
+          "EXACT_COPY": 55,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "MODIFIED_COPY": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 55,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 0
+        },
+        "PARAPHRASE": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 55
+        },
+        "ORIGINAL_UNRELATED": {
+          "EXACT_COPY": 0,
+          "MODIFIED_COPY": 0,
+          "PARAPHRASE": 0,
+          "ORIGINAL_UNRELATED": 50
+        }
+      }
+    }
+  }
+}

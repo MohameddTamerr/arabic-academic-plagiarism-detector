@@ -166,6 +166,9 @@ class FrozenWorkerProcess:
 
         try:
             while self.is_running:
+                stop_file = os.environ.get('ARABIC_WORKER_STOP_FILE')
+                if stop_file and Path(stop_file).is_file():
+                    self.is_draining = True
                 if max_iterations and iterations >= max_iterations:
                     break
 
@@ -198,6 +201,7 @@ class FrozenWorkerProcess:
                     time.sleep(0.1)
         finally:
             self.deregister()
+            base_repo.engine.dispose()
 
 
 def run_frozen_worker(argv: List[str]) -> None:

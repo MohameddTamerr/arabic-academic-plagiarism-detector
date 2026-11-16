@@ -52,7 +52,17 @@ _AGGRESSIVE_TRANS = str.maketrans({
 })
 
 
-def normalize_light(text: str) -> str:
+def is_camel_enabled() -> bool:
+    """Return True if CAMeL Tools is installed and enabled in runtime settings."""
+    try:
+        import config
+        from plagiarism_detector.preprocessing.camel_adapter import is_camel_available
+        return bool(config.DEFAULT_SETTINGS.get('enable_camel_preprocessing', False)) and is_camel_available()
+    except Exception:
+        return False
+
+
+def normalize_light(text: str, *, use_camel: bool | None = None) -> str:
     """
     تطبيع لغوي معتدل يُستخدم في استخراج متجهات TF-IDF والمقارنات الدلالية.
     - يزيل التشكيل، الكشيدة (التطويل)، والمسافات الصفرية.
@@ -61,6 +71,10 @@ def normalize_light(text: str) -> str:
     """
     if not text:
         return ''
+
+    if use_camel or (use_camel is None and is_camel_enabled()):
+        from plagiarism_detector.preprocessing.camel_adapter import camel_normalize_light
+        return camel_normalize_light(text)
 
     # 1. تطبيع يونيكود قياسي
     text = unicodedata.normalize('NFC', text)
@@ -82,7 +96,7 @@ def normalize_light(text: str) -> str:
     return ' '.join(text.split()).strip()
 
 
-def normalize_aggressive(text: str) -> str:
+def normalize_aggressive(text: str, *, use_camel: bool | None = None) -> str:
     """
     تطبيع مشدد يُستخدم في كشف النسخ الحرفي المباشر (Shingles + Jaccard)
     وفحص محاولات التهرب من الاقتباس بتغيير الهمزات أو التاء المربوطة.
@@ -91,6 +105,10 @@ def normalize_aggressive(text: str) -> str:
     """
     if not text:
         return ''
+
+    if use_camel or (use_camel is None and is_camel_enabled()):
+        from plagiarism_detector.preprocessing.camel_adapter import camel_normalize_aggressive
+        return camel_normalize_aggressive(text)
 
     text = unicodedata.normalize('NFC', text)
     text = _ZERO_WIDTH_RE.sub('', text)

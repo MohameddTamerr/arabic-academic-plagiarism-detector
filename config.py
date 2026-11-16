@@ -169,6 +169,10 @@ SEMANTIC_PASSAGE_PREFIX = 'passage: '
 SEMANTIC_CACHE_DIR = Path(os.environ.get('SEMANTIC_CACHE_DIR', STORAGE_ROOT / 'semantic_cache'))
 SEMANTIC_CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
+# Stage 3 disk-backed lexical index. It is local-only and contains normalized
+# source tokens, never uploaded documents or model artefacts.
+RETRIEVAL_INDEX_DIR = Path(os.environ.get('RETRIEVAL_INDEX_DIR', STORAGE_ROOT / 'retrieval_index'))
+
 # مفتاح الجلسة الآمن (Flask Secret Key)
 _SECRET_KEY_FILE = CONFIG_DIR / '.secret_key'
 if os.environ.get('SECRET_KEY'):
@@ -208,8 +212,32 @@ DEFAULT_SETTINGS = {
     'detection_profile': 'BALANCED',       # أنماط الكشف: LIGHT, BALANCED, ADVANCED
     'max_candidate_retrieval': 50,         # أقصى عدد مرشحين للفقرة الواحدة لتفادي البطء
     'candidate_retrieval_mode': 'dual_channel',  # نمط الاسترجاع: 'dual_channel' (RC2) أو 'baseline' (RC1)
+    'enable_persistent_retrieval': True,
+    'persistent_retrieval_mode': 'bm25',
+    'bm25_k1': 1.2,
+    'bm25_b': 0.75,
+    # Stage 4 remains experimental until independently labelled Arabic data
+    # supports an operational semantic calibration. It never changes coverage.
+    'enable_hybrid_semantic_retrieval': False,
+    'hybrid_semantic_top_k': 50,
+    'hybrid_rrf_k': 60,
+    'semantic_evidence_limit': 5,
     'common_text_filter_mode': 'span_level',    # فلترة النصوص الشائعة: 'span_level' (RC2) أو 'baseline' (RC1)
     'citation_filter_mode': 'refined',          # كاشف الاستشهاد: 'refined' (RC2) أو 'baseline' (RC1)
+    # Stage 5 enriches reports only; it does not auto-exclude lexical evidence.
+    'enable_citation_intelligence': True,
+    # Stage 6 is deliberately opt-in.  Evidence-review decisions require a
+    # separately approved storage migration; the application must therefore
+    # continue to operate exactly as before until an administrator enables it.
+    'enable_reviewer_evidence_workflow': False,
+    # Stage 8 AI-writing analysis is intentionally unavailable until a
+    # provenance-labelled Arabic academic dataset supports calibration.
+    'enable_experimental_ai_writing_analysis': False,
+    'enable_ai_research_mode': False,
+    'ai_research_model': 'nawaf_int8',
+    # CAMeL Tools integration option (Phase 2). Preserves standard fallback by default.
+    'enable_camel_preprocessing': False,
+    'camel_normalization_mode': 'standard',
 }
 
 # Keep an existing current-root settings file authoritative for compatibility.

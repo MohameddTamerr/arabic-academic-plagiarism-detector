@@ -26,16 +26,25 @@ from plagiarism_detector.preprocessing.cheating_detector import (
 from plagiarism_detector.preprocessing.segmenter import segment_pages, DocumentSegment
 from plagiarism_detector.citations.citation_detector import detect_citation
 from plagiarism_detector.citations.bibliography_detector import filter_bibliography_sections
+from plagiarism_detector.citations.citation_intelligence import (
+    extract_citations, link_citations, parse_bibliography_segments,
+)
 from plagiarism_detector.filters.common_phrases import (
     classify_non_substantive_academic_text,
     filter_common_spans,
 )
 from plagiarism_detector.detection.candidate_retriever import CandidateRetriever
+from plagiarism_detector.detection.persistent_retrieval import (
+    load_or_reconcile_index, map_persistent_candidates,
+)
 from plagiarism_detector.detection.shingle_matcher import match_exact_or_near_copy
 from plagiarism_detector.detection.tfidf_matcher import match_lexical_paraphrase
 from plagiarism_detector.detection.evidence_gate import (
     accept_lexical_paraphrase,
     accept_semantic_paraphrase,
+)
+from plagiarism_detector.detection.span_aligner import (
+    alignment_evidence, tokenize_original, unique_matched_token_indexes,
 )
 from plagiarism_detector.detection.review_history_matcher import (
     build_review_history_index,
@@ -46,8 +55,13 @@ from plagiarism_detector.detection.semantic_matcher import (
     check_semantic_model_availability,
     compute_embeddings,
     match_semantic_similarity,
+    rank_semantic_candidates,
 )
-from plagiarism_detector.ai_analysis.stylistic_indicators import analyze_stylistic_ai_indicators
+from plagiarism_detector.detection.hybrid_retrieval import (
+    build_semantic_evidence, reciprocal_rank_fusion,
+)
+from plagiarism_detector.ai_detection.analysis import unavailable_analysis
+from plagiarism_detector.ai_detection.analysis import public_ai_analysis
 from plagiarism_detector.reporting.page_allowance import compute_source_allowance
 from app import versioning
 
@@ -166,6 +180,23 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
                 'raw_text': raw_text
             })
 
+        # Candidate-only bridge: all later matcher, Stage 2 alignment and report
+        # code still receives current scan-local corpus positions.
+        persistent_retrieval = None
+        persistent_retrieval_status = {'enabled': False, 'reason': 'disabled'}
+        segment_id_to_position = {int(seg['seg_id']): pos for pos, seg in enumerate(raw_segments)}
+        if config.DEFAULT_SETTINGS.get('enable_persistent_retrieval', False):
+            try:
+                persistent_retrieval, persistent_retrieval_status = load_or_reconcile_index(
+                    raw_segments, corpus_version, corpus_fingerprint,
+                    bm25_k1=float(config.DEFAULT_SETTINGS.get('bm25_k1', 1.2)),
+                    bm25_b=float(config.DEFAULT_SETTINGS.get('bm25_b', 0.75)),
+                )
+                persistent_retrieval_status['enabled'] = True
+            except Exception as exc:
+                logger.warning("تعذر تهيئة فهرس الاسترجاع الدائم؛ سيستخدم الفهرس المؤقت: %s", exc)
+                persistent_retrieval_status = {'enabled': False, 'reason': str(exc)[:200]}
+
         if job_id:
             job_queue_service.update_job_progress(job_id, 75, "جاري تهيئة مصفوفة TF-IDF والفهارس المعجمية...")
 
@@ -212,6 +243,9 @@ def build_pipeline_index(job_id: Optional[str] = None) -> dict:
         index_data = {
             'shingle_size': shingle_size,
             'retriever': retriever,
+            'persistent_retrieval': persistent_retrieval,
+            'persistent_retrieval_status': persistent_retrieval_status,
+            'segment_id_to_position': segment_id_to_position,
             'corpus_shingles': corpus_shingles,
             'corpus_light_texts': corpus_light_texts,
             'corpus_aggr_texts': corpus_aggr_texts,
@@ -384,9 +418,6 @@ def analyze_academic_document(
     cheating_res = detect_cheating_manipulation(raw_text)
     cleaned_text = clean_cheating_text(raw_text)
 
-    # 2. مؤشرات أسلوب الذكاء الاصطناعي الاستئناسية
-    ai_indicators = analyze_stylistic_ai_indicators(cleaned_text)
-
     # 3. تقطيع النص لفقرات مع الحفاظ على الصفحات
     if pages_data:
         segments_list = segment_pages(pages_data, min_words=settings['min_sentence_words'])
@@ -407,6 +438,8 @@ def analyze_academic_document(
 
     index_data = get_pipeline_index(shingle_size=settings['shingle_size'])
     retriever: CandidateRetriever = index_data['retriever']
+    persistent_retrieval = index_data.get('persistent_retrieval')
+    segment_id_to_position = index_data.get('segment_id_to_position', {})
     corpus_shingles = index_data['corpus_shingles']
     corpus_light_texts = index_data['corpus_light_texts']
     corpus_aggr_texts = index_data['corpus_aggr_texts']
@@ -481,8 +514,26 @@ def analyze_academic_document(
             'matched_text': '',
             'is_cited': False,
             'citation_detail': '',
+            'citation_occurrences': [],
+            'citation_links': [],
+            'citation_adjustment': {
+                'applied': False,
+                'excluded_token_indexes': [],
+                'reason': 'No automatic exclusion: reviewer approval and source verification are required.',
+            },
             'evaluated_word_count': w_count,
+            # Stage 2: lexical evidence uses original-text offsets.  Historical
+            # reports have no field and retain legacy rendering/scoring.
+            'alignment_evidence': [],
+            'alignment_coordinate_status': 'not_evaluated',
+            # Review-only semantic retrieval provenance. It deliberately has
+            # neither lexical offsets nor any coverage/scoring effect.
+            'semantic_candidate_evidence': [],
+            'evaluated_token_count': len(tokenize_original(seg.raw_text)),
+            'matched_token_count': 0,
         }
+        alignment_candidate_indices: list[int] = []
+        lexical_match_found = False
 
         # 0. فحص واستبعاد النصوص المؤسسية الشائعة على مستوى المقاطع (EXP-03)
         front_matter_reason = classify_non_substantive_academic_text(seg.raw_text)
@@ -523,6 +574,8 @@ def analyze_academic_document(
 
         # فحص وجود استشهاد أو علامات تنصيص (EXP-04)
         citation_check = detect_citation(seg.raw_text, mode=citation_mode)
+        if settings.get('enable_citation_intelligence', True):
+            seg_dict['citation_occurrences'] = extract_citations(seg.raw_text)
         if citation_check.is_cited:
             seg_dict['is_cited'] = True
             seg_dict['citation_detail'] = citation_check.citation_detail
@@ -576,14 +629,40 @@ def analyze_academic_document(
                 pages_by_source[doc_id].add(meta['page_number'])
                 source_info[doc_id] = {'title': meta['title'], 'author': meta['author']}
                 match_found = True
+                lexical_match_found = True
+                alignment_candidate_indices = [cand_idx] + [
+                    candidate for candidate in sorted(shingle_candidates)
+                    if candidate != cand_idx
+                ][:4]
 
         # ── المرحلة B: كشف إعادة الصياغة عبر TF-IDF و الاسترجاع المطور (EXP-01) ──
         if not match_found:
-            token_candidates = retriever.retrieve_candidates(
-                eval_light,
-                top_k=settings['max_candidate_retrieval'],
-                mode=retrieval_mode
-            )
+            token_candidates = []
+            if (
+                settings.get('enable_persistent_retrieval', False)
+                and settings.get('persistent_retrieval_mode') == 'bm25'
+                and persistent_retrieval is not None
+            ):
+                try:
+                    allowed_doc_ids = None
+                    if excluded_doc_ids:
+                        allowed_doc_ids = {
+                            meta['doc_id'] for meta in corpus_metadata
+                            if meta['doc_id'] not in excluded_doc_ids
+                        }
+                    token_candidates = map_persistent_candidates(
+                        persistent_retrieval, eval_light, segment_id_to_position,
+                        top_k=settings['max_candidate_retrieval'],
+                        allowed_doc_ids=allowed_doc_ids,
+                    )
+                except Exception as exc:
+                    logger.warning("تعذر بحث BM25 الدائم؛ سيستخدم الاسترجاع المتوافق: %s", exc)
+            if not token_candidates:
+                token_candidates = retriever.retrieve_candidates(
+                    eval_light,
+                    top_k=settings['max_candidate_retrieval'],
+                    mode=retrieval_mode
+                )
             if excluded_doc_ids:
                 token_candidates = [
                     cand_idx for cand_idx in token_candidates
@@ -638,6 +717,11 @@ def analyze_academic_document(
                     pages_by_source[doc_id].add(meta['page_number'])
                     source_info[doc_id] = {'title': meta['title'], 'author': meta['author']}
                     match_found = True
+                    lexical_match_found = True
+                    alignment_candidate_indices = [cand_idx] + [
+                        candidate for candidate in token_candidates
+                        if candidate != cand_idx
+                    ][:4]
 
         # ── المرحلة C: التشابه الدلالي (اختياري) ───────────────────
         if (
@@ -646,30 +730,60 @@ def analyze_academic_document(
             and semantic_query_embeddings is not None
             and corpus_embeddings is not None
         ):
-            batch_start = (segment_index // semantic_batch_size) * semantic_batch_size
-            if batch_start not in semantic_batch_cache:
-                batch_end = min(batch_start + semantic_batch_size, len(segments_list))
-                semantic_batch_cache[batch_start] = batch_match_semantic_similarity(
-                    query_embeddings=semantic_query_embeddings[batch_start:batch_end],
+            stage_c_candidates = semantic_candidates
+            hybrid_enabled = bool(settings.get('enable_hybrid_semantic_retrieval', False))
+            if hybrid_enabled:
+                # E5 ranks the complete allowed corpus rather than only BM25
+                # output, so lexical misses remain recoverable candidates.
+                semantic_ranked = rank_semantic_candidates(
+                    semantic_query_embeddings[segment_index], corpus_embeddings,
                     candidate_indices=semantic_candidates,
-                    corpus_embeddings=corpus_embeddings,
-                    threshold=settings['semantic_threshold'],
+                    top_k=int(settings.get('hybrid_semantic_top_k', 50)),
                 )
-            batch_offset = segment_index - batch_start
-            batch_results = semantic_batch_cache[batch_start]
-            if batch_offset < len(batch_results):
-                res_c = batch_results[batch_offset]
-            else:
-                # Preserve the stable scalar path if a malformed batch ever
-                # returns fewer entries than requested.
+                stage_c_candidates = reciprocal_rank_fusion(
+                    {'bm25': token_candidates, 'e5': [item[0] for item in semantic_ranked]},
+                    top_k=int(settings.get('hybrid_semantic_top_k', 50)),
+                    rrf_k=int(settings.get('hybrid_rrf_k', 60)),
+                ) or semantic_candidates
+                seg_dict['semantic_candidate_evidence'] = build_semantic_evidence(
+                    semantic_ranked, corpus_metadata,
+                    limit=int(settings.get('semantic_evidence_limit', 5)),
+                )
+                # Candidate sets differ per segment; use the established scalar
+                # comparison rather than a batch cache keyed only by batch start.
                 res_c = match_semantic_similarity(
                     query_text=seg.raw_text,
-                    candidate_indices=semantic_candidates,
+                    candidate_indices=stage_c_candidates,
                     corpus_texts=corpus_light_texts,
                     corpus_embeddings=corpus_embeddings,
                     threshold=settings['semantic_threshold'],
                     query_embedding=semantic_query_embeddings[segment_index],
                 )
+            else:
+                batch_start = (segment_index // semantic_batch_size) * semantic_batch_size
+                if batch_start not in semantic_batch_cache:
+                    batch_end = min(batch_start + semantic_batch_size, len(segments_list))
+                    semantic_batch_cache[batch_start] = batch_match_semantic_similarity(
+                        query_embeddings=semantic_query_embeddings[batch_start:batch_end],
+                        candidate_indices=semantic_candidates,
+                        corpus_embeddings=corpus_embeddings,
+                        threshold=settings['semantic_threshold'],
+                    )
+                batch_offset = segment_index - batch_start
+                batch_results = semantic_batch_cache[batch_start]
+                if batch_offset < len(batch_results):
+                    res_c = batch_results[batch_offset]
+                else:
+                    # Preserve the stable scalar path if a malformed batch ever
+                    # returns fewer entries than requested.
+                    res_c = match_semantic_similarity(
+                        query_text=seg.raw_text,
+                        candidate_indices=semantic_candidates,
+                        corpus_texts=corpus_light_texts,
+                        corpus_embeddings=corpus_embeddings,
+                        threshold=settings['semantic_threshold'],
+                        query_embedding=semantic_query_embeddings[segment_index],
+                    )
             if res_c:
                 cand_idx, score, _match_type = res_c
                 meta = corpus_metadata[cand_idx]
@@ -702,6 +816,36 @@ def analyze_academic_document(
                 words_by_source[doc_id] += w_count
                 pages_by_source[doc_id].add(meta['page_number'])
                 source_info[doc_id] = {'title': meta['title'], 'author': meta['author']}
+
+        # Stage 2 lexical evidence is independent from the winner selection:
+        # retain credible alternative source spans, but count submitted tokens
+        # only once in the later union.  Semantic matches deliberately create no
+        # lexical spans and cannot contribute to official coverage.
+        if lexical_match_found:
+            for candidate in alignment_candidate_indices:
+                meta = corpus_metadata[candidate]
+                evidence = alignment_evidence(
+                    seg.raw_text, meta['raw_text'], meta['doc_id'], min_tokens=2
+                )
+                if not evidence:
+                    continue
+                evidence.update({
+                    'source_id': meta['doc_id'],
+                    'source_reference_id': meta.get('reference_id', ''),
+                    'source_title': meta['title'],
+                    'source_author': meta.get('author', ''),
+                    'source_page': meta.get('page_number'),
+                    'source_segment_number': meta.get('segment_number'),
+                })
+                seg_dict['alignment_evidence'].append(evidence)
+            matched_indexes = unique_matched_token_indexes(seg_dict['alignment_evidence'])
+            seg_dict['matched_token_indexes'] = sorted(matched_indexes)
+            seg_dict['matched_token_count'] = len(matched_indexes)
+            seg_dict['alignment_coordinate_status'] = (
+                'original_text_offsets' if matched_indexes else 'no_nontrivial_lexical_span'
+            )
+        elif seg_dict.get('match_type') in ('SEMANTIC PARAPHRASE', 'CITED SEMANTIC MATCH'):
+            seg_dict['alignment_coordinate_status'] = 'semantic_no_lexical_coordinates'
 
         # ── سجل القبول المبدئي: يدخل في النسبة الأكاديمية الأساسية ──
         history_query_embedding = (
@@ -743,6 +887,24 @@ def analyze_academic_document(
                 'title': meta['title'],
                 'author': meta.get('author', ''),
             }
+            if history_match_type != 'SEMANTIC PARAPHRASE':
+                evidence = alignment_evidence(seg.raw_text, meta.get('raw_text', ''), source_key, min_tokens=2)
+                if evidence:
+                    evidence.update({
+                        'source_id': source_key, 'source_report_id': meta['report_id'],
+                        'source_review_status': 'preliminary_accepted',
+                        'source_title': meta['title'], 'source_author': meta.get('author', ''),
+                        'source_page': meta.get('page_number'),
+                        'source_segment_number': meta.get('segment_number'),
+                    })
+                    seg_dict['alignment_evidence'].append(evidence)
+                    seg_dict['matched_token_indexes'] = sorted(unique_matched_token_indexes(seg_dict['alignment_evidence']))
+                    seg_dict['matched_token_count'] = len(seg_dict['matched_token_indexes'])
+                    seg_dict['alignment_coordinate_status'] = 'original_text_offsets'
+                elif not seg_dict.get('matched_token_indexes'):
+                    seg_dict['alignment_coordinate_status'] = 'no_nontrivial_lexical_span'
+            elif not seg_dict.get('matched_token_indexes'):
+                seg_dict['alignment_coordinate_status'] = 'semantic_no_lexical_coordinates'
 
         # ── سجل المرفوضات: تنبيه إعادة تقديم مستقل لا يرفع النسبة الرسمية ──
         rejected_match = match_review_history_segment(
@@ -754,6 +916,9 @@ def analyze_academic_document(
         )
         if rejected_match:
             meta, score, history_match_type = rejected_match
+            rejected_evidence = (alignment_evidence(seg.raw_text, meta.get('raw_text', ''),
+                f"review:{meta['report_id']}", min_tokens=2)
+                if history_match_type != 'SEMANTIC PARAPHRASE' else None)
             seg_dict['rejected_history_match'] = {
                 'report_id': meta['report_id'],
                 'research_id': meta.get('research_id'),
@@ -765,12 +930,38 @@ def analyze_academic_document(
                 'score': score,
                 'pct': min(round(score * 100), 100),
                 'match_type': history_match_type,
+                'alignment_evidence': rejected_evidence,
+                'matched_token_indexes': rejected_evidence['matched_suspicious_token_indexes'] if rejected_evidence else [],
+                'alignment_coordinate_status': ('original_text_offsets' if rejected_evidence else
+                    'semantic_no_lexical_coordinates' if history_match_type == 'SEMANTIC PARAPHRASE' else
+                    'no_nontrivial_lexical_span'),
             }
 
         processed_segments.append(seg_dict)
 
     # 4. فحص واستبعاد أقسام المراجع الببليوغرافية
     processed_segments, bib_count = filter_bibliography_sections(processed_segments)
+
+    # Stage 5: bibliography linkage is report enrichment, not a scoring gate.
+    bibliography_entries = parse_bibliography_segments(processed_segments) if settings.get('enable_citation_intelligence', True) else []
+    for seg in processed_segments:
+        if seg.get('is_bibliography'):
+            continue
+        occurrences = seg.get('citation_occurrences', [])
+        if occurrences:
+            seg['citation_links'] = link_citations(occurrences, bibliography_entries)
+            linked = [link for link in seg['citation_links'] if link['status'] == 'LINKED']
+            seg['citation_linkage_status'] = (
+                'LINKED' if len(linked) == len(seg['citation_links']) else
+                'AMBIGUOUS' if any(link['status'] == 'AMBIGUOUS' for link in seg['citation_links']) else
+                'UNRESOLVED'
+            )
+            # Bibliography linkage says nothing by itself about the local matched
+            # source. Keep that uncertainty visible to the reviewer.
+            seg['source_verification_status'] = 'NOT_VERIFIED'
+        else:
+            seg['citation_linkage_status'] = 'NO_CITATION'
+            seg['source_verification_status'] = 'NOT_APPLICABLE'
 
     # 5. حساب الإجماليات بدقة رياضية بعد استبعاد المراجع الببليوغرافية
     copied_words = 0
@@ -779,6 +970,7 @@ def analyze_academic_document(
     problematic_words = 0
     rejected_history_words = 0
     clean_total_words = 0
+    clean_total_tokens = 0
     rejected_history_sources: dict[str, dict] = {}
 
     # إعادة بناء إحصائيات المصادر بعد استبعاد Bibliography لضمان توافق نسب المصادر مع overall_pct
@@ -787,6 +979,7 @@ def analyze_academic_document(
 
     for seg in processed_segments:
         w_cnt = int(seg.get('evaluated_word_count', len(seg['text'].split())) or 0)
+        token_count = int(seg.get('evaluated_token_count', len(tokenize_original(seg.get('text', '')))) or 0)
 
         if seg.get('is_bibliography') or seg.get('status') == 'suppressed':
             # استبعاد المراجع والنصوص التمهيدية غير الموضوعية من البسط
@@ -794,19 +987,25 @@ def analyze_academic_document(
             continue
 
         clean_total_words += w_cnt
+        clean_total_tokens += token_count
+        # Stage 2 official numerator is the union of aligned submitted tokens
+        # for this segment.  Semantic-only evidence remains visible but is zero.
+        matched_tokens = len(set(seg.get('matched_token_indexes') or []))
+        seg['matched_token_count'] = matched_tokens
 
         if seg['status'] == 'copied':
-            copied_words += w_cnt
-            problematic_words += w_cnt
+            copied_words += matched_tokens
+            problematic_words += matched_tokens
         elif seg['status'] == 'paraphrased':
-            para_words += w_cnt
-            problematic_words += w_cnt
+            para_words += matched_tokens
+            problematic_words += matched_tokens
         elif seg['status'] == 'cited':
-            cited_words += w_cnt
+            cited_words += matched_tokens
 
         rejected_match = seg.get('rejected_history_match')
         if rejected_match:
-            rejected_history_words += w_cnt
+            rejected_tokens = len(set(rejected_match.get('matched_token_indexes') or []))
+            rejected_history_words += rejected_tokens
             existing_rejected = rejected_history_sources.get(rejected_match['report_id'])
             if not existing_rejected:
                 rejected_history_sources[rejected_match['report_id']] = {
@@ -816,11 +1015,11 @@ def analyze_academic_document(
                     'page_number': rejected_match.get('page_number'),
                     'matched_text': rejected_match.get('matched_text', ''),
                     'max_pct': rejected_match.get('pct', 0),
-                    'matched_words': w_cnt,
+                    'matched_words': rejected_tokens,
                     'matched_segments_count': 1,
                 }
             else:
-                existing_rejected['matched_words'] += w_cnt
+                existing_rejected['matched_words'] += rejected_tokens
                 existing_rejected['matched_segments_count'] += 1
                 if rejected_match.get('pct', 0) >= existing_rejected.get('max_pct', 0):
                     existing_rejected['max_pct'] = rejected_match.get('pct', 0)
@@ -830,10 +1029,19 @@ def analyze_academic_document(
         # إعادة تجميع كلمات المصادر من النص القابل للتحليل فقط
         source_key = seg.get('source_key') or seg.get('source_id')
         if source_key is not None and seg['status'] in ('copied', 'paraphrased', 'cited'):
-            words_by_source_clean[source_key] += w_cnt
+            # Attribute official coverage to the selected source. Alternatives
+            # remain in alignment_evidence for reviewer inspection and do not
+            # inflate the document numerator.
+            primary_evidence = [e for e in seg.get('alignment_evidence', []) if e.get('source_id') == source_key]
+            source_tokens = (len(unique_matched_token_indexes(primary_evidence)) if primary_evidence
+                             else 0 if str(source_key).startswith('review:') else matched_tokens)
+            words_by_source_clean[source_key] += source_tokens
             pages_by_source_clean[source_key].add(seg.get('source_page'))
 
-    total_safe_words = max(clean_total_words, 1)
+    # Denominator: every non-suppressed, non-bibliography submitted token once.
+    # The legacy `total_words` field is retained for display/backward payload
+    # compatibility, while percentages use this documented Stage 2 denominator.
+    total_safe_words = max(clean_total_tokens, 1)
     matched_total_words = copied_words + para_words + cited_words
     for r_source in rejected_history_sources.values():
         r_source['pct'] = min(round((r_source.get('matched_words', 0) / total_safe_words) * 100, 1), 100.0)
@@ -878,7 +1086,22 @@ def analyze_academic_document(
         'details': [s['alert_message'] for s in exceeded_sources]
     }
 
+    try:
+        if settings.get('enable_ai_research_mode', False):
+            from plagiarism_detector.ai_detection.analysis import analyze_document_ai_research
+            ai_analysis = analyze_document_ai_research(
+                raw_text,
+                pages_data=pages_data,
+                model_variant=settings.get('ai_research_model', 'nawaf_int8'),
+            )
+        else:
+            ai_analysis = unavailable_analysis(settings.get('enable_experimental_ai_writing_analysis', False))
+    except Exception as exc:
+        logger.error('AI analysis failed; retaining the similarity result: %s', exc, exc_info=True)
+        ai_analysis = public_ai_analysis({'reason': 'analysis_error'})
+
     return {
+        'plagiarism_analysis': {'status': 'completed'},
         'overall_pct': overall_pct,               # النسبة الكلية للاستلال
         'problematic_pct': problematic_pct,       # نسبة الاستلال المشبوهة (غير الموثقة)
         'copied_pct': copied_pct,                 # نسبة النسخ الحرفي
@@ -895,6 +1118,16 @@ def analyze_academic_document(
             reverse=True,
         ),
         'total_words': total_words,
+        'scoring_version': 'stage2_aligned_token_coverage_v1',
+        'coverage_denominator_tokens': clean_total_tokens,
+        'coverage_numerator_tokens': matched_total_words,
+        # Raw Stage 2 coverage remains authoritative. Citation syntax and a
+        # bibliography link do not remove a token without explicit review.
+        'raw_lexical_similarity_pct': overall_pct,
+        'citation_adjusted_similarity_pct': overall_pct,
+        'citation_adjustment_applied_tokens': 0,
+        'bibliography_entries': bibliography_entries,
+        'raw_similarity_evidence': 'lexical aligned tokens only; semantic evidence is non-counting',
         'copied_words': copied_words,
         'paraphrased_words': para_words,
         'cited_words': cited_words,
@@ -902,6 +1135,7 @@ def analyze_academic_document(
         'segments': processed_segments,
         'sources': sources_list,
         'cheating': cheating_res,
+        'ai_analysis': ai_analysis,
         'page_limit_alert': page_limit_alert,
         'bibliography_segments_count': bib_count,
         'application_version': versioning.APPLICATION_VERSION,

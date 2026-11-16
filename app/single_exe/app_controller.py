@@ -52,6 +52,14 @@ def is_port_in_use(port: int, host: str = '127.0.0.1') -> bool:
         return s.connect_ex((host, port)) == 0
 
 
+def configured_worker_count():
+    """Keep normal defaults; allow an explicit one-process standalone trial."""
+    count = int(os.environ.get('SINGLE_EXE_WORKERS', '2'))
+    if count < 1:
+        raise ValueError('SINGLE_EXE_WORKERS must be positive')
+    return count
+
+
 class AppController:
     """المتحكم المركزي في تشغيل منظومة فحص الاستلال الأكاديمي."""
 
@@ -79,6 +87,12 @@ class AppController:
         self.waitress_server = None
         self.is_running = False
         self.is_stopping = False
+        self.shutdown_status = 'not_started'
+        self.shutdown_detail = ''
+        self._stop_lock = threading.Lock()
+        self._requests = threading.Condition()
+        self._active_requests = 0
+        self._worker_stop_file = self.config_dir / f'worker-stop-{secrets.token_hex(16)}'
 
     def ensure_directories_and_permissions(self) -> None:
         """التأكد من إنشاء كافة مجلدات البيانات والتحقق من صلاحية الكتابة والمساحة الحرة."""
@@ -188,6 +202,7 @@ class AppController:
             env = os.environ.copy()
             env["ARABIC_APP_DATA_DIR"] = str(self.data_dir)
             env["PORTABLE_MODE"] = "1"
+            env["ARABIC_WORKER_STOP_FILE"] = str(self._worker_stop_file)
             
             p = subprocess.Popen(
                 cmd,
@@ -198,11 +213,34 @@ class AppController:
             )
             self.worker_processes.append(p)
             logger.info(f"Started worker process {worker_id} (PID: {p.pid}).")
+        worker_log.close()
 
     def start_waitress_server(self) -> None:
         """تشغيل خادم الإنتاج Waitress بشكل إلزامي."""
         # تهيئة تطبيق Flask
         flask_app = create_app()
+        original_app = flask_app.wsgi_app
+        def draining_app(environ, start_response):
+            with self._requests:
+                if self.is_stopping:
+                    start_response('503 Service Unavailable', [('Content-Type', 'text/plain')])
+                    return [b'Application is shutting down']
+                self._active_requests += 1
+            def response():
+                iterable = None
+                try:
+                    iterable = original_app(environ, start_response)
+                    yield from iterable
+                finally:
+                    try:
+                        if iterable is not None and hasattr(iterable, 'close'):
+                            iterable.close()
+                    finally:
+                        with self._requests:
+                            self._active_requests -= 1
+                            self._requests.notify_all()
+            return response()
+        flask_app.wsgi_app = draining_app
 
         server_log_path = self.logs_dir / "server.log"
         try:
@@ -262,7 +300,16 @@ class AppController:
 
     def start(self, auto_open_browser: bool = True) -> bool:
         """بدء تشغيل المنظومة بالكامل."""
+        if self.shutdown_status in ('draining', 'incomplete') or (self.is_stopping and (
+            (self.server_thread and self.server_thread.is_alive())
+            or any(p.poll() is None for p in self.worker_processes)
+        )):
+            raise RuntimeError('Previous shutdown is still draining')
         self.ensure_directories_and_permissions()
+        self.is_stopping = False
+        self._worker_stop_file.unlink(missing_ok=True)
+        from app.services.scan_service import resume_scan_executor
+        resume_scan_executor()
         
         # حفظ ملف القفل ورقم العملية
         with open(self.pid_file, 'w', encoding='utf-8') as f:
@@ -295,45 +342,80 @@ class AppController:
         return True
 
     def stop(self) -> None:
+        """Bound each retry; never confuse a timeout with process termination."""
+        import math
+        seconds = float(os.environ.get('APP_SHUTDOWN_TIMEOUT_SECONDS', '120'))
+        if not math.isfinite(seconds) or seconds <= 0:
+            raise ValueError('APP_SHUTDOWN_TIMEOUT_SECONDS must be finite and positive')
+        if not self._stop_lock.acquire(blocking=False):
+            raise RuntimeError('Shutdown already draining; wait before retrying')
+        try:
+            self.shutdown_status = 'draining'
+            self.shutdown_detail = 'Waiting for accepted work'
+            self._stop_deadline = time.monotonic() + seconds
+            self._stop_components()
+            self.shutdown_status = 'complete'
+            self.shutdown_detail = 'All accepted work drained and resources closed'
+        except Exception as exc:
+            self.shutdown_status = 'incomplete'
+            self.shutdown_detail = f'{exc}; threads/processes may remain alive. Retry shutdown after work completes.'
+            logger.error('Shutdown incomplete: %s', self.shutdown_detail)
+            raise
+        finally:
+            self._stop_lock.release()
+
+    def _shutdown_remaining(self):
+        remaining = self._stop_deadline - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError('Shutdown deadline exceeded')
+        return remaining
+
+    def _stop_components(self) -> None:
         """الإغلاق السلس والآمن لكافة مكونات المنظومة."""
         self.is_stopping = True
         self.is_running = False
         logger.info("Stopping system gracefully...")
 
-        # 1. إيقاف العمال
-        for p in self.worker_processes:
-            try:
-                p.terminate()
-            except Exception:
-                pass
-
-        # انتظار خروج العمال لمدة قصيرة
-        time.sleep(1.0)
-        for p in self.worker_processes:
-            try:
-                if p.poll() is None:
-                    p.kill()
-            except Exception:
-                pass
-
-        # 2. إيقاف خادم Waitress
+        # Cooperatively drain only workers launched by this controller.
+        self._worker_stop_file.parent.mkdir(parents=True, exist_ok=True)
+        self._worker_stop_file.touch()
+        with self._requests:
+            if not self._requests.wait_for(lambda: self._active_requests == 0, timeout=self._shutdown_remaining()):
+                raise TimeoutError("Active requests still draining; application remains stopping")
+        from app.services.scan_service import drain_scan_executor
+        drain_scan_executor(timeout=self._shutdown_remaining())
+        for process in self.worker_processes:
+            process.wait(timeout=self._shutdown_remaining())
+            if process.returncode != 0:
+                raise RuntimeError("Worker exited unsuccessfully during shutdown")
         if self.waitress_server:
-            try:
-                self.waitress_server.close()
-            except Exception:
-                pass
+            self.waitress_server.task_dispatcher.shutdown(cancel_pending=False, timeout=self._shutdown_remaining())
+            if self.waitress_server.task_dispatcher.threads:
+                raise TimeoutError('HTTP dispatcher threads still draining')
+            self.waitress_server.close()
+            self.waitress_server.asyncore.close_all(self.waitress_server._map)
+        if self.server_thread:
+            self.server_thread.join(timeout=self._shutdown_remaining())
+            if self.server_thread.is_alive():
+                raise TimeoutError("Server thread did not exit")
+        from app.repositories import base_repo
+        base_repo.engine.dispose()
+        self._worker_stop_file.unlink(missing_ok=True)
 
         # 3. تثبيت معاملات WAL (WAL Checkpoint)
         if self.db_path.exists():
             try:
-                conn = sqlite3.connect(str(self.db_path), timeout=5.0)
-                conn.execute("PRAGMA wal_checkpoint(TRUNCATE);")
+                with sqlite3.connect(str(self.db_path), timeout=self._shutdown_remaining()) as conn:
+                    if conn.execute("PRAGMA wal_checkpoint(TRUNCATE);").fetchone()[0]:
+                        raise TimeoutError('SQLite checkpoint remains busy')
                 conn.close()
                 logger.info("SQLite WAL checkpoint truncated safely.")
             except Exception as e:
                 logger.warning(f"WAL checkpoint note: {e}")
+                raise
 
         # 4. تنظيف ملفات القفل
+        self._shutdown_remaining()
         self.pid_file.unlink(missing_ok=True)
         self.lock_file.unlink(missing_ok=True)
         logger.info("System stopped cleanly.")

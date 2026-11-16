@@ -1,0 +1,42 @@
+﻿{
+    "pagefile_usage":  [
+                           {
+                               "Name":  "C:\\pagefile.sys",
+                               "AllocatedBaseSize":  15827,
+                               "CurrentUsage":  981,
+                               "PeakUsage":  3290
+                           }
+                       ],
+    "windows":  {
+                    "Caption":  "Microsoft Windows 11 Home",
+                    "Version":  "10.0.26300",
+                    "BuildNumber":  "26300",
+                    "FreePhysicalMemory":  8684740,
+                    "TotalVirtualMemorySize":  49421384,
+                    "FreeVirtualMemory":  7426720
+                },
+    "pagefile_settings":  [
+
+                          ],
+    "storage":  [
+                    {
+                        "MediaType":  "SSD",
+                        "BusType":  "NVMe",
+                        "Size":  1000204886016,
+                        "HealthStatus":  "Healthy"
+                    }
+                ],
+    "collected_utc":  "2026-11-06T09:30:56.4270178Z",
+    "cpu":  [
+                {
+                    "Name":  "12th Gen Intel(R) Core(TM) i5-12500H",
+                    "NumberOfCores":  12,
+                    "NumberOfLogicalProcessors":  16
+                }
+            ],
+    "computer":  {
+                     "Model":  "Victus by HP Gaming Laptop 15-fa0xxx",
+                     "TotalPhysicalMemory":  34011582464,
+                     "AutomaticManagedPagefile":  true
+                 }
+}

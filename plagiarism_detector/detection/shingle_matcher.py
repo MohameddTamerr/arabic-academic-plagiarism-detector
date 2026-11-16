@@ -33,7 +33,8 @@ def match_exact_or_near_copy(
     corpus_shingles: list[set[tuple]],
     corpus_norm_texts: list[str],
     threshold: float = 0.33,
-    min_words: int = 4
+    min_words: int = 4,
+    min_sequence_ratio: float = 0.60,
 ) -> Optional[tuple[int, float, str]]:
     """
     مقارنة المقطع المدخل بمجموعة المرشحين لكشف النسخ الحرفي أو شبه الحرفي.
@@ -73,11 +74,11 @@ def match_exact_or_near_copy(
         # 2. فحص SequenceMatcher على مستوى التسلسل الحرفي للكلمات
         #    يُشغَّل على كل مرشح (ليس فقط عند فشل Jaccard) لضمان اختيار الأفضل عالمياً
         seq_score = sequence_ratio(query_norm_text, cand_text)
-        # نقبل SequenceMatcher فقط إذا تجاوز 65% (حد أدنى للنسخ شبه الحرفي)
-        if seq_score >= 0.65 and seq_score > best_score:
+        # نقبل SequenceMatcher إذا تجاوز الحد الأدنى للنسخ شبه الحرفي (افتراضياً 60%)
+        if seq_score >= min_sequence_ratio and seq_score > best_score:
             best_score = seq_score
             best_idx = idx
-            best_match_type = 'NEAR COPY'
+            best_match_type = 'DIRECT COPY' if seq_score >= 0.95 else 'NEAR COPY'
 
     if best_score >= threshold and best_idx != -1:
         return best_idx, best_score, best_match_type

@@ -21,7 +21,12 @@ from app.repositories import report_repo
 from app.repositories import batch_repo
 from app.services.scan_service import start_async_scan, start_thesis_scan, start_batch_scan
 from app.security.permissions import Permission
-from app.security.authorization import require_permission
+from app.security.authorization import (
+    require_permission, get_authenticated_user, can_view_report, can_view_research,
+    can_view_scan_owner, scan_owner_scope,
+)
+from plagiarism_detector.ai_detection.analysis import public_ai_analysis
+from plagiarism_detector.extraction.ocr_engine import normalize_ocr_mode
 
 logger = logging.getLogger(__name__)
 batch_bp = Blueprint('batch_bp', __name__)
@@ -61,14 +66,14 @@ def start_independent_batch():
       files[]          ← الملفات
       titles[]         ← عنوان كل ملف (نفس الترتيب)
       authors[]        ← اسم الباحث لكل ملف
-      created_by       ← اسم المستخدم الرافع
       label            ← وصف اختياري للدفعة
     """
     files = request.files.getlist('files[]')
     titles = request.form.getlist('titles[]')
     authors = request.form.getlist('authors[]')
-    created_by = request.form.get('created_by', '').strip()
+    created_by = get_authenticated_user()['username']
     label = request.form.get('label', '').strip()
+    ocr_mode = normalize_ocr_mode(request.form.get('ocr_mode'))
 
     if not files or not files[0].filename:
         return jsonify({'error': 'لم يتم رفع أي ملفات'}), 400
@@ -145,7 +150,7 @@ def start_independent_batch():
         })
 
     # تشغيل فحص الدفعة في الخلفية
-    start_batch_scan(batch_id, batch_items)
+    start_batch_scan(batch_id, batch_items, requested_by=created_by, ocr_mode=ocr_mode)
 
     # توثيق حدث إنشاء الدفعة في سجل التدقيق
     from app.services import audit_service
@@ -156,7 +161,7 @@ def start_independent_batch():
         object_id=batch_id,
         batch_id=batch_id,
         success=True,
-        metadata={"total_items": len(files), "label": label, "duplicates_count": len(duplicates)}
+        metadata={"total_items": len(files), "label": label, "duplicates_count": len(duplicates), "ocr_mode": ocr_mode}
     )
 
     if duplicates:
@@ -191,7 +196,6 @@ def start_thesis_upload():
       author           ← اسم الباحث
       specialization   ← التخصص
       degree_type      ← الدرجة (ماجستير / دكتوراه)
-      created_by       ← اسم المستخدم الرافع
     """
     files = request.files.getlist('files[]')
     orders_raw = request.form.getlist('orders[]')
@@ -199,7 +203,8 @@ def start_thesis_upload():
     author = request.form.get('author', '').strip()
     specialization = request.form.get('specialization', '').strip()
     degree_type = request.form.get('degree_type', '').strip()
-    created_by = request.form.get('created_by', '').strip()
+    created_by = get_authenticated_user()['username']
+    ocr_mode = normalize_ocr_mode(request.form.get('ocr_mode'))
 
     if not files or not files[0].filename:
         return jsonify({'error': 'لم يتم رفع أي ملفات'}), 400
@@ -285,7 +290,9 @@ def start_thesis_upload():
         research_id=research_id,
         file_entries=file_entries,
         title=title,
-        author=author
+        author=author,
+        requested_by=created_by,
+        ocr_mode=ocr_mode,
     )
 
     # توثيق رفع الرسالة في سجل التدقيق
@@ -306,7 +313,8 @@ def start_thesis_upload():
             "author": author,
             "file_count": len(file_entries),
             "degree_type": degree_type,
-            "specialization": specialization
+            "specialization": specialization,
+            "ocr_mode": ocr_mode,
         }
     )
 
@@ -343,6 +351,8 @@ def get_batch_status(batch_id):
     data = batch_repo.get_batch(batch_id)
     if not data:
         return jsonify({'error': 'الدفعة غير موجودة'}), 404
+    if not can_view_scan_owner(get_authenticated_user(), data['created_by']):
+        return jsonify(error='غير مصرح بالوصول إلى هذه الدفعة', code=ErrorCode.AUTH_FORBIDDEN), 403
 
     # إثراء بحالة المهام من _ACTIVE_SCANS لو لم تُكتمل بعد
     from app.services.scan_service import get_scan_status
@@ -370,7 +380,10 @@ def get_batch_item_report(batch_id, research_id):
     report = report_repo.get_report(report_id)
     if not report:
         return jsonify({'error': 'التقرير غير موجود في قاعدة البيانات'}), 404
-
+    actor = get_authenticated_user()
+    if not can_view_report(actor, report) or not can_view_scan_owner(actor, batch_repo.get_batch_owner(batch_id)):
+        return jsonify(error='غير مصرح بالوصول إلى هذا التقرير', code=ErrorCode.AUTH_FORBIDDEN), 403
+    report['ai_analysis'] = public_ai_analysis(report.get('ai_analysis'))
     return jsonify(report)
 
 
@@ -383,6 +396,9 @@ def retry_batch_item(batch_id, research_id):
     batch_data = batch_repo.get_batch(batch_id)
     if not batch_data:
         return jsonify({'error': 'الدفعة غير موجودة'}), 404
+    actor = get_authenticated_user()
+    if not can_view_scan_owner(actor, batch_data['created_by']):
+        return jsonify(error='غير مصرح بالوصول إلى هذه الدفعة', code=ErrorCode.AUTH_FORBIDDEN), 403
 
     # إيجاد العنصر
     target_item = None
@@ -421,7 +437,7 @@ def retry_batch_item(batch_id, research_id):
         'author': research['author'],
         'file_name': files[0]['original_filename'] if files else '',
         'raw_text': ''
-    }])
+    }], requested_by=actor['username'])
 
     from app.services import audit_service
     audit_service.record_event(
@@ -450,6 +466,9 @@ def get_thesis_status(research_id):
     research = batch_repo.get_research(research_id)
     if not research:
         return jsonify({'error': 'الرسالة غير موجودة'}), 404
+    actor = get_authenticated_user()
+    if not can_view_research(actor, research) or not can_view_scan_owner(actor, research.get('created_by')):
+        return jsonify(error='غير مصرح بالوصول إلى هذه الرسالة', code=ErrorCode.AUTH_FORBIDDEN), 403
 
     result = {'research_id': research_id, 'report_id': research.get('report_id')}
 
@@ -460,8 +479,11 @@ def get_thesis_status(research_id):
         result['progress'] = job.get('progress', 0)
         result['stage'] = job.get('stage', '')
         result['error'] = job.get('error', '')
-        if job.get('result'):
-            result['result'] = job['result']
+        report = job.get('result')
+        if report:
+            if not can_view_report(actor, report):
+                return jsonify(error='غير مصرح بالوصول إلى هذا التقرير', code=ErrorCode.AUTH_FORBIDDEN), 403
+            result['result'] = {**report, 'ai_analysis': public_ai_analysis(report.get('ai_analysis'))}
     else:
         result['status'] = 'not_started'
 
@@ -484,8 +506,6 @@ def list_researches_paginated():
     - ?page=1 & ?page_size=25 (max 100)
     """
     from app.utils.pagination import get_pagination_params, format_paginated_response
-    from app.security.authorization import get_authenticated_user
-    from app.security.permissions import Role
 
     params = get_pagination_params(
         default_size=25,
@@ -494,12 +514,6 @@ def list_researches_paginated():
         default_sort='created_at',
         default_order='desc'
     )
-
-    # التحقق من نطاق صلاحيات المستخدم (Data Scoping)
-    current_user = get_authenticated_user()
-    user_scope = None
-    if current_user and current_user.get('role') == Role.DATA_ENTRY:
-        user_scope = current_user.get('username')
 
     scan_status = request.args.get('scan_status')
     review_status = request.args.get('review_status')
@@ -514,9 +528,9 @@ def list_researches_paginated():
         order_direction=params['order'],
         offset=params['offset'],
         limit=params['limit'],
-        user_scope_username=user_scope,
         after_id=params.get('after_id'),
-        before_id=params.get('before_id')
+        before_id=params.get('before_id'),
+        owner_scope=scan_owner_scope(get_authenticated_user()),
     )
 
     return jsonify(format_paginated_response(
@@ -555,7 +569,8 @@ def list_batches_paginated():
         sort_field=params['sort'],
         order_direction=params['order'],
         offset=params['offset'],
-        limit=params['limit']
+        limit=params['limit'],
+        owner_scope=scan_owner_scope(get_authenticated_user()),
     )
 
     return jsonify(format_paginated_response(

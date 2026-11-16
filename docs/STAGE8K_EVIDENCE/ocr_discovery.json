@@ -1,0 +1,18 @@
+{
+  "availability": {
+    "available": true,
+    "cmd_path": "C:\\Program Files\\Tesseract-OCR\\tesseract.EXE",
+    "has_arabic": true,
+    "languages": [
+      "ara",
+      "eng"
+    ],
+    "tessdata_path": "C:\\Users\\user\\Downloads\\Baba\\assets\\tessdata",
+    "ocr_mode": "accurate",
+    "reason": "محرك Tesseract جاهز ومتاح أوفلاين."
+  },
+  "cold_discovery_seconds": 0.9822298000217415,
+  "cached_discovery_seconds": 8.00006091594696e-07,
+  "equal_results": true,
+  "note": "Development host, concurrent regression; diagnostic probe, not isolated throughput"
+}

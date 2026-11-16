@@ -1,0 +1,160 @@
+{
+  "startup_factory_seconds": 0.17825170001015067,
+  "baseline_process_rss": 716894208,
+  "available_ram_before": 8435859456,
+  "total_ram": 34011582464,
+  "runs": [
+    {
+      "pages": 10,
+      "nominal_words": 1000,
+      "pdf_bytes": 2136211,
+      "total_request_seconds": 84.26431940001203,
+      "extracted_words": 1000,
+      "extracted_characters": 7300,
+      "extraction_seconds": 0.3820053999661468,
+      "plagiarism_seconds": 8.167653699987568,
+      "torch_import_seconds": 4.399975296109915e-06,
+      "transformers_import_seconds": 68.04321159998653,
+      "thread_configuration_seconds": 0.0013902999926358461,
+      "artifact_verification_seconds": 0.9772129000048153,
+      "source_asset_verification_seconds": 1.9612713999813423,
+      "tokenizer_load_seconds": 0.33695720002288,
+      "model_file_load_seconds": 1.2327526999870315,
+      "ai_load_seconds": 72.55352600000333,
+      "ai_seconds": 2.5129816999542527,
+      "ai_paragraphs": 10,
+      "ai_tokens": 1020,
+      "report_persistence_seconds": 0.02281970001058653,
+      "overall_pct": 52.0,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "pages": 50,
+      "nominal_words": 5000,
+      "pdf_bytes": 10680412,
+      "total_request_seconds": 14.26353029999882,
+      "extracted_words": 5000,
+      "extracted_characters": 36500,
+      "extraction_seconds": 0.6767450999468565,
+      "plagiarism_seconds": 4.130576400028076,
+      "ai_load_seconds": 1.300009898841381e-06,
+      "ai_seconds": 8.933411800011527,
+      "ai_paragraphs": 50,
+      "ai_tokens": 5100,
+      "report_persistence_seconds": 0.05920379998860881,
+      "overall_pct": 52.0,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "pages": 100,
+      "nominal_words": 10000,
+      "pdf_bytes": 21362271,
+      "total_request_seconds": 28.383013399958145,
+      "extracted_words": 10000,
+      "extracted_characters": 73000,
+      "extraction_seconds": 1.2147398000233807,
+      "plagiarism_seconds": 8.922697599977255,
+      "ai_load_seconds": 1.2999516911804676e-06,
+      "ai_seconds": 17.374828099971637,
+      "ai_paragraphs": 100,
+      "ai_tokens": 10200,
+      "report_persistence_seconds": 0.0725218000006862,
+      "overall_pct": 52.0,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "file_type": "synthetic.docx",
+      "status_code": 200,
+      "total_request_seconds": 11.346171099983621,
+      "extracted_words": 1000,
+      "extracted_characters": 7156,
+      "extraction_seconds": 8.267193000006955,
+      "plagiarism_seconds": 0.5072228999924846,
+      "ai_load_seconds": 1.4999532140791416e-06,
+      "ai_seconds": 2.350302600010764,
+      "ai_paragraphs": 2,
+      "ai_tokens": 931,
+      "report_persistence_seconds": 0.04229269997449592,
+      "overall_pct": 94.7,
+      "production_ai_reason": "disabled"
+    },
+    {
+      "file_type": "synthetic-scanned.pdf",
+      "status_code": 200,
+      "total_request_seconds": 3.9036741000018083,
+      "extracted_words": 100,
+      "extracted_characters": 696,
+      "extraction_seconds": 3.333268999995198,
+      "plagiarism_seconds": 0.03703680000035092,
+      "ai_load_seconds": 1.100008375942707e-06,
+      "ai_seconds": 0.20035870000720024,
+      "ai_paragraphs": 1,
+      "ai_tokens": 102,
+      "report_persistence_seconds": 0.0029868000419810414,
+      "overall_pct": 100.0,
+      "production_ai_reason": "disabled"
+    }
+  ],
+  "stage_peaks": {
+    "startup": {
+      "peak_tree_rss": 718196736,
+      "peak_tree_private_bytes": 2104012800,
+      "peak_system_used": 25575374848
+    },
+    "fixture_generation": {
+      "peak_tree_rss": 1889869824,
+      "peak_tree_private_bytes": 3399561216,
+      "peak_system_used": 27227676672
+    },
+    "upload": {
+      "peak_tree_rss": 1975328768,
+      "peak_tree_private_bytes": 3512152064,
+      "peak_system_used": 27472236544
+    },
+    "extraction": {
+      "peak_tree_rss": 2094899200,
+      "peak_tree_private_bytes": 3620945920,
+      "peak_system_used": 27587358720
+    },
+    "plagiarism": {
+      "peak_tree_rss": 2008137728,
+      "peak_tree_private_bytes": 3543605248,
+      "peak_system_used": 27515248640
+    },
+    "ai_load": {
+      "peak_tree_rss": 2008137728,
+      "peak_tree_private_bytes": 3543605248,
+      "peak_system_used": 27502235648
+    },
+    "ai_inference": {
+      "peak_tree_rss": 2010804224,
+      "peak_tree_private_bytes": 3545112576,
+      "peak_system_used": 27514429440
+    },
+    "report_processing": {
+      "peak_tree_rss": 2010820608,
+      "peak_tree_private_bytes": 3545112576,
+      "peak_system_used": 27513958400
+    },
+    "cleanup": {
+      "peak_tree_rss": 1774141440,
+      "peak_tree_private_bytes": 3298361344,
+      "peak_system_used": 27275952128
+    }
+  },
+  "after_cleanup_rss": 1762111488,
+  "process_cpu_seconds": 200.9375,
+  "elapsed_seconds": 147.18061229999876,
+  "limitations": [
+    "Flask test client; no network responsiveness measurement",
+    "test authentication/CSRF mode and antivirus double",
+    "synthetic authorized fixtures; not representative academic documents",
+    "semantic model disabled; synchronous extraction may invoke OCR",
+    "framework imports before factory timer excluded from startup measurement",
+    "no target 4GB PC, system commit or page-file activity measurement",
+    "cached research model; experimental outputs discarded"
+  ],
+  "corpus_import_seconds": 0.6003572000190616,
+  "corpus_profile": "populated",
+  "sampling_interval": 0.02
+}

@@ -77,6 +77,41 @@ def test_rejected_history_is_separate_from_official_similarity(monkeypatch):
     assert result['rejected_history_sources'][0]['pct'] == 100.0
 
 
+def test_partial_history_matches_keep_official_and_rejected_tokens_independent(monkeypatch):
+    from plagiarism_detector.detection.span_aligner import alignment_evidence, tokenize_original
+    monkeypatch.setattr(report_builder, 'get_pipeline_index', lambda **_: _empty_reference_index())
+    monkeypatch.setattr(report_builder, '_get_review_history_index', lambda _: {})
+    preliminary = {**_history_segment('preliminary_accepted'), 'raw_text': 'تعتمد الدراسة على تحليل الأدلة الرقمية وربط النتائج'}
+    rejected = {**_history_segment('rejected'), 'raw_text': 'وربط النتائج بالسياق المؤسسي لتحسين دقة القرارات'}
+    def match(_text, _index, _settings, statuses, _embedding):
+        return (preliminary if 'preliminary_accepted' in statuses else rejected, 0.9, 'NEAR COPY')
+    monkeypatch.setattr(report_builder, 'match_review_history_segment', match)
+    result = report_builder.analyze_academic_document(PASSAGE, settings_override={'enable_semantic_model': False})
+    segment = result['segments'][0]
+    pre = alignment_evidence(PASSAGE, preliminary['raw_text'], 'p')['matched_suspicious_token_indexes']
+    rej = alignment_evidence(PASSAGE, rejected['raw_text'], 'r')['matched_suspicious_token_indexes']
+    assert set(pre) != set(rej)
+    assert segment['matched_token_indexes'] == pre
+    assert segment['rejected_history_match']['matched_token_indexes'] == rej
+    assert result['overall_pct'] == round(100 * len(pre) / len(tokenize_original(PASSAGE)), 1)
+    assert result['rejected_history_pct'] == round(100 * len(rej) / len(tokenize_original(PASSAGE)), 1)
+    assert segment['alignment_evidence'][0]['source_report_id'] == preliminary['report_id']
+    from plagiarism_detector.reporting.reviewer_evidence import build_evidence_catalog
+    assert build_evidence_catalog(result)[0]['matched_token_indexes'] == pre
+
+
+def test_semantic_review_history_never_fabricates_lexical_coverage(monkeypatch):
+    monkeypatch.setattr(report_builder, 'get_pipeline_index', lambda **_: _empty_reference_index())
+    monkeypatch.setattr(report_builder, '_get_review_history_index', lambda _: {})
+    monkeypatch.setattr(report_builder, 'match_review_history_segment',
+        lambda _text, _index, _settings, statuses, _embedding:
+            (_history_segment(next(iter(statuses))), 0.9, 'SEMANTIC PARAPHRASE'))
+    result = report_builder.analyze_academic_document(PASSAGE, settings_override={'enable_semantic_model': False})
+    assert result['overall_pct'] == result['rejected_history_pct'] == 0.0
+    assert result['segments'][0]['alignment_coordinate_status'] == 'semantic_no_lexical_coordinates'
+    assert result['segments'][0]['rejected_history_match']['alignment_coordinate_status'] == 'semantic_no_lexical_coordinates'
+
+
 def test_rejected_history_symbol_noise_never_matches(monkeypatch):
     """المقاطع الرمزية أو الخالية من الكلمات لا تتطابق إطلاقاً مع سجل المرفوضات."""
     monkeypatch.setattr(report_builder, 'get_pipeline_index', lambda **_: _empty_reference_index())

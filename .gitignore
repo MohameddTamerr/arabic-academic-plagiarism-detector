@@ -18,6 +18,7 @@ __pycache__/
 .eggs/
 .pytest_cache/
 .pytest-*/
+.venv-stage8d/
 .coverage
 htmlcov/
 build_log.txt

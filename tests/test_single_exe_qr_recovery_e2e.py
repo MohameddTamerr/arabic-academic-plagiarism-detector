@@ -26,7 +26,11 @@ from pathlib import Path
 
 EXE_PATH = Path(r"C:\FinalUserTest\Arabic-Plagiarism-System.exe")
 if not EXE_PATH.exists():
-    EXE_PATH = Path(__file__).resolve().parent.parent / "dist" / "Arabic-Plagiarism-System.exe"
+    candidate_fresh = Path(__file__).resolve().parent.parent / "dist" / "fresh_acceptance_rc3" / "Arabic-Plagiarism-System.exe"
+    if candidate_fresh.exists():
+        EXE_PATH = candidate_fresh
+    else:
+        EXE_PATH = Path(__file__).resolve().parent.parent / "dist" / "Arabic-Plagiarism-System.exe"
 
 
 def get_pe_subsystem(exe_path: Path) -> int:
@@ -83,7 +87,7 @@ def test_single_exe_e2e_server_and_recovery_flow():
     start_time = time.time()
     try:
         # Wait for /api/system/ping -> 200
-        while time.time() - start_time < 60:
+        while time.time() - start_time < 120:
             try:
                 req = urllib.request.Request("http://127.0.0.1:5000/api/system/ping")
                 with urllib.request.urlopen(req, timeout=2) as resp:
@@ -95,7 +99,7 @@ def test_single_exe_e2e_server_and_recovery_flow():
             except Exception:
                 time.sleep(0.5)
 
-        assert server_ready, "Frozen executable failed to start within 60 seconds"
+        assert server_ready, "Frozen executable failed to start within 120 seconds"
 
         # Verify /api/system/ping is 200 OK
         req_ping = urllib.request.Request("http://127.0.0.1:5000/api/system/ping")

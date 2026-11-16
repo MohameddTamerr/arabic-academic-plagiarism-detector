@@ -337,7 +337,13 @@ class ControlCenterGUI:
         if confirm:
             self.lbl_status.config(text="🟡 جاري حفظ البيانات والإيقاف بأمان...", foreground="#d97706")
             self.root.update()
-            self.controller.stop()
+            try:
+                self.controller.stop()
+            except Exception:
+                detail = self.controller.shutdown_detail
+                self.lbl_status.config(text='🟡 إيقاف غير مكتمل — أعد المحاولة بعد انتهاء المعالجة', foreground='#d97706')
+                messagebox.showwarning('إيقاف غير مكتمل', detail, parent=self.root)
+                return
             self.root.destroy()
             sys.exit(0)
 

@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><title>مراجعة شواهد التقرير</title>
+<style>body{font-family:Tahoma,Arial,sans-serif;background:#f8fafc;color:#172033;margin:2rem}.card{background:#fff;border:1px solid #dce3ed;border-radius:8px;padding:1rem;margin:.75rem 0}.muted{color:#566579}.semantic{border-right:4px solid #9467bd}.lexical{border-right:4px solid #c0392b}</style></head>
+<body>
+  <h1>مراجعة شواهد التقرير</h1><p class="muted" id="summary">جارٍ تحميل الشواهد…</p><main id="evidence" aria-live="polite"></main>
+  <script>
+  (async function(){
+    const response = await fetch('/api/reports/{{ report_id }}/reviewer-evidence');
+    const data = await response.json(); const root=document.getElementById('evidence');
+    if(!response.ok){ root.textContent=data.error || 'تعذر تحميل الشواهد'; return; }
+    document.getElementById('summary').textContent = `التشابه المعجمي الخام: ${data.raw_lexical_similarity_pct}% — النتيجة المعدلة للمراجع: ${data.reviewer_adjusted.reviewer_adjusted_similarity_pct ?? 'غير محددة'}%`;
+    data.evidence.forEach(item => { const el=document.createElement('article'); el.className=`card ${item.kind==='lexical'?'lexical':'semantic'}`;
+      const heading=document.createElement('h2'); heading.textContent=item.source_title || 'مصدر غير مسمى';
+      const detail=document.createElement('p'); detail.textContent=item.kind==='lexical' ? `شاهد معجمي؛ صفحة المصدر: ${item.source_page ?? 'غير متاحة'}؛ رموز مطابقة: ${item.matched_token_indexes.length}` : `مرشح دلالي للمراجعة فقط؛ لا يغير النسبة ولا يملك إحداثيات تظليل.`;
+      const text=document.createElement('p'); text.textContent=item.submitted_text; el.append(heading,detail,text); root.append(el); });
+  })();
+  </script>
+</body></html>

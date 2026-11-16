@@ -69,7 +69,9 @@ def test_check_exe_executes_with_bundled_runtime(tmp_path):
 
     # نسخ بايثون الحالي إلى Runtime
     import shutil
-    shutil.copy2(sys.executable, runtime_dir / "python.exe")
+    # A venv's python.exe is a redirector and cannot run when copied without
+    # pyvenv.cfg. Use its base interpreter to test the launcher, not the venv.
+    shutil.copy2(getattr(sys, '_base_executable', sys.executable), runtime_dir / "python.exe")
 
     check_exe = tmp_path / "Check-System.exe"
     res = subprocess.run([str(check_exe), "--no-pause"], input="\n", capture_output=True, text=True, cwd=str(tmp_path))

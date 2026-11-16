@@ -129,7 +129,6 @@ def compute_embeddings(texts: list[str], role: str = 'query') -> Optional[np.nda
     embedder = get_embedder()
     if embedder is None or not texts:
         return None
-
     try:
         if role not in {'query', 'passage'}:
             raise ValueError("role must be either 'query' or 'passage'")
@@ -142,13 +141,47 @@ def compute_embeddings(texts: list[str], role: str = 'query') -> Optional[np.nda
             text if str(text).startswith(prefix) else f'{prefix}{text}'
             for text in texts
         ]
-        # FastEmbed يرجع مولداً لمصفوفات numpy
+        # FastEmbed returns an iterator of normalized NumPy vectors.
         embeddings = list(embedder.embed(prepared_texts, batch_size=16))
         return np.array(embeddings)
     except Exception as e:
         logger.warning(f"فشل حساب التضمين الدلالي: {e}")
         return None
 
+
+def rank_semantic_candidates(
+    query_embedding: Optional[np.ndarray],
+    corpus_embeddings: Optional[np.ndarray],
+    candidate_indices: Optional[list[int]] = None,
+    top_k: int = 50,
+) -> list[tuple[int, float]]:
+    """Rank semantic candidates without applying a plagiarism threshold.
+
+    This is retrieval evidence only.  It intentionally returns cosine scores
+    separately from the Stage C acceptance threshold and never creates spans.
+    Supplying no candidate indices ranks the complete local corpus, allowing a
+    semantic paraphrase to be recovered even when BM25 has no lexical candidate.
+    """
+    if query_embedding is None or corpus_embeddings is None or top_k <= 0:
+        return []
+    try:
+        corpus = np.asarray(corpus_embeddings)
+        if corpus.ndim != 2 or not len(corpus):
+            return []
+        indices = np.arange(len(corpus), dtype=np.intp) if candidate_indices is None else np.asarray(candidate_indices, dtype=np.intp)
+        if not len(indices):
+            return []
+        q_vec = np.asarray(query_embedding)
+        vectors = corpus[indices]
+        norms = np.linalg.norm(vectors, axis=1) * np.linalg.norm(q_vec)
+        norms[norms == 0] = 1e-10
+        scores = (vectors @ q_vec) / norms
+        # Stable tie-break by corpus position makes repeat reports reproducible.
+        order = sorted(range(len(indices)), key=lambda local: (-float(scores[local]), int(indices[local])))
+        return [(int(indices[local]), float(scores[local])) for local in order[:top_k]]
+    except Exception as exc:
+        logger.debug("تعذر ترتيب المرشحين الدلاليين: %s", exc)
+        return []
 
 def batch_match_semantic_similarity(
     query_embeddings: np.ndarray,

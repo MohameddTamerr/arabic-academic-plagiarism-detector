@@ -21,14 +21,58 @@ import config
 from app.repositories import report_repo
 from app.services.settings_service import get_current_settings
 from plagiarism_detector.extraction.page_extractor import extract_document_pages
+from plagiarism_detector.extraction.ocr_engine import OCR_MODE_ACCURATE, normalize_ocr_mode
 from plagiarism_detector.reporting.report_builder import analyze_academic_document
 from app.services.self_match_service import reference_ids_for_work, reference_ids_for_scan
 from plagiarism_detector.core.categorizer import categorize_text
 
 logger = logging.getLogger(__name__)
 
-_EXECUTOR = ThreadPoolExecutor(max_workers=max(4, config.MAX_CONCURRENT_SCANS + 2))
+class DrainingScanExecutor(ThreadPoolExecutor):
+    # Track accepted futures without interrupting running Python threads.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._drain_lock = threading.Lock()
+        self._accepted = set()
+
+    def submit(self, *args, **kwargs):
+        with self._drain_lock:
+            future = super().submit(*args, **kwargs)
+            self._accepted = {f for f in self._accepted if not f.done()}
+            self._accepted.add(future)
+            return future
+
+    def drain(self, timeout):
+        from concurrent.futures import wait
+        with self._drain_lock:
+            self.shutdown(wait=False, cancel_futures=False)
+            pending = set(self._accepted)
+        if pending:
+            _, pending = wait(pending, timeout=max(0, timeout))
+        if pending:
+            raise TimeoutError(f"Shutdown incomplete: {len(pending)} accepted scan task(s) still active; retry after completion. Threads remain alive.")
+
+
+def _new_scan_executor():
+    return DrainingScanExecutor(max_workers=max(1, int(os.environ.get(
+        "SCAN_EXECUTOR_WORKERS", max(4, config.MAX_CONCURRENT_SCANS + 2)))))
+
+
+_EXECUTOR = _new_scan_executor()
 _ACTIVE_SCANS = {}
+
+
+def drain_scan_executor(timeout=120):
+    _EXECUTOR.drain(timeout)
+
+
+def resume_scan_executor():
+    global _EXECUTOR
+    with _EXECUTOR._drain_lock:
+        if any(not f.done() for f in _EXECUTOR._accepted):
+            raise RuntimeError("Previous scans still draining")
+        if _EXECUTOR._shutdown:
+            _EXECUTOR = _new_scan_executor()
 
 # Semaphore لتحديد التزامن الحقيقي لمهام الدفعة
 _BATCH_SEMAPHORE = threading.Semaphore(config.MAX_CONCURRENT_SCANS)
@@ -84,9 +128,12 @@ def start_async_scan(
     author: str,
     raw_text: str = '',
     file_name: str = '',
-    requested_by: str = ''
+    requested_by: str = '',
+    ocr_mode: str = OCR_MODE_ACCURATE,
+    enable_ai_research: bool = False,
 ) -> str:
     """بدء مهمة فحص في الخلفية وإرجاع task_id للمتابعة."""
+    mode = normalize_ocr_mode(ocr_mode)
     task_id = str(uuid.uuid4())[:10]
 
     _ACTIVE_SCANS[task_id] = {
@@ -95,6 +142,7 @@ def start_async_scan(
         'progress': 10,
         'stage': 'جاري استلام الملف وبدء الفحص...',
         'file_name': file_name or title or 'بحث جديد',
+        'ocr_mode': mode,
         'result': None,
         'error': None
     }
@@ -108,13 +156,14 @@ def start_async_scan(
 
     job_queue_service.enqueue_job(
         job_type=JobType.SCAN,
-        payload={'file_path': file_path, 'title': title, 'author': author, 'file_name': file_name},
+        payload={'file_path': file_path, 'title': title, 'author': author, 'file_name': file_name, 'ocr_mode': mode, 'enable_ai_research': enable_ai_research},
         requested_by=requested_by,
         custom_job_id=task_id,
         scan_execution_id=task_id
     )
 
-    _EXECUTOR.submit(_execute_scan_pipeline, task_id, file_path, title, author, raw_text, file_name)
+    pipeline_args = (task_id, file_path, title, author, raw_text, file_name, mode, enable_ai_research)
+    _EXECUTOR.submit(_execute_scan_pipeline, *pipeline_args)
     return task_id
 
 
@@ -135,7 +184,8 @@ def start_thesis_scan(
     file_entries: list[dict],   # [{'path': str, 'original_filename': str, 'file_type': str}, ...]
     title: str,
     author: str,
-    requested_by: str = ''
+    requested_by: str = '',
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ) -> str:
     """
     فحص رسالة تتكون من عدة ملفات مرتبة.
@@ -143,6 +193,7 @@ def start_thesis_scan(
     مع حفظ عزو المصدر (اسم الملف + رقم الصفحة) في التقرير.
     يُعيد task_id.
     """
+    mode = normalize_ocr_mode(ocr_mode)
     task_id = str(uuid.uuid4())[:10]
 
     _ACTIVE_SCANS[task_id] = {
@@ -151,6 +202,7 @@ def start_thesis_scan(
         'progress': 5,
         'stage': 'جاري استقبال ملفات الرسالة...',
         'file_name': title or 'رسالة جديدة',
+        'ocr_mode': mode,
         'result': None,
         'error': None
     }
@@ -164,17 +216,18 @@ def start_thesis_scan(
 
     job_queue_service.enqueue_job(
         job_type=JobType.THESIS_SCAN,
-        payload={'research_id': research_id, 'file_entries': file_entries, 'title': title, 'author': author},
+        payload={'research_id': research_id, 'file_entries': file_entries, 'title': title, 'author': author, 'ocr_mode': mode},
         requested_by=requested_by,
         research_id=research_id,
         custom_job_id=task_id,
         scan_execution_id=task_id
     )
 
-    _EXECUTOR.submit(
-        _execute_thesis_pipeline,
-        task_id, research_id, file_entries, title, author
-    )
+    pipeline_args = (task_id, research_id, file_entries, title, author)
+    if mode == OCR_MODE_ACCURATE:
+        _EXECUTOR.submit(_execute_thesis_pipeline, *pipeline_args)
+    else:
+        _EXECUTOR.submit(_execute_thesis_pipeline, *pipeline_args, mode)
     return task_id
 
 
@@ -183,7 +236,8 @@ def _execute_thesis_pipeline(
     research_id: int,
     file_entries: list[dict],
     title: str,
-    author: str
+    author: str,
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ):
     """
     خط أنابيب فحص الرسالة متعددة الملفات.
@@ -192,6 +246,7 @@ def _execute_thesis_pipeline(
     """
     try:
         pipeline_started = time.perf_counter()
+        mode = normalize_ocr_mode(ocr_mode)
         if job_queue_service.is_cancellation_requested(task_id):
             job_queue_service.finalize_cancellation(task_id)
             return
@@ -242,6 +297,7 @@ def _execute_thesis_pipeline(
                         file_end,
                         f'قراءة الملف {f_idx + 1} من {total_files}',
                     ),
+                    ocr_mode=mode,
                 )
             logger.info(
                 "توقيت فحص %s: استخراج الملف %s استغرق %.2f ثانية (%s صفحة).",
@@ -317,6 +373,7 @@ def _execute_thesis_pipeline(
         report['research_reference_number'] = ref_no
         report['file_count'] = len(file_entries)
         report['file_names'] = [e['original_filename'] for e in file_entries]
+        report['ocr_mode'] = mode
         # إدارة الإصدارات وسلسلة النسب (Revision Lineage)
         from app.services import report_integrity_service
         rev_num, prev_rep_id = report_integrity_service.create_report_revision(
@@ -408,7 +465,12 @@ def _enrich_matches_with_file_provenance(report: dict, all_pages_data: list[dict
 
 # ─── فحص دفعة أبحاث مستقلة (Batch Scan) ─────────────────────────────────────
 
-def start_batch_scan(batch_id: str, batch_items: list[dict], requested_by: str = ''):
+def start_batch_scan(
+    batch_id: str,
+    batch_items: list[dict],
+    requested_by: str = '',
+    ocr_mode: str = OCR_MODE_ACCURATE,
+):
     """
     جدولة فحص دفعة أبحاث مستقلة في الخلفية.
     batch_items: [{'research_id': int, 'file_path': str, 'title': str, 'author': str, 'file_name': str}, ...]
@@ -416,6 +478,7 @@ def start_batch_scan(batch_id: str, batch_items: list[dict], requested_by: str =
     فشل عنصر واحد لا يوقف البقية.
     """
     from app.repositories import batch_repo
+    mode = normalize_ocr_mode(ocr_mode)
 
     def run_batch():
         batch_repo.start_batch(batch_id)
@@ -432,7 +495,8 @@ def start_batch_scan(batch_id: str, batch_items: list[dict], requested_by: str =
                     item['author'],
                     item.get('file_name', ''),
                     item.get('raw_text', ''),
-                    requested_by
+                    requested_by,
+                    mode,
                 )
                 futures[future] = item['research_id']
 
@@ -461,11 +525,13 @@ def _execute_batch_item(
     author: str,
     file_name: str,
     raw_text: str,
-    requested_by: str = ''
+    requested_by: str = '',
+    ocr_mode: str = OCR_MODE_ACCURATE,
 ):
     """تنفيذ فحص عنصر واحد داخل الدفعة."""
     from app.repositories import batch_repo
 
+    mode = normalize_ocr_mode(ocr_mode)
     task_id = str(uuid.uuid4())[:10]
 
     try:
@@ -483,6 +549,7 @@ def _execute_batch_item(
             'progress': 10,
             'stage': 'جاري البدء...',
             'file_name': file_name or title,
+            'ocr_mode': mode,
             'result': None,
             'error': None
         }
@@ -496,7 +563,7 @@ def _execute_batch_item(
 
         job_queue_service.enqueue_job(
             job_type=JobType.BATCH_SCAN,
-            payload={'batch_id': batch_id, 'research_id': research_id, 'file_path': file_path, 'title': title, 'author': author},
+            payload={'batch_id': batch_id, 'research_id': research_id, 'file_path': file_path, 'title': title, 'author': author, 'ocr_mode': mode},
             requested_by=requested_by,
             batch_id=batch_id,
             research_id=research_id,
@@ -511,7 +578,11 @@ def _execute_batch_item(
 
         # تنفيذ الفحص الفعلي مع Semaphore
         with _BATCH_SEMAPHORE:
-            _execute_scan_pipeline(task_id, file_path, title, author, raw_text, file_name)
+            pipeline_args = (task_id, file_path, title, author, raw_text, file_name)
+            if mode == OCR_MODE_ACCURATE:
+                _execute_scan_pipeline(*pipeline_args)
+            else:
+                _execute_scan_pipeline(*pipeline_args, mode)
 
         # جلب النتيجة وتحديث الدفعة
         result = _ACTIVE_SCANS.get(task_id, {})
@@ -554,11 +625,14 @@ def _execute_scan_pipeline(
     title: str,
     author: str,
     raw_text: str,
-    file_name: str
+    file_name: str,
+    ocr_mode: str = OCR_MODE_ACCURATE,
+    enable_ai_research: bool = False,
 ):
     """تنفيذ خط أنابيب الفحص الأكاديمي الشامل في مسار الخلفية."""
     try:
         pipeline_started = time.perf_counter()
+        mode = normalize_ocr_mode(ocr_mode)
         if job_queue_service.is_cancellation_requested(task_id):
             job_queue_service.finalize_cancellation(task_id)
             return
@@ -583,6 +657,7 @@ def _execute_scan_pipeline(
                     file_path,
                     enable_ocr=settings.get('enable_ocr', True),
                     progress_callback=_pdf_progress_callback(task_id, 20, 44),
+                    ocr_mode=mode,
                 )
             logger.info(
                 "توقيت فحص %s: استخراج المستند استغرق %.2f ثانية (%s صفحة).",
@@ -611,6 +686,8 @@ def _execute_scan_pipeline(
         # المرحلة 3: المطابقة متعددة المراحل واسترجاع المرشحين
         _update_progress(task_id, 70, 'جاري مطابقة المتواليات واسترجاع المرشحين من المراجع...')
         settings = get_current_settings()
+        if enable_ai_research:
+            settings['enable_ai_research_mode'] = True
         analysis_started = time.perf_counter()
         report = analyze_academic_document(
             raw_text=raw_text,
@@ -643,6 +720,7 @@ def _execute_scan_pipeline(
         report['category'] = category
         report['file_path'] = file_path
         report['status'] = 'مفحوص'
+        report['ocr_mode'] = mode
 
         # ربط أو إنشاء سجل Research للبحث وتعيين الرقم المرجعي
         from app.repositories import batch_repo

@@ -18,6 +18,7 @@ VENDOR_DIR = ROOT_DIR / "vendor"
 TEMPLATES_DIR = ROOT_DIR / "templates"
 STATIC_DIR = ROOT_DIR / "static"
 TESSDATA_DIR = ROOT_DIR / "assets" / "tessdata"
+TESSDATA_FAST_DIR = ROOT_DIR / "assets" / "tessdata_fast"
 MODELS_DIR = ROOT_DIR / "models"
 LOGO_FILE = ROOT_DIR / "Police-Academy-College-of-Graduate-Studies.png"
 MANIFEST_FILE = ROOT_DIR / "release_manifest.json"
@@ -46,6 +47,7 @@ def build_single_exe(
     output_name: str = "Arabic-Plagiarism-System",
     dist_dir: Path | str = DIST_DIR,
     terminate_running: bool = True,
+    manifest_file: Path | str = MANIFEST_FILE,
 ):
     """Build the application, optionally into a side-by-side staging folder."""
     resolved_dist_dir = Path(dist_dir).resolve()
@@ -63,7 +65,12 @@ def build_single_exe(
         except Exception:
             pass
 
-    required_ocr_models = [TESSDATA_DIR / 'ara.traineddata', TESSDATA_DIR / 'eng.traineddata']
+    required_ocr_models = [
+        TESSDATA_DIR / 'ara.traineddata',
+        TESSDATA_DIR / 'eng.traineddata',
+        TESSDATA_FAST_DIR / 'ara.traineddata',
+        TESSDATA_FAST_DIR / 'eng.traineddata',
+    ]
     missing_ocr_models = [str(path) for path in required_ocr_models if not path.is_file()]
     if missing_ocr_models:
         raise FileNotFoundError(f"Missing bundled OCR models: {missing_ocr_models}")
@@ -90,6 +97,25 @@ def build_single_exe(
             f"Missing bundled semantic model files: {missing_semantic_files}"
         )
 
+    ai_snapshot_dir = MODELS_DIR / 'ai_classifier' / 'nawaf_int8'
+    required_ai_files = [
+        ai_snapshot_dir / 'nawaf_int8.onnx',
+        ai_snapshot_dir / 'nawaf_int8.onnx.manifest.json',
+        ai_snapshot_dir / 'nawaf_int8.jit',
+        ai_snapshot_dir / 'nawaf_int8.manifest.json',
+        ai_snapshot_dir / 'hashes_nawaf.json',
+        ai_snapshot_dir / 'config.json',
+        ai_snapshot_dir / 'tokenizer.json',
+        ai_snapshot_dir / 'vocab.txt',
+    ]
+    missing_ai_files = [
+        str(path) for path in required_ai_files if not path.is_file()
+    ]
+    if missing_ai_files:
+        raise FileNotFoundError(
+            f"Missing bundled AI research model files: {missing_ai_files}"
+        )
+
     vendor_runtime_binaries = []
     for library_dir, destination in VENDOR_RUNTIME_DIRS:
         dlls = sorted(library_dir.glob("*.dll"))
@@ -112,9 +138,10 @@ def build_single_exe(
         f"--add-data={TEMPLATES_DIR};templates",
         f"--add-data={STATIC_DIR};static",
         f"--add-data={TESSDATA_DIR};tessdata",
+        f"--add-data={TESSDATA_FAST_DIR};tessdata_fast",
         f"--add-data={MODELS_DIR};models",
         f"--add-data={LOGO_FILE};.",
-        f"--add-data={MANIFEST_FILE};.",
+        f"--add-data={Path(manifest_file).resolve()};.",
         f"--add-data={SKLEARN_REPR_ASSETS_DIR};sklearn/utils/_repr_html",
         # Hidden imports
         "--hidden-import=waitress",
@@ -166,6 +193,8 @@ def build_single_exe(
         "--collect-all=pypdfium2",
         "--collect-all=pypdfium2_raw",
         "--collect-all=fastembed",
+        "--collect-all=onnxruntime",
+        "--collect-all=tokenizers",
         "--hidden-import=fitz",
         "--hidden-import=pymupdf",
         "--hidden-import=pypdfium2",
@@ -219,6 +248,12 @@ def build_single_exe(
         "--hidden-import=app.utils.windows_security",
         "--hidden-import=config",
         "--hidden-import=plagiarism_detector",
+        "--hidden-import=plagiarism_detector.preprocessing.camel_adapter",
+        "--hidden-import=camel_tools",
+        "--hidden-import=camel_tools.tokenizers.word",
+        "--hidden-import=camel_tools.utils.dediac",
+        "--hidden-import=camel_tools.utils.normalize",
+        "--hidden-import=emoji",
 
         # Excludes
         "--exclude-module=torch",
@@ -248,15 +283,17 @@ def build_single_exe(
         sys.exit(1)
 
     size_mb = os.path.getsize(exe_path) / (1024 * 1024)
+    digest = hashlib.sha256()
     with open(exe_path, "rb") as f:
-        sha256 = hashlib.sha256(f.read()).hexdigest()
+        for chunk in iter(lambda: f.read(1024 * 1024), b''):
+            digest.update(chunk)
 
     print("=" * 75)
     print("   [OK] SINGLE-EXE BUILD COMPLETED SUCCESSFULLY")
     print("=" * 75)
     print(f"File Path:   {exe_path}")
     print(f"Size:        {size_mb:.2f} MB ({os.path.getsize(exe_path):,} bytes)")
-    print(f"SHA-256:     {sha256}")
+    print(f"SHA-256:     {digest.hexdigest()}")
     print(f"Build Time:  {t1 - t0:.2f} seconds")
     print("=" * 75)
     return str(exe_path)

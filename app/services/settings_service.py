@@ -92,6 +92,14 @@ def save_settings(new_settings: dict) -> tuple[bool, str]:
         if 'enable_semantic_model' in new_settings:
             current['enable_semantic_model'] = bool(new_settings['enable_semantic_model'])
 
+        if 'enable_ai_research_mode' in new_settings:
+            current['enable_ai_research_mode'] = bool(new_settings['enable_ai_research_mode'])
+
+        if 'ai_research_model' in new_settings:
+            val = str(new_settings['ai_research_model']).strip()
+            if val in ('nawaf_int8', 'sabari_fp32'):
+                current['ai_research_model'] = val
+
         if 'enable_ocr' in new_settings:
             current['enable_ocr'] = bool(new_settings['enable_ocr'])
 

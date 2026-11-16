@@ -25,7 +25,7 @@ hiddenimports = [
     'app.single_exe.app_controller', 'app.single_exe.worker_runner',
     'app.single_exe.gui_controller',
     'app.routes.common_phrases_routes',
-    'config', 'plagiarism_detector',
+    'config', 'plagiarism_detector', 'plagiarism_detector.preprocessing.camel_adapter', 'camel_tools', 'camel_tools.tokenizers.word', 'camel_tools.utils.dediac', 'camel_tools.utils.normalize', 'emoji',
 ]
 hiddenimports += numpy_hidden + scipy_hidden + sklearn_hidden
 hiddenimports += collect_submodules('numpy')
@@ -40,6 +40,8 @@ a = Analysis(
     datas=[
         ('templates', 'templates'),
         ('static', 'static'),
+        ('assets\\tessdata', 'tessdata'),
+        ('assets\\tessdata_fast', 'tessdata_fast'),
         ('Police-Academy-College-of-Graduate-Studies.png', '.'),
         ('release_manifest.json', '.'),
     ] + numpy_datas + scipy_datas + sklearn_datas,

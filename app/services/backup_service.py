@@ -18,6 +18,7 @@ import zipfile
 import sqlite3
 import shutil
 import logging
+import re
 import threading
 from pathlib import Path
 from datetime import datetime
@@ -28,6 +29,7 @@ import config
 from app import versioning
 from app.repositories import backup_repo, base_repo
 from app.services import audit_service, reference_service, integrity_service, snapshot_service
+from app.services import backup_persistent_files
 
 logger = logging.getLogger(__name__)
 
@@ -45,6 +47,33 @@ def get_backup_dir() -> Path:
     b_dir = getattr(config, 'BACKUP_DIR', config.STORAGE_ROOT / 'backups')
     b_dir.mkdir(parents=True, exist_ok=True)
     return b_dir
+
+
+def _remove_owned_directory(path: Path, parent: Path) -> None:
+    """Remove only the directory created by this operation inside its trusted parent."""
+    try:
+        trusted=parent.resolve()
+        target=path.resolve()
+        if path.is_symlink() or target.parent != trusted:
+            raise ValueError('Cleanup target escaped its trusted parent')
+        shutil.rmtree(path)
+    except FileNotFoundError:
+        pass
+    except Exception:
+        logger.warning('Unable to safely remove operation directory %s',path,exc_info=True)
+
+
+def _locate_backup_path(backup_identifier: str, entry=None) -> Optional[Path]:
+    if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', backup_identifier or ''):
+        raise ValueError('Invalid backup identifier')
+    root=get_backup_dir().resolve()
+    if entry and entry.get('file_path'):
+        candidate=Path(entry['file_path']).resolve()
+        if candidate.is_relative_to(root) and candidate.is_file():return candidate
+    for candidate in sorted(root.glob(f'{backup_identifier}_*.zip')):
+        resolved=candidate.resolve()
+        if resolved.is_relative_to(root) and resolved.is_file():return resolved
+    return None
 
 
 class CrossProcessRestoreLock:
@@ -228,6 +257,9 @@ def backup_sqlite_consistently(src_db_path: Path, dst_db_path: Path) -> None:
     try:
         # تنفيذ النسخ عبر واجهة backup_api مع معالجة WAL frames
         src_conn.backup(dst_conn, pages=250, sleep=0.01)
+        # The portable snapshot must be self-contained; do not archive unchecked
+        # WAL frames that could change the database after integrity validation.
+        dst_conn.execute('PRAGMA journal_mode=DELETE')
     finally:
         dst_conn.close()
         src_conn.close()
@@ -256,15 +288,24 @@ def create_institutional_backup(
     if not cross_lock.acquire(blocking=False):
         raise RuntimeError("توجد عملية نسخ احتياطي أخرى قيد التنفيذ حالياً على مستوى النظام (Cross-Process Lock). يرجى الانتظار.")
 
+    backup_id = None
+    staging_dir = None
+    staging_created = False
+    partial_zip = None
     try:
         with _BACKUP_LOCK:
             _BACKUP_IN_PROGRESS = True
             start_time = datetime.utcnow()
-            backup_id = reference_service.get_next_backup_reference(prefix='BKP')
             backup_dir = get_backup_dir()
-            zip_filename = f"{backup_id}_{backup_type}.zip"
-            zip_filepath = backup_dir / zip_filename
-            staging_dir = backup_dir / f"_staging_{backup_id}"
+            # Imported archives may not yet be in this database's sequence.
+            # Never replace any existing backup while making a safety snapshot.
+            while True:
+                backup_id = reference_service.get_next_backup_reference(prefix='BKP')
+                zip_filename = f"{backup_id}_{backup_type}.zip"
+                zip_filepath = backup_dir / zip_filename
+                if not list(backup_dir.glob(f'{backup_id}_*.zip')):
+                    break
+            staging_dir = backup_dir / f"_staging_{backup_id}_{uuid.uuid4().hex}"
 
             # تسجيل مبدئي في الفهرس
             backup_repo.create_backup_entry(
@@ -279,7 +320,8 @@ def create_institutional_backup(
                 manifest_version=MANIFEST_SCHEMA_VERSION
             )
 
-            staging_dir.mkdir(parents=True, exist_ok=True)
+            staging_dir.mkdir(parents=False, exist_ok=False)
+            staging_created = True
             db_staging_dir = staging_dir / 'database'
             research_staging_dir = staging_dir / 'research_files'
             ref_staging_dir = staging_dir / 'reference_files'
@@ -398,6 +440,12 @@ def create_institutional_backup(
             })
             total_files_count += len(research_files_manifest)
 
+            # Preserve database-referenced originals, including report sources and
+            # reference/thesis documents, independently of regenerable caches.
+            persistent_component = backup_persistent_files.stage(staged_db_path, staging_dir / 'persistent_files')
+            included_components.append(persistent_component)
+            total_files_count += persistent_component['file_count']
+
             # 3. نسخ إعدادات المنظومة
             from app.services.settings_service import get_current_settings
             current_settings = get_current_settings()
@@ -405,11 +453,13 @@ def create_institutional_backup(
             with open(staged_settings_path, 'w', encoding='utf-8') as f:
                 json.dump(current_settings, f, ensure_ascii=False, indent=2)
             cfg_size = staged_settings_path.stat().st_size
+            cfg_hash, _ = integrity_service.compute_stream_sha256(staged_settings_path)
             included_components.append({
                 'name': 'configuration',
                 'file_name': 'configuration/settings.json',
                 'file_count': 1,
-                'size_bytes': cfg_size
+                'size_bytes': cfg_size,
+                'sha256': cfg_hash
             })
             total_files_count += 1
 
@@ -428,11 +478,13 @@ def create_institutional_backup(
             with open(staged_meta_path, 'w', encoding='utf-8') as f:
                 json.dump(version_meta, f, ensure_ascii=False, indent=2)
             meta_size = staged_meta_path.stat().st_size
+            meta_hash, _ = integrity_service.compute_stream_sha256(staged_meta_path)
             included_components.append({
                 'name': 'metadata',
                 'file_name': 'metadata/version_info.json',
                 'file_count': 1,
-                'size_bytes': meta_size
+                'size_bytes': meta_size,
+                'sha256': meta_hash
             })
             total_files_count += 1
 
@@ -469,7 +521,8 @@ def create_institutional_backup(
                 json.dump(manifest_data, f, ensure_ascii=False, indent=2)
 
             # 6. ضغط الحزمة إلى ملف ZIP
-            with zipfile.ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as zf:
+            partial_zip = backup_dir / f'.{backup_id}_{uuid.uuid4().hex}.partial'
+            with zipfile.ZipFile(partial_zip, 'w', zipfile.ZIP_DEFLATED) as zf:
                 for root, _, files in os.walk(staging_dir):
                     for file in files:
                         full_p = Path(root) / file
@@ -477,12 +530,18 @@ def create_institutional_backup(
                         zf.write(full_p, arcname=rel_p.as_posix())
 
             # 7. حساب البصمة الرقمية للحزمة وفحص سلامتها
-            package_checksum, package_size = integrity_service.compute_stream_sha256(zip_filepath)
+            package_checksum, package_size = integrity_service.compute_stream_sha256(partial_zip)
 
             # 8. التحقق التلقائي الصارم من سلامة الحزمة قبل اعتمادها
-            val_result = validate_backup_package_file(zip_filepath, expected_db_hash=db_hash)
+            val_result = validate_backup_package_file(partial_zip, expected_db_hash=db_hash, allow_partial=True)
             if not val_result['valid']:
                 raise ValueError(f"فشل التحقق الذاتي من النسخة الاحتياطية: {val_result.get('error')}")
+            # Publish without ever replacing an archive created by another actor.
+            if os.name == 'nt':
+                os.rename(partial_zip, zip_filepath)
+            else:
+                os.link(partial_zip, zip_filepath)
+                partial_zip.unlink()
 
             # 9. تحديث السجل في الفهرس
             backup_repo.update_backup_status(
@@ -527,7 +586,8 @@ def create_institutional_backup(
 
     except Exception as e:
         logger.error(f"فشل إنشاء النسخة الاحتياطية {backup_id}: {e}", exc_info=True)
-        backup_repo.update_backup_status(backup_id, status='failed')
+        if backup_id:
+            backup_repo.update_backup_status(backup_id, status='failed')
         audit_service.record_event(
             action="backup.failed",
             category="backup",
@@ -541,8 +601,13 @@ def create_institutional_backup(
 
     finally:
         _BACKUP_IN_PROGRESS = False
-        if staging_dir.exists():
-            shutil.rmtree(staging_dir, ignore_errors=True)
+        if staging_created and staging_dir is not None and staging_dir.exists():
+            _remove_owned_directory(staging_dir,backup_dir)
+        if partial_zip is not None:
+            try:
+                partial_zip.unlink(missing_ok=True)
+            except OSError:
+                logger.warning('Unable to remove incomplete backup %s', partial_zip, exc_info=True)
         cross_lock.release()
 
 
@@ -557,20 +622,15 @@ def validate_backup(backup_identifier: str) -> Dict[str, Any]:
     """
     entry = backup_repo.get_backup_entry(backup_identifier)
     backup_dir = get_backup_dir()
-
-    if entry and entry.get('file_path') and os.path.exists(entry['file_path']):
-        zip_path = Path(entry['file_path'])
-    else:
-        # البحث في مجلد النسخ
-        candidates = list(backup_dir.glob(f"{backup_identifier}*.zip"))
-        if not candidates:
-            return {
-                'backup_id': backup_identifier,
-                'valid': False,
-                'validation_status': 'invalid',
-                'error': 'ملف النسخة الاحتياطية غير موجود على القرص'
-            }
-        zip_path = candidates[0]
+    if entry and entry.get('status') in ('creating','failed'):
+        return {'backup_id':backup_identifier,'valid':False,'error':'Backup creation was not completed'}
+    try:
+        zip_path = _locate_backup_path(backup_identifier,entry)
+    except ValueError as exc:
+        return {'backup_id':backup_identifier,'valid':False,'error':str(exc)}
+    if zip_path is None:
+        return {'backup_id':backup_identifier,'valid':False,'validation_status':'invalid',
+                'error':'ملف النسخة الاحتياطية غير موجود على القرص'}
 
     if entry and entry.get('checksum'):
         current_pkg_hash, _ = integrity_service.compute_stream_sha256(zip_path)
@@ -604,18 +664,24 @@ def validate_backup(backup_identifier: str) -> Dict[str, Any]:
     return result
 
 
-def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str] = None) -> Dict[str, Any]:
+def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str] = None, *, allow_partial: bool = False) -> Dict[str, Any]:
     """فحص داخلي متقدم لبنية محتويات ملف الـ ZIP."""
+    if zip_path.suffix == '.partial' and not allow_partial:
+        return {'valid': False, 'error': 'Incomplete backup archive'}
     if not zip_path.exists():
         return {'valid': False, 'error': 'ملف الحزمة غير موجود'}
 
-    temp_inspect_dir = get_backup_dir() / f"_inspect_{uuid.uuid4().hex[:8]}"
+    temp_inspect_dir = get_backup_dir() / f"_inspect_{uuid.uuid4().hex}"
+    inspect_created = False
     try:
         if not zipfile.is_zipfile(zip_path):
             return {'valid': False, 'error': 'الملف ليس حزمة ZIP صالحة'}
 
         with zipfile.ZipFile(zip_path, 'r') as zf:
+            backup_persistent_files.safe_members(zf)
             namelist = zf.namelist()
+            if 'database/papers.db-wal' in namelist and zf.getinfo('database/papers.db-wal').file_size:
+                return {'valid': False, 'error': 'Unverified database WAL is not permitted in a backup'}
             if 'manifest.json' not in namelist:
                 return {'valid': False, 'error': 'البيان الوصفي manifest.json مفقود من الحزمة'}
 
@@ -628,12 +694,21 @@ def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str]
                 manifest = json.loads(manifest_bytes.decode('utf-8'))
             except Exception as e:
                 return {'valid': False, 'error': f"فشل قراءة وفك ترميز manifest.json: {e}"}
+            allowed={'manifest.json','database/papers.db','database/papers.db-wal','database/papers.db-shm'}
+            for component in manifest.get('components',[]):
+                if component.get('file_name'):allowed.add(component['file_name'].replace('\\','/'))
+                for item in component.get('files',[]):
+                    if item.get('file_name'):allowed.add(item['file_name'].replace('\\','/'))
+            for entry in zf.infolist():
+                if not entry.is_dir() and entry.filename.replace('\\','/') not in allowed:
+                    return {'valid':False,'error':'Backup contains an unlisted file'}
 
             # فحص قاعدة البيانات في مجلد مؤقت للقراءة فقط
-            temp_inspect_dir.mkdir(parents=True, exist_ok=True)
+            temp_inspect_dir.mkdir(parents=False, exist_ok=False)
+            inspect_created = True
             extracted_db_path = temp_inspect_dir / 'papers.db'
-            with open(extracted_db_path, 'wb') as f:
-                f.write(zf.read('database/papers.db'))
+            with zf.open('database/papers.db') as source, open(extracted_db_path, 'wb') as f:
+                shutil.copyfileobj(source, f, length=1024*1024)
 
             # مطابقة الهاش
             computed_db_hash, db_size = integrity_service.compute_stream_sha256(extracted_db_path)
@@ -668,11 +743,22 @@ def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str]
                     return {'valid': False, 'error': f"جداول أساسية مفقودة من قاعدة البيانات: {missing_tables}"}
             finally:
                 db_conn.close()
+            backup_persistent_files.validate_references(extracted_db_path, manifest)
 
             # فحص ومطابقة سلامة ملفات الأبحاث والمراجع المرفقة داخل الحزمة مقابل البيان
             import hashlib
             norm_namelist = {n.replace('\\', '/'): n for n in namelist}
             for comp in manifest.get('components', []):
+                component_name=comp.get('file_name','').replace('\\','/')
+                if component_name and comp.get('sha256'):
+                    if component_name not in norm_namelist:
+                        return {'valid':False,'error':f'Missing component: {component_name}'}
+                    component_hash=hashlib.sha256();component_size=0
+                    with zf.open(norm_namelist[component_name]) as source:
+                        for block in iter(lambda:source.read(1024*1024),b''):
+                            component_hash.update(block);component_size+=len(block)
+                    if component_hash.hexdigest().lower()!=comp['sha256'].lower() or component_size!=comp.get('size_bytes'):
+                        return {'valid':False,'error':f'Component integrity mismatch: {component_name}'}
                 for file_meta in comp.get('files', []):
                     f_name = file_meta.get('file_name', '')
                     f_name = f_name.replace('\\', '/') if f_name else ''
@@ -686,15 +772,19 @@ def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str]
                         }
 
                     actual_zip_entry = norm_namelist[f_name]
-                    file_bytes = zf.read(actual_zip_entry)
-                    if expected_size and len(file_bytes) != expected_size:
+                    actual_hash_obj = hashlib.sha256()
+                    actual_size = 0
+                    with zf.open(actual_zip_entry) as source:
+                        for block in iter(lambda: source.read(1024*1024), b''):
+                            actual_hash_obj.update(block); actual_size += len(block)
+                    if expected_size is not None and actual_size != expected_size:
                         return {
                             'valid': False,
-                            'error': f"حجم الملف المرفق «{f_name}» غير مطابق للبيان (فعلي: {len(file_bytes)}، متوقع: {expected_size})"
+                            'error': f"حجم الملف المرفق «{f_name}» غير مطابق للبيان (فعلي: {actual_size}، متوقع: {expected_size})"
                         }
 
                     if expected_hash:
-                        actual_hash = hashlib.sha256(file_bytes).hexdigest()
+                        actual_hash = actual_hash_obj.hexdigest()
                         if actual_hash.lower() != expected_hash.lower():
                             return {
                                 'valid': False,
@@ -717,8 +807,8 @@ def validate_backup_package_file(zip_path: Path, expected_db_hash: Optional[str]
     except Exception as e:
         return {'valid': False, 'error': f"خطأ أثناء التحقق: {str(e)}"}
     finally:
-        if temp_inspect_dir.exists():
-            shutil.rmtree(temp_inspect_dir, ignore_errors=True)
+        if inspect_created and temp_inspect_dir.exists():
+            _remove_owned_directory(temp_inspect_dir,get_backup_dir())
 
 
 # ─── 4. الاستعادة والتعافي الآمن (Safe Restore & Rollback) ─────────────────────
@@ -756,7 +846,11 @@ def restore_institutional_backup(
         raise RuntimeError("توجد عملية استعادة أخرى قيد التنفيذ حالياً على مستوى النظام (Cross-Process Lock). يرجى الانتظار.")
 
     safety_backup_id = None
-    staging_restore_dir = get_backup_dir() / f"_staging_restore_{uuid.uuid4().hex[:8]}"
+    staging_restore_dir = get_backup_dir() / f"_staging_restore_{uuid.uuid4().hex}"
+    restore_staging_created = False
+    restored_sources_dir = None
+    created_restore_paths = []
+    database_touched = False
 
     try:
         # 1. التحقق المسبق من سلامة النسخة
@@ -791,21 +885,24 @@ def restore_institutional_backup(
 
         # 4. فك الحزمة إلى مجلد عزل مؤقت
         entry = backup_repo.get_backup_entry(clean_id)
-        zip_path = Path(entry['file_path']) if entry and entry.get('file_path') else get_backup_dir() / f"{clean_id}_full.zip"
-        if not zip_path.exists():
-            candidates = list(get_backup_dir().glob(f"{clean_id}*.zip"))
-            if candidates:
-                zip_path = candidates[0]
-            else:
-                raise FileNotFoundError(f"ملف النسخة الاحتياطية غير موجود: {zip_path}")
+        zip_path = _locate_backup_path(clean_id,entry)
+        if zip_path is None:raise FileNotFoundError('Backup archive is unavailable in the configured backup directory')
 
-        staging_restore_dir.mkdir(parents=True, exist_ok=True)
+        staging_restore_dir.mkdir(parents=False, exist_ok=False)
+        restore_staging_created = True
         with zipfile.ZipFile(zip_path, 'r') as zf:
+            backup_persistent_files.safe_members(zf)
             zf.extractall(staging_restore_dir)
+        # Empty legacy WAL/SHM files are not part of the verified DB snapshot.
+        for suffix in ('-wal','-shm'):
+            (staging_restore_dir/'database'/('papers.db'+suffix)).unlink(missing_ok=True)
 
         staged_db = staging_restore_dir / 'database' / 'papers.db'
         if not staged_db.exists():
             raise FileNotFoundError("ملف database/papers.db مفقود داخل حزمة الاستعادة")
+
+        restored_sources_dir = Path(config.STORAGE_ROOT) / 'restored_backup_files' / uuid.uuid4().hex
+        backup_persistent_files.rebase_staged_database(staged_db, staging_restore_dir, restored_sources_dir, created_restore_paths)
 
         # 5. إغلاق اتصالات SQLAlchemy المحرك الحالي
         base_repo.engine.dispose()
@@ -815,6 +912,7 @@ def restore_institutional_backup(
         src_conn = sqlite3.connect(str(staged_db), timeout=30.0)
         dst_conn = sqlite3.connect(str(live_db), timeout=30.0)
         try:
+            database_touched = True
             src_conn.backup(dst_conn)
         finally:
             src_conn.close()
@@ -823,13 +921,8 @@ def restore_institutional_backup(
         base_repo.engine.dispose()
 
         # 7. استبدال ملفات الأبحاث
-        staged_research = staging_restore_dir / 'research_files'
-        live_uploads = config.TEMP_UPLOAD_DIR
-        if staged_research.exists() and live_uploads:
-            live_uploads.mkdir(parents=True, exist_ok=True)
-            for item in staged_research.glob('*'):
-                if item.is_file():
-                    shutil.copy2(item, live_uploads / item.name)
+        # All referenced originals were copied into a unique destination above;
+        # never overwrite existing uploads while restoring.
 
         # 8. التحقق بعد الاستعادة
         post_conn = sqlite3.connect(str(live_db), timeout=10.0)
@@ -872,6 +965,14 @@ def restore_institutional_backup(
                     checksum=safety_backup.get('checksum', '')
                 )
 
+        # The restored snapshot may contain the old machine's catalog path and
+        # a 'creating' record captured before publication; relocate this entry.
+        from app.models.backup_schema import BackupCatalog
+        with base_repo.get_session() as session:
+            record=session.query(BackupCatalog).filter_by(backup_identifier=clean_id).first()
+            if record:
+                record.file_path=str(zip_path);record.file_name=zip_path.name
+                record.checksum,record.size_bytes=integrity_service.compute_stream_sha256(zip_path)
         backup_repo.mark_backup_restored(clean_id)
         audit_service.record_event(
             action="backup.restore_completed",
@@ -898,8 +999,8 @@ def restore_institutional_backup(
     except Exception as e:
         logger.error(f"خطأ حرج أثناء استعادة النسخة {clean_id}: {e}", exc_info=True)
         # تنفيذ التراجع التلقائي إلى نسخة الأمان (Rollback)
-        rollback_success = False
-        if safety_backup_id:
+        rollback_success = not database_touched
+        if safety_backup_id and database_touched:
             logger.warning(f"جاري التراجع التلقائي (Rollback) إلى نسخة الأمان: {safety_backup_id}...")
             try:
                 _rollback_to_safety_backup(safety_backup_id)
@@ -907,6 +1008,11 @@ def restore_institutional_backup(
                 logger.info(f"اكتمل التراجع التلقائي إلى {safety_backup_id} بنجاح.")
             except Exception as rb_err:
                 logger.critical(f"فشل التراجع التلقائي: {rb_err}", exc_info=True)
+        if restored_sources_dir in created_restore_paths and restored_sources_dir.exists() and (not database_touched or rollback_success):
+            safe_root = (Path(config.STORAGE_ROOT) / 'restored_backup_files').resolve()
+            target = restored_sources_dir.resolve()
+            if target.parent == safe_root:
+                _remove_owned_directory(restored_sources_dir,safe_root)
 
         audit_service.record_event(
             action="backup.restore_failed",
@@ -926,8 +1032,8 @@ def restore_institutional_backup(
         raise RuntimeError(f"فشلت الاستعادة: {str(e)} (حالة التراجع التلقائي: {'تم بنجاح' if rollback_success else 'فشل'})")
 
     finally:
-        if staging_restore_dir.exists():
-            shutil.rmtree(staging_restore_dir, ignore_errors=True)
+        if restore_staging_created and staging_restore_dir.exists():
+            _remove_owned_directory(staging_restore_dir,get_backup_dir())
         cross_lock.release()
         _RESTORE_MUTEX.release()
 
@@ -943,10 +1049,11 @@ def _rollback_to_safety_backup(safety_backup_id: str) -> None:
         else:
             raise FileNotFoundError(f"ملف نسخة الأمان مفقود: {zip_path}")
 
-    temp_rb = get_backup_dir() / f"_rb_{uuid.uuid4().hex[:6]}"
-    temp_rb.mkdir(parents=True, exist_ok=True)
+    temp_rb = get_backup_dir() / f"_rb_{uuid.uuid4().hex}"
+    temp_rb.mkdir(parents=False, exist_ok=False)
     try:
         with zipfile.ZipFile(zip_path, 'r') as zf:
+            backup_persistent_files.safe_members(zf)
             zf.extractall(temp_rb)
 
         staged_db = temp_rb / 'database' / 'papers.db'
@@ -970,7 +1077,7 @@ def _rollback_to_safety_backup(safety_backup_id: str) -> None:
             base_repo.engine.dispose()
     finally:
         if temp_rb.exists():
-            shutil.rmtree(temp_rb, ignore_errors=True)
+            _remove_owned_directory(temp_rb,get_backup_dir())
 
 
 # ─── 5. سياسة مدة الحفظ (Retention Management) ───────────────────────────────

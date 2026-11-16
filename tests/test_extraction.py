@@ -115,6 +115,48 @@ def test_identical_page_uses_persistent_ocr_cache(tmp_path, monkeypatch):
     assert len(list((tmp_path / 'ocr-cache').glob('*.json'))) == 1
 
 
+def test_fast_and_accurate_ocr_use_separate_cache_entries(tmp_path, monkeypatch):
+    from PIL import Image
+    from plagiarism_detector.extraction import ocr_engine
+
+    class DummyLock:
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def acquire(self, *args, **kwargs):
+            return True
+
+        def release(self):
+            pass
+
+    calls = []
+
+    monkeypatch.setattr(config, 'OCR_CACHE_ENABLED', True)
+    monkeypatch.setattr(config, 'OCR_CACHE_DIR', tmp_path / 'ocr-cache')
+    monkeypatch.setattr(
+        ocr_engine,
+        'check_ocr_availability',
+        lambda mode='accurate': {
+            'available': True,
+            'has_arabic': True,
+            'cmd_path': 'tesseract',
+            'tessdata_path': str(tmp_path / mode),
+        },
+    )
+    monkeypatch.setattr(ocr_engine, 'CrossProcessOcrLock', DummyLock)
+    monkeypatch.setattr(
+        'pytesseract.image_to_string',
+        lambda *args, **kwargs: calls.append(kwargs['config']) or 'نص عربي',
+    )
+
+    image = Image.new('L', (120, 80), color=255)
+    ocr_engine.ocr_page_pixmap(image, ocr_mode='accurate')
+    ocr_engine.ocr_page_pixmap(image, ocr_mode='fast')
+
+    assert len(calls) == 2
+    assert len(list((tmp_path / 'ocr-cache').glob('*.json'))) == 2
+
+
 def test_corrupt_legacy_arabic_text_layer_requires_ocr():
     corrupted = "\ufffd\x1b الدراساتå الأمنية والقانونية والعلوم العربية المستخرجة من طبقة نص قديمة غير سليمة إطلاقاً"
     needs_ocr, reason = pdf_text_needs_ocr(corrupted)
@@ -152,6 +194,11 @@ def test_bundled_arabic_and_english_ocr_models_exist():
     assert tessdata_dir is not None
     assert (tessdata_dir / 'ara.traineddata').is_file()
     assert (tessdata_dir / 'eng.traineddata').is_file()
+
+    fast_tessdata_dir = find_tessdata_dir('fast')
+    assert fast_tessdata_dir is not None
+    assert (fast_tessdata_dir / 'ara.traineddata').is_file()
+    assert (fast_tessdata_dir / 'eng.traineddata').is_file()
 
 
 def test_clean_alternative_pdf_layer_skips_expensive_ocr():
@@ -222,6 +269,34 @@ def test_identical_pdf_reuses_full_extraction_cache(tmp_path, monkeypatch):
 
     assert second == first
     assert updates == [(1, 1, 1)]
+
+
+def test_pdf_extraction_cache_is_separated_by_ocr_mode(tmp_path, monkeypatch):
+    import fitz
+    from plagiarism_detector.extraction import page_extractor
+
+    pdf_path = tmp_path / 'mode-specific-cache.pdf'
+    document = fitz.open()
+    document.new_page().insert_text(
+        (72, 72),
+        'Searchable document content used to verify OCR profile cache isolation',
+    )
+    document.save(pdf_path)
+    document.close()
+
+    cache_dir = tmp_path / 'pdf-extraction-cache'
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_ENABLED', True)
+    monkeypatch.setattr(config, 'PDF_EXTRACTION_CACHE_DIR', cache_dir)
+
+    accurate = page_extractor.extract_document_pages(
+        str(pdf_path), enable_ocr=False, ocr_mode='accurate'
+    )
+    fast = page_extractor.extract_document_pages(
+        str(pdf_path), enable_ocr=False, ocr_mode='fast'
+    )
+
+    assert accurate == fast
+    assert len(list(cache_dir.glob('*.json'))) == 2
 
 
 def test_pdf_extraction_cache_invalidates_when_file_changes(tmp_path, monkeypatch):

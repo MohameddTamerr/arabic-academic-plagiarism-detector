@@ -208,6 +208,39 @@ def check_unit_access(user: Optional[dict], target_department: Optional[str]) ->
     return user_dept == target_dept
 
 
+def scan_owner_scope(user: dict):
+    """Return a username subquery for scans whose authenticated owner is visible."""
+    from sqlalchemy import func, select
+    from app.models.schema import User
+
+    role = normalize_role(user.get('role', ''))
+    if role in (Role.SYSTEM_ADMIN, Role.LEGACY_ADMIN):
+        return None
+
+    usernames = select(User.username)
+    if role == Role.DATA_ENTRY:
+        return usernames.where(User.username == user['username'])
+
+    department = (user.get('department') or '').strip().lower()
+    if department and department not in ('عام', 'general', 'all'):
+        owner_department = func.lower(func.trim(func.coalesce(User.department, '')))
+        usernames = usernames.where(owner_department.in_((department, '', 'عام', 'general', 'all', 'default')))
+    return usernames
+
+
+def can_view_scan_owner(user: dict, username: str | None) -> bool:
+    from app.models.schema import User
+    from app.repositories.base_repo import get_session
+
+    scope = scan_owner_scope(user)
+    if scope is None:
+        return True
+    if not username:
+        return False
+    with get_session() as session:
+        return session.execute(scope.where(User.username == username)).scalar_one_or_none() is not None
+
+
 def can_view_research(user: Any, research: Optional[dict] = None) -> bool:
     """
     التحقق من صلاحية استعراض البحث وفق سياسة نطاق البيانات المؤسسية (Data Scoping).

@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "origin": "DEVELOPER_SYNTHETIC_MANUALLY_ADJUDICATED",
+  "offset_policy": "Raw character offsets are provided only for contiguous raw lexical text. Token-range selectors are ground truth for normalized/reordered lexical correspondence; semantic-only cases deliberately have no lexical span.",
+  "labels": [
+    {"case_id":"B01-exact","kind":"raw_lexical","expected_spans_from_case":true},
+    {"case_id":"B02-partial","kind":"raw_lexical","expected_spans_from_case":true},
+    {"case_id":"B03-normalization","kind":"normalized_lexical","source_id":"SRC-DIG-01","source_token_selector":"ALL","suspicious_token_selector":"ALL"},
+    {"case_id":"B04-diacritic-hamza","kind":"normalized_lexical","source_id":"SRC-CYBER-01","source_token_selector":"ALL","suspicious_token_selector":"ALL"},
+    {"case_id":"B05-word-substitution","kind":"partial_lexical","source_id":"SRC-CYBER-01","source_token_range":[2,7],"suspicious_token_range":[2,7]},
+    {"case_id":"B06-sentence-restructure","kind":"reordered_lexical","source_id":"SRC-SEC-01","note":"Only contiguous blocks of at least two normalized tokens are eligible; unmatched syntactic additions are excluded."},
+    {"case_id":"B07-paragraph-reorder","kind":"multi_source_lexical","source_ids":["SRC-METHOD-01","SRC-EDU-01"],"expected_spans_from_case":true},
+    {"case_id":"B08-semantic","kind":"semantic_only","source_id":"SRC-SEC-01","expected_lexical_spans":[]},
+    {"case_id":"B09-multiple-sources","kind":"multi_source_partial_lexical","source_ids":["SRC-HEALTH-01","SRC-ENV-01"],"note":"No raw-contiguous offsets are claimed for synonym substitutions."},
+    {"case_id":"B12-bibliography","kind":"excluded_structure","expected_lexical_spans":[]},
+    {"case_id":"B13-ocr-noise","kind":"normalized_lexical","source_id":"SRC-CYBER-01","source_token_selector":"ALL","suspicious_token_selector":"ALL"},
+    {"case_id":"B14-unrelated","kind":"negative","expected_lexical_spans":[]},
+    {"case_id":"B15-shared-terms","kind":"negative","expected_lexical_spans":[]}
+  ]
+}

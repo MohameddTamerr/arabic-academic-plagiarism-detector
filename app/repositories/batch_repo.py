@@ -435,6 +435,11 @@ def get_batch_item_report_id(batch_id: str, research_id: int) -> Optional[str]:
         return item.report_id if item else None
 
 
+def get_batch_owner(batch_id: str) -> Optional[str]:
+    with get_session() as session:
+        return session.query(ScanBatch.created_by).filter(ScanBatch.id == batch_id).scalar()
+
+
 def get_recent_batches(limit: int = 10) -> list[dict]:
     """استرجاع أحدث الدفعات للعرض في لوحة التحكم."""
     with get_session() as session:
@@ -472,7 +477,8 @@ def search_researches(
     limit: int = 25,
     user_scope_username: Optional[str] = None,
     after_id: Optional[int] = None,
-    before_id: Optional[int] = None
+    before_id: Optional[int] = None,
+    owner_scope=None,
 ) -> tuple[list[dict], int]:
     """
     استعلام وبحث مقسم ومحسن للأبحاث والرسائل:
@@ -491,6 +497,8 @@ def search_researches(
         # 1. تقييد الصلاحيات ونطاق البيانات للمستخدم إن وجد
         if user_scope_username:
             q = q.filter(Research.created_by == user_scope_username)
+        if owner_scope is not None:
+            q = q.filter(Research.created_by.in_(owner_scope))
 
         # 2. الفلترة بحالة الفحص وحالة التحكيم
         if scan_status and scan_status != 'all':
@@ -617,7 +625,8 @@ def search_batches(
     sort_field: str = 'created_at',
     order_direction: str = 'desc',
     offset: int = 0,
-    limit: int = 25
+    limit: int = 25,
+    owner_scope=None,
 ) -> tuple[list[dict], int]:
     """استعلام مقسم ومحسن لدفعات الفحص."""
     from app.utils.search_normalizer import normalize_search_query
@@ -625,6 +634,8 @@ def search_batches(
 
     with get_session() as session:
         q = session.query(ScanBatch)
+        if owner_scope is not None:
+            q = q.filter(ScanBatch.created_by.in_(owner_scope))
 
         if status and status != 'all':
             q = q.filter(ScanBatch.status == status)

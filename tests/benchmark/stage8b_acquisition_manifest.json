@@ -1,0 +1,42 @@
+[
+  {
+    "dataset_id": "genaidetect-academic-essay-arabic",
+    "title": "GenAI Content Detection Task 2 Arabic Academic Essay data",
+    "version": "2025-shared-task",
+    "publisher": "GenAI Content Detection shared-task organizers",
+    "source_url": "https://github.com/belgats/gen-ai-detection",
+    "license_identifier": "shared-task agreement; redistribution not established",
+    "license_permission": false,
+    "acquisition_status": "APPROVAL_REQUIRED"
+  },
+  {
+    "dataset_id": "kfupm-arabic-ai-fingerprint",
+    "title": "Arabic AI Fingerprint academic abstracts and social-media data",
+    "version": "repository-main-observed-2026-10-09",
+    "publisher": "SDAIA-KFUPM Joint Research Center for AI",
+    "source_url": "https://github.com/KFUPM-JRCAI/arabic-text-detection",
+    "license_identifier": "repository MIT; dataset-specific grant not established",
+    "license_permission": false,
+    "acquisition_status": "APPROVAL_REQUIRED"
+  },
+  {
+    "dataset_id": "ar-apt",
+    "title": "Ar-APT Arabic AI polish text",
+    "version": "repository-main-observed-2026-10-09",
+    "publisher": "Saleh Almohaimeed",
+    "source_url": "https://github.com/Saleh-Almohaimeed/Ar-APT",
+    "license_identifier": "no dataset license observed",
+    "license_permission": false,
+    "acquisition_status": "REJECTED"
+  },
+  {
+    "dataset_id": "multitude-arabic",
+    "title": "MULTITuDE Arabic subset",
+    "version": "Zenodo 10.5281/zenodo.10013755",
+    "publisher": "MULTITuDE authors / Zenodo",
+    "source_url": "https://zenodo.org/records/10013755",
+    "license_identifier": "Zenodo v1 files restricted; research-only access requires approval and institutional email, no resharing; third-party rights remain user's responsibility",
+    "license_permission": false,
+    "acquisition_status": "APPROVAL_REQUIRED"
+  }
+]

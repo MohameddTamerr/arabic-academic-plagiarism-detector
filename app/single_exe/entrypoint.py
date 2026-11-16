@@ -75,7 +75,7 @@ if bundle_path and bundle_path not in sys.path:
     sys.path.insert(0, bundle_path)
 
 import config
-from app.single_exe.app_controller import AppController, is_port_in_use
+from app.single_exe.app_controller import AppController, is_port_in_use, configured_worker_count
 
 
 def main():
@@ -90,7 +90,7 @@ def main():
                 pass
     host = os.environ.get('HOST', '0.0.0.0')
 
-    controller = AppController(host=host, port=port, num_workers=2)
+    controller = AppController(host=host, port=port, num_workers=configured_worker_count())
 
     # 1. فحص النسخة المكررة (Single Instance Check)
     if controller.check_single_instance():
@@ -159,7 +159,7 @@ def main():
             from app.single_exe.gui_controller import ControlCenterGUI
             from app.single_exe.tray_controller import TrayController
 
-            gui = ControlCenterGUI(controller, start_hidden=True)
+            gui = ControlCenterGUI(controller, start_hidden='--show-console' not in sys.argv)
             tray = TrayController(controller, gui)
             tray.start()
             gui.run()  # blocks until Tkinter mainloop exits
@@ -177,7 +177,12 @@ def main():
 
     def handle_exit(sig, frame):
         print("\nStopping system...")
-        controller.stop()
+        try:
+            controller.stop()
+        except Exception as exc:
+            print(f"Shutdown incomplete: {controller.shutdown_detail or exc}")
+            print('Outstanding work remains alive. Retry Ctrl+C after it finishes.')
+            return
         sys.exit(0)
 
     try:
@@ -187,7 +192,7 @@ def main():
         pass
 
     try:
-        while controller.is_running:
+        while controller.is_running or controller.shutdown_status in ('draining', 'incomplete'):
             time.sleep(1)
     except KeyboardInterrupt:
         handle_exit(None, None)

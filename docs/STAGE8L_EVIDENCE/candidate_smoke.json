@@ -1,0 +1,27 @@
+{
+  "pid": 7020,
+  "ready": true,
+  "port": 5087,
+  "data": "C:\\Users\\user\\Downloads\\Baba\\scratch\\stage8l\\candidate_trial_data",
+  "scope": "development host, isolated candidate, not 4GB acceptance",
+  "ready_seconds": 52.22277100000065,
+  "exit_before_stop": null,
+  "process_tree": [
+    {
+      "pid": 7020,
+      "rss": 10108928,
+      "private": 2482176
+    },
+    {
+      "pid": 17284,
+      "rss": 220536832,
+      "private": 244449280
+    },
+    {
+      "pid": 5376,
+      "rss": 116150272,
+      "private": 163201024
+    }
+  ],
+  "shutdown": "forced termination of test-owned processes; graceful shutdown untested"
+}

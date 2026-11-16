@@ -112,7 +112,12 @@ def test_thesis_single_pdf(app_client, temp_sample_files):
             'degree_type': 'ماجستير',
             'created_by': 'المختبر'
         }
-        res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
+        # This endpoint test asserts request persistence and scheduling, not the
+        # asynchronous scan implementation.  Letting its background worker run
+        # past the temporary-file fixture tears down the fixture underneath the
+        # worker and can invoke the real Word COM server during unrelated tests.
+        with patch('app.routes.batch_routes.start_thesis_scan', return_value='scheduled-single-pdf'):
+            res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
 
     assert res.status_code == 202
     res_data = res.get_json()
@@ -144,7 +149,8 @@ def test_thesis_three_pdfs(app_client, temp_sample_files):
             'degree_type': 'دكتوراه',
             'created_by': 'المختبر'
         }
-        res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
+        with patch('app.routes.batch_routes.start_thesis_scan', return_value='scheduled-three-pdfs'):
+            res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
 
     assert res.status_code == 202
     res_data = res.get_json()
@@ -170,7 +176,8 @@ def test_thesis_mixed_pdf_and_docx(app_client, temp_sample_files):
             'author': 'خالد إبراهيم',
             'created_by': 'المختبر'
         }
-        res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
+        with patch('app.routes.batch_routes.start_thesis_scan', return_value='scheduled-mixed-files'):
+            res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
 
     assert res.status_code == 202
     res_data = res.get_json()
@@ -197,7 +204,8 @@ def test_thesis_custom_file_ordering(app_client, temp_sample_files):
             'author': 'عمر سالم',
             'created_by': 'المختبر'
         }
-        res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
+        with patch('app.routes.batch_routes.start_thesis_scan', return_value='scheduled-custom-order'):
+            res = app_client.post('/api/batch/thesis', data=data, content_type='multipart/form-data')
 
     assert res.status_code == 202
     res_data = res.get_json()
@@ -235,7 +243,7 @@ def test_thesis_provenance_and_attribution(app_client, temp_sample_files):
         return mock_pages_pdf
 
     try:
-        with patch('app.services.scan_service.extract_document_pages', side_effect=_mock_extract_side_effect):
+        with patch('app.services.scan_service.extract_document_pages', side_effect=_mock_extract_side_effect) as extract_mock:
             research_id = batch_repo.create_research(title='بحث العزو', author='باحث تجريبي')
             for idx, fe in enumerate(file_entries):
                 batch_repo.add_research_file(
@@ -265,14 +273,22 @@ def test_thesis_provenance_and_attribution(app_client, temp_sample_files):
             # تحقق من التقرير المحفوظ
             report = report_repo.get_report(research['report_id'])
             assert report is not None
+            assert extract_mock.call_count == len(file_entries)
+            assert report['ai_analysis']['status'] == 'unavailable'
+            assert 'overall_pct' in report
             assert report['file_count'] == 2
             assert 'الفصل_الأول.pdf' in report['file_names']
             assert 'الفصل_الثاني.docx' in report['file_names']
     finally:
         if 'research_id' in locals():
             with get_session() as session:
+                from sqlalchemy import text
+                created_research = session.query(Research).filter(Research.id == research_id).first()
+                created_report_id = created_research.report_id if created_research else None
                 session.query(ResearchFile).filter(ResearchFile.research_id == research_id).delete()
                 session.query(Research).filter(Research.id == research_id).delete()
+                if created_report_id:
+                    session.execute(text('DELETE FROM reports WHERE id = :id'), {'id': created_report_id})
 
 
 # ─── 6. Three independent researches in one batch ─────────────────────────────

@@ -1,0 +1,24 @@
+{
+  "num_samples": 80,
+  "fp32_vs_eager_max_diff": 5.125999450683594e-06,
+  "fp32_vs_eager_label_agreement": 100.0,
+  "onnx_int8_vs_jit_int8": {
+    "label_agreement_pct": 98.75,
+    "mean_probability_diff": 0.043519098311662674,
+    "max_probability_diff": 0.24528861045837402
+  },
+  "onnx_int8_vs_eager": {
+    "label_agreement_pct": 97.5,
+    "mean_probability_diff": 0.011849273927509785,
+    "max_probability_diff": 0.12628203630447388
+  },
+  "latency_ms": {
+    "torchscript_int8": 61.27,
+    "onnxruntime_int8": 48.39,
+    "speedup": 1.27
+  },
+  "file_sizes_mb": {
+    "torchscript_int8": 271.6,
+    "onnx_int8": 130.12
+  }
+}

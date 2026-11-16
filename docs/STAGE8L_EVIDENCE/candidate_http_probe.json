@@ -1,0 +1,32 @@
+{
+  "scope": "development host; normal auth, isolated candidate data",
+  "checks": {
+    "browser_http_status": 200,
+    "setup_status": 200,
+    "login_status": 200,
+    "digital.pdf": {
+      "status": 200,
+      "seconds": 3.7387909999815747,
+      "error_code": null,
+      "ai_status": "unavailable",
+      "report_id": null
+    },
+    "document.docx": {
+      "status": 200,
+      "seconds": 2.4365944000310265,
+      "error_code": null,
+      "ai_status": "unavailable",
+      "report_id": null
+    },
+    "scanned.pdf": {
+      "status": 200,
+      "seconds": 1.243845599994529,
+      "error_code": null,
+      "ai_status": "unavailable",
+      "report_id": null
+    },
+    "backup_status": 200
+  },
+  "ready_seconds": 32.158842300006654,
+  "shutdown": "forced test-owned processes; graceful shutdown not tested"
+}

@@ -1,0 +1,78 @@
+{
+  "runs": [
+    [
+      10,
+      15.483,
+      52.0,
+      null
+    ],
+    [
+      50,
+      14.7,
+      52.0,
+      null
+    ],
+    [
+      100,
+      27.692,
+      52.0,
+      null
+    ],
+    [
+      "synthetic.docx",
+      9.691,
+      94.7,
+      null
+    ],
+    [
+      "synthetic-scanned.pdf",
+      2.988,
+      100.0,
+      null
+    ],
+    [
+      "repeat-1.docx",
+      7.415,
+      94.7,
+      null
+    ],
+    [
+      "repeat-2.docx",
+      10.25,
+      94.7,
+      null
+    ],
+    [
+      "repeat.pdf",
+      2.731,
+      52.0,
+      null
+    ],
+    [
+      "injected missing research package",
+      0.751,
+      52.0,
+      "FileNotFoundError: injected missing research package"
+    ]
+  ],
+  "peak_rss": 1988321280,
+  "peak_private": 2579173376,
+  "cleanup_rss": 1665937408,
+  "cleanup_private": 2266906624,
+  "host_elapsed": 114.37409960001241,
+  "min_available": 7369064448,
+  "peak_commit": 43798241280,
+  "min_commit_limit": 50607497216,
+  "cpu": 61.6,
+  "paging_current": true,
+  "monitor_exit_before_stop": null,
+  "paging_samples": 111,
+  "pages_in_max": 8665.644978245466,
+  "pages_out_max": 0.0,
+  "paging_usage_range": [
+    6.2925110884541615,
+    6.293152788544765
+  ],
+  "csv_first": "11/06/2026 11:12:38.018",
+  "csv_last": "11/06/2026 11:14:29.488"
+}

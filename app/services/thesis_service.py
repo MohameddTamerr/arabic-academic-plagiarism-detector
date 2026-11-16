@@ -21,6 +21,7 @@ from app.repositories import thesis_repo, report_repo, base_repo
 from app.models.schema import LegacyReport, Document
 from app.services import audit_service, job_queue_service, report_integrity_service
 from app.services.job_queue_service import JobType
+from plagiarism_detector.ai_detection.analysis import public_ai_analysis
 from plagiarism_detector.reporting.report_builder import analyze_academic_document
 from app.services.self_match_service import reference_ids_for_work
 from plagiarism_detector.extraction.page_extractor import extract_document_pages
@@ -317,6 +318,7 @@ def generate_combined_thesis_report(
             'problematic_words': p_prob,
             'overall_pct': rep.get('overall_pct', 0.0),
             'problematic_pct': rep.get('problematic_pct', 0.0),
+            'ai_analysis': public_ai_analysis(rep.get('ai_analysis')),
             'settings_used': rep.get('settings_snapshot', {})
         })
 
@@ -408,13 +410,21 @@ def generate_combined_thesis_report(
     else:
         new_rev = 1
 
-    is_complete_thesis = (len(incomplete_parts) == 0)
+    is_complete_thesis = not incomplete_parts
+    part_ai_reasons = {part['ai_analysis']['reason'] for part in part_summaries}
+    ai_reason = 'no_validated_model'
+    if 'analysis_error' in part_ai_reasons:
+        ai_reason = 'analysis_error'
+    elif part_ai_reasons == {'disabled'}:
+        ai_reason = 'disabled'
 
     combined_report_dict = {
         'id': new_report_id,
         'title': f"التقرير المجمع — {thesis['title']}",
         'author': thesis['author'],
         'date': now_str,
+        'plagiarism_analysis': {'status': 'completed' if is_complete_thesis else 'partial'},
+        'ai_analysis': public_ai_analysis({'reason': ai_reason}),
         'overall_pct': combined_overall_pct,
         'problematic_pct': combined_problematic_pct,
         'copied_pct': combined_copied_pct,

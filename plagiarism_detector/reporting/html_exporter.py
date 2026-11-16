@@ -22,11 +22,9 @@ def export_report_to_html(report: dict) -> str:
     copied_pct = report.get('copied_pct', 0.0)
     para_pct = report.get('paraphrase_pct', 0.0)
     cited_pct = report.get('cited_pct', 0.0)
-
-    ai_data = report.get('ai_analysis', {})
-    ai_level = html.escape(str(ai_data.get('indicator_level', 'منخفض')))
-    ai_score = ai_data.get('score', 0)
-    ai_warning = html.escape(str(ai_data.get('warning', '')))
+    ai_message = ('غير متاح — تعذر تحليل الكتابة بالذكاء الاصطناعي.'
+                  if (report.get('ai_analysis') or {}).get('reason') == 'analysis_error'
+                  else 'غير متاح — لا يوجد نموذج مدقق.')
 
     sources = report.get('sources', [])
     segments = report.get('segments', [])
@@ -327,10 +325,10 @@ def export_report_to_html(report: dict) -> str:
 
     <!-- مؤشرات الذكاء الاصطناعي -->
     <div class="ai-card">
-        <h3 style="color: #6b21a8; margin-top: 0;">🤖 مؤشرات الأسلوب اللغوي الشبيه بالذكاء الاصطناعي</h3>
-        <p><strong>مستوى المؤشرات:</strong> {ai_level} (الدرجة الاستئناسية: {ai_score} من 100)</p>
+        <h3 style="color: #6b21a8; margin-top: 0;">تحليل الكتابة بالذكاء الاصطناعي</h3>
+        <p>{ai_message}</p>
         <p style="font-size: 12px; color: #6b21a8; background: #f3e8ff; padding: 10px; border-radius: 6px; margin-bottom: 0;">
-            ⚠️ {ai_warning}
+            لا يمكن استنتاج مصدر النص أو نسبة الكتابة بالذكاء الاصطناعي من المؤشرات الأسلوبية.
         </p>
     </div>
 
